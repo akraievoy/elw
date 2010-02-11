@@ -6,7 +6,7 @@ import java.text.*;
 import org.apache.commons.lang.*;
 
 import java.util.*;
-import java.util.logging.*;
+import java.util.logging.Level;
 import java.util.regex.Pattern;
 
 /**
@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
  * @author Anton Kraievoy
  */
 public class Str {
-    private static final Logger log = Logger.getLogger(Str.class.getName());
+    private static final java.util.logging.Logger log = java.util.logging.Logger.getLogger(Str.class.getName());
 
     public static final String DATE_PATTERN = "MM/dd/yyyy";
     public static final String DATE_PATTERN_HOURS = "MM/dd/yyyy hh:mm";
@@ -452,7 +452,10 @@ public class Str {
         }
 
         if (log.isLoggable(Level.FINE)) {
-            log.fine("suggestObjectByName() returning null for searchedName '" + searchedName + "'");
+            log.log(
+                    Level.FINE,
+                    "suggestObjectByName() returning null for searchedName '" + searchedName + "'"
+            );
         }
 
         return null;
@@ -578,5 +581,15 @@ public class Str {
         }
 
         return -1;
+    }
+
+    public static String toPaddedString(final int someNum, final int places) {
+        String taskNumStr= String.valueOf(someNum);
+
+        while (taskNumStr.length() < places) {
+            taskNumStr= "0" + taskNumStr;
+        }
+
+        return taskNumStr;
     }
 }

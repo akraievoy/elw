@@ -81,10 +81,6 @@ public abstract class ClassRegistry {
         }
     }
 
-    /**
-     *  Этот код надо просто скопировать в наследник.
-     *  Package-local классы не грузятся без повторения этого кода в реестре классов пакета.
-     */
     protected Object instantiateInternal(Class implClass) throws InstantiationException, IllegalAccessException {
         return implClass.newInstance();
     }

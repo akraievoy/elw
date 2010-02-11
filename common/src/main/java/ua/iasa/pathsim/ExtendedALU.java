@@ -5,16 +5,16 @@
 package ua.iasa.pathsim;
 
 import java.awt.*;
-import ua.iasa.pathsim.app.ui.DataPath;
+import ua.iasa.pathsim.app.ui.DataPathOld;
 
 class ExtendedALU extends ALU {
 
     private DataLine aluControl, input1, input2, result;
     private DataLine zero;
-    private DataPath parent;
+    private DataPathOld parent;
 
     public ExtendedALU(double x[], double y[], int n, Color color, String label, String name, DataLine aluControl,
-                       DataLine input1, DataLine input2, DataLine result, DataLine zero, DataPath parent) {
+                       DataLine input1, DataLine input2, DataLine result, DataLine zero, DataPathOld parent) {
         super(x, y, n, color, label, name, aluControl, input1, input2, result, zero);
         this.input1 = input1;
         this.input2 = input2;

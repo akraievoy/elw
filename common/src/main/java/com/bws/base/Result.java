@@ -15,13 +15,11 @@ import com.bws.base.utils.*;
 public class Result implements Serializable {
     public static final String OUTSTATE_SUCCESS = "success";
     public static final String OUTSTATE_FAILURE = "failure";
-    public static final String OUTSTATE_DEPENDENT = "dependent";
-    public static final String OUTSTATE_VALIDATION = "validation";
+    public static final String OUTSTATE_DEPENDENTRECORDS = "dependent";
 
     public static final Result SUCCESS = simple(true);
     public static final Result FAILURE = simple(false);
-    public static final Result FAILURE_DEPENDENT = message(OUTSTATE_DEPENDENT, null);
-    public static final Result FAILURE_VALIDATION = message(OUTSTATE_VALIDATION, null);
+    public static final Result DEPENDENT_RECORDS = message(OUTSTATE_DEPENDENTRECORDS, null);
 
     String outState;
     String messageKey;

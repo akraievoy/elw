@@ -1,0 +1,1 @@
+java -cp lib/commons-lang-2.1.jar:lib/tlog4j-1.2.14.jar:lib/transformer.jar:mipsEmu.jar ua.iasa.pathsim.app.ui.DataPath

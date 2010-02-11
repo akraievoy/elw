@@ -3,7 +3,7 @@ package com.bws.base.utils;
 import java.io.*;
 
 import java.util.*;
-import java.util.logging.*;
+import java.util.logging.Level;
 
 /**
  * Cross-module message bundle implementation.
@@ -11,7 +11,7 @@ import java.util.logging.*;
  * @author Anton Kraievoy $Id: Msg.java,v 1.2 2006/12/27 20:31:40 Anton S. Kraievoy Exp $
  */
 public class Msg {
-    private static final Logger log = Logger.getLogger(Msg.class.getName());
+    private static final java.util.logging.Logger log = java.util.logging.Logger.getLogger(Msg.class.getName());
     protected static final String BUNDLES_CHARSET = "UTF-8";
 
     protected static final String[] NAMES = {
@@ -37,10 +37,10 @@ public class Msg {
         try {
             StringWriter mergedProps = new StringWriter();
 
-            for (String name : NAMES) {
-                final InputStream resourceStream = Msg.class.getResourceAsStream(name);
+            for (String aNAMES : NAMES) {
+                final InputStream resourceStream = Msg.class.getResourceAsStream(aNAMES);
                 if (resourceStream == null) {
-                    log.warning(name + " is not in classpath");
+                    log.warning(aNAMES + " is not in classpath");
                     continue;
                 }
                 final InputStreamReader resourceReader = new InputStreamReader(resourceStream, BUNDLES_CHARSET);
@@ -54,7 +54,7 @@ public class Msg {
 
             return new PropertyResourceBundle(new ByteArrayInputStream(mergedProps.toString().getBytes(BUNDLES_CHARSET)));
         } catch (IOException e) {
-            log.log(Level.SEVERE, "createMsg() Error accessing bundle sources: " + e.getMessage(), e);
+            log.log(Level.SEVERE, "Error accessing bundle sources", e);
 
             try {
                 return new PropertyResourceBundle(new ByteArrayInputStream(new byte[0]));

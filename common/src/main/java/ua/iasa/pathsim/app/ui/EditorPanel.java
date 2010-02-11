@@ -4,28 +4,17 @@
  */
 package ua.iasa.pathsim.app.ui;
 
-import javax.swing.*;
 import com.bws.base.swing.GBC;
-import ua.iasa.pathsim.app.*;
 import java.awt.*;
-
-/**
- * TOAK general overview javadoc.
- *
- * @author Anton Kraievoy
- * @version $Id: EditorPanel.java,v 1.1 2006/12/28 11:55:33 Anton S. Kraievoy Exp $
- */
+import javax.swing.*;
 
 public class EditorPanel extends JPanel {
-    protected JTextArea instructionsInput = new JTextArea();
-    protected JTextArea dataInput = new JTextArea();
-    protected JTextArea registersInput = new JTextArea();
+    JTextArea instructionsInput = new JTextArea();
+    JTextArea dataInput = new JTextArea();
+    JTextArea registersInput = new JTextArea();
+    JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 
-    public EditorPanel(Control control) {
-        control.getLoadDataAction().setInput(dataInput);
-        control.getLoadRegistersAction().setRegistersInput(registersInput);
-        control.getAssembleAction().setTextInput(instructionsInput);
-
+    public EditorPanel() {
         setLayout(new GridBagLayout());
 
         final GBC gbc = new GBC();
@@ -37,7 +26,7 @@ public class EditorPanel extends JPanel {
         add(Box.createRigidArea(new Dimension(4,4)), gbc.getVal());
 
         gbc.moveTo(1,1).span(3,1).weight(1,0);
-        add(createButtonsPanel(control), gbc.getVal());
+        add(buttonsPanel, gbc.getVal());
 
         gbc.moveTo(2,0);
         add(Box.createRigidArea(new Dimension(4,4)), gbc.getVal());
@@ -62,14 +51,26 @@ public class EditorPanel extends JPanel {
         setMinimumSize(new Dimension(200, 300));
     }
 
-    protected JPanel createButtonsPanel(Control control) {
-        final JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+    public JTextArea getInstructionsInput() {
+        return instructionsInput;
+    }
 
-        buttonsPanel.add(new JButton(control.getLoadDataAction()));
-        buttonsPanel.add(new JButton(control.getAssembleAction()));
-        buttonsPanel.add(new JButton(control.getLoadRegistersAction()));
+    public JTextArea getDataInput() {
+        return dataInput;
+    }
 
+    public JTextArea getRegistersInput() {
+        return registersInput;
+    }
+
+    public JPanel getButtonsPanel() {
         return buttonsPanel;
+    }
+
+    public void installActions(final AbstractAction[] abstractActions) {
+        for (AbstractAction action : abstractActions) {
+            getButtonsPanel().add(new JButton(action));
+        }
     }
 }
 

@@ -7,13 +7,13 @@ import com.bws.base.ReflectiveConfigurationError;
 import java.lang.reflect.Field;
 
 import java.util.*;
-import java.util.logging.*;
+import java.util.logging.Level;
 
 /**
  * @author Anton Kraievoy
  */
 public class Vm {
-    private static final Logger log = Logger.getLogger(Vm.class.getName());
+    private static final java.util.logging.Logger log = java.util.logging.Logger.getLogger(Vm.class.getName());
 
     private Vm() { /*closed constructor for utility class*/ }
 
@@ -122,4 +122,49 @@ public class Vm {
             return false;
         }
     }
+
+    public static Throwable getRootCause(final Throwable ex) {
+        Throwable exCause = ex;
+        while (exCause.getCause() != null && exCause.getCause() != exCause) {
+            exCause = exCause.getCause();
+        }
+        return exCause;
+    }
+
+    public static String report(final Throwable throwable) {
+        final Throwable cause= getRootCause(throwable);
+        return cause.getClass().getName() + "{" + cause.getMessage() + "}";
+    }
+
+    /** @unchecked Class.newInstance */
+    public static<T> T newInstance(Class<T> klass) {
+        try {
+            return klass.newInstance();
+        } catch (Exception e) {
+            throw Die.criticalConfigError(e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T tryToCreateByName(String className, Class<T> expectedClass) {
+        Object result;
+        try {
+            result= Class.forName(className).newInstance();
+            if (expectedClass.isInstance(result)) {
+                return (T) result;
+            } else {
+                final String message = "loaded " + result.getClass().getName() + " is not instance of " + expectedClass.getName();
+                throw Die.criticalConfigError(message);
+            }
+        } catch (ClassNotFoundException e) {
+            log.info("failed: " + report(e) + " returning null");
+            return null;
+
+        } catch (IllegalAccessException e) {
+            throw Die.criticalConfigError(e);
+        } catch (InstantiationException e) {
+            throw Die.criticalConfigError(e);
+        }
+    }
+
 }

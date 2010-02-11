@@ -4,16 +4,10 @@
  */
 package ua.iasa.pathsim;
 
-import com.bws.base.utils.Str;
+import com.bws.base.utils.*;
+import ua.iasa.pathsim.domain.asm.AssemblyException;
 
 import java.util.*;
-
-/**
- * TOAK general overview javadoc.
- *
- * @author Anton Kraievoy
- * @version $Id: Data.java,v 1.14 2006/12/28 10:38:54 Anton S. Kraievoy Exp $
- */
 
 public class Data {
     public static boolean isHexDigit(char c) {
@@ -197,10 +191,63 @@ public class Data {
                 continue;
             }
 
-            result.add(codeStr.trim().toUpperCase());
+            result.add(codeStr.trim());
         }
 
         return result;
+    }
+
+    public static String uint2bin(final int intValue, final int len, final String varName) throws AssemblyException {
+        Die.ifTrue(len <= 0, "len is not positive: " + len);
+        Die.ifTrue(len > 32, "len exceeds int width: " + len);
+        AssemblyException.ifExceeds(0, intValue, (1 << len) -  1, varName);
+
+        final String binaryString = Integer.toBinaryString(intValue);
+
+        if (binaryString.length() == len) {
+            return binaryString;
+        }
+
+        final StringBuffer binaryBuffer= new StringBuffer(binaryString);
+        while (binaryBuffer.length() < len) {
+            binaryBuffer.insert(0, "0");
+        }
+
+        return binaryBuffer.toString();
+    }
+
+    public static String int2bin(final int intValue, final int len, final String varName) throws AssemblyException {
+        Die.ifTrue(len <= 0, "len is not positive: " + len);
+        Die.ifTrue(len > 32, "len exceeds int width: " + len);
+
+        if (len < 32) {
+            AssemblyException.ifExceeds(-(1 << len - 1), intValue, (1 << len - 1) - 1, varName);
+        }
+
+        final String binaryString = Integer.toBinaryString(intValue);
+
+        if (binaryString.length() > len) {  //  this holds true only for negatives, given validations above work fine
+            return binaryString.substring(binaryString.length() - len);
+        }
+
+        if (binaryString.length() == len) {
+            return binaryString;
+        }
+
+        final StringBuffer binaryBuffer= new StringBuffer(binaryString);
+        while (binaryBuffer.length() < len) {
+            binaryBuffer.insert(0, "0");
+        }
+
+        return binaryBuffer.toString();
+    }
+
+    public static int bin2int(final String binValue) {
+        if (binValue.startsWith("1")) {
+            return (int) (Long.parseLong(binValue, 2) + Integer.MIN_VALUE);
+        }
+
+        return Integer.parseInt(binValue, 2);
     }
 }
 

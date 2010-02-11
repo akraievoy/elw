@@ -8,7 +8,7 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import static ua.iasa.pathsim.Data.hex2int;
-import ua.iasa.pathsim.app.ui.DataPath;
+import ua.iasa.pathsim.app.ui.DataPathOld;
 
 import java.util.Vector;
 
@@ -19,10 +19,10 @@ public class DataPathPanel extends JPanel
     private Vector dataLines, devices;
     private InfoBox floatingInfoBox;
     private int selectedDataLine;
-    private DataPath parent;
+    private DataPathOld parent;
     private boolean overDataLine, overDevice, paintFloatingBox;
 
-    public DataPathPanel(DataPath parent) {
+    public DataPathPanel(DataPathOld parent) {
         this.parent = parent;
         setBackground(Color.lightGray);
         setForeground(Color.black);

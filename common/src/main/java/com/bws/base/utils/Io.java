@@ -5,15 +5,13 @@ package com.bws.base.utils;
 
 import java.io.*;
 
-import java.util.logging.*;
-
 /**
  * Several useful methods for generic IO.
  *
  * @author Anton Kraievoy
  */
 public class Io {
-    private static final Logger log = Logger.getLogger(Io.class.getName());
+    private static final java.util.logging.Logger log = java.util.logging.Logger.getLogger(Io.class.getName());
     /**
      * One day, in millis.
      */
@@ -71,10 +69,9 @@ public class Io {
 
     /**
      * <b>Note</b>: source stream will be automatically closed.
-     * @deprecated due to unsafety related to different character encodings
      */
-    public static String dumpToString(final InputStream sourceStream) throws IOException {
-        final BufferedReader source = new BufferedReader(new InputStreamReader(sourceStream));
+    public static String dumpToString(final InputStream sourceStream, final String encoding) throws IOException {
+        final BufferedReader source = new BufferedReader(new InputStreamReader(sourceStream, encoding));
         final StringWriter result = new StringWriter();
         final BufferedWriter target = new BufferedWriter(result);
 
@@ -84,6 +81,10 @@ public class Io {
         target.close();
 
         return result.toString();
+    }
+
+    public static String dumpToString(final InputStream sourceStream) throws IOException {
+        return dumpToString(sourceStream, System.getProperty("file.encoding"));
     }
 
     /**
@@ -101,10 +102,22 @@ public class Io {
     }
 
     public static void safeClose(final OutputStream target) {
-        try { if (target != null) { target.close(); } } catch (IOException ioe) { log.log(Level.WARNING, "", ioe); }
+        try { if (target != null) { target.close(); } } catch (IOException ioe) { log.warning("safeClose(): " + ioe.getMessage()); }
+    }
+
+    public static void safeClose(final InputStream source) {
+        try { if (source != null) { source.close(); } } catch (IOException ioe) { log.warning("safeClose(): " + ioe.getMessage()); }
     }
 
     public static void safeClose(final BufferedInputStream source) {
-        try { if (source != null) { source.close(); } } catch (IOException ioe) { log.log(Level.WARNING, "", ioe); }
+        try { if (source != null) { source.close(); } } catch (IOException ioe) { log.warning("safeClose(): " + ioe.getMessage()); }
+    }
+
+    public static String getResource(Class owner, String resource, final String encoding) {
+        try {
+            return dumpToString(owner.getResourceAsStream(resource), encoding);
+        } catch (IOException e) {
+            throw Die.criticalConfigError("failed to resolve '"+ resource+ "' from class " + owner.getName());
+        }
     }
 }
