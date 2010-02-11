@@ -5,6 +5,7 @@ public class Class {
 	protected String  fromTime;
 	protected String toTime;
 	protected String[] ipMask;
+	protected boolean classIndexAdvance;
 
 	public String getDate() {
 		return date;
@@ -36,5 +37,13 @@ public class Class {
 
 	public void setToTime(String toTime) {
 		this.toTime = toTime;
+	}
+
+	public boolean isClassIndexAdvance() {
+		return classIndexAdvance;
+	}
+
+	public void setClassIndexAdvance(boolean classIndexAdvance) {
+		this.classIndexAdvance = classIndexAdvance;
 	}
 }
