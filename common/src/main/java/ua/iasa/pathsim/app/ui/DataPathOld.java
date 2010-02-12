@@ -34,8 +34,6 @@ public class DataPathOld implements Control {
 
         final Container contentPane = appFrame.getContentPane();
         contentPane.setLayout(new BorderLayout());
-        JSidebarPane sidebarPane = JSidebarPane.createPane();
-        contentPane.add(sidebarPane, BorderLayout.CENTER);
 
         dpPanel = new DataPathPanel(this);
 
@@ -47,31 +45,10 @@ public class DataPathOld implements Control {
         final EditorPanel editorPanel = new EditorPanel(/*this*/);
         final RunnerPanel runnerPanel = new RunnerPanel(/*this*/);
 
-        sidebarPane.setContent(Util.wrap(dpPanel, "MIPS architecture"));
-        sidebarPane.addSidebar(new JSidebarPane.SidebarInfo(
-                BorderLayout.WEST,
-                true,
-                null,
-                "editorPanel",
-                editorPanel,
-                "Editor"
-        ));
-        sidebarPane.addSidebar(new JSidebarPane.SidebarInfo(
-                BorderLayout.EAST,
-                true,
-                null,
-                "runner",
-                runnerPanel,
-                "Runner"
-        ));
-        sidebarPane.addSidebar(new JSidebarPane.SidebarInfo(
-                BorderLayout.SOUTH,
-                true,
-                null,
-                "logger",
-                createLoggerPanel(loggerArea),
-                "System Messages"
-        ));
+        contentPane.add(Util.wrap(dpPanel, "MIPS architecture"), BorderLayout.CENTER);
+        contentPane.add(editorPanel, BorderLayout.WEST);
+        contentPane.add(runnerPanel, BorderLayout.EAST);
+        contentPane.add(createLoggerPanel(loggerArea), BorderLayout.SOUTH);
 
         appFrame.pack();
         appFrame.setVisible(true);
