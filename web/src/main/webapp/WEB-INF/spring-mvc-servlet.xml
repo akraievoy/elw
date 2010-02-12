@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:sec="http://www.springframework.org/schema/security"
+	   xsi:schemaLocation=
+			   "http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-2.0.4.xsd"
+	   default-init-method="start"
+	   default-destroy-method="stop">
+
+	<bean id="handlerMapping" class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping">
+		<property name="interceptors">
+			<list>
+				<bean class="org.codebistro.miniweb.SecurityInterceptor">
+					<constructor-arg ref="viewDecorator"/>
+					<constructor-arg ref="btServer"/>
+				</bean>
+			</list>
+		</property>
+		<property name="alwaysUseFullPath" value="true"/>
+	</bean>
+
+	<bean id="viewDecorator" class="org.codebistro.miniweb.TemplateModelDecoratorBq">
+		<constructor-arg ref="btServer"/>
+		<constructor-arg ref="btServer"/>
+	</bean>
+
+	<bean id="methodNameResolver"
+		  class="codebistro.bt.server.ExternalPathMethodNameResolver">
+		<property name="prefix" value="handle_"/>
+	</bean>
+
+	<bean id="viewResolver"
+			class="org.springframework.web.servlet.view.velocity.VelocityViewResolver">
+			<property name="prefix" value="" />
+			<property name="suffix" value=".vm" />
+	</bean>
+
+	<bean id="velocityConfig"
+			class="org.springframework.web.servlet.view.velocity.VelocityConfigurer">
+			<property name="resourceLoaderPath" value="/" />
+	</bean>
+</beans>
