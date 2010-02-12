@@ -5,22 +5,21 @@
 package elw.dp.mips.vis;
 
 import java.awt.*;
-import elw.dp.mips.vis.DataLine;
 
 class LabeledLine extends DataLine {
 
-    String label;
+	String label;
 
-    public LabeledLine(int size, Color c, String name, String label, String value) {
-        super(size, c, name, label, value);
-        this.label = label;
-    }
+	public LabeledLine(int size, Color c, String name, String label, String value) {
+		super(size, c, name, label, value);
+		this.label = label;
+	}
 
-    public void draw(Graphics g, int w, int h) {
-        Line line = (Line) lines.elementAt(0);
-        int x1 = (int) Math.floor(line.getX1() * (double) w);
-        int y1 = (int) Math.floor(line.getY1() * (double) h);
-        super.draw(g, w, h);
-        g.drawString(label, x1 - 15, y1);
-    }
+	public void draw(Graphics g, int w, int h) {
+		Line line = (Line) lines.elementAt(0);
+		int x1 = (int) Math.floor(line.getX1() * (double) w);
+		int y1 = (int) Math.floor(line.getY1() * (double) h);
+		super.draw(g, w, h);
+		g.drawString(label, x1 - 15, y1);
+	}
 }

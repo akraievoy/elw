@@ -1,76 +1,77 @@
 package elw.dp.app;
 
-import javax.swing.table.AbstractTableModel;
 import elw.dp.mips.Instructions;
 import elw.dp.mips.asm.Data;
 
+import javax.swing.table.AbstractTableModel;
+
 public class InstructionsTableModel extends AbstractTableModel {
-    public static final String COL_ADDR = "Addr";
-    public static final String COL_BIN = "Hex";
-    public static final String COL_CODE = "Code";
-    public static final String COL_ACC = "Acc";
+	public static final String COL_ADDR = "Addr";
+	public static final String COL_BIN = "Hex";
+	public static final String COL_CODE = "Code";
+	public static final String COL_ACC = "Acc";
 
-    protected final String[] columns = new String[]{COL_ADDR, COL_BIN, COL_ACC, COL_CODE};
-    protected final Instructions instructions;
+	protected final String[] columns = new String[]{COL_ADDR, COL_BIN, COL_ACC, COL_CODE};
+	protected final Instructions instructions;
 
-    public InstructionsTableModel(Instructions instructions) {
-        this.instructions = instructions;
-    }
+	public InstructionsTableModel(Instructions instructions) {
+		this.instructions = instructions;
+	}
 
-    public String getColumnName(int column) {
-        return columns[column];
-    }
+	public String getColumnName(int column) {
+		return columns[column];
+	}
 
-    public int getColumnCount() {
-        return columns.length;
-    }
+	public int getColumnCount() {
+		return columns.length;
+	}
 
-    public int getRowCount() {
-        return instructions.getSize();
-    }
+	public int getRowCount() {
+		return instructions.getSize();
+	}
 
-    public Object getValueAt(int rowIndex, int columnIndex) {
-        final String colName = columns[columnIndex];
-        final int address = instructions.getAddressAt(rowIndex);
+	public Object getValueAt(int rowIndex, int columnIndex) {
+		final String colName = columns[columnIndex];
+		final int address = instructions.getAddressAt(rowIndex);
 
-        if (COL_ADDR.equals(colName)) {
+		if (COL_ADDR.equals(colName)) {
 
-            return Data.int2dec(address, 2);
+			return Data.int2dec(address, 2);
 
-        } else if (COL_BIN.equals(colName)) {
+		} else if (COL_BIN.equals(colName)) {
 
-            final String code = instructions.getInternal(address).getBinaryCode();
-            
-            return groupBy(code, 4);
+			final String code = instructions.getInternal(address).getBinaryCode();
 
-        } else if (COL_CODE.equals(colName)) {
+			return groupBy(code, 4);
 
-            return instructions.getInternal(address).getCodeLine();
+		} else if (COL_CODE.equals(colName)) {
 
-        } else if (COL_ACC.equals(colName)) {
+			return instructions.getInternal(address).getCodeLine();
 
-            return getAccessMod(address);
+		} else if (COL_ACC.equals(colName)) {
 
-        }
+			return getAccessMod(address);
 
-        return "";
-    }
+		}
 
-    private String groupBy(final String code, final int group) {
-        if (code.length() > group) {
-            return code.substring(0, group) + " " + groupBy(code.substring(group), group);
-        }
+		return "";
+	}
 
-        return code;
-    }
+	private String groupBy(final String code, final int group) {
+		if (code.length() > group) {
+			return code.substring(0, group) + " " + groupBy(code.substring(group), group);
+		}
 
-    protected String getAccessMod(int rowIndex) {
-        StringBuffer accessMod = new StringBuffer();
+		return code;
+	}
 
-        if (instructions.getReadAddresses().contains(rowIndex)) {
-            accessMod.append("r");
-        }
+	protected String getAccessMod(int rowIndex) {
+		StringBuffer accessMod = new StringBuffer();
 
-        return accessMod.toString();
-    }
+		if (instructions.getReadAddresses().contains(rowIndex)) {
+			accessMod.append("r");
+		}
+
+		return accessMod.toString();
+	}
 }

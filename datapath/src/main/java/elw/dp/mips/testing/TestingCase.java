@@ -1,66 +1,66 @@
 package elw.dp.mips.testing;
 
 public class TestingCase {
-    protected static final int EXECUTION_LIMIT = 10000;
+	protected static final int EXECUTION_LIMIT = 10000;
 
-    String memInput;
-    String regsInput;
+	String memInput;
+	String regsInput;
 
-    String memExpected;
-    String regsExpected;
+	String memExpected;
+	String regsExpected;
 
-    long executionLimit;
-    int ordinal;
+	long executionLimit;
+	int ordinal;
 
-    public String getMemInput() {
-        return memInput;
-    }
+	public String getMemInput() {
+		return memInput;
+	}
 
-    public void setMemInput(final String memInput) {
-        this.memInput = memInput;
-    }
+	public void setMemInput(final String memInput) {
+		this.memInput = memInput;
+	}
 
-    public String getRegsInput() {
-        return regsInput;
-    }
+	public String getRegsInput() {
+		return regsInput;
+	}
 
-    public void setRegsInput(final String regsInput) {
-        this.regsInput = regsInput;
-    }
+	public void setRegsInput(final String regsInput) {
+		this.regsInput = regsInput;
+	}
 
-    public String getMemExpected() {
-        return memExpected;
-    }
+	public String getMemExpected() {
+		return memExpected;
+	}
 
-    public void setMemExpected(final String memExpected) {
-        this.memExpected = memExpected;
-    }
+	public void setMemExpected(final String memExpected) {
+		this.memExpected = memExpected;
+	}
 
-    public String getRegsExpected() {
-        return regsExpected;
-    }
+	public String getRegsExpected() {
+		return regsExpected;
+	}
 
-    public void setRegsExpected(final String regsExpected) {
-        this.regsExpected = regsExpected;
-    }
+	public void setRegsExpected(final String regsExpected) {
+		this.regsExpected = regsExpected;
+	}
 
-    public long getExecutionLimit() {
-        return executionLimit;
-    }
+	public long getExecutionLimit() {
+		return executionLimit;
+	}
 
-    public void setExecutionLimit(final long executionLimit) {
-        this.executionLimit = executionLimit;
-    }
+	public void setExecutionLimit(final long executionLimit) {
+		this.executionLimit = executionLimit;
+	}
 
-    public int getOrdinal() {
-        return ordinal;
-    }
+	public int getOrdinal() {
+		return ordinal;
+	}
 
-    public void setOrdinal(final int ordinal) {
-        this.ordinal = ordinal;
-    }
+	public void setOrdinal(final int ordinal) {
+		this.ordinal = ordinal;
+	}
 
-    public String toString() {
-        return "Test " + ordinal;
-    }
+	public String toString() {
+		return "Test " + ordinal;
+	}
 }

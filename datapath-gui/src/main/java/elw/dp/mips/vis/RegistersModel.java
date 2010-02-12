@@ -13,26 +13,26 @@ import javax.swing.table.TableModel;
  * @version $Id: RegistersModel.java,v 1.4 2006/12/27 20:22:44 Anton S. Kraievoy Exp $
  */
 public interface RegistersModel {
-    int REGS = 32;
+	int REGS = 32;
 
-    int getRead1RegisterIndex();
+	int getRead1RegisterIndex();
 
-    int getRead2RegisterIndex();
+	int getRead2RegisterIndex();
 
-    boolean isWriteEnabled();
+	boolean isWriteEnabled();
 
-    int getWriteRegisterIndex();
+	int getWriteRegisterIndex();
 
-    int getWriteDataValue();
+	int getWriteDataValue();
 
-    int getRegisterValue(int index);
+	int getRegisterValue(int index);
 
-    void zeroRegisters();
+	void zeroRegisters();
 
-    void setRegister(int word, int registerIndex);
+	void setRegister(int word, int registerIndex);
 
-    void load(int[] lastLoaded);
+	void load(int[] lastLoaded);
 
-    TableModel getTableModel();
+	TableModel getTableModel();
 }
 

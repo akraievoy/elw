@@ -7,7 +7,8 @@ package elw.dp.mips.vis;
 import elw.dp.mips.asm.Data;
 import org.akraievoy.gear.G4Str;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -18,87 +19,87 @@ import java.util.logging.Logger;
  */
 
 public class RegisterControl {
-    private static final Logger log = Logger.getLogger(RegisterControl.class.getName());
+	private static final Logger log = Logger.getLogger(RegisterControl.class.getName());
 
-    protected final int[] lastLoaded = new int[RegistersModel.REGS];
-    protected final RegistersModel regModel;
+	protected final int[] lastLoaded = new int[RegistersModel.REGS];
+	protected final RegistersModel regModel;
 
-    public RegisterControl(RegistersModel newRegModel) {
-        regModel = newRegModel;
-    }
+	public RegisterControl(RegistersModel newRegModel) {
+		regModel = newRegModel;
+	}
 
-    public boolean isRegisterNumber(String registerNumber) {
-        return Data.isDecPositive(registerNumber) && Data.dec2int(registerNumber) < RegistersModel.REGS;
-    }
+	public boolean isRegisterNumber(String registerNumber) {
+		return Data.isDecPositive(registerNumber) && Data.dec2int(registerNumber) < RegistersModel.REGS;
+	}
 
-    public void load(List<String> codeLines) {
-        final boolean validated = validateInput(codeLines);
-        if (!validated) {
-            log.info("Please correct validation errors. Register loading terminated.");
-            return;
-        }
+	public void load(List<String> codeLines) {
+		final boolean validated = validateInput(codeLines);
+		if (!validated) {
+			log.info("Please correct validation errors. Register loading terminated.");
+			return;
+		}
 
-        Arrays.fill(this.lastLoaded, 0);
-        for (String tempStr : codeLines) {
-            final int index = tempStr.indexOf(':');
-            final String register = tempStr.substring(0, index);
-            final int lookupIndex = G4Str.indexOf(register, InstructionsModel.REGS);
-            final int registerIndex = lookupIndex > 0 ? lookupIndex : Data.dec2int(register);
-            if (registerIndex != 0) {
-                String word = tempStr.substring(index + 1);
-                this.lastLoaded[registerIndex] = Data.hex2int(word);
-            }
-        }
+		Arrays.fill(this.lastLoaded, 0);
+		for (String tempStr : codeLines) {
+			final int index = tempStr.indexOf(':');
+			final String register = tempStr.substring(0, index);
+			final int lookupIndex = G4Str.indexOf(register, InstructionsModel.REGS);
+			final int registerIndex = lookupIndex > 0 ? lookupIndex : Data.dec2int(register);
+			if (registerIndex != 0) {
+				String word = tempStr.substring(index + 1);
+				this.lastLoaded[registerIndex] = Data.hex2int(word);
+			}
+		}
 
-        listReload();
+		listReload();
 
-        log.info("Registers Successfully Loaded!");
-    }
+		log.info("Registers Successfully Loaded!");
+	}
 
-    private boolean validateInput(List<String> codeLines) {
-        if (codeLines.isEmpty()) {
-            log.info("Registers NOT loaded - empty source");
-            return false;
-        }
+	private boolean validateInput(List<String> codeLines) {
+		if (codeLines.isEmpty()) {
+			log.info("Registers NOT loaded - empty source");
+			return false;
+		}
 
-        for (String tempStr : codeLines) {
-            int index = tempStr.indexOf(':');
-            if (index == -1 || index == 0) {
-                log.warning("'" + tempStr + "' must have reg:value format.");
-                return false;
-            }
+		for (String tempStr : codeLines) {
+			int index = tempStr.indexOf(':');
+			if (index == -1 || index == 0) {
+				log.warning("'" + tempStr + "' must have reg:value format.");
+				return false;
+			}
 
-            String registerNumber = tempStr.substring(0, index);
-            if (G4Str.indexOf(registerNumber, InstructionsModel.REGS) <= 0) {
-                if (InstructionsModel.REGS[0].equalsIgnoreCase(registerNumber)) {
-                    log.warning("Register '"+InstructionsModel.REGS[0]+"' is Constant Holding 00000000. Its Value CANNOT be Changed!");
-                    return false;
-                } else if (!isRegisterNumber(registerNumber)) {
-                    log.warning("Register Number '" + registerNumber + "' must be a decimal number between 1 and 31.");
-                    return false;
-                } else if (Data.dec2int(registerNumber) == 0) {
-                    log.warning("Register 0 is Constant Holding 00000000. Its Value CANNOT be Changed!");
-                    return false;
-                }
-            }
+			String registerNumber = tempStr.substring(0, index);
+			if (G4Str.indexOf(registerNumber, InstructionsModel.REGS) <= 0) {
+				if (InstructionsModel.REGS[0].equalsIgnoreCase(registerNumber)) {
+					log.warning("Register '" + InstructionsModel.REGS[0] + "' is Constant Holding 00000000. Its Value CANNOT be Changed!");
+					return false;
+				} else if (!isRegisterNumber(registerNumber)) {
+					log.warning("Register Number '" + registerNumber + "' must be a decimal number between 1 and 31.");
+					return false;
+				} else if (Data.dec2int(registerNumber) == 0) {
+					log.warning("Register 0 is Constant Holding 00000000. Its Value CANNOT be Changed!");
+					return false;
+				}
+			}
 
-            final String word = tempStr.substring(index + 1);
-            if (word.length() > 8) {
-                log.warning("'" + word + "' must have not more than 8 hex digits.");
-                return false;
-            }
+			final String word = tempStr.substring(index + 1);
+			if (word.length() > 8) {
+				log.warning("'" + word + "' must have not more than 8 hex digits.");
+				return false;
+			}
 
-            if (!Data.isHexPositive(word)) {
-                log.warning("'" + word + "' is not a legal hex number.");
-                return false;
-            }
-        }
+			if (!Data.isHexPositive(word)) {
+				log.warning("'" + word + "' is not a legal hex number.");
+				return false;
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    public void listReload() {
-        regModel.load(lastLoaded);
-    }
+	public void listReload() {
+		regModel.load(lastLoaded);
+	}
 }
 

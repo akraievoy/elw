@@ -30,13 +30,13 @@
 	</bean>
 
 	<bean id="viewResolver"
-			class="org.springframework.web.servlet.view.velocity.VelocityViewResolver">
-			<property name="prefix" value="" />
-			<property name="suffix" value=".vm" />
+		  class="org.springframework.web.servlet.view.velocity.VelocityViewResolver">
+		<property name="prefix" value=""/>
+		<property name="suffix" value=".vm"/>
 	</bean>
 
 	<bean id="velocityConfig"
-			class="org.springframework.web.servlet.view.velocity.VelocityConfigurer">
-			<property name="resourceLoaderPath" value="/" />
+		  class="org.springframework.web.servlet.view.velocity.VelocityConfigurer">
+		<property name="resourceLoaderPath" value="/"/>
 	</bean>
 </beans>

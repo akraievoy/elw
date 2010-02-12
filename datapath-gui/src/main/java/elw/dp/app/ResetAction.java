@@ -6,7 +6,6 @@ package elw.dp.app;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
-import elw.dp.app.Control;
 
 /**
  * TOAK general overview javadoc.
@@ -15,15 +14,15 @@ import elw.dp.app.Control;
  * @version $Id: ResetAction.java,v 1.1 2006/12/28 10:57:27 Anton S. Kraievoy Exp $
  */
 public class ResetAction extends AbstractAction {
-    protected final Control control;
+	protected final Control control;
 
-    public ResetAction(Control control) {
-        super("Reset");
-        this.control = control;
-    }
+	public ResetAction(Control control) {
+		super("Reset");
+		this.control = control;
+	}
 
-    public void actionPerformed(ActionEvent e) {
-        control.resetMachine();
-    }
+	public void actionPerformed(ActionEvent e) {
+		control.resetMachine();
+	}
 }
 

@@ -2,7 +2,7 @@ package elw.vo;
 
 public class Class {
 	protected String date;
-	protected String  fromTime;
+	protected String fromTime;
 	protected String toTime;
 	protected String[] ipMask;
 	protected boolean classIndexAdvance;

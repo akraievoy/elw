@@ -5,12 +5,12 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Group {
-  protected String name;
-  protected int id;
-	
+	protected String name;
+	protected int id;
+
 	protected List<Student> students = new ArrayList<Student>();
-	
-		public Student[] getStudents() {
+
+	public Student[] getStudents() {
 		return students.toArray(new Student[students.size()]);
 	}
 
@@ -18,6 +18,7 @@ public class Group {
 		this.students.clear();
 		this.students.addAll(Arrays.asList(students));
 	}
+
 	public int getId() {
 		return id;
 	}

@@ -1,120 +1,120 @@
 package elw.dp.ui;
 
-import java.awt.*;
-import javax.swing.*;
-
 import elw.dp.swing.GBC;
 import elw.dp.swing.Swing;
 
+import javax.swing.*;
+import java.awt.*;
+
 
 public class SourceEditorFrame extends JFrame {
-    JTextPane definition;
-    JTextArea solution;
-    JButton submit;
-    JButton close;
-    JButton run;
-    JButton step;
-    JComboBox testingCase;
+	JTextPane definition;
+	JTextArea solution;
+	JButton submit;
+	JButton close;
+	JButton run;
+	JButton step;
+	JComboBox testingCase;
 
-    JPanel contentPanel;
+	JPanel contentPanel;
 
-    public void init() {
-        getContentPane().setLayout(new BorderLayout());
-        getContentPane().add(getContentPanel(), BorderLayout.CENTER);
-        pack();
-    }
+	public void init() {
+		getContentPane().setLayout(new BorderLayout());
+		getContentPane().add(getContentPanel(), BorderLayout.CENTER);
+		pack();
+	}
 
-    public JTextPane getDefinition() {
-        if (definition == null) {
-            definition = new JTextPane();
+	public JTextPane getDefinition() {
+		if (definition == null) {
+			definition = new JTextPane();
 
-            definition.setContentType("text/html");
-            definition.setEditable(false);
-        }
+			definition.setContentType("text/html");
+			definition.setEditable(false);
+		}
 
-        return definition;
-    }
+		return definition;
+	}
 
-    public JTextArea getSolution() {
-        if (solution == null) {
-            solution = new JTextArea();
-        }
+	public JTextArea getSolution() {
+		if (solution == null) {
+			solution = new JTextArea();
+		}
 
-        return solution;
-    }
+		return solution;
+	}
 
-    public JButton getSubmit() {
-        if (submit == null) {
-            submit = new JButton("Submit");
-        }
+	public JButton getSubmit() {
+		if (submit == null) {
+			submit = new JButton("Submit");
+		}
 
-        return submit;
-    }
+		return submit;
+	}
 
-    public JButton getClose() {
-        if (close == null) {
-            close = new JButton("Close");
-        }
+	public JButton getClose() {
+		if (close == null) {
+			close = new JButton("Close");
+		}
 
-        return close;
-    }
+		return close;
+	}
 
-    public JButton getRun() {
-        if (run == null) {
-            run = new JButton("Run");
-        }
+	public JButton getRun() {
+		if (run == null) {
+			run = new JButton("Run");
+		}
 
-        return run;
-    }
+		return run;
+	}
 
-    public JButton getStep() {
-        if (step == null) {
-            step = new JButton("Step");
-        }
+	public JButton getStep() {
+		if (step == null) {
+			step = new JButton("Step");
+		}
 
-        return step;
-    }
+		return step;
+	}
 
-    public JComboBox getTestingCase() {
-        if (testingCase == null) {
-            testingCase = new JComboBox();
+	public JComboBox getTestingCase() {
+		if (testingCase == null) {
+			testingCase = new JComboBox();
 
-            testingCase.setEditable(false);
-        }
+			testingCase.setEditable(false);
+		}
 
-        return testingCase;
-    }
+		return testingCase;
+	}
 
-    public JPanel getContentPanel() {
-        if (contentPanel == null) {
-            contentPanel = new JPanel(new GridBagLayout());
+	public JPanel getContentPanel() {
+		if (contentPanel == null) {
+			contentPanel = new JPanel(new GridBagLayout());
 
-            GBC gbc = new GBC();
+			GBC gbc = new GBC();
 
-            gbc.moveTo(0, 0).span(2, 1).weight(1, 1).insets(2, 2).align(GridBagConstraints.CENTER, GridBagConstraints.BOTH);
+			gbc.moveTo(0, 0).span(2, 1).weight(1, 1).insets(2, 2).align(GridBagConstraints.CENTER, GridBagConstraints.BOTH);
 
-            contentPanel.add(Swing.border(Swing.scroll(getDefinition(), 400, 120), "Definition"), gbc.getVal());
+			contentPanel.add(Swing.border(Swing.scroll(getDefinition(), 400, 120), "Definition"), gbc.getVal());
 
-            gbc.moveTo(0, 1).span(2, 1).weight(1, 3).insets(2, 2).align(GridBagConstraints.CENTER, GridBagConstraints.BOTH);
+			gbc.moveTo(0, 1).span(2, 1).weight(1, 3).insets(2, 2).align(GridBagConstraints.CENTER, GridBagConstraints.BOTH);
 
-            contentPanel.add(Swing.border(Swing.scroll(getSolution(), 400, 180), "Solution"), gbc.getVal());
+			contentPanel.add(Swing.border(Swing.scroll(getSolution(), 400, 180), "Solution"), gbc.getVal());
 
-            gbc.moveTo(0, 2).span(1, 1).weight(1, 0).insets(2, 2).align(GridBagConstraints.CENTER, GridBagConstraints.NONE);
+			gbc.moveTo(0, 2).span(1, 1).weight(1, 0).insets(2, 2).align(GridBagConstraints.CENTER, GridBagConstraints.NONE);
 
-            contentPanel.add(Swing.flow(new JComponent[]{getTestingCase(), getStep(), getRun()}, 3), gbc.getVal());
+			contentPanel.add(Swing.flow(new JComponent[]{getTestingCase(), getStep(), getRun()}, 3), gbc.getVal());
 
-            gbc.moveTo(1, 2).span(1, 1).weight(0, 0).insets(2, 2).align(GridBagConstraints.EAST, GridBagConstraints.NONE);
+			gbc.moveTo(1, 2).span(1, 1).weight(0, 0).insets(2, 2).align(GridBagConstraints.EAST, GridBagConstraints.NONE);
 
-            contentPanel.add(Swing.flow(new JComponent[]{getSubmit(), getClose()}, 3), gbc.getVal());
-        }
+			contentPanel.add(Swing.flow(new JComponent[]{getSubmit(), getClose()}, 3), gbc.getVal());
+		}
 
-        return contentPanel;
-    }
+		return contentPanel;
+	}
 
-    public static void main(String[] args) {
-        final SourceEditorFrame frame = new SourceEditorFrame();
-        frame.init();
-        frame.setVisible(true);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    }
+	public static void main(String[] args) {
+		final SourceEditorFrame frame = new SourceEditorFrame();
+		frame.init();
+		frame.setVisible(true);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	}
 }

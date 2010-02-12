@@ -1,116 +1,119 @@
 package elw.dp.mips.asm;
 
-import java.io.*;
-
 import base.Vm;
 import elw.dp.mips.Instruction;
 
-import java.util.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 
 public class AssemblerRegistry {
-    protected static String preprocess(final String codeLine) {
-        final String trimmed = codeLine.trim();
-        final String whiteSpaceNormalized = trimmed.replaceAll("\\s+", " ");
-        final String lowerCase = whiteSpaceNormalized.toLowerCase();
+	protected static String preprocess(final String codeLine) {
+		final String trimmed = codeLine.trim();
+		final String whiteSpaceNormalized = trimmed.replaceAll("\\s+", " ");
+		final String lowerCase = whiteSpaceNormalized.toLowerCase();
 
-        return lowerCase;
-    }
+		return lowerCase;
+	}
 
-    public static class InstructionSetup {
-        public final String name;
-        public final InstructionAssembler assembler;
-        public final String template;
-        public final String syntax;
-        public final boolean unsigned;
+	public static class InstructionSetup {
+		public final String name;
+		public final InstructionAssembler assembler;
+		public final String template;
+		public final String syntax;
+		public final boolean unsigned;
 
-        public InstructionSetup(String instructionName, InstructionAssembler assembler, String template, String syntax) {
-            this.name = instructionName;
-            this.assembler = assembler;
-            this.template = template;
-            this.syntax = syntax;
-            this.unsigned= name.endsWith("u");
-        }
-    }
+		public InstructionSetup(String instructionName, InstructionAssembler assembler, String template, String syntax) {
+			this.name = instructionName;
+			this.assembler = assembler;
+			this.template = template;
+			this.syntax = syntax;
+			this.unsigned = name.endsWith("u");
+		}
+	}
 
-    Map<String, InstructionSetup> nameToSetup = new HashMap<String, InstructionSetup>();
+	Map<String, InstructionSetup> nameToSetup = new HashMap<String, InstructionSetup>();
 
-    private AssemblerRegistry() {
-    }
+	private AssemblerRegistry() {
+	}
 
-    InstructionSetup resolve(String codeLine) throws AssemblyException {
-        final String opName = getOpName(codeLine);
-        final InstructionSetup setup = nameToSetup.get(opName);
+	InstructionSetup resolve(String codeLine) throws AssemblyException {
+		final String opName = getOpName(codeLine);
+		final InstructionSetup setup = nameToSetup.get(opName);
 
-        if (setup == null) {
-            throw AssemblyException.opNameUnsupported(opName, codeLine);
-        }
+		if (setup == null) {
+			throw AssemblyException.opNameUnsupported(opName, codeLine);
+		}
 
-        return setup;
-    }
+		return setup;
+	}
 
-    public Instruction assemble(String codeLine, int instructionOffset) throws AssemblyException {
-        final String preprocessed = preprocess(codeLine);
-        final InstructionSetup setup = resolve(preprocessed);
+	public Instruction assemble(String codeLine, int instructionOffset) throws AssemblyException {
+		final String preprocessed = preprocess(codeLine);
+		final InstructionSetup setup = resolve(preprocessed);
 
-        final Instruction template = new Instruction(setup, preprocessed, instructionOffset);
-        final Instruction instruction = setup.assembler.assemble(template);
+		final Instruction template = new Instruction(setup, preprocessed, instructionOffset);
+		final Instruction instruction = setup.assembler.assemble(template);
 
-        return instruction;
-    }
+		return instruction;
+	}
 
-    public static String getOpName(String codeLine) {
-        //  here we have to return first word, lowercase
-        return codeLine.split(" ")[0];
-    }
+	public static String getOpName(String codeLine) {
+		//  here we have to return first word, lowercase
+		return codeLine.split(" ")[0];
+	}
 
-    public static AssemblerRegistry create() {
-        Properties temples= new Properties();
+	public static AssemblerRegistry create() {
+		Properties temples = new Properties();
 
-        final InputStream templesStream = AssemblerRegistry.class.getResourceAsStream("templates.properties");
-        base.Die.ifNull("templeStream", templesStream);
+		final InputStream templesStream = AssemblerRegistry.class.getResourceAsStream("templates.properties");
+		base.Die.ifNull("templeStream", templesStream);
 
-        try {
-            temples.load(templesStream);
-        } catch (IOException e) {
-            throw base.Die.criticalConfigError(e);
-        }
+		try {
+			temples.load(templesStream);
+		} catch (IOException e) {
+			throw base.Die.criticalConfigError(e);
+		}
 
-        return create(temples);
-    }
+		return create(temples);
+	}
 
-    static AssemblerRegistry create(Properties templates) {
-        final AssemblerRegistry assemblerRegistry = new AssemblerRegistry();
-        final Set<Object> keys = templates.keySet();
+	static AssemblerRegistry create(Properties templates) {
+		final AssemblerRegistry assemblerRegistry = new AssemblerRegistry();
+		final Set<Object> keys = templates.keySet();
 
-        for (Object key : keys) {
-            final String property = (String) key;
-            if (property.endsWith(".syntax")) {
-                final String name = property.substring(0, property.indexOf('.'));
-                base.Die.ifEmpty("name", name);
+		for (Object key : keys) {
+			final String property = (String) key;
+			if (property.endsWith(".syntax")) {
+				final String name = property.substring(0, property.indexOf('.'));
+				base.Die.ifEmpty("name", name);
 
-                final String syntax = templates.getProperty(property);
+				final String syntax = templates.getProperty(property);
 
-                final String template = templates.getProperty(name + ".template");
-                base.Die.ifEmpty(name + ".template", template);
-                base.Die.ifFalse(template.length() == 32, "template.length == " + template.length() + " for " + name);
+				final String template = templates.getProperty(name + ".template");
+				base.Die.ifEmpty(name + ".template", template);
+				base.Die.ifFalse(template.length() == 32, "template.length == " + template.length() + " for " + name);
 
-                final String assemblerClass = templates.getProperty(name + ".assembler");
-                base.Die.ifEmpty(name + ".assembler", assemblerClass);
+				final String assemblerClass = templates.getProperty(name + ".assembler");
+				base.Die.ifEmpty(name + ".assembler", assemblerClass);
 
-                final InstructionAssembler assembler = Vm.tryToCreateByName(assemblerClass, InstructionAssembler.class);
-                base.Die.ifNull(assemblerClass + ", assembler for " + name, assembler);
+				final InstructionAssembler assembler = Vm.tryToCreateByName(assemblerClass, InstructionAssembler.class);
+				base.Die.ifNull(assemblerClass + ", assembler for " + name, assembler);
 
-                final InstructionSetup setup = new InstructionSetup(name, assembler, template, syntax);
+				final InstructionSetup setup = new InstructionSetup(name, assembler, template, syntax);
 
-                assemblerRegistry.setupInstruction(setup);
-            }
-        }
+				assemblerRegistry.setupInstruction(setup);
+			}
+		}
 
-        return assemblerRegistry;
-    }
+		return assemblerRegistry;
+	}
 
-    void setupInstruction(final InstructionSetup setup) {
-        final InstructionSetup prevContent = nameToSetup.put(setup.name, setup);
-        base.Die.ifNotNull("prevContent (" + setup.name + ")", prevContent);
-    }
+	void setupInstruction(final InstructionSetup setup) {
+		final InstructionSetup prevContent = nameToSetup.put(setup.name, setup);
+		base.Die.ifNotNull("prevContent (" + setup.name + ")", prevContent);
+	}
 }

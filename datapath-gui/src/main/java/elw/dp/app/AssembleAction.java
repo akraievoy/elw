@@ -4,15 +4,14 @@
  */
 package elw.dp.app;
 
-import javax.swing.*;
-import javax.swing.text.JTextComponent;
-import java.awt.event.ActionEvent;
-
 import elw.dp.mips.asm.Data;
 import elw.dp.mips.vis.Assembler;
 import elw.dp.mips.vis.InstructionsModel;
 import elw.dp.mips.vis.MipsAssembler;
 
+import javax.swing.*;
+import javax.swing.text.JTextComponent;
+import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 
 /**
@@ -22,39 +21,39 @@ import java.util.logging.Logger;
  * @version $Id: AssembleAction.java,v 1.1 2006/12/28 10:57:24 Anton S. Kraievoy Exp $
  */
 public class AssembleAction extends AbstractAction {
-    private static final Logger log = Logger.getLogger(AssembleAction.class.getName());
+	private static final Logger log = Logger.getLogger(AssembleAction.class.getName());
 
-    protected final Assembler assembler = new MipsAssembler();
-    protected final InstructionsModel instructionsModel;
-    protected JTextComponent textInput;
+	protected final Assembler assembler = new MipsAssembler();
+	protected final InstructionsModel instructionsModel;
+	protected JTextComponent textInput;
 
-    public AssembleAction(InstructionsModel instructionsModel) {
-        super("Assemble");
-        this.instructionsModel = instructionsModel;
-    }
+	public AssembleAction(InstructionsModel instructionsModel) {
+		super("Assemble");
+		this.instructionsModel = instructionsModel;
+	}
 
-    public void load(java.util.List<String> newCode) {
-        assembler.assembleLoad(newCode);
-        reload();
-    }
+	public void load(java.util.List<String> newCode) {
+		assembler.assembleLoad(newCode);
+		reload();
+	}
 
-    public void reload() {
-        instructionsModel.setInstructions(assembler.getInstructions(), assembler.getCodeLines());
-    }
+	public void reload() {
+		instructionsModel.setInstructions(assembler.getInstructions(), assembler.getCodeLines());
+	}
 
-    public void actionPerformed(ActionEvent e) {
-        if (textInput != null) {
-            load(Data.extractCode(textInput.getText()));
-        } else {
-            log.warning("textInput == null, nothing to assemble");
-        }
-    }
+	public void actionPerformed(ActionEvent e) {
+		if (textInput != null) {
+			load(Data.extractCode(textInput.getText()));
+		} else {
+			log.warning("textInput == null, nothing to assemble");
+		}
+	}
 
-    public JTextComponent getTextInput() {
-        return textInput;
-    }
+	public JTextComponent getTextInput() {
+		return textInput;
+	}
 
-    public void setTextInput(JTextComponent textInput) {
-        this.textInput = textInput;
-    }
+	public void setTextInput(JTextComponent textInput) {
+		this.textInput = textInput;
+	}
 }

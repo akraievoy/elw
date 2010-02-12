@@ -11,18 +11,18 @@ import java.awt.*;
  */
 
 public class Util {
-    public static JComponent wrap(final Component textArea, String title) {
-        return wrapSized(textArea, title, new Dimension(120, 120));
-    }
+	public static JComponent wrap(final Component textArea, String title) {
+		return wrapSized(textArea, title, new Dimension(120, 120));
+	}
 
-    private static JComponent wrapSized(Component textArea, String title, Dimension preferredSize) {
-        final JScrollPane scrollPane = new JScrollPane();
+	private static JComponent wrapSized(Component textArea, String title, Dimension preferredSize) {
+		final JScrollPane scrollPane = new JScrollPane();
 
-        scrollPane.setViewportView(textArea);
-        scrollPane.setPreferredSize(preferredSize);
-        scrollPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), title));
+		scrollPane.setViewportView(textArea);
+		scrollPane.setPreferredSize(preferredSize);
+		scrollPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), title));
 
-        return scrollPane;
-    }
+		return scrollPane;
+	}
 }
 

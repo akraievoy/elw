@@ -1,43 +1,43 @@
-   function initInstructions() {
-      document.DataPath.initInstructions();
-   }
+function initInstructions() {
+	document.DataPath.initInstructions();
+}
 
-   function zeroRegisters() {
-     document.DataPath.zeroRegisters();
-   }
+function zeroRegisters() {
+	document.DataPath.zeroRegisters();
+}
 
-   function resetData() {
-     document.DataPath.resetData();
-   }
+function resetData() {
+	document.DataPath.resetData();
+}
 
-   function resetDataPath(){
-      document.DataPath.resetDataPath();
-   }
+function resetDataPath() {
+	document.DataPath.resetDataPath();
+}
 
-   function setInstruction(instruction, address) {
-      document.DataPath.setInstruction(instruction, address);
-   }
+function setInstruction(instruction, address) {
+	document.DataPath.setInstruction(instruction, address);
+}
 
-   function setRegister(word, registerNumber) {
-     document.DataPath.setRegister(word, registerNumber);
-   }
-  
-   function setData(dataItem, address) {
-     document.DataPath.setData(dataItem, address);
-   }
+function setRegister(word, registerNumber) {
+	document.DataPath.setRegister(word, registerNumber);
+}
 
-   function returnedDataAccess(value, address, access) {
-     parent.returnedDataAccess(value, address, access);
-   }
+function setData(dataItem, address) {
+	document.DataPath.setData(dataItem, address);
+}
 
-   function returnedRegisterAccess(read1, read2, write, value) {
-     parent.returnedRegisterAccess(read1, read2, write, value);
-   }
+function returnedDataAccess(value, address, access) {
+	parent.returnedDataAccess(value, address, access);
+}
 
-   function returnedInstructionAccess(address) {
-     parent.returnedInstructionAccess(address);
-   }
+function returnedRegisterAccess(read1, read2, write, value) {
+	parent.returnedRegisterAccess(read1, read2, write, value);
+}
 
-   function displayMessage(message) {
-      alert("" + message);
-   }
+function returnedInstructionAccess(address) {
+	parent.returnedInstructionAccess(address);
+}
+
+function displayMessage(message) {
+	alert("" + message);
+}

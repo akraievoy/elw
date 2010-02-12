@@ -14,24 +14,24 @@ import javax.swing.table.AbstractTableModel;
  */
 
 public interface MemoryModel {
-    int MEM_SIZE = 100;
+	int MEM_SIZE = 100;
 
-    void setData(String dataItem, String address);
+	void setData(String dataItem, String address);
 
-    void resetData();
+	void resetData();
 
-    void setData(int[] newValues);
+	void setData(int[] newValues);
 
-    int getReadIndex();
+	int getReadIndex();
 
-    int getWriteIndex();
+	int getWriteIndex();
 
-    int getSize();
+	int getSize();
 
-    int getValue(int memoryIndex);
+	int getValue(int memoryIndex);
 
-    AbstractTableModel getTableModel();
+	AbstractTableModel getTableModel();
 
-    void setDataForIndex(int value, int memoryIndex);
+	void setDataForIndex(int value, int memoryIndex);
 }
 

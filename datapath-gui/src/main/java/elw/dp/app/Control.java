@@ -12,20 +12,20 @@ import elw.dp.mips.vis.RegistersModel;
  */
 
 public interface Control {
-    void resetMachine();
+	void resetMachine();
 
-    RegistersModel getRegisters();
+	RegistersModel getRegisters();
 
-    MemoryModel getData();
+	MemoryModel getData();
 
-    InstructionsModel getInstructions();
+	InstructionsModel getInstructions();
 
-    AssembleAction getAssembleAction();
+	AssembleAction getAssembleAction();
 
-    LoadDataAction getLoadDataAction();
+	LoadDataAction getLoadDataAction();
 
-    LoadRegistersAction getLoadRegistersAction();
+	LoadRegistersAction getLoadRegistersAction();
 
-    ResetAction getResetAction();
+	ResetAction getResetAction();
 }
 

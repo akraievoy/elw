@@ -4,7 +4,7 @@
  */
 package elw.dp.mips.vis;
 
-import java.util.*;
+import java.util.List;
 
 /**
  * TOAK general overview javadoc.
@@ -13,10 +13,10 @@ import java.util.*;
  * @version $Id: Assembler.java,v 1.1 2006/12/28 10:38:48 Anton S. Kraievoy Exp $
  */
 public interface Assembler {
-    void assembleLoad(List<String> codeLines);
+	void assembleLoad(List<String> codeLines);
 
-    String[] getCodeLines();
+	String[] getCodeLines();
 
-    int[] getInstructions();
+	int[] getInstructions();
 }
 
