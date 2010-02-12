@@ -4,7 +4,6 @@
  */
 package elw.dp.mips.vis;
 
-import elw.dp.ui.DataPathOld;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,11 +21,9 @@ public class DataPathPanel extends JPanel
 	private Vector dataLines, devices;
 	private InfoBox floatingInfoBox;
 	private int selectedDataLine;
-	private DataPathOld parent;
 	private boolean overDataLine, overDevice, paintFloatingBox;
 
-	public DataPathPanel(DataPathOld parent) {
-		this.parent = parent;
+	public DataPathPanel() {
 		setBackground(Color.lightGray);
 		setForeground(Color.black);
 		setPreferredSize(new Dimension(240, 120));
@@ -265,7 +262,7 @@ public class DataPathPanel extends JPanel
 
 		devices.addElement(new SignExtend(12.300000000000001D / w, 11.1D / h, 0.80000000000000004D / w, 1.8D / h, Color.magenta, "Sign", "Ext", "signExtend", findDataLine("instruction[15-0]"), findDataLine("signExtendOut")));
 
-		devices.addElement(new ExtendedALUControl(15D / w, 11.5D / h, 0.80000000000000004D / w, 1.8D / h, Color.magenta, "Alu", "Cont", "aluControl", findDataLine("controlALUOp"), findDataLine("instruction[5-0]"), findDataLine("aluControl"), parent));
+		devices.addElement(new ExtendedALUControl(15D / w, 11.5D / h, 0.80000000000000004D / w, 1.8D / h, Color.magenta, "Alu", "Cont", "aluControl", findDataLine("controlALUOp"), findDataLine("instruction[5-0]"), findDataLine("aluControl")));
 
 		devices.addElement(new AndGate(18.199999999999999D / w, 4D / h, 0.80000000000000004D / w, 1.2D / h, Color.blue, "And Gate", "andGate", findDataLine("controlBranch"), findDataLine("aluZero"), findDataLine("andOut")));
 
@@ -301,7 +298,7 @@ public class DataPathPanel extends JPanel
 				7.7000000000000002D / h, 8.6999999999999993D / h, 9.6999999999999993D / h, 10.699999999999999D / h, 9.5D / h, 9.1999999999999993D / h, 8.9000000000000004D / h
 		};
 
-		devices.addElement(new ExtendedALU(x3, y3, 7, Color.green, "ua.iasa.ALU", "aluGeneral", findDataLine("aluControl"), findDataLine("registerData1"), findDataLine("mux4Out"), findDataLine("aluResult"), findDataLine("aluZero"), parent));
+		devices.addElement(new ExtendedALU(x3, y3, 7, Color.green, "ua.iasa.ALU", "aluGeneral", findDataLine("aluControl"), findDataLine("registerData1"), findDataLine("mux4Out"), findDataLine("aluResult"), findDataLine("aluZero")));
 		floatingInfoBox = new InfoBox(5, 5, 35, Color.white);
 	}
 

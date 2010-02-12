@@ -4,10 +4,8 @@ import elw.dp.mips.DataPath;
 import elw.dp.mips.Reg;
 import elw.dp.mips.asm.Data;
 import elw.dp.mips.asm.MipsAssembler;
-import elw.dp.swing.Swing;
 import elw.dp.ui.DataPathForm;
-import elw.dp.ui.SourceEditorFrame;
-import elw.dp.ui.StepperFrame;
+import elw.dp.ui.FeedbackAppender;
 import elw.vo.Course;
 import elw.vo.Test;
 import elw.vo.Version;
@@ -28,20 +26,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Properties;
 
 public class Controller {
 	private static final org.slf4j.Logger log = LoggerFactory.getLogger(Controller.class);
 
-	DataPathForm dpForm = new DataPathForm();
-	Swing.ActionFactory actions = new Swing.ActionFactory(this);
+	DataPathForm view = new DataPathForm();
 
-	//  Source Editor frame
-	SourceEditorFrame sourceEditor;
 	DefaultComboBoxModel tCaseModel;
-
-	//  Stepper frame
-	StepperFrame stepper;
 
 	InstructionsTableModel instructionsTableModel;
 	RegistersTableModel registersTableModel;
@@ -58,22 +49,18 @@ public class Controller {
 		final Course course = mapper.readValue(modelStream, Course.class);
 
 		selectedTask = course.getAssBundles()[0].getAssignments()[0].getVersions()[0];
-		final Properties actionProps = new Properties();
-		actionProps.load(this.getClass().getResourceAsStream("actions.properties"));
-
-		actions.init(actionProps);
 
 		tCaseModel = new DefaultComboBoxModel(selectedTask.getTests());
 
-		final FeedbackAppender feedbackAppender = new FeedbackAppender(dpForm.getLogTextPane());
+		final FeedbackAppender feedbackAppender = new FeedbackAppender(view.getLogTextPane());
 		feedbackAppender.setThreshold(Level.ALL);
 		Logger.getRootLogger().addAppender(feedbackAppender);
 
 		log.info("started up, yeah!");
-		dpForm.getProblemTextPane().setText(G4Str.join(selectedTask.getStatementHtml(), "\n"));
-		dpForm.getTestComboBox().setModel(tCaseModel);
+		view.getProblemTextPane().setText(G4Str.join(selectedTask.getStatementHtml(), "\n"));
+		view.getTestComboBox().setModel(tCaseModel);
 		//  TODO hide this
-		dpForm.getSourceTextArea().setText(G4Str.join(selectedTask.getSolution(), "\n"));
+		view.getSourceTextArea().setText(G4Str.join(selectedTask.getSolution(), "\n"));
 	}
 
 	public AbstractTableModel getInstructionsModel() {
@@ -98,32 +85,6 @@ public class Controller {
 		}
 
 		return memoryTableModel;
-	}
-
-	public SourceEditorFrame getSourceEditor() {
-		if (sourceEditor == null) {
-			sourceEditor = new SourceEditorFrame();
-			sourceEditor.init();
-
-			sourceEditor.getRun().setAction(actions.forKey("run"));
-			sourceEditor.getClose().setAction(actions.forKey("closeSource"));
-			sourceEditor.getSubmit().setAction(actions.forKey("submit"));
-		}
-
-		return sourceEditor;
-	}
-
-	public StepperFrame getStepper() {
-		if (stepper == null) {
-			stepper = new StepperFrame();
-			stepper.init();
-
-			stepper.getStepInto().setAction(actions.forKey("step"));
-			stepper.getReset().setAction(actions.forKey("reset"));
-			stepper.getClose().setAction(actions.forKey("closeStepper"));
-
-		}
-		return stepper;
 	}
 
 	class AssembleAction extends AbstractAction {
@@ -333,7 +294,7 @@ public class Controller {
 		frame.setTitle("DataPath");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		frame.getContentPane().add(instance.dpForm.getRootPanel());
+		frame.getContentPane().add(instance.view.getRootPanel());
 		frame.pack();
 		frame.setVisible(true);
 	}
@@ -357,22 +318,12 @@ public class Controller {
 
 	public void do_run(ActionEvent e) {
 		Test tCase = (Test) tCaseModel.getSelectedItem();
-
-		getSourceEditor().setVisible(false);
-
-		getStepper().setVisible(true);
 	}
 
 	public void do_submit(ActionEvent e) {
 		//  TODO do something here
 	}
 
-	public void do_closeSource(ActionEvent e) {
-		getSourceEditor().setVisible(false);
-	}
-
 	public void do_closeStepper(ActionEvent e) {
-		getStepper().setVisible(false);
-		getSourceEditor().setVisible(true);
 	}
 }

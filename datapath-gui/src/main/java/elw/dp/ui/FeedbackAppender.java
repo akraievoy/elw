@@ -1,4 +1,4 @@
-package elw.dp.app;
+package elw.dp.ui;
 
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
