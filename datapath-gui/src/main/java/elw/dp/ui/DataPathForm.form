@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="elw.dp.ui.DataPathForm">
+  <grid id="27dc6" layout-manager="BorderLayout" hgap="0" vgap="0">
+    <constraints>
+      <xy x="20" y="20" width="500" height="400"/>
+    </constraints>
+    <properties/>
+    <border type="none"/>
+    <children>
+      <splitpane id="9b6a7">
+        <constraints border-constraint="Center"/>
+        <properties>
+          <dividerLocation value="291"/>
+          <oneTouchExpandable value="true"/>
+          <orientation value="0"/>
+        </properties>
+        <border type="none"/>
+        <children>
+          <tabbedpane id="17750" binding="strTabbedPane">
+            <constraints>
+              <splitpane position="left"/>
+            </constraints>
+            <properties>
+              <tabPlacement value="3"/>
+            </properties>
+            <border type="none"/>
+            <children>
+              <grid id="5960f" layout-manager="BorderLayout" hgap="0" vgap="0">
+                <constraints>
+                  <tabbedpane title="Source"/>
+                </constraints>
+                <properties/>
+                <border type="none"/>
+                <children>
+                  <scrollpane id="ab292">
+                    <constraints border-constraint="Center"/>
+                    <properties/>
+                    <border type="none"/>
+                    <children>
+                      <component id="38cf8" class="javax.swing.JTextArea" binding="sourceTextArea">
+                        <constraints/>
+                        <properties>
+                          <columns value="60"/>
+                          <font name="Courier New"/>
+                        </properties>
+                      </component>
+                    </children>
+                  </scrollpane>
+                  <grid id="1e85" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="0">
+                    <constraints border-constraint="South"/>
+                    <properties/>
+                    <border type="none"/>
+                    <children>
+                      <component id="a7b" class="javax.swing.JButton" binding="sourceCompileButton">
+                        <constraints/>
+                        <properties>
+                          <actionCommand value="Compile"/>
+                          <label value="Compile"/>
+                          <text value="Compile"/>
+                        </properties>
+                      </component>
+                      <component id="41bdd" class="javax.swing.JLabel" binding="sourceFeedbackLabel">
+                        <constraints/>
+                        <properties>
+                          <text value="..."/>
+                        </properties>
+                      </component>
+                    </children>
+                  </grid>
+                </children>
+              </grid>
+              <grid id="b6ac3" layout-manager="BorderLayout" hgap="0" vgap="0">
+                <constraints>
+                  <tabbedpane title="Test"/>
+                </constraints>
+                <properties/>
+                <border type="none"/>
+                <children>
+                  <grid id="e67a" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="0">
+                    <constraints border-constraint="South"/>
+                    <properties/>
+                    <border type="none"/>
+                    <children>
+                      <component id="5b006" class="javax.swing.JLabel">
+                        <constraints/>
+                        <properties>
+                          <text value="Test"/>
+                        </properties>
+                      </component>
+                      <component id="37807" class="javax.swing.JComboBox" binding="testComboBox">
+                        <constraints/>
+                        <properties/>
+                      </component>
+                      <component id="2ec89" class="javax.swing.JButton" binding="testAddCustomButton">
+                        <constraints/>
+                        <properties>
+                          <text value="Add Custom Test"/>
+                        </properties>
+                      </component>
+                      <component id="f53b6" class="javax.swing.JToolBar$Separator">
+                        <constraints/>
+                        <properties>
+                          <maximumSize width="23" height="23"/>
+                          <minimumSize width="23" height="23"/>
+                          <opaque value="true"/>
+                          <orientation value="1"/>
+                          <separatorSize width="23" height="23"/>
+                        </properties>
+                      </component>
+                      <component id="c8fce" class="javax.swing.JButton" binding="testRunButton">
+                        <constraints/>
+                        <properties>
+                          <text value="Run"/>
+                        </properties>
+                      </component>
+                      <component id="969e8" class="javax.swing.JButton" binding="testStepButton">
+                        <constraints/>
+                        <properties>
+                          <text value="Step"/>
+                        </properties>
+                      </component>
+                    </children>
+                  </grid>
+                  <splitpane id="3ffa0">
+                    <constraints border-constraint="Center"/>
+                    <properties>
+                      <resizeWeight value="0.5"/>
+                    </properties>
+                    <border type="none"/>
+                    <children>
+                      <scrollpane id="dc813">
+                        <constraints>
+                          <splitpane position="right"/>
+                        </constraints>
+                        <properties/>
+                        <border type="none"/>
+                        <children>
+                          <component id="ba032" class="javax.swing.JTextArea" binding="testRegsTextArea">
+                            <constraints/>
+                            <properties/>
+                          </component>
+                        </children>
+                      </scrollpane>
+                      <scrollpane id="6ab77">
+                        <constraints>
+                          <splitpane position="left"/>
+                        </constraints>
+                        <properties/>
+                        <border type="none"/>
+                        <children>
+                          <component id="2fe19" class="javax.swing.JTextArea" binding="testMemTextArea">
+                            <constraints/>
+                            <properties/>
+                          </component>
+                        </children>
+                      </scrollpane>
+                    </children>
+                  </splitpane>
+                </children>
+              </grid>
+              <grid id="ac1c5" layout-manager="BorderLayout" hgap="0" vgap="0">
+                <constraints>
+                  <tabbedpane title="Run"/>
+                </constraints>
+                <properties/>
+                <border type="none"/>
+                <children>
+                  <grid id="590fe" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="0">
+                    <constraints border-constraint="South"/>
+                    <properties/>
+                    <border type="none"/>
+                    <children>
+                      <component id="2e5e5" class="javax.swing.JButton" binding="runStepButton">
+                        <constraints/>
+                        <properties>
+                          <text value="Step"/>
+                        </properties>
+                      </component>
+                      <component id="ba2f5" class="javax.swing.JButton" binding="runRunButton">
+                        <constraints/>
+                        <properties>
+                          <text value="Run"/>
+                        </properties>
+                      </component>
+                      <component id="bc5bc" class="javax.swing.JToolBar$Separator">
+                        <constraints/>
+                        <properties>
+                          <orientation value="1"/>
+                          <separatorSize width="23" height="23"/>
+                        </properties>
+                      </component>
+                      <component id="4d5ee" class="javax.swing.JButton" binding="runResetButton">
+                        <constraints/>
+                        <properties>
+                          <text value="Reset"/>
+                        </properties>
+                      </component>
+                      <component id="5955b" class="javax.swing.JLabel" binding="runStatusLabel">
+                        <constraints/>
+                        <properties>
+                          <text value="..."/>
+                        </properties>
+                      </component>
+                    </children>
+                  </grid>
+                  <grid id="16366" layout-manager="BorderLayout" hgap="0" vgap="0">
+                    <constraints border-constraint="Center"/>
+                    <properties/>
+                    <border type="none"/>
+                    <children>
+                      <splitpane id="29813">
+                        <constraints border-constraint="Center"/>
+                        <properties>
+                          <dividerLocation value="120"/>
+                          <orientation value="0"/>
+                        </properties>
+                        <border type="none"/>
+                        <children>
+                          <scrollpane id="d1343">
+                            <constraints>
+                              <splitpane position="right"/>
+                            </constraints>
+                            <properties/>
+                            <border type="none"/>
+                            <children>
+                              <component id="fd071" class="javax.swing.JTable" binding="runInstructionsTable">
+                                <constraints/>
+                                <properties/>
+                              </component>
+                            </children>
+                          </scrollpane>
+                          <splitpane id="a7d3">
+                            <constraints>
+                              <splitpane position="left"/>
+                            </constraints>
+                            <properties>
+                              <dividerLocation value="180"/>
+                            </properties>
+                            <border type="none"/>
+                            <children>
+                              <scrollpane id="2f635">
+                                <constraints>
+                                  <splitpane position="left"/>
+                                </constraints>
+                                <properties/>
+                                <border type="none"/>
+                                <children>
+                                  <component id="3177b" class="javax.swing.JTable" binding="runRegsTable">
+                                    <constraints/>
+                                    <properties/>
+                                  </component>
+                                </children>
+                              </scrollpane>
+                              <scrollpane id="595f9">
+                                <constraints>
+                                  <splitpane position="right"/>
+                                </constraints>
+                                <properties/>
+                                <border type="none"/>
+                                <children>
+                                  <component id="c5f04" class="javax.swing.JTable" binding="runMemTable">
+                                    <constraints/>
+                                    <properties/>
+                                  </component>
+                                </children>
+                              </scrollpane>
+                            </children>
+                          </splitpane>
+                        </children>
+                      </splitpane>
+                    </children>
+                  </grid>
+                </children>
+              </grid>
+            </children>
+          </tabbedpane>
+          <tabbedpane id="9b28d" binding="pclTabbedPane">
+            <constraints>
+              <splitpane position="right"/>
+            </constraints>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <grid id="a8995" layout-manager="BorderLayout" hgap="0" vgap="0">
+                <constraints>
+                  <tabbedpane title="Problem"/>
+                </constraints>
+                <properties/>
+                <border type="none"/>
+                <children>
+                  <scrollpane id="98e8b">
+                    <constraints border-constraint="Center"/>
+                    <properties/>
+                    <border type="none"/>
+                    <children>
+                      <component id="a8d96" class="javax.swing.JTextArea" binding="problemTextArea">
+                        <constraints/>
+                        <properties/>
+                      </component>
+                    </children>
+                  </scrollpane>
+                </children>
+              </grid>
+              <grid id="f5f26" layout-manager="BorderLayout" hgap="0" vgap="0">
+                <constraints>
+                  <tabbedpane title="Clipper"/>
+                </constraints>
+                <properties/>
+                <border type="none"/>
+                <children>
+                  <scrollpane id="42422">
+                    <constraints border-constraint="Center"/>
+                    <properties/>
+                    <border type="none"/>
+                    <children>
+                      <component id="2d7d5" class="javax.swing.JTextArea" binding="clipTextArea">
+                        <constraints/>
+                        <properties/>
+                      </component>
+                    </children>
+                  </scrollpane>
+                </children>
+              </grid>
+              <grid id="83cd" layout-manager="BorderLayout" hgap="0" vgap="0">
+                <constraints>
+                  <tabbedpane title="Log"/>
+                </constraints>
+                <properties/>
+                <border type="none"/>
+                <children>
+                  <scrollpane id="959ca">
+                    <constraints border-constraint="Center"/>
+                    <properties/>
+                    <border type="none"/>
+                    <children>
+                      <component id="53c2a" class="javax.swing.JTextArea" binding="logTextArea">
+                        <constraints/>
+                        <properties/>
+                      </component>
+                    </children>
+                  </scrollpane>
+                </children>
+              </grid>
+            </children>
+          </tabbedpane>
+        </children>
+      </splitpane>
+    </children>
+  </grid>
+</form>
