@@ -1,6 +1,8 @@
 package elw.dp.app;
 
+import base.pattern.Result;
 import elw.dp.mips.DataPath;
+import elw.dp.mips.Instruction;
 import elw.dp.mips.Reg;
 import elw.dp.mips.asm.Data;
 import elw.dp.mips.asm.MipsAssembler;
@@ -21,16 +23,27 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 public class Controller {
 	private static final org.slf4j.Logger log = LoggerFactory.getLogger(Controller.class);
 
-	DataPathForm view = new DataPathForm();
+	protected static final String LINE_SEPARATOR = System.getProperty("line.separator");
+
+	protected final DataPathForm view = new DataPathForm();
+
+	protected final ScheduledExecutorService executor = new ScheduledThreadPoolExecutor(3);
+	protected final CompileAction compileAction = new CompileAction();
+
+	protected final MipsAssembler assembler = new MipsAssembler();
+	protected DataPath dataPath = new DataPath();
 
 	DefaultComboBoxModel tCaseModel;
 
@@ -41,7 +54,6 @@ public class Controller {
 	//  application state
 	Version selectedTask;
 	Test selectedCase;
-	DataPath dataPath = new DataPath();
 
 	public void init() throws IOException {
 		final InputStream modelStream = Controller.class.getResourceAsStream("/aos-s10.json");
@@ -59,8 +71,10 @@ public class Controller {
 		log.info("started up, yeah!");
 		view.getProblemTextPane().setText(G4Str.join(selectedTask.getStatementHtml(), "\n"));
 		view.getTestComboBox().setModel(tCaseModel);
+
 		//  TODO hide this
 		view.getSourceTextArea().setText(G4Str.join(selectedTask.getSolution(), "\n"));
+		view.getSourceCompileButton().setAction(compileAction);
 	}
 
 	public AbstractTableModel getInstructionsModel() {
@@ -87,24 +101,51 @@ public class Controller {
 		return memoryTableModel;
 	}
 
-	class AssembleAction extends AbstractAction {
-		final MipsAssembler assembler = new MipsAssembler();
-
-		public AssembleAction() {
-			super("Assemble");
-		}
-
-		public void load(java.util.List<String> newCode) {
-			assembler.assembleLoad(newCode);
-			reload();
-		}
-
-		public void reload() {
-			dataPath.getInstructions().setInstructions(assembler.getInstructions2());
+	class CompileAction extends AbstractAction {
+		public CompileAction() {
+			super("Compile");
 		}
 
 		public void actionPerformed(ActionEvent e) {
+			setEnabled(false);
+			final JLabel statusLabel = view.getSourceFeedbackLabel();
+			setupStatus(statusLabel, "Compiling...");
+
+			executor.submit(new Runnable() {
+				public void run() {
+					final Result[] resRef = new Result[] {new Result("status unknown", false)};
+					try {
+						final String source = view.getSourceTextArea().getText();
+						final String[] sourceLines = source.split(LINE_SEPARATOR);
+
+						final Instruction[] instructions = assembler.assembleLoad(sourceLines, resRef);
+						if (instructions != null) {
+							dataPath.getInstructions().setInstructions(Arrays.asList(instructions));
+						}
+					} finally {
+						SwingUtilities.invokeLater(new Runnable() {
+							public void run() {
+								setEnabled(true);
+								setupStatus(statusLabel, resRef[0]);
+							}
+						});
+					}
+				}
+			});
 		}
+
+	}
+
+	public static void setupStatus(final JLabel label, final String text) {
+		label.setText(text);
+		label.setToolTipText(text);
+		label.setForeground(Color.DARK_GRAY);
+	}
+
+	public static void setupStatus(final JLabel label, final Result result) {
+		label.setToolTipText(result.getMessage());
+		label.setText(result.getMessage());
+		label.setForeground(result.isSuccess() ? Color.GREEN.darker().darker() : Color.RED.darker().darker());
 	}
 
 	class LoadDataAction extends AbstractAction {
@@ -310,11 +351,6 @@ public class Controller {
 		}
 
 	}
-
-	public void do_exit(ActionEvent e) {
-		System.exit(0);
-	}
-
 
 	public void do_run(ActionEvent e) {
 		Test tCase = (Test) tCaseModel.getSelectedItem();

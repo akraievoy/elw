@@ -4,39 +4,32 @@
  */
 package elw.dp.mips.asm;
 
+import base.pattern.Result;
 import elw.dp.mips.Instruction;
 import org.akraievoy.gear.G4Str;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 public class MipsAssembler {
-	private static final org.slf4j.Logger log = LoggerFactory.getLogger(MipsAssembler.class);
+	private static final Logger log = LoggerFactory.getLogger(MipsAssembler.class);
 
-	static final String RE_LABEL = InstructionAssembler.RE_LABEL;
-	static final Pattern PATTERN_LABELS = Pattern.compile("\\s*" + RE_LABEL + "(\\s*,\\s*" + RE_LABEL + ")*\\s*");
+	protected static final String RE_LABEL = InstructionAssembler.RE_LABEL;
+	protected static final Pattern PATTERN_LABELS = Pattern.compile("\\s*" + RE_LABEL + "(\\s*,\\s*" + RE_LABEL + ")*\\s*");
 
-	ArrayList<Instruction> instructions = new ArrayList<Instruction>();
-	ArrayList<String> codeLines = new ArrayList<String>();
+	protected final AssemblerRegistry assemblerRegistry = AssemblerRegistry.create();
 
-	public String[] toArray(ArrayList<String> instructionComponents) {
-		return instructionComponents.toArray(new String[instructionComponents.size()]);
-	}
-
-	public void assembleLoad(List<String> newCodeLines) {
-		instructions.clear();
-		codeLines.clear();
-		codeLines.addAll(newCodeLines);
+	public Instruction[] assembleLoad(String[] codeLines, Result[] resRef) {
+		final List<Instruction> instructions = new ArrayList<Instruction>();
 
 		String assemblyCode = null;
 		try {
-			final AssemblerRegistry assemblerRegistry = AssemblerRegistry.create();
 			final Map<String, Integer> labelOffsets = new HashMap<String, Integer>();
 
 			int instructionOffset = 0;
-			for (String codeLine : newCodeLines) {
+			for (String codeLine : codeLines) {
 				assemblyCode = codeLine;
 
 				final String labelList;
@@ -78,37 +71,25 @@ public class MipsAssembler {
 				instruction.getSetup().assembler.assembleDeps(instruction, labelOffsets);
 
 				if (!instruction.isAssembled()) {
-					throw AssemblyException.internalError("Instruction assembly incomplete: " + instruction);
+					final String message = "Instruction assembly incomplete: " + instruction;
+					Result.failure(resRef, message);
+					log.warn(message);
+					return null;
 				}
 			}
 
-			log.info("Instructions Successfully Assembled and Loaded into Memory!");
+			final String message = "Instructions Successfully Assembled and Loaded into Memory!";
+
+			Result.success(resRef, message);
+			log.info(message);
+			return instructions.toArray(new Instruction[instructions.size()]);
 		} catch (Throwable t) {
-			t.printStackTrace();
-			log.warn(t.getClass().getName() + " '" + t.getMessage() + "' occured in '" + assemblyCode + "', assembly terminated");
+
+			final String message = t.getClass().getSimpleName() + " '" + t.getMessage() + "' occured in '" + assemblyCode + "', assembly terminated";
+			Result.failure(resRef, message);
+			log.warn(message);
+			return null;
 		}
-	}
-
-	public int[] getInstructions() {
-		final int[] instructionsArr = new int[instructions.size()];
-
-		for (int instructionIndex = 0; instructionIndex < instructions.size(); instructionIndex++) {
-			Instruction instruction = instructions.get(instructionIndex);
-			instructionsArr[instructionIndex] = instruction.intValue();
-		}
-
-		return instructionsArr;
-	}
-
-	public List<Instruction> getInstructions2() {
-		return Collections.unmodifiableList(instructions);
-	}
-
-	protected static void setComponent(final ArrayList<String> instructionComponents, final int index, final String value) {
-		while (instructionComponents.size() <= index) {
-			instructionComponents.add(null);
-		}
-		instructionComponents.set(index, value);
 	}
 }
 

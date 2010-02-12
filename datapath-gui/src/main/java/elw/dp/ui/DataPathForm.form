@@ -46,13 +46,16 @@
                       </component>
                     </children>
                   </scrollpane>
-                  <grid id="1e85" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="0">
+                  <grid id="1e85" layout-manager="GridBagLayout">
                     <constraints border-constraint="South"/>
                     <properties/>
                     <border type="none"/>
                     <children>
                       <component id="a7b" class="javax.swing.JButton" binding="sourceCompileButton">
-                        <constraints/>
+                        <constraints>
+                          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag top="1" left="2" bottom="1" right="2" weightx="0.0" weighty="0.0"/>
+                        </constraints>
                         <properties>
                           <actionCommand value="Compile"/>
                           <label value="Compile"/>
@@ -60,7 +63,10 @@
                         </properties>
                       </component>
                       <component id="41bdd" class="javax.swing.JLabel" binding="sourceFeedbackLabel">
-                        <constraints/>
+                        <constraints>
+                          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag top="0" left="4" bottom="0" right="0" weightx="1.0" weighty="0.0"/>
+                        </constraints>
                         <properties>
                           <text value="..."/>
                         </properties>
@@ -76,29 +82,41 @@
                 <properties/>
                 <border type="none"/>
                 <children>
-                  <grid id="e67a" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="0">
+                  <grid id="e67a" layout-manager="GridBagLayout">
                     <constraints border-constraint="South"/>
                     <properties/>
                     <border type="none"/>
                     <children>
                       <component id="5b006" class="javax.swing.JLabel">
-                        <constraints/>
+                        <constraints>
+                          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag top="0" left="2" bottom="0" right="2" weightx="0.0" weighty="0.0"/>
+                        </constraints>
                         <properties>
-                          <text value="Test"/>
+                          <text value="Test:"/>
                         </properties>
                       </component>
                       <component id="37807" class="javax.swing.JComboBox" binding="testComboBox">
-                        <constraints/>
+                        <constraints>
+                          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.2" weighty="0.0"/>
+                        </constraints>
                         <properties/>
                       </component>
                       <component id="2ec89" class="javax.swing.JButton" binding="testAddCustomButton">
-                        <constraints/>
+                        <constraints>
+                          <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag top="1" left="2" bottom="1" right="2" weightx="0.0" weighty="0.0"/>
+                        </constraints>
                         <properties>
-                          <text value="Add Custom Test"/>
+                          <text value="Custom"/>
                         </properties>
                       </component>
                       <component id="f53b6" class="javax.swing.JToolBar$Separator">
-                        <constraints/>
+                        <constraints>
+                          <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
                         <properties>
                           <maximumSize width="23" height="23"/>
                           <minimumSize width="23" height="23"/>
@@ -108,15 +126,30 @@
                         </properties>
                       </component>
                       <component id="c8fce" class="javax.swing.JButton" binding="testRunButton">
-                        <constraints/>
+                        <constraints>
+                          <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag top="1" left="2" bottom="1" right="1" weightx="0.0" weighty="0.0"/>
+                        </constraints>
                         <properties>
                           <text value="Run"/>
                         </properties>
                       </component>
                       <component id="969e8" class="javax.swing.JButton" binding="testStepButton">
-                        <constraints/>
+                        <constraints>
+                          <grid row="0" column="5" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag top="1" left="1" bottom="1" right="2" weightx="0.0" weighty="0.0"/>
+                        </constraints>
                         <properties>
                           <text value="Step"/>
+                        </properties>
+                      </component>
+                      <component id="87942" class="javax.swing.JLabel" binding="testStatusLabel">
+                        <constraints>
+                          <grid row="0" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag top="0" left="2" bottom="0" right="0" weightx="1.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <text value="..."/>
                         </properties>
                       </component>
                     </children>
@@ -165,38 +198,53 @@
                 <properties/>
                 <border type="none"/>
                 <children>
-                  <grid id="590fe" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="0">
+                  <grid id="590fe" layout-manager="GridBagLayout">
                     <constraints border-constraint="South"/>
                     <properties/>
                     <border type="none"/>
                     <children>
                       <component id="2e5e5" class="javax.swing.JButton" binding="runStepButton">
-                        <constraints/>
+                        <constraints>
+                          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag top="1" left="2" bottom="1" right="1" weightx="0.0" weighty="0.0"/>
+                        </constraints>
                         <properties>
                           <text value="Step"/>
                         </properties>
                       </component>
                       <component id="ba2f5" class="javax.swing.JButton" binding="runRunButton">
-                        <constraints/>
+                        <constraints>
+                          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag top="1" left="1" bottom="1" right="2" weightx="0.0" weighty="0.0"/>
+                        </constraints>
                         <properties>
                           <text value="Run"/>
                         </properties>
                       </component>
                       <component id="bc5bc" class="javax.swing.JToolBar$Separator">
-                        <constraints/>
+                        <constraints>
+                          <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
                         <properties>
                           <orientation value="1"/>
                           <separatorSize width="23" height="23"/>
                         </properties>
                       </component>
                       <component id="4d5ee" class="javax.swing.JButton" binding="runResetButton">
-                        <constraints/>
+                        <constraints>
+                          <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag top="1" left="2" bottom="1" right="2" weightx="0.0" weighty="0.0"/>
+                        </constraints>
                         <properties>
                           <text value="Reset"/>
                         </properties>
                       </component>
                       <component id="5955b" class="javax.swing.JLabel" binding="runStatusLabel">
-                        <constraints/>
+                        <constraints>
+                          <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="1.0" weighty="0.0"/>
+                        </constraints>
                         <properties>
                           <text value="..."/>
                         </properties>
