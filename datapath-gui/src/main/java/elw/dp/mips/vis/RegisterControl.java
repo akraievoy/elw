@@ -6,20 +6,14 @@ package elw.dp.mips.vis;
 
 import elw.dp.mips.asm.Data;
 import org.akraievoy.gear.G4Str;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
-/**
- * TOAK general overview javadoc.
- *
- * @author Anton Kraievoy
- * @version $Id: RegisterControl.java,v 1.16 2006/12/28 10:38:57 Anton S. Kraievoy Exp $
- */
-
 public class RegisterControl {
-	private static final Logger log = Logger.getLogger(RegisterControl.class.getName());
+	private static final org.slf4j.Logger log = LoggerFactory.getLogger(RegisterControl.class);
 
 	protected final int[] lastLoaded = new int[RegistersModel.REGS];
 	protected final RegistersModel regModel;
@@ -65,32 +59,32 @@ public class RegisterControl {
 		for (String tempStr : codeLines) {
 			int index = tempStr.indexOf(':');
 			if (index == -1 || index == 0) {
-				log.warning("'" + tempStr + "' must have reg:value format.");
+				log.warn("'" + tempStr + "' must have reg:value format.");
 				return false;
 			}
 
 			String registerNumber = tempStr.substring(0, index);
 			if (G4Str.indexOf(registerNumber, InstructionsModel.REGS) <= 0) {
 				if (InstructionsModel.REGS[0].equalsIgnoreCase(registerNumber)) {
-					log.warning("Register '" + InstructionsModel.REGS[0] + "' is Constant Holding 00000000. Its Value CANNOT be Changed!");
+					log.warn("Register '" + InstructionsModel.REGS[0] + "' is Constant Holding 00000000. Its Value CANNOT be Changed!");
 					return false;
 				} else if (!isRegisterNumber(registerNumber)) {
-					log.warning("Register Number '" + registerNumber + "' must be a decimal number between 1 and 31.");
+					log.warn("Register Number '" + registerNumber + "' must be a decimal number between 1 and 31.");
 					return false;
 				} else if (Data.dec2int(registerNumber) == 0) {
-					log.warning("Register 0 is Constant Holding 00000000. Its Value CANNOT be Changed!");
+					log.warn("Register 0 is Constant Holding 00000000. Its Value CANNOT be Changed!");
 					return false;
 				}
 			}
 
 			final String word = tempStr.substring(index + 1);
 			if (word.length() > 8) {
-				log.warning("'" + word + "' must have not more than 8 hex digits.");
+				log.warn("'" + word + "' must have not more than 8 hex digits.");
 				return false;
 			}
 
 			if (!Data.isHexPositive(word)) {
-				log.warning("'" + word + "' is not a legal hex number.");
+				log.warn("'" + word + "' is not a legal hex number.");
 				return false;
 			}
 		}

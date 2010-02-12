@@ -5,6 +5,7 @@ import elw.dp.mips.Reg;
 import elw.dp.mips.asm.Data;
 import elw.dp.mips.asm.MipsAssembler;
 import elw.dp.swing.Swing;
+import elw.dp.ui.DataPathForm;
 import elw.dp.ui.SourceEditorFrame;
 import elw.dp.ui.StepperFrame;
 import elw.vo.Course;
@@ -12,7 +13,11 @@ import elw.vo.Test;
 import elw.vo.Version;
 import org.akraievoy.gear.G;
 import org.akraievoy.gear.G4Str;
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -24,12 +29,11 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class Controller {
-	private static final Logger log = Logger.getLogger(LoadRegistersAction.class.getName());
+	private static final org.slf4j.Logger log = LoggerFactory.getLogger(Controller.class);
 
+	DataPathForm dpForm = new DataPathForm();
 	Swing.ActionFactory actions = new Swing.ActionFactory(this);
 
 	//  Source Editor frame
@@ -61,14 +65,15 @@ public class Controller {
 
 		tCaseModel = new DefaultComboBoxModel(selectedTask.getTests());
 
-		getSourceEditor().setTitle("DataPath" + " - " + selectedTask.getName());
-		getSourceEditor().getDefinition().setText(G4Str.join(selectedTask.getStatementHtml(), "\n"));
-		getSourceEditor().getTestingCase().setModel(tCaseModel);
+		final FeedbackAppender feedbackAppender = new FeedbackAppender(dpForm.getLogTextPane());
+		feedbackAppender.setThreshold(Level.ALL);
+		Logger.getRootLogger().addAppender(feedbackAppender);
 
+		log.info("started up, yeah!");
+		dpForm.getProblemTextPane().setText(G4Str.join(selectedTask.getStatementHtml(), "\n"));
+		dpForm.getTestComboBox().setModel(tCaseModel);
 		//  TODO hide this
-		getSourceEditor().getSolution().setText(G4Str.join(selectedTask.getSolution(), "\n"));
-
-		getSourceEditor().setVisible(true);
+		dpForm.getSourceTextArea().setText(G4Str.join(selectedTask.getSolution(), "\n"));
 	}
 
 	public AbstractTableModel getInstructionsModel() {
@@ -178,20 +183,20 @@ public class Controller {
 			for (String tempStr : temp) {
 				int index = tempStr.indexOf(":");
 				if (index == -1 || index == 0) {
-					log.severe("Data item '" + tempStr + "' must be given with an address.");
+					log.warn("Data item '" + tempStr + "' must be given with an address.");
 					return -1;
 				}
 
 				String address = tempStr.substring(0, index);
 				if (!Data.isHexPositive(address)) {
-					log.severe("Address '" + address + "' must be an hexadecimal number.");
+					log.warn("Address '" + address + "' must be an hexadecimal number.");
 					return -1;
 				}
 
 				long addressValue = Data.hex2long(address);
 
 				if (addressValue > Integer.MAX_VALUE) {
-					log.severe("Address '" + address + "' must not exceed " + Integer.toString(Integer.MAX_VALUE, 16));
+					log.warn("Address '" + address + "' must not exceed " + Integer.toString(Integer.MAX_VALUE, 16));
 					return -1;
 				}
 
@@ -199,14 +204,14 @@ public class Controller {
 
 				String word = tempStr.substring(index + 1);
 				if (word.length() != 8) {
-					log.severe("'" + word + "' must have 8 hex digits!");
+					log.warn("'" + word + "' must have 8 hex digits!");
 					return -1;
 				}
 				for (int j = 0; j < word.length(); j++) {
 					int digit = word.charAt(j);
 					if ((digit < '0' || digit > '9') &&
 							(digit < 'A' || digit > 'F')) {
-						log.severe("'" + word + "' has an ILLEGAL character (not a Hex digit).");
+						log.warn("'" + word + "' has an ILLEGAL character (not a Hex digit).");
 						return -1;
 					}
 				}
@@ -261,25 +266,25 @@ public class Controller {
 			for (String tempStr : codeLines) {
 				int index = tempStr.indexOf(':');
 				if (index == -1 || index == 0) {
-					log.warning("'" + tempStr + "' must have reg:value format.");
+					log.warn("'" + tempStr + "' must have reg:value format.");
 					return false;
 				}
 
 				String registerNumber = tempStr.substring(0, index);
 				final Reg reg = Reg.fromString(registerNumber);
 				if (reg == Reg.zero) {
-					log.warning("Register '" + reg + "' is Constant Holding 00000000. Its Value CANNOT be Changed!");
+					log.warn("Register '" + reg + "' is Constant Holding 00000000. Its Value CANNOT be Changed!");
 					return false;
 				}
 
 				final String word = tempStr.substring(index + 1);
 				if (word.length() > 8) {
-					log.warning("'" + word + "' must have not more than 8 hex digits.");
+					log.warn("'" + word + "' must have not more than 8 hex digits.");
 					return false;
 				}
 
 				if (!Data.isHexPositive(word)) {
-					log.warning("'" + word + "' is not a legal hex number.");
+					log.warn("'" + word + "' is not a legal hex number.");
 					return false;
 				}
 			}
@@ -303,8 +308,8 @@ public class Controller {
 			dataPath.execute();
 
 		} catch (Throwable t) {
-			log.warning(G.report(t));
-			log.log(Level.INFO, "details", t);
+			log.warn(G.report(t));
+			log.info("details", t);
 		}
 
 		getInstructionsModel().fireTableDataChanged();
@@ -313,14 +318,24 @@ public class Controller {
 	}
 
 	public static void main(String[] args) throws IOException {
+		BasicConfigurator.configure();
+
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Exception e) {
 			System.out.println("Error setting native LAF: " + e);
 		}
 
-		Controller instance = new Controller();
+		final Controller instance = new Controller();
 		instance.init();
+
+		final JFrame frame = new JFrame();
+		frame.setTitle("DataPath");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		frame.getContentPane().add(instance.dpForm.getRootPanel());
+		frame.pack();
+		frame.setVisible(true);
 	}
 
 	class TaskListSelectionListener implements ListSelectionListener {

@@ -6,6 +6,7 @@ package elw.dp.app;
 
 import elw.dp.mips.asm.Data;
 import elw.dp.mips.vis.MemoryModel;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
@@ -14,14 +15,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
-/**
- * TOAK general overview javadoc.
- *
- * @author Anton Kraievoy
- * @version $Id: LoadDataAction.java,v 1.1 2006/12/28 10:57:27 Anton S. Kraievoy Exp $
- */
 public class LoadDataAction extends AbstractAction {
-	private static final Logger log = Logger.getLogger(LoadDataAction.class.getName());
+	private static final org.slf4j.Logger log = LoggerFactory.getLogger(LoadDataAction.class);
 
 	protected final MemoryModel memModel;
 	protected final int[] lastLoaded;
@@ -66,19 +61,19 @@ public class LoadDataAction extends AbstractAction {
 		for (String tempStr : temp) {
 			int index = tempStr.indexOf(":");
 			if (index == -1 || index == 0) {
-				log.severe("Data item '" + tempStr + "' must be given with an address.");
+				log.warn("Data item '" + tempStr + "' must be given with an address.");
 				return false;
 			}
 
 			String address = tempStr.substring(0, index);
 			if (!Data.isHexPositive(address)) {
-				log.severe("Address '" + address + "' must be an hexadecimal number.");
+				log.warn("Address '" + address + "' must be an hexadecimal number.");
 				return false;
 			}
 
 			long addressValue = Data.hex2long(address);
 			if (addressValue > 400 || addressValue % 4 != 0) {
-				log.severe("Address '" + address + "' must be a multiple of 4 and no more than 400.");
+				log.warn("Address '" + address + "' must be a multiple of 4 and no more than 400.");
 				return false;
 			}
 		}
@@ -87,14 +82,14 @@ public class LoadDataAction extends AbstractAction {
 			int index = tempStr.indexOf(":");
 			String word = tempStr.substring(index + 1);
 			if (word.length() != 8) {
-				log.severe("'" + word + "' must have 8 hex digits!");
+				log.warn("'" + word + "' must have 8 hex digits!");
 				return false;
 			}
 			for (int j = 0; j < word.length(); j++) {
 				int digit = word.charAt(j);
 				if ((digit < '0' || digit > '9') &&
 						(digit < 'A' || digit > 'F')) {
-					log.severe("'" + word + "' has an ILLEGAL character (not a Hex digit).");
+					log.warn("'" + word + "' has an ILLEGAL character (not a Hex digit).");
 					return false;
 				}
 			}
@@ -115,7 +110,7 @@ public class LoadDataAction extends AbstractAction {
 		if (input != null) {
 			load(Data.extractCode(input.getText()));
 		} else {
-			log.warning("input == null, nothing to assemble");
+			log.warn("input == null, nothing to assemble");
 		}
 
 	}

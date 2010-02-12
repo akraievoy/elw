@@ -1,6 +1,7 @@
 package elw.dp.swing;
 
 import org.akraievoy.gear.G;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -85,7 +86,7 @@ public class Swing {
 	public static class ActionFactory {
 		public static final String PREFIX = "do_";
 
-		static final Logger log = Logger.getLogger(ActionFactory.class.getName());
+		private static final org.slf4j.Logger log = LoggerFactory.getLogger(ActionFactory.class);
 
 		protected final Object targetObject;
 		protected final Map<String, AbstractAction> actions = new HashMap<String, AbstractAction>();
@@ -137,7 +138,7 @@ public class Swing {
 
 					} catch (InvocationTargetException ite) {
 
-						log.log(Level.WARNING, "failed: " + G.report(ite), ite);
+						log.warn("failed: " + G.report(ite), ite);
 
 					}
 				}

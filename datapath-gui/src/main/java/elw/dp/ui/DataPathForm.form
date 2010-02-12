@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="elw.dp.ui.DataPathForm">
-  <grid id="27dc6" layout-manager="BorderLayout" hgap="0" vgap="0">
+  <grid id="27dc6" binding="rootPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
     <constraints>
       <xy x="20" y="20" width="500" height="400"/>
     </constraints>
@@ -293,9 +293,11 @@
                     <properties/>
                     <border type="none"/>
                     <children>
-                      <component id="a8d96" class="javax.swing.JTextArea" binding="problemTextArea">
+                      <component id="bf917" class="javax.swing.JTextPane" binding="problemTextPane">
                         <constraints/>
-                        <properties/>
+                        <properties>
+                          <editable value="false"/>
+                        </properties>
                       </component>
                     </children>
                   </scrollpane>
@@ -333,9 +335,12 @@
                     <properties/>
                     <border type="none"/>
                     <children>
-                      <component id="53c2a" class="javax.swing.JTextArea" binding="logTextArea">
+                      <component id="30881" class="javax.swing.JTextPane" binding="logTextPane">
                         <constraints/>
-                        <properties/>
+                        <properties>
+                          <editable value="false"/>
+                          <font name="Courier New"/>
+                        </properties>
                       </component>
                     </children>
                   </scrollpane>

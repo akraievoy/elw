@@ -59,8 +59,6 @@ public class DataPathOld implements Control {
 
 		final JTextAreaLogHandler jTextAreaLogHandler = new JTextAreaLogHandler(loggerArea, 65536 * 4);
 		jTextAreaLogHandler.setLevel(Level.FINEST);
-		Logger.getLogger("ua.iasa.pathsim").addHandler(jTextAreaLogHandler);
-		Logger.getLogger("com.bws").addHandler(jTextAreaLogHandler);
 	}
 
 	public RegistersModel getRegisters() {

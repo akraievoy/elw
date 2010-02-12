@@ -6,13 +6,14 @@ package elw.dp.mips.asm;
 
 import elw.dp.mips.Instruction;
 import org.akraievoy.gear.G4Str;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 public class MipsAssembler {
-	private static final Logger log = Logger.getLogger(MipsAssembler.class.getName());
+	private static final org.slf4j.Logger log = LoggerFactory.getLogger(MipsAssembler.class);
 
 	static final String RE_LABEL = InstructionAssembler.RE_LABEL;
 	static final Pattern PATTERN_LABELS = Pattern.compile("\\s*" + RE_LABEL + "(\\s*,\\s*" + RE_LABEL + ")*\\s*");
@@ -84,7 +85,7 @@ public class MipsAssembler {
 			log.info("Instructions Successfully Assembled and Loaded into Memory!");
 		} catch (Throwable t) {
 			t.printStackTrace();
-			log.warning(t.getClass().getName() + " '" + t.getMessage() + "' occured in '" + assemblyCode + "', assembly terminated");
+			log.warn(t.getClass().getName() + " '" + t.getMessage() + "' occured in '" + assemblyCode + "', assembly terminated");
 		}
 	}
 

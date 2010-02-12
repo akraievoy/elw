@@ -6,19 +6,14 @@ package elw.dp.mips.vis;
 
 import elw.dp.mips.asm.Data;
 import org.akraievoy.gear.G4Str;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-/**
- * TOAK general overview javadoc.
- *
- * @author Anton Kraievoy
- * @version $Id: MipsAssembler.java,v 1.1 2006/12/28 10:38:57 Anton S. Kraievoy Exp $
- */
 public class MipsAssembler implements Assembler {
-	private static final Logger log = Logger.getLogger(MipsAssembler.class.getName());
+	private static final org.slf4j.Logger log = LoggerFactory.getLogger(MipsAssembler.class);
 
 	protected ArrayList<String> instructions = new ArrayList<String>();
 	protected ArrayList<String> codeLines = new ArrayList<String>();
@@ -515,7 +510,7 @@ public class MipsAssembler implements Assembler {
 			log.info("Instructions Successfully Assembled and Loaded into Memory!");
 		} catch (Throwable t) {
 			t.printStackTrace();
-			log.warning(t.getClass().getName() + " '" + t.getMessage() + "' occured in '" + assemblyCode + "', assembly terminated");
+			log.warn(t.getClass().getName() + " '" + t.getMessage() + "' occured in '" + assemblyCode + "', assembly terminated");
 		}
 	}
 

@@ -8,20 +8,15 @@ import elw.dp.mips.asm.Data;
 import elw.dp.mips.vis.Assembler;
 import elw.dp.mips.vis.InstructionsModel;
 import elw.dp.mips.vis.MipsAssembler;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 
-/**
- * TOAK general overview javadoc.
- *
- * @author Anton Kraievoy
- * @version $Id: AssembleAction.java,v 1.1 2006/12/28 10:57:24 Anton S. Kraievoy Exp $
- */
 public class AssembleAction extends AbstractAction {
-	private static final Logger log = Logger.getLogger(AssembleAction.class.getName());
+	private static final org.slf4j.Logger log = LoggerFactory.getLogger(AssembleAction.class);
 
 	protected final Assembler assembler = new MipsAssembler();
 	protected final InstructionsModel instructionsModel;
@@ -45,7 +40,7 @@ public class AssembleAction extends AbstractAction {
 		if (textInput != null) {
 			load(Data.extractCode(textInput.getText()));
 		} else {
-			log.warning("textInput == null, nothing to assemble");
+			log.warn("textInput == null, nothing to assemble");
 		}
 	}
 
