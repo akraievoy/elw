@@ -5,7 +5,6 @@ import elw.dp.mips.Reg;
 import elw.dp.mips.asm.Data;
 import elw.dp.mips.asm.MipsAssembler;
 import elw.dp.mips.testing.Task;
-import elw.dp.mips.testing.TaskRepo;
 import elw.dp.mips.testing.TestingCase;
 import elw.dp.swing.Swing;
 import elw.dp.ui.SourceEditorFrame;
@@ -32,7 +31,6 @@ public class Controller {
 
 	//  TaskSelector frame
 	TaskSelectorFrame taskSelector;
-	TaskListModel taskListModel;
 
 	//  Source Editor frame
 	SourceEditorFrame sourceEditor;
@@ -61,7 +59,6 @@ public class Controller {
 		getTaskSelector().getActivate().setAction(actions.forKey("activate"));
 		getTaskSelector().getExit().setAction(actions.forKey("exit"));
 		getTaskSelector().getTaskList().getSelectionModel().addListSelectionListener(new TaskListSelectionListener());
-		getTaskSelector().getTaskList().setModel(getTaskListModel());
 
 		getTaskSelector().setVisible(true);
 	}
@@ -83,14 +80,6 @@ public class Controller {
 		}
 
 		actions.setEnabled("activate", selectedTask != null);
-	}
-
-	AbstractTableModel getTaskListModel() {
-		if (taskListModel == null) {
-			taskListModel = new TaskListModel(TaskRepo.getInstance());
-		}
-
-		return taskListModel;
 	}
 
 	public DataPath getDataPath() {
@@ -372,13 +361,6 @@ public class Controller {
 
 	class TaskListSelectionListener implements ListSelectionListener {
 		public void valueChanged(ListSelectionEvent e) {
-			final int row = getTaskSelector().getTaskList().getSelectedRow();
-
-			if (row >= 0) {
-				setSelectedTask(TaskRepo.getInstance().findAll()[row]);
-			} else {
-				setSelectedTask(null);
-			}
 		}
 	}
 

@@ -1,0 +1,2571 @@
+{
+	"name" :"AOS",
+	"id" :"aos-s10",
+	"resourcePath" :"res/aos-s10",
+	"assBundles" : [
+		{
+			"assignments" : [
+				{
+					"name" :"Лабораторная №1",
+					"id" : "1.lw1",
+					"versions" : [
+						{
+							"name" :"Сдвиг влево",
+							"id" : "1",
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 65"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 65","$v0: 130"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 9"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 9","$v0: 18"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 23"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 23","$v0: 46"]
+								}
+							],
+							"statementHtml" : ["Выполнить побитовый сдвиг влево на 1 разряд"],
+							"solution" : ["sll $v0, $a0, 1"]
+						},
+						{
+							"name" :"Сдвиг вправо",
+							"id" : "2",
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 65"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 65","$v0: 32"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 9"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 9","$v0: 4"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 23"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 23","$v0: 11"]
+								}
+							],
+							"statementHtml" : ["Выполнить побитовый сдвиг вправо на 1 разряд"],
+							"solution" : ["srl $v0, $a0, 1"]
+						},
+						{
+							"name" :"Запись в память",
+							"id" : "3",
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 65","$a1: 0x100"],
+									"memoryInput" : [""],
+									"memoryOutput" : ["0x100: 65"],
+									"regsOutput" : ["$a0: 65","$a1: 0x100"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 9","$a1: 0x100"],
+									"memoryInput" : [""],
+									"memoryOutput" : ["0x100: 9"],
+									"regsOutput" : ["$a0: 9","$a1: 0x100"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 23","$a1: 0x100"],
+									"memoryInput" : [""],
+									"memoryOutput" : ["0x100: 23"],
+									"regsOutput" : ["$a0: 23","$a1: 0x100"]
+								}
+							],
+							"statementHtml" : ["Поместить содержимое регистра $a0 в память по адресу из регистра $a1"],
+							"solution" : ["sw $a0, 0($a1)"]
+						},
+						{
+							"name" :"Чтение из памяти",
+							"id" : "4",
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a1: 0x100"],
+									"memoryInput" : ["0x100: 10"],
+									"memoryOutput" : ["0x100: 10"],
+									"regsOutput" : ["$a1: 0x100","$a0: 10"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a1: 0x100"],
+									"memoryInput" : ["0x100: 71"],
+									"memoryOutput" : ["0x100: 71"],
+									"regsOutput" : ["$a1: 0x100","$a0: 71"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a1: 0x100"],
+									"memoryInput" : ["0x100: 22"],
+									"memoryOutput" : ["0x100: 22"],
+									"regsOutput" : ["$a1: 0x100","$a0: 22"]
+								}
+							],
+							"statementHtml" : ["Поместить в регистр $a0 содержимое ячейки памяти по адресу из регистра $a1"],
+							"solution" : ["lw $a0, 0($a1)"]
+						},
+						{
+							"name" :"Увеличить на 2",
+							"id" : "5",
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 65"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 67"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 9"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 11"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 23"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 25"]
+								}
+							],
+							"statementHtml" : ["Увеличить содержимое регистра $a0 на 2"],
+							"solution" : ["addi $a0, $a0, 2"]
+						},
+						{
+							"name" :"Уменьшить на 2",
+							"id" : "6",
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 65"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 63"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 9"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 7"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 23"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 21"]
+								}
+							],
+							"statementHtml" : ["Уменьшить содержимое регистра $a0 на 2"],
+							"solution" : ["addi $a0, $a0, -2"]
+						},
+						{
+							"name" :"Сложение",
+							"id" : "7",
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 65","$a1: 3"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 65","$a1: 3","$v0: 68"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 9","$a1: 17"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 9","$a1: 17","$v0: 26"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 23","$a1: 5"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 23","$a1: 5","$v0: 28"]
+								}
+							],
+							"statementHtml" : ["Сложить содержимое регистров $a1 и $a2 и поместить результат в $v0"],
+							"solution" : ["add $v0, $a0, $a1"]
+						},
+						{
+							"name" :"Вычитание",
+							"id" : "8",
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 65","$a1: 3"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 65","$a1: 3","$v0: 62"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 9","$a1: 17"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 9","$a1: 17","$v0: -8"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 23","$a1: 5"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 23","$a1: 5","$v0: 18"]
+								}
+							],
+							"statementHtml" : ["Вычесть содержимое регистра $a1 из содержимого регистра $a2 и поместить результат в $v0"],
+							"solution" : ["sub $v0, $a0, $a1"]
+						},
+						{
+							"name" :"Умножение",
+							"id" : "9",
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 13","$a1: 3"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 13","$a1: 3","$v0: 39"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 11","$a1: 12"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 11","$a1: 12", "$v0: 132"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 25","$a1: 4"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 25","$a1: 4", "$v0: 100"]
+								}
+							],
+							"statementHtml" : ["Умножить содержимое регистров $a1 и $a2 и поместить результат в $v0"],
+							"solution" : ["mult $a0, $a1", "mflo $v0"]
+						},
+						{
+							"name" :"Деление",
+							"id" : "10",
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 12","$a1: 3"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 12","$a1: 3"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 117","$a1: 7"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 117","$a1: 7"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 43","$a1: 4"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 43","$a1: 4"]
+								}
+							],
+							"statementHtml" : ["Разделить содержимое регистра $a1 на содержимое регистра $a2 и поместить результат в $v0"],
+							"solution" : ["div $a0, $a1", "mflo $v0"]
+						}
+					]
+				},
+				{
+					"name" :"Лабораторная №2",
+					"id" : null,
+					"versions" : [
+						{
+							"name" :"1.11 Проверка на 0",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 12"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 12"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 0"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 4"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 4"]
+								}
+							],
+							"statementHtml" : ["Проверить содержимое регистра на ноль и осуществить переход по метке"],
+							"solution" : ["beq $a0, $zero, end","end:"]
+						},
+						{
+							"name" :"1.12 Проверка на больше 0",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 117"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 117"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 0"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: -23"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: -23"]
+								}
+							],
+							"statementHtml" : ["Проверить содержимое регистра на больше нуля и осуществить переход по метке"],
+							"solution" : ["bgtz $a0, $zero, end","end:"]
+						},
+						{
+							"name" :"1.13 Проверка на меньше 0",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 11"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 11"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: -9"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: -9"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 0"]
+								}
+							],
+							"statementHtml" : ["Проверить содержимое регистра на меньше нуля и осуществить переход по метке"],
+							"solution" : ["bltz $a0, $zero, end","end:"]
+						},
+						{
+							"name" :"1.14 PC:=PC+4",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : [],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : []
+								}
+							],
+							"statementHtml" : ["Увеличить PC на 4"],
+							"solution" : ["noop"]
+						},
+						{
+							"name" :"1.15 Младший бит",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 15"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 15","$v0: 1"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: -7"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: -7","$v0: 1"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 6"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 6","$v0: 0"]
+								}
+							],
+							"statementHtml" : ["Выделить последний бит числа"],
+							"solution" : ["andi $v0,$a0, 1"]
+						},
+						{
+							"name" :"1.16 Логическое \"ИЛИ\"",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 15","$a1: 11"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 15","$a1: 11","$v0: 15"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 9","$a1: 6"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 9","$a1: 6","$v0: 15"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 10","$a1: 5"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 10","$a1: 5","$v0: 15"]
+								}
+							],
+							"statementHtml" : ["Выполнить логическое «или» двух регистров"],
+							"solution" : ["or $v0,$a0, $a1"]
+						},
+						{
+							"name" :"1.17 Логическое \"И\"",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 15","$a1: 7"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 15","$a1: 7"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 10","$a1: 5"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 10","$a1: 0"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 6","$a1: 17"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 6","$a1: 0"]
+								}
+							],
+							"statementHtml" : ["Выполнить логическое «и» двух регистров"],
+							"solution" : ["and $v0, $a0, $a1"]
+						},
+						{
+							"name" :"1.18 Исключающее \"ИЛИ\"",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 11","$a1: 3"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 11","$a1: 3","$v0:"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 23","$a1: 17"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 23","$a1: 17","$v0:"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 14","$a1: 9"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 14","$a1: 9","$v0:"]
+								}
+							],
+							"statementHtml" : ["Выполнить исключающее «или» двух регистров"],
+							"solution" : ["xor $v0, $a0, $a1"]
+						},
+						{
+							"name" :"1.19 Исключающее \"ИЛИ\" непосредственно",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 11"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 11","$v0: 0"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 23"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 23","$v0: 28"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 14"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 14","$v0: 5"]
+								}
+							],
+							"statementHtml" : ["Выполнить исключающее «или» регистра и числа \"11\""],
+							"solution" : ["xori $v0, $a0, 11"]
+						},
+						{
+							"name" :"1.20 Присвоение",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 1"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 1","$a1: 1"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 123"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 123","$a1: 123"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 84"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 84","$a1: 84"]
+								}
+							],
+							"statementHtml" : ["Присвоить содержимому одного регистра значение содержимого другого"],
+							"solution" : ["addi $a1, $a0, 0"]
+						},
+						{
+							"name" :"1.21 Цикл без выхода",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : [""],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : [""]
+								}
+							],
+							"statementHtml" : ["Организовать цикл со счетчиком без выхода"],
+							"solution" : ["addi $a0, $a0, 0","loop: addi $a0, $a0, 1","j loop"]
+						},
+						{
+							"name" :"1.22 Условный переход",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 19","$a1: 19"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 19","$a1: 19","$v0: 1"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 25","$a1: 2"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 25","$a1: 2","$v0: 0"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 14","$a1: -14"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 14","$a1: -14","$v0: 0"]
+								}
+							],
+							"statementHtml" : ["Сравнить на равенство содержимое двух регистров и осуществить переход по метке"],
+							"solution" : ["addi $v0, $v0, 1","beq $a0, $a1, end","addi $v0, $v0, -1","end:"]
+						},
+						{
+							"name" :"1.23 Установление в \"1\"",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 17"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 17","$v0: 21"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 23"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 23","$v0: 23"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 0","$v0: 20"]
+								}
+							],
+							"statementHtml" : ["Установить 3-й и 5-й биты содержимого регистра в \"1\""],
+							"solution" : ["ori $v0, $a0, 20"]
+						},
+						{
+							"name" :"1.24 Установление в \"0\"",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 25"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 25","$v0: 59"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 19"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 19","$v0: 51"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 42"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 42","$v0: 42"]
+								}
+							],
+							"statementHtml" : ["Установить 2-й и 6-й биты содержимого регистра в \"0\""],
+							"solution" : ["ori $v0, $a0, 34"]
+						},
+						{
+							"name" :"2.1 Побитовый сдвиг влево",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 12"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 12","$v0: 108"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 6"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 6","$v0: 60"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0"],
+									"memoryInput" : [""],
+									"memoryOutput" : [],
+									"regsOutput" : ["$a0: 0","$v0: 12"]
+								}
+							],
+							"statementHtml" : ["Выполнить побитовый сдвиг влево на 3 разряда и  установить 3-й и 4-й биты содержимого регистра в \"1\""],
+							"solution" : ["sll $v0, $a0, 3","ori $v0, $v0, 12"]
+						},
+						{
+							"name" :"2.2 Побитовый сдвиг вправо",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 32"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 32","$v0: 7"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 16"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 16","$v0: 3"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 65"],
+									"memoryInput" : [""],
+									"memoryOutput" : [],
+									"regsOutput" : ["$a0: 65","$v0: 11"]
+								}
+							],
+							"statementHtml" : ["Выполнить побитовый сдвиг вправо на 3 разряда и установить 1-й и 2-й биты содержимого регистра в \"1\""],
+							"solution" : ["srl $v0, $a0, 3","ori $v0, $v0, 3"]
+						},
+						{
+							"name" :" 2.3 пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 0x104"],
+									"memoryInput" : ["0x100: 25","0x104: 25"],
+									"memoryOutput" : ["0x100: 25","0x104: 25"],
+									"regsOutput" : ["$a0: 0x100","$a1: 0x104","$v0: 1"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 0x104"],
+									"memoryInput" : ["0x100: 0","0x104: 10"],
+									"memoryOutput" : ["0x100: 0","0x104: 10"],
+									"regsOutput" : ["$a0: 0x100","$a1: 0x104","$v0: 0"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 0x104"],
+									"memoryInput" : ["0x100: 117","0x104: 117"],
+									"memoryOutput" : ["0x100: 117","0x104: 117"],
+									"regsOutput" : ["$a0: 0x100","$a1: 0x104","$v0: 1"]
+								}
+							],
+							"statementHtml" : ["Проверить на равенство содержимое 2-х ЯП."],
+							"solution" : ["addi $v0, $v0, 1","lw $t0, 0($a0) ","lw $t1, 0($a1)","beq $t0, $t1,  end","addi $v0, $v0, -1","end:"]
+						},
+						{
+							"name" :"2.4 Сумма и вычитание ЯП",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 0x104","$a2: 0x108"],
+									"memoryInput" : ["0x100: 17","0x104: 13","0x108: 5"],
+									"memoryOutput" : ["0x100: 17","0x104: 13","0x108: 5"],
+									"regsOutput" : ["$a0: 0x100","$a1: 0x104","$a2: 0x108","$v0: 25"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 0x104","$a2: 0x108"],
+									"memoryInput" : ["0x100: 9","0x104: -3","0x108: 6"],
+									"memoryOutput" : ["0x100: 9","0x104: -3","0x108: 6"],
+									"regsOutput" : ["$a0: 0x100","$a1: 0x104","$a2: 0x108","$v0: 0"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 0x104","$a2: 0x108"],
+									"memoryInput" : ["0x100: 1","0x104: -5","0x108: -14"],
+									"memoryOutput" : ["0x100: 1","0x104: -5","0x108: -14"],
+									"regsOutput" : ["$a0: 0x100","$a1: 0x104","$a2: 0x108","$v0: 10"]
+								}
+							],
+							"statementHtml" : ["Cложить содержимое 2-х ЯП и от результата отнять содержимое 3-й ЯП"],
+							"solution" : ["lw $t0, 0($a0) ","lw $t1, 0($a1)","lw $t2, 0($a2)","add $v0, $t0, $t1","sub $v0, $v0, $t2"]
+						},
+						{
+							"name" :"2.5 Сложение и проверка на >0",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 5"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 7","$v0: 1"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: -2"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 0","$v0: 0"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 1"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 3","$v0: 1"]
+								}
+							],
+							"statementHtml" : ["Увеличить содержимое регистра на 2 и проверить, больше ли оно нуля.  "],
+							"solution" : ["addi $v0, $v0, 1","addi $a0, $a0, 2","bgtz $a0, end","addi $v0, $v0, -1","end:"]
+						},
+						{
+							"name" :"2.6 Вычитание и проверка на <0",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 2"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: -1","$v0: 1"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 3"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 0","$v0: 0"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: -5"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: -8","$v0: 1"]
+								}
+							],
+							"statementHtml" : ["Уменьшить содержимое регистра на 3 и проверить, меньше ли оно нуля.  "],
+							"solution" : ["addi $v0, $v0, 1","addi $a0, $a0, -3","bltz $a0, end","addi $v0, $v0, -1","end:"]
+						},
+						{
+							"name" :"2.7 Сложение и деление",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 3","$a1: 7","$a2: 4"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 3","$a1: 7","$a2: 4"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: -13","$a1: 25","$a2: 6"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: -13","$a1: 25","$a2: 6"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0","$a1: 17","$a2: 5"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 0","$a1: 17","$a2: 5"]
+								}
+							],
+							"statementHtml" : ["Сложить 2 регистра и разделить результат на содержимое третьего регистра"],
+							"solution" : ["add $t0, $a0, $a1","div $t0, $a2"]
+						},
+						{
+							"name" :"2.8 Вычитание и умножение",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 23","$a1: 7","$a2: 10"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 23","$a1: 7","$a2: 10"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0","$a1: -9","$a2: 5"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 0","$a1: -9","$a2: 5"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 4","$a1: 11","$a2: 7"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 4","$a1: 11","$a2: 7"]
+								}
+							],
+							"statementHtml" : ["Отнять 2 регистра и умножить результат на содержимое третьего регистра"],
+							"solution" : ["sub $t0, $a0, $a1","mult $t0, $a2"]
+						},
+						{
+							"name" :"2.9 Логическое «И» и проверка на =0***",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 12","$a1: 48"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 12","$a1: 48","$v0: 1"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 10","$a1: 5"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 10","$a1: 5","$v0: 1"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 11","$a1: 2"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 11","$a1: 2","$v0: 0"]
+								}
+							],
+							"statementHtml" : ["Выполнить логическое «И» двух регистров и проверить результат на равенство нулю"],
+							"solution" : ["addi $v0, $v0, 1","and $t0, $a0, $a1","beq $t0, $zero, end","addi $v0, $v0, -1","end:"]
+						},
+						{
+							"name" :"2.10 Цикл с выходом",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 9"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 9","$v0: 0"]
+								}
+							],
+							"statementHtml" : ["Организовать цикл (с выходом) с заданным количеством шагов"],
+							"solution" : ["add          $v0,          $a0,         $zero","iLoop:","addi $v0, $v0, -1","beq $v0, $zero, end","j iLoop","end:"]
+						},
+						{
+							"name" :"2.11 Логическое \"ИЛИ\" и последний бит",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 16","$a1: 2"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 16","$a1: 2","$v0: 0"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 11","$a1: 0"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 11","$a1: 0","$v0: 1"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 7","$a1: 3"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 7","$a1: 3","$v0: 1"]
+								}
+							],
+							"statementHtml" : ["Выполнить логическое «ИЛИ» двух регистров и выделить последний бит результата"],
+							"solution" : ["or $t0, $a0, $a1","andi $v0, $t0, 1"]
+						},
+						{
+							"name" :"2.12 Установка битов и проверка на рав-во",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 16","$a1: 21"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 16","$a1: 21","$v0: 1"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 11","$a1: 15"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 11","$a1: 15","$v0: 1"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0","$a1: 4"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 0","$a1: 4","$v0: 0"]
+								}
+							],
+							"statementHtml" : ["Установить 1-й и 3-й биты содержимого регистра в «1», проверить на равенство с другим регистром и осуществить переход по метке"],
+							"solution" : ["addi $v0, $v0, 1","ori  $t0, $a0, 5","beq $t0, $a1,  end","addi $v0, $v0, -1","end:"]
+						},
+						{
+							"name" :"3.1 Сумма массива",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 5"],
+									"memoryInput" : ["0x100: 1","0x104: 2","0x108:  3","0x10C: 4","0x110: 5"],
+									"memoryOutput" : ["0x100: 1","0x104: 2","0x108:  3","0x10C: 4","0x110: 5"],
+									"regsOutput" : ["$a0: 0x100","$a1: 5","$v0: 15"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 5"],
+									"memoryInput" : ["0x100: 11","0x104: 22","0x108:    32","0x10C: 4","0x110: 5"],
+									"memoryOutput" : ["0x100: 11","0x104: 22","0x108:    32","0x10C: 4","0x110: 5"],
+									"regsOutput" : ["$a0: 0x100","$a1: 5","$v0: 74"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 7"],
+									"memoryInput" : ["0x100: 1","0x104: 0","0x108:  0","0x10C: 7","0x110: 2","0x114: 9","0x118: 5"],
+									"memoryOutput" : ["0x100: 1","0x104: 0","0x108:  0","0x10C: 7","0x110: 2","0x114: 9","0x118: 5"],
+									"regsOutput" : ["$a0: 0x100","$a1: 7","$v0: 24"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 6"],
+									"memoryInput" : ["0x100: -3","0x104: 1","0x108:  2","0x10C: -7","0x110: -2","0x114: 9"],
+									"memoryOutput" : ["0x100: -3","0x104: 1","0x108:  2","0x10C: -7","0x110: -2","0x114: 9"],
+									"regsOutput" : ["$a0: 0x100","$a1: 6","$v0: 0"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 6"],
+									"memoryInput" : ["0x100: -7","0x104: 1","0x108:  9","0x10C: -7","0x110: 2","0x114: -99"],
+									"memoryOutput" : ["0x100: -7","0x104: 1","0x108:  9","0x10C: -7","0x110: 2","0x114: -99"],
+									"regsOutput" : ["$a0: 0x100","$a1: 6","$v0: -101"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 1"],
+									"memoryInput" : ["0x100: -117"],
+									"memoryOutput" : ["0x100: -117"],
+									"regsOutput" : ["$a0: 0x100","$a1: 1","$v0: -117"]
+								}
+							],
+							"statementHtml" : ["Задан целочисленный массив. Найти сумму элементов массива"],
+							"solution" : ["add $v0, $zero, $zero","add          $t1,           $a1,         $zero ","add          $t2,           $a0,         $zero","iLoop:  ","  ","lw $t0, 0($t2)","add $v0, $v0, $t0","addi $t1, $t1, -1","beq $t1, $zero, end","addi $t2, $t2, 4","j iLoop ","  ","end:  "]
+						},
+						{
+							"name" :"3.3 Наибольший общий делитель",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 12","$a1: 18"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 12","$a1: 18","$v0: 6"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 36","$a1: 54"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 36","$a1: 54","$v0: 18"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 117","$a1: 1"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 117","$a1: 1","$v0: 1"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 9","$a1: 18"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 9","$a1: 18","$v0: 9"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 29","$a1: 87"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 29","$a1: 87","$v0: 29"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 12","$a1: 12"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 12","$a1: 12","$v0: 12"]
+								}
+							],
+							"statementHtml" : ["Найти наибольший общий делитель двух заданных чисел"],
+							"solution" : ["slt $t0, $a1, $a0","add $t1, $zero, $a0","add $t2, $zero, $a1","  ","beq $t0, $zero, do","div $t1, $t2","  ","do:  ","  ","div $t2, $t1","mfhi $t0 ","  ","add $t2, $t1, $zero","add $t1, $t0, $zero","beq $t0, $zero, end","j do ","  ","end:  ","  ","add $v0, $t2, $zero"]
+						},
+						{
+							"name" :"3.2 Максимум массива",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 5"],
+									"memoryInput" : ["0x100: 1","0x104: 2","0x108:     3","0x10C: 4","0x110: 5"],
+									"memoryOutput" : ["0x100: 1","0x104: 2","0x108:     3","0x10C: 4","0x110: 5"],
+									"regsOutput" : ["$a0: 0x100","$a1: 5","$v0: 5"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 6"],
+									"memoryInput" : ["0x100: 1","0x104: -5","0x108:     10","0x10C: 2","0x110: 4","0x114: 8"],
+									"memoryOutput" : ["0x100: 1","0x104: -5","0x108:     10","0x10C: 2","0x110: 4","0x114: 8"],
+									"regsOutput" : ["$a0: 0x100","$a1: 6","$v0: 10"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 7"],
+									"memoryInput" : ["0x100: -1","0x104: -2","0x108:  -7","0x10C: 0","0x110: -11","0x114: -16","0x118: -9"],
+									"memoryOutput" : ["0x100: -1","0x104: -2","0x108:  -7","0x10C: 0","0x110: -11","0x114: -16","0x118: -9"],
+									"regsOutput" : ["$a0: 0x100","$a1: 7","$v0: 0"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 6"],
+									"memoryInput" : ["0x100: 17","0x104: 17","0x108:     17","0x10C: 17","0x110: 17","0x114: 17"],
+									"memoryOutput" : ["0x100: 17","0x104: 17","0x108:     17","0x10C: 17","0x110: 17","0x114: 17"],
+									"regsOutput" : ["$a0: 0x100","$a1: 6","$v0: 17"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 7"],
+									"memoryInput" : ["0x100:     -4","0x104: -3","0x108:     -7","0x10C: -12","0x110: -1","0x114: -21","0x118: -9"],
+									"memoryOutput" : ["0x100:     -4","0x104: -3","0x108:     -7","0x10C: -12","0x110: -1","0x114: -21","0x118: -9"],
+									"regsOutput" : ["$a0: 0x100","$a1: 7","$v0: -1"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 7"],
+									"memoryInput" : ["0x100: -2","0x104: -13","0x108:     -7","0x10C: -4","0x110: -11","0x114: -6","0x118: -2"],
+									"memoryOutput" : ["0x100: -2","0x104: -13","0x108:     -7","0x10C: -4","0x110: -11","0x114: -6","0x118: -2"],
+									"regsOutput" : ["$a0: 0x100","$a1: 7","$v0: -2"]
+								}
+							],
+							"statementHtml" : ["Задан целочисленный массив. Найти максимальный элемент"],
+							"solution" : ["lw $t0, 0($a0)","lw $t1, 0($a0)","add $t4, $a0, $zero","add $t5, $a1, $zero  ","iLoop:  ","  ","addi $t5, $t5, -1","beq $t5, $zero, end","addi $t4, $t4, 4","lw $t3, 0($t4)","sub $t2, $t3, $t0","bgtz $t2, ch_max","j iLoop ","  ","ch_max:  ","  ","lw $t0, 0($t4)","j iLoop ","    ","end:  ","  ","add $v0, $t0, $zero"]
+						},
+						{
+							"name" :"3.4 Делимость на 2**n",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 64","$a1: 6"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 64","$a1: 6","$v0: 1"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 129","$a1: 4"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 129","$a1: 4","$v0: 0"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 1024","$a1: 10"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 1024","$a1: 10","$v0: 1"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 123","$a1: 3"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 123","$a1: 3","$v0: 0"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 4","$a1: 3"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 4","$a1: 3","$v0: 0"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 512","$a1: 9"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 512","$a1: 9","$v0: 1"]
+								}
+							],
+							"statementHtml" : ["Реализовать функцию, которая возвращает 1 для чисел k, делящихся на 2**n, и 0 для остальных"],
+							"solution" : ["add $t2, $zero, $a1","","addi $t0, $zero, 1","addi $v0, $zero, 1","  ","beq $t2, $zero, end","  ","iLoop:  ","  ","sll $t0, $t0, 1","addi $t2, $t2, -1","bgtz $t2, iLoop","  ","div $a0, $t0","mfhi $t1 ","bne $t1, $zero, false","j end ","  ","false:  ","  ","addi $v0, $zero, 0","  ","end:  "]
+						},
+						{
+							"name" :"3.5 Старший бит",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 65"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 65","$v0: 7"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 63"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 63","$v0: 6"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0:9"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 9","$v0: 4"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 89"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 89","$v0: 7"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 255"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 255","$v0: 8"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 1025"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 1025","$v0: 11"]
+								}
+							],
+							"statementHtml" : ["Определить номер старшего значащего бита положительного числа"],
+							"solution" : ["addi $v0, $zero, 0","addi $t0, $a0, 0","","do:","sra $t0, $t0, 1","addi $v0, $v0, 1","beq $t0, $zero, end","j do ","","end:"]
+						},
+						{
+							"name" :"3.6 Факториал",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 0","$v0: 1"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 5"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 5","$v0: 120"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0:9"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 9","$v0: 362880"]
+								}
+							],
+							"statementHtml" : ["Дано натуральное число n. Найти факториал данного числа"],
+							"solution" : [""]
+						},
+						{
+							"name" :"3.7 Установленные биты",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 0","$v0: 0"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 5"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 5","$v0: 2"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0:15"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 15","$v0: 4"]
+								}
+							],
+							"statementHtml" : ["Дано натуральное число n. Требуется вычислить количество установленных бит"],
+							"solution" : ["addi $v0, $zero, 0","addi $s0, $zero, 1","addi $t0, $zero, 31","  ","iLoop:  ","  ","and $t1, $a0, $s0","beq $t1, $s0, inc","sll $s0, $s0, 1","addi $t0, $t0, -1","beq $t0, $zero, end","j iLoop ","  ","inc:  ","  ","addi $v0, $v0, 1","sll $s0, $s0, 1","addi $t0, $t0, -1","beq $t0, $zero, end","j iLoop ","  ","end:  "]
+						},
+						{
+							"name" :"3.8 Кол-во нулей",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 16","$a1: 2"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 16","$a1: 2","$v0: 4"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 131","$a1: 2"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 131","$a1: 2","$v0: 5"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0:15","$a1: 2"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0:15","$a1: 2","$v0: 0"]
+								}
+							],
+							"statementHtml" : ["Подсчитать суммарное количество нулей в записи числа N в системе счисления с основой q"],
+							"solution" : ["addi $v0, $zero, 0","add          $t2,          $a0,         $zero  ","loop:  ","  ","slt $t1, $t2, $a1","bne $t1, $zero, end","div $t2, $a1","mfhi $t0 ","beq $t0, $zero, inc","mflo $t2 ","j loop ","  ","inc:  ","  ","addi $v0, $v0, 1","mflo $t2 ","j loop ","  ","end:  "]
+						},
+						{
+							"name" :"3.9 Минимум массива",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 5"],
+									"memoryInput" : ["0x100: 1","0x104: 2","0x108:     3","0x10C: 4","0x110: 5"],
+									"memoryOutput" : ["0x100: 1","0x104: 2","0x108:     3","0x10C: 4","0x110: 5"],
+									"regsOutput" : ["$a0: 0x100","$a1: 5","$v0: 1"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 6"],
+									"memoryInput" : ["0x100: 1","0x104: -5","0x108:     10","0x10C: 2","0x110: 4","0x114: 8"],
+									"memoryOutput" : ["0x100: 1","0x104: -5","0x108:     10","0x10C: 2","0x110: 4","0x114: 8"],
+									"regsOutput" : ["$a0: 0x100","$a1: 6","$v0: -5"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 7"],
+									"memoryInput" : ["0x100: -1","0x104: -2","0x108:  -7","0x10C: 0","0x110: -11","0x114: -16","0x118: -9"],
+									"memoryOutput" : ["0x100: -1","0x104: -2","0x108:  -7","0x10C: 0","0x110: -11","0x114: -16","0x118: -9"],
+									"regsOutput" : ["$a0: 0x100","$a1: 7","$v0: -16"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 6"],
+									"memoryInput" : ["0x100: 13","0x104: 13","0x108:     13","0x10C: 13","0x110: 13","0x114: 13"],
+									"memoryOutput" : ["0x100: 13","0x104: 13","0x108:     13","0x10C: 13","0x110: 13","0x114: 13"],
+									"regsOutput" : ["$a0: 0x100","$a1: 6","$v0: 13"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 7"],
+									"memoryInput" : ["0x100:      0","0x104: 25","0x108:      7","0x10C:  12","0x110:  1","0x114:  21","0x118:  9"],
+									"memoryOutput" : ["0x100:      0","0x104: 25","0x108:      7","0x10C:  12","0x110:  1","0x114:  21","0x118:  9"],
+									"regsOutput" : ["$a0: 0x100","$a1: 7","$v0: 0"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 7"],
+									"memoryInput" : ["0x100: -1","0x104: -13","0x108:     -7","0x10C: -4","0x110: -11","0x114: -6","0x118: -13"],
+									"memoryOutput" : ["0x100: -1","0x104: -13","0x108:     -7","0x10C: -4","0x110: -11","0x114: -6","0x118: -13"],
+									"regsOutput" : ["$a0: 0x100","$a1: 7","$v0: -13"]
+								}
+							],
+							"statementHtml" : ["Задан целочисленный массив. Найти минимальный элемент."],
+							"solution" : ["lw $t0, 0($a0)","lw $t1, 0($a0)","add          $t4,           $a0,    $zero","add          $t5,           $a1,    $zero  ","iLoop:  ","  ","addi $t5, $t5, -1","beq $t5, $zero, end","addi $t4, $t4, 4","lw $t3, 0($t4)","sub $t2, $t1, $t3","bgtz $t2, ch_min","j iLoop  ","  ","ch_min:  ","  ","lw $t1, 0($t4)","j iLoop ","  ","end:  ","  ","add $v0, $t1, $zero"]
+						},
+						{
+							"name" :"3.10 Наименьшее общее кратное двух чисел",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 5","$a1: 6"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 5","$a1: 6","$v0: 30"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 6","$a1: 8"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 6","$a1: 8","$v0: 24"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 3","$a1: 27"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 3","$a1: 27","$v0: 27"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 17","$a1: 17"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 17","$a1: 17","$v0: 17"]
+								}
+							],
+							"statementHtml" : ["Найти наименьшее общее кратное двух заданных чисел"],
+							"solution" : ["slt $t0, $a1, $a0","add $t1, $zero, $a0","add $t2, $zero, $a1","  ","beq $t0, $zero, do","div $t1, $t2","  ","do:  ","  ","div $t2, $t1","mfhi $t0 ","  ","add $t2, $t1, $zero","add $t1, $t0, $zero","beq $t0, $zero, end","j do ","  ","end:  ","  ","add $v0, $t2, $zero"]
+						},
+						{
+							"name" :"3.11 Число из ряда Фибоначчи",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 1"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 1","$v0: 0"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 9"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 9","$v0: 21"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 11"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 11","$v0: 55"]
+								}
+							],
+							"statementHtml" : ["По заданному номеру n найти число из ряда Фибоначчи"],
+							"solution" : ["add   $t1,     $a0,    $zero","","fact:  ","  ","addi $sp, $sp, -8","sw $ra, 0($sp)","addi $t0, $a0, -1","blez $t0, base","addi $t1, $t1, -1","jal fact ","addi $t1, $t1, 1","mult $t1, $v0","mflo $v0 ","lw $ra, 0($sp)","addi $sp, $sp, 4","jr $ra ","  ","base:  ","  ","addi $v0, $ZERO, 1","addi $sp, $sp, 4","jr $ra ","  ","end:  "]
+						},
+						{
+							"name" :"яю3\u0000.\u00001\u00002\u0000 \u0000\u001C\u00040\u0004A\u0004A\u00048\u00042\u0004:\u0000 \u0000@\u00040\u00047\u0004=\u00048\u0004F\u00040\u0004 \u0000M\u0004;\u00045\u0004<\u00045\u0004=\u0004B\u0004>\u00042\u0004.\u0000",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 0x114","$a2: 5"],
+									"memoryInput" : ["0x100: 0","0x104: 2","0x108:     11","0x10C: 4","0x110: 5","","0x114:    2","0x118:    2","0x11C:    5","0x120:    0","0x124:    2"],
+									"memoryOutput" : ["0x100: -2","0x104: 0","0x108:     6","0x10C: 4","0x110: 3","","0x114:    2","0x118:    2","0x11C:    5","0x120:    0","0x124:    2"],
+									"regsOutput" : ["$a0: 0x100","$a1: 0x114","$a2: 5"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 0x118","$a2: 6"],
+									"memoryInput" : ["0x100: 1","0x104: -5","0x108:     -10","0x10C: 2","0x110: 4","0x114: 8","","0x118: 1","0x11C:    2","0x120:   -10","0x124:    7","0x128:    2","0x12C:    7"],
+									"memoryOutput" : ["0x100: 0","0x104: -7","0x108:      0","0x10C: -5","0x110: 2","0x114: 1","","0x118: 1","0x11C:    2","0x120:   -10","0x124:    7","0x128:    2","0x12C:    7"],
+									"regsOutput" : ["$a0: 0x100","$a1: 0x118","$a2: 6"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 0x11C","$a2: 7"],
+									"memoryInput" : ["0x100: 1","0x104: -5","0x108:     -10","0x10C: 2","0x110: 40","0x114: 8","0x118: 13","","0x11C:    12","0x120:   -10","0x124:    7","0x128:    2","0x12C:    7","0x130:    8","0x134:    12"],
+									"memoryOutput" : ["0x100: -11","0x104: 5","0x108:     -17","0x10C: 0","0x110: 33","0x114: 0","0x118: 1","","0x11C:    12","0x120:   -10","0x124:    7","0x128:    2","0x12C:    7","0x130:    8","0x134:    12"],
+									"regsOutput" : ["$a0: 0x100","$a1: 0x11C","$a2: 7"]
+								}
+							],
+							"statementHtml" : ["Заданы два целочисленных массива. Сформировать третий массив, каждый элемент которого является разницей соответствующих элементов данных массивов"],
+							"solution" : ["lw $t0, 0($a0)","lw $t1, 0($a0)","add $t4, $a0, $zero","add $t5, $a1, $zero  ","iLoop:  ","  ","addi $t5, $t5, -1","beq $t5, $zero, end","addi $t4, $t4, 4","lw $t3, 0($t4)","sub $t2, $t3, $t0","bgtz $t2, ch_max","j iLoop ","  ","ch_max:  ","  ","lw $t0, 0($t4)","j iLoop ","    ","end:  ","  ","add $v0, $t0, $zero"]
+						},
+						{
+							"name" :"4.1 Сдвиг массива вправо",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 5","$a2: 2"],
+									"memoryInput" : ["0x100: 1","0x104: 3","0x108:  5","0x10C: 7","0x110: 9"],
+									"memoryOutput" : ["0x100: 7","0x104: 9","0x108:  1","0x10C: 3","0x110: 5"],
+									"regsOutput" : ["$a0: 0x100","$a1: 5","$a2: 2"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 5","$a2: 3"],
+									"memoryInput" : ["0x100: 0","0x104: 2","0x108:   -1","0x10C: 6","0x110: 4"],
+									"memoryOutput" : ["0x100: -1","0x104: 6","0x108:   4","0x10C: 0","0x110: 2"],
+									"regsOutput" : ["$a0: 0x100","$a1: 5","$a2: 3"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 8","$a2: 2"],
+									"memoryInput" : ["0x100: 3","0x104: 27","0x108:   9","0x10C: 0","0x110: 1","0x114:      8","0x118: 11","0x11C: 13"],
+									"memoryOutput" : ["0x100: 11","0x104: 13","0x108:   3","0x10C: 27","0x110: 9","0x114:      0","0x118: 1","0x11C: 8"],
+									"regsOutput" : ["$a0: 0x100","$a1: 8","$a2: 2"]
+								}
+							],
+							"statementHtml" : ["Задан целочисленный массив. Произвести циклический сдвиг его элементов на k позиций вправо"],
+							"solution" : ["add $t4, $zero, $a2","beq $t4, $zero, L1","","iLoop:  ","  ","add $t2, $zero, $a0","addi $t3, $a1, -1","lw $t0, 0($t2)","  ","jLoop:  ","  ","lw $t1, 4($t2)","sw $t0, 4($t2)","add $t0, $zero, $t1","addi $t3, $t3, -1","beq $t3, $zero, end","addi $t2, $t2, 4","j jLoop ","  ","L1:","","addi $t4, $t4, 1","lw $t1, 0($a0)","","end:  ","  ","sw $t1, 0($a0)","addi $t4, $t4, -1","bgtz $t4, iLoop"]
+						},
+						{
+							"name" :"4.2 Максимум массива",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 5"],
+									"memoryInput" : ["0x100: 1","0x104: 2","0x108:  3","0x10C: 2","0x110: 3"],
+									"memoryOutput" : ["0x100: 1","0x104: 2","0x108:  3","0x10C: 2","0x110: 3"],
+									"regsOutput" : ["$a0: 0x100","$a1: 5","$v0: 2"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 6"],
+									"memoryInput" : ["0x100: 1","0x104: -5","0x108:     3","0x10C: 2","0x110: 4","0x114: 8"],
+									"memoryOutput" : ["0x100: 1","0x104: -5","0x108:     3","0x10C: 2","0x110: 4","0x114: 8"],
+									"regsOutput" : ["$a0: 0x100","$a1: 6","$v0: 1"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 7"],
+									"memoryInput" : ["0x100: -1","0x104: -2","0x108:  -7","0x10C: 0","0x110: -11","0x114: -16","0x118: -9"],
+									"memoryOutput" : ["0x100: -1","0x104: -2","0x108:  -7","0x10C: 0","0x110: -11","0x114: -16","0x118: -9"],
+									"regsOutput" : ["$a0: 0x100","$a1: 7","$v0: 1"]
+								}
+							],
+							"statementHtml" : ["Задан целочисленный массив. Подсчитать, сколько раз в нем встречается максимальный элемент"],
+							"solution" : ["addi $v0, $zero, 1","lw $t0, 0($a0)","add $t3, $zero, $a0","add $t4, $zero, $a1  ","iLoop:  ","  ","addi $t4, $t4, -1","beq $t4, $zero, end","addi $t3, $t3, 4","lw $t1, 0($t3)","sub $t2, $t1, $t0","bgtz $t2, ch_max","beq $t0, $t1, inc","j iLoop ","  ","ch_max:  ","  ","addi $v0, $zero, 1","lw $t0, 0($t3)","j iLoop ","  ","inc:  ","  ","addi $v0, $v0, 1","j iLoop ","  ","end:  "]
+						},
+						{
+							"name" :"4.3 Массив: разница экстремумов",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 5"],
+									"memoryInput" : ["0x100: 1","0x104: 2","0x108:  3","0x10C: 8","0x110: 5"],
+									"memoryOutput" : ["0x100: 1","0x104: 2","0x108:  3","0x10C: 8","0x110: 5"],
+									"regsOutput" : ["$a0: 0x100","$a1: 5","$v0: 7"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 6"],
+									"memoryInput" : ["0x100: -1","0x104: 2","0x108:  3","0x10C: 8","0x110: 5","0x114: 5"],
+									"memoryOutput" : ["0x100: -1","0x104: 2","0x108:  3","0x10C: 8","0x110: 5","0x114: 5"],
+									"regsOutput" : ["$a0: 0x100","$a1: 6","$v0: 9"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 6"],
+									"memoryInput" : ["0x100: 8","0x104: 0","0x108:  14","0x10C: 7","0x110: 10","0x114: 13"],
+									"memoryOutput" : ["0x100: 8","0x104: 0","0x108:  14","0x10C: 7","0x110: 10","0x114: 13"],
+									"regsOutput" : ["$a0: 0x100","$a1: 6","$v0: 14"]
+								}
+							],
+							"statementHtml" : ["Задан целочисленный массив. Найти разность его максимального и минимального элементов"],
+							"solution" : ["add $t4, $zero, $a0","add $t5, $zero, $a1","","lw $t0, 0($t4)","lw $t1, 0($t4)","  ","iLoop:  ","  ","addi $t5, $t5, -1","beq $t5, $zero, end","addi $t4, $t4, 4","lw $t3, 0($t4)","sub $t2, $t3, $t0","bgtz $t2, ch_max","sub $t2, $t1, $t3","bgtz $t2, ch_min","j iLoop ","  ","ch_max:  ","  ","lw $t0, 0($t4)","j iLoop ","  ","ch_min:  ","  ","lw $t1, 0($t4)","j iLoop ","  ","end:  ","  ","sub $v0, $t0, $t1"]
+						},
+						{
+							"name" :"4.4 Разделение массива",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 10","$a2: 0x200","$a3: 0x300"],
+									"memoryInput" : ["0x100: 0","0x104: 8","0x108:  6","0x10C: 4","0x110: 2","0x114: 1","0x118: 3","0x11C:  5","0x120: 7","0x124: 9"],
+									"memoryOutput" : ["0x100: 0","0x104: 8","0x108:  6","0x10C: 4","0x110: 2","0x114: 1","0x118: 3","0x11C:  5","0x120: 7","0x124: 9","","0x200: 0","0x204: 6","0x208:  2","0x20C: 3","0x210: 7","","0x300: 8","0x304: 4","0x308:  1","0x30C: 5","0x310: 9"],
+									"regsOutput" : ["$a0: 0x100","$a1: 10","$a2: 0x200","$a3: 0x300"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 10","$a2: 0x200","$a3: 0x300"],
+									"memoryInput" : ["0x100: 117","0x104: 34","0x108:  3","0x10C: 7","0x110: 3","0x114: -5","0x118: 0","0x11C:  2","0x120: 7","0x124: -4"],
+									"memoryOutput" : ["0x100: 117","0x104: 34","0x108:  3","0x10C: 7","0x110: 3","0x114: -5","0x118: 0","0x11C:  2","0x120: 7","0x124: -4","","0x200: 117","0x204: 3","0x208:  3","0x20C: 0","0x210: 7","","0x300: 34","0x304: 7","0x308:     -5","0x30C:    2","0x310: -4"],
+									"regsOutput" : ["$a0: 0x100","$a1: 10","$a2: 0x200","$a3: 0x300"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 10","$a2: 0x200","$a3: 0x300"],
+									"memoryInput" : ["0x100: 1","0x104: 3","0x108:  3","0x10C: 7","0x110: 67","0x114: -5","0x118: 0","0x11C:  3","0x120: 7","0x124: -4"],
+									"memoryOutput" : ["0x100: 1","0x104: 3","0x108:  3","0x10C: 7","0x110: 67","0x114: -5","0x118: 0","0x11C:  3","0x120: 7","0x124: -4","","0x200: 1","0x204: 3","0x208:  67","0x20C: 0","0x210: 7","","0x300: 3","0x304: 7","0x308:   -5","0x30C: 3","0x310: -4"],
+									"regsOutput" : ["$a0: 0x100","$a1: 10","$a2: 0x200","$a3: 0x300"]
+								}
+							],
+							"statementHtml" : ["Задан массив размером 2N. Сформировать два массива размером N включая в первый элементы исходного массива с четными индексами, а во второй - с нечетными"],
+							"solution" : ["add $t1, $zero, $a0","add $t2, $zero, $a1","add $t3, $zero, $a2","add $t4, $zero, $a3","","iLoop:  ","  ","lw $t0, 0($t1)","sw $t0, 0($t3)","addi $t3, $t3, 4","addi $t2, $t2, -1","beq $t2, $zero, end","addi $t1, $t1, 4","lw $t0, 0($t1)","sw $t0, 0($t4)","addi $t4, $t4, 4","addi $t2, $t2, -1","beq $t2, $zero, end","addi $t1, $t1, 4","j iLoop ","  ","end:  "]
+						},
+						{
+							"name" :"4.5 Повторяющиеся элементы",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a2: 0x100","$a3: 7","$t0: 2"],
+									"memoryInput" : ["0x100: 0","0x104: 8","0x108:  6","0x10C: 4","0x110: 2","0x114: 1","0x118: 3"],
+									"memoryOutput" : ["0x100: 0","0x104: 8","0x108:  6","0x10C: 4","0x110: 2","0x114: 1","0x118: 3"],
+									"regsOutput" : ["$a2: 0x100","$a3: 7","$t0: 2","$v1: 1"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a2: 0x100","$a3: 8","$t0: 11"],
+									"memoryInput" : ["0x100: 17","0x104: 4","0x108:  3","0x10C: 7","0x110: 3","0x114: 5","0x118: 0","0x11C:  2"],
+									"memoryOutput" : ["0x100: 17","0x104: 4","0x108:  3","0x10C: 7","0x110: 3","0x114: 5","0x118: 0","0x11C:  2"],
+									"regsOutput" : ["$a2: 0x100","$a3: 8","$t0: 11","$v1: 0"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a2: 0x100","$a3: 9","$t0: 3"],
+									"memoryInput" : ["0x100: 1","0x104: 3","0x108:  3","0x10C: 7","0x110: 6","0x114: 5","0x118: 0","0x11C:  3","0x120: 7"],
+									"memoryOutput" : ["0x100: 1","0x104: 3","0x108:  3","0x10C: 7","0x110: 6","0x114: 5","0x118: 0","0x11C:  3","0x120: 7"],
+									"regsOutput" : ["$a2: 0x100","$a3: 9","$t0: 3","$v1: 3"]
+								}
+							],
+							"statementHtml" : ["Задан массив, в котором могут быть повторяющиеся элементы. Найти количество различных элементов массива. Можно использовать дополнительный массив такого же размера, как и исходный"],
+							"solution" : ["addi $v0, $zero, 1","  ","lw $t0, 0($a0)","add $t1, $zero, $s0","add $t2, $zero, $a1","  ","loop:  ","  ","sw $t0, 0($t1)","addi $t2, $t2, -1","beq $t2, $zero, break","addi $t1, $t1, 4","j loop ","  ","break:  ","  ","addi $a0, $a0, 4","add $t1, $zero, $s0","addi $t2, $a1, -1","  ","iLoop:  ","  ","lw $t0, 0($a0)","  ","add $a2, $zero, $s0","add $a3, $zero, $a1","jal inloop ","beq $v1, $zero, inc","addi $t2, $t2, -1","beq $t2, $zero, end","addi $a0, $a0, 4","j iLoop ","  ","inc:  ","  ","addi $v0, $v0, 1","addi $t1, $t1, 4","lw $t0, 0($t1)","  ","addi $t2, $t2, -1","beq $t2, $zero, end","addi $a0, $a0, 4","j iLoop ","  ","inloop:  ","  ","lw $t8, 0($a2)","beq $t8, $t0, yes","addi $a3, $a3, -1","beq $a3, $zero, no","addi $a2, $a2, 4","j inloop ","  ","yes:  ","  ","addi $v1, $zero, 1","jr $ra ","  ","no:  ","  ","addi $v1, $zero, 0","jr $ra ","  ","end:  "]
+						},
+						{
+							"name" :"4.6 Обрамление",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 17"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 17","$v0: 59"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 21"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 21","$v0: 63"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 15"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 15","$v0: 31"]
+								}
+							],
+							"statementHtml" : ["Дано натуральное число n. Необходимо “обрамить” установленные биты  единицами"],
+							"solution" : ["sll $t0, $a0, 1","srl $t1, $a0, 1","or $v0, $a0, $t0","or $v0, $v0, $t1"]
+						},
+						{
+							"name" :"4.7 Число в обратном порядке",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 512"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 512","$v0: 1"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 513"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 513","$v0: 513"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 514"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 514","$v0: 257"]
+								}
+							],
+							"statementHtml" : ["Целое положительное число m записывается в двоичной системе счисления и разряды в этой записи представляются в обратном порядке. Найти заданное число"],
+							"solution" : ["addi $v0, $zero, 0","Addi $t0, $zero, 0","add $t1, $zero, $a0","  ","do:  ","  ","srl $t1, $t1, 1","beq $t1, $zero, while","addi $t0, $t0, 1","j do ","  ","while:  ","  ","addi $s0, $zero, 1","addi $s1, $zero, 1","sllv $s1, $s1, $t0","  ","iLoop:  ","  ","and $t2, $s0, $a0","and $t3, $s1, $a0","sllv $t2, $t2, $t0","srlv $t3, $t3, $t0","add $v0, $v0, $t2","add $v0, $v0, $t3","addi $t0, $t0, -2","blez $t0, end","sll $s0, $s0, 1","srl $s1, $s1, 1","  ","j iLoop ","  ","end:  "]
+						},
+						{
+							"name" :"4.8 Установить в \"1\"",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 70"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 70","$v0: 239"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 17"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 17","$v0: 59"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 32"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 32","$v0: 112"]
+								}
+							],
+							"statementHtml" : ["Установить в «1» все биты, смежные с хотя-бы одним уже установленным в «1» в заданном числе. Допускаем, что крайние биты смежны с нулевым. Изначально установленные 1 биты не сбрасывать"],
+							"solution" : ["addi $s0, $zero, 1","addi $v0, $zero, 0","  ","addi $t0, $zero, 0","add $t1, $zero, $a0","  ","s1:  ","  ","sra $t1, $t1, 1","beq $t1, $zero, m1","addi $t0, $t0, 1","j s1 ","  ","m1:  ","  ","add $a1, $zero, $a0","jal right ","add $t3, $zero, $v1","  ","add $a1, $zero, $a0","jal left ","add $t4, $zero, $v1","  ","or $v0, $a0, $t3","or $v0, $v0, $t4","  ","j end ","  ","right:  ","  ","addi $v1, $zero, 0","srl $v1, $a1, 1","jr $ra ","  ","left:  ","  ","addi $v1, $zero, 0","add $t1, $zero, $t0","addi $t7, $zero, 0","  ","loop:  ","  ","addi $t7, $t7, 1","sll $t7, $t7, 1","addi $t1, $t1, -1","beq $t1, $zero, break","j loop ","  ","break:  ","addi $t7, $t7, 1","  ","sll $v1, $a1, 1","and $v1, $v1, $t7","jr $ra ","  ","end:  "]
+						},
+						{
+							"name" :"4.9 Установить в \"0\"",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 70"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 70","$v0: 6"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 17"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 17","$v0: 0"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 31"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 31","$v0: 31"]
+								}
+							],
+							"statementHtml" : ["Сбросить в «0» все биты, смежные одновременно с двумя установленными в «0» в заданном числе. Допускаем, что крайние биты смежны с нулевым"],
+							"solution" : ["addi $s0, $zero, 1","addi $v0, $zero, 0","  ","addi $t0, $zero, 0","add $t1, $zero, $a0","  ","s1:  ","  ","sra $t1, $t1, 1","beq $t1, $zero, m1","addi $t0, $t0, 1","j s1 ","  ","m1:  ","  ","add $a1, $zero, $a0","jal right ","add $t3, $zero, $v1","  ","add $a1, $zero, $a0","jal left ","add $t4, $zero, $v1","  ","or $t3, $t3, $t4","and $v0, $a0, $t3","  ","j end ","  ","right:  ","  ","addi $v1, $zero, 0","srl $v1, $a1, 1","jr $ra ","  ","left:  ","  ","addi $v1, $zero, 0","add $t1, $zero, $t0","addi $t7, $zero, 0","  ","loop:  ","  ","addi $t7, $t7, 1","sll $t7, $t7, 1","addi $t1, $t1, -1","beq $t1, $zero, break","j loop ","  ","break:  ","addi $t7, $t7, 1","  ","sll $v1, $a1, 1","and $v1, $v1, $t7","jr $ra ","  ","end:  "]
+						},
+						{
+							"name" :"4.10 Минимум массива",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 5"],
+									"memoryInput" : ["0x100: 1","0x104: 2","0x108:  3","0x10C: 8","0x110: 5"],
+									"memoryOutput" : ["0x100: 1","0x104: 2","0x108:  3","0x10C: 8","0x110: 5"],
+									"regsOutput" : ["$a0: 0x100","$a1: 5","$v0: 1"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 6"],
+									"memoryInput" : ["0x100: -1","0x104: 2","0x108:  3","0x10C: -1","0x110: 5","0x114: -1"],
+									"memoryOutput" : ["0x100: -1","0x104: 2","0x108:  3","0x10C: 8","0x110: 5","0x114: 5"],
+									"regsOutput" : ["$a0: 0x100","$a1: 6","$v0: 3"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 6"],
+									"memoryInput" : ["0x100: 8","0x104: 8","0x108:  8","0x10C: 8","0x110: 8","0x114: 8"],
+									"memoryOutput" : ["0x100: 8","0x104: 8","0x108:  8","0x10C: 8","0x110: 8","0x114: 8"],
+									"regsOutput" : ["$a0: 0x100","$a1: 6","$v0: 6"]
+								}
+							],
+							"statementHtml" : ["Задан целочисленный массив. Подсчитать, сколько раз в нем встречается минимальный элемент"],
+							"solution" : [""]
+						},
+						{
+							"name" :"4.11 Четные на нечетные",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 21"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 21","$v0: 42"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 73"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 73","$v0: 134"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 5"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 5","$v0: 10"]
+								}
+							],
+							"statementHtml" : ["Поменять местами четные и нечетные биты в 32-разрядном числе"],
+							"solution" : ["addi $t0, $zero, 16","addi $t1, $zero, 2","addi $s0, $zero, 0","  ","iLoop:  ","  ","add $s0, $s0, $t1","sll $t1, $t1, 2","addi $t0, $t0, -1","bgtz $t0, iLoop","  ","addi $t0, $zero, 16","addi $t1, $zero, 1","addi $s1, $zero, 0","  ","jLoop:  ","  ","add $s1, $s1, $t1","sll $t1, $t1, 2","addi $t0, $t0, -1","bgtz $t0, jLoop","  ","and $s0, $a0, $s0","and $s1, $a0, $s1","srl $s0, $s0, 1","sll $s1, $s1, 1","add $v0, $s0, $s1"]
+						},
+						{
+							"name" :"4.12 Сдвиг массива влево",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 5","$a2: 2"],
+									"memoryInput" : ["0x100: 1","0x104: 3","0x108:  5","0x10C: 7","0x110: 9"],
+									"memoryOutput" : ["0x100: 5","0x104: 7","0x108:  9","0x10C: 1","0x110: 3"],
+									"regsOutput" : ["$a0: 0x100","$a1: 5","$a2: 2"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 5","$a2: 3"],
+									"memoryInput" : ["0x100: 0","0x104: 2","0x108:   -1","0x10C: 6","0x110: 4"],
+									"memoryOutput" : ["0x100: 6","0x104: 4","0x108:  0","0x10C: 2","0x110: -1"],
+									"regsOutput" : ["$a0: 0x100","$a1: 5","$a2: 3"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 8","$a2: 5"],
+									"memoryInput" : ["0x100: 3","0x104: 27","0x108:   9","0x10C: 0","0x110: 1","0x114:      8","0x118: 11","0x11C: 13"],
+									"memoryOutput" : ["0x100: 8","0x104: 11","0x108:  13","0x10C: 3","0x110: 27","0x114:  9","0x118: 0","0x11C: 1"],
+									"regsOutput" : ["$a0: 0x100","$a1: 8","$a2: 5"]
+								}
+							],
+							"statementHtml" : ["Задан целочисленный массив. Произвести циклический сдвиг его элементов на k позиций влево"],
+							"solution" : [""]
+						},
+						{
+							"name" :"5.1 Рекурсивный факториал",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 5"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 5","$v0: 120"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 3"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 3","$v0: 6"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 6"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 6","$v0: 720"]
+								}
+							],
+							"statementHtml" : ["Написать рекурсивную функцию для вычисления факториала натурального числа"],
+							"solution" : ["fact:  ","  ","addi $sp, $sp, -8","sw $ra, 0($sp)","addi $t0, $a0, -1","blez $t0, base","addi $a0, $a0, -1","jal fact ","addi $a0, $a0, 1","mult $a0, $v0","mflo $v0 ","lw $ra, 0($sp)","addi $sp, $sp, 4","jr $ra ","  ","base:  ","  ","addi $v0, $ZERO, 1","addi $sp, $sp, 4","jr $ra ","  ","end:  "]
+						},
+						{
+							"name" :"5.2 Степень",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 3","$a1: 4"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 3","$a1: 4","$v0: 64"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 5","$a1: 2"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 5","$a1: 2","$v0: 32"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 4","$a1: 5"],
+									"memoryInput" : [""],
+									"memoryOutput" : [""],
+									"regsOutput" : ["$a0: 4","$a1: 5","$v0: 625"]
+								}
+							],
+							"statementHtml" : ["Написать рекурсивную функцию для вычисления положительной степени целого числа"],
+							"solution" : ["pow:  ","  ","addi $sp, $sp, -4","sw $ra, 0($sp)","addi $t0, $a0, -1","blez $t0, finish","addi $a0, $a0, -1","jal pow ","mult $a1, $v0","mflo $v0 ","lw $ra, 0($sp)","addi $sp, $sp, 4","jr $ra ","  ","finish:  ","  ","add $v0, $ZERO, $a1","addi $sp, $sp, 4","jr $ra ","  ","end:  "]
+						},
+						{
+							"name" :"5.3 Массив числа",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 5","$a2: 3"],
+									"memoryInput" : ["0x100: 1","0x104: 0","0x108:  2","0x10C: 1","0x110: 0"],
+									"memoryOutput" : ["0x100: 1","0x104: 0","0x108:  2","0x10C: 1","0x110: 0"],
+									"regsOutput" : ["$a0: 0x100","$a1: 5","$a2: 3","$v0: 102"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 5","$a2: 4"],
+									"memoryInput" : ["0x100: 2","0x104: 3","0x108:  0","0x10C: 1","0x110: 0"],
+									"memoryOutput" : ["0x100: 2","0x104: 3","0x108:  0","0x10C: 1","0x110: 0"],
+									"regsOutput" : ["$a0: 0x100","$a1: 5","$a2: 4","$v0: 708"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 4","$a2: 10"],
+									"memoryInput" : ["0x100: 2","0x104: 1","0x108:  9","0x10C: 3"],
+									"memoryOutput" : ["0x100: 2","0x104: 1","0x108:  9","0x10C: 3"],
+									"regsOutput" : ["$a0: 0x100","$a1: 4","$a2: 10","$v0: 2193"]
+								}
+							],
+							"statementHtml" : ["Число задается целочисленным массивом. Реализовать алгоритм перевода заданного числа из системы счисления р в непосредственное значение"],
+							"solution" : ["addi $v0, $zero, 0","add $s0, $zero, $a2","  ","addi $s1, $a1, -1","  ","iLoop:  ","  ","jal pow ","lw $t0, 0($a0)","mult $t0, $v1","mflo $t0 ","add $v0, $v0, $t0","addi $s1, $s1, -1","bltz $s1, end","addi $a0, $a0, 4","j iLoop ","  ","pow: % $s0 – a $s1 – n","        % $v1 – a^n","  ","addi $v1, $zero, 1","beq $s1, $zero, m","add $t0, $zero, $s1","  ","loop:  ","  ","mult $v1, $s0","mflo $v1 ","addi $t0, $t0, -1","bgtz $t0, loop","  ","m:  ","  ","jr $ra ","  ","end:  "]
+						},
+						{
+							"name" :"5.4 Положительная последовательность",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 6"],
+									"memoryInput" : ["0x100: -1","0x104: 1","0x108:  1","0x10C: 0","0x110: 1","0x114: -1"],
+									"memoryOutput" : ["0x100: -1","0x104: 1","0x108:  1","0x10C: 0","0x110: 1","0x114: -1"],
+									"regsOutput" : ["$a0: 0x100","$a1: 6","$v0: 2","$ra: 0x838"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 6"],
+									"memoryInput" : ["0x100: 7","0x104: 1","0x108:  1","0x10C: 4","0x110: -4","0x114: -18"],
+									"memoryOutput" : ["0x100: 7","0x104: 1","0x108:  1","0x10C: 4","0x110: -4","0x114: -18"],
+									"regsOutput" : ["$a0: 0x100","$a1: 6","$v0: 4","$ra: 0x838"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 7"],
+									"memoryInput" : ["0x100: 0","0x104: 1","0x108:  1","0x10C: -5","0x110: 1","0x114: 2","0x118: 9"],
+									"memoryOutput" : ["0x100: 0","0x104: 1","0x108:  1","0x10C: -5","0x110: 1","0x114: 2","0x118: 9"],
+									"regsOutput" : ["$a0: 0x100","$a1: 7","$v0: 3","$ra: 0x838"]
+								}
+							],
+							"statementHtml" : ["Задан целочисленный массив. Подсчитать наибольшее количество расположенных последовательно положительных элементов"],
+							"solution" : ["addi $v0, $zero, 0","addi $t0, $zero, 0","add $t3, $zero, $a0","add $t4, $zero, $a1  ","iLoop:  ","  ","lw $t1, 0($t3)","bgtz $t1, if_1","blez $t1, if_2","  ","if_1:  ","  ","addi $t0, $t0, 1","addi $t4, $t4, -1","beq $t4, $zero, end","addi $t3, $t3, 4","j iLoop ","  ","if_2:  ","  ","sub $t2, $v0, $t0","bltzal $t2, ch","addi $t0, $zero, 0","addi $t4, $t4, -1","beq $t4, $zero, end","addi $t3, $t3, 4","j iLoop ","  ","ch:  ","  ","add $v0, $t0, $zero","jr $ra ","","L:","","add $v0, $t0, $zero","addi $t5, $zero, 4","bgtz $t5, endl","","end:  ","  ","sub $t2, $v0, $t0","blez $t2, L","","endl:"]
+						},
+						{
+							"name" :"5.5 Без повторений",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 7","$v0: 0x200"],
+									"memoryInput" : ["0x100: 1","0x104: 7","0x108:  2","0x10C: 1","0x110: 30","0x114:  7","0x118:  3"],
+									"memoryOutput" : ["0x100: 1","0x104: 7","0x108:  7","0x10C: 1","0x110: 30","0x114:  3","0x118:  3","","0x200: 1","0x204: 7","0x208:  1","0x20C: 30","0x210: 3",""],
+									"regsOutput" : ["$a0: 0x100","$a1: 7","$v0: 0x200"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 6","$v0: 0x200"],
+									"memoryInput" : ["0x100: 2","0x104: 3","0x108:  0","0x10C: 0","0x110: 0","0x114: 2"],
+									"memoryOutput" : ["0x100: 2","0x104: 3","0x108:  0","0x10C: 0","0x110: 0","0x114: 2","","0x200: 2","0x204: 3","0x208:  0","0x20C: 2"],
+									"regsOutput" : ["$a0: 0x100","$a1: 6","$v0: 0x200"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 6","$v0: 0x200"],
+									"memoryInput" : ["0x100: 2","0x104: 2","0x108:  2","0x10C: 2","0x110: 2","0x114: 2"],
+									"memoryOutput" : ["0x100: 2","0x104: 2","0x108:  2","0x10C: 2","0x110: 2","0x114: 2","","0x200: 2"],
+									"regsOutput" : ["$a0: 0x100","$a1: 6","$v0: 0x200"]
+								}
+							],
+							"statementHtml" : ["Задан целочисленный массив. В выходной массив нужно вывести эти же числа, удалив все повторения. То есть, если в массиве встречаются подряд 2 или больше одинаковых чисел, то в этом месте нужно оставить только одно из них"],
+							"solution" : ["lw $t0, 0($a0)","sw $t0, 0($v0)","  ","addi $v1, $zero, 1","  ","addi $a1, $a1, -1","beq $a1, $zero, end","  ","iLoop:  ","  ","lw $t0, 0($a0)","addi $a0, $a0, 4","lw $t1, 0($a0)","  ","bne $t0, $t1, plus","  ","back:  ","  ","addi $a1, $a1, -1","beq $a1, $zero, end","  ","j iLoop ","  ","plus:  ","  ","addi $v1, $v1, 1","addi $v0, $v0, 4","sw $t1, 0($v0)","j back ","  ","end:  "]
+						},
+						{
+							"name" :"5.6 Неспадающая последовательность",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 8"],
+									"memoryInput" : ["0x100: 1","0x104: 2","0x108:  2","0x10C: 3","0x110: 8","0x114: 5","0x118: 2","0x11C: 1"],
+									"memoryOutput" : ["0x100: 1","0x104: 2","0x108:     2","0x10C: 3","0x110: 8","0x114: 5","0x118: 2","0x11C: 1"],
+									"regsOutput" : ["$a0: 0x100","$a1: 8","$v0: 5","$ra: 0x828"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 9"],
+									"memoryInput" : ["0x100: 0","0x104: 2","0x108:  1","0x10C: 3","0x110: 5","0x114: 7","0x118: 9","0x11C: 1","0x120: 0"],
+									"memoryOutput" : ["0x100: 0","0x104: 2","0x108:  1","0x10C: 3","0x110: 5","0x114: 7","0x118: 9","0x11C: 1","0x120: 0"],
+									"regsOutput" : ["$a0: 0x100","$a1: 9","$v0: 5","$ra: 0x828"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 8"],
+									"memoryInput" : ["0x100:    0","0x104: 1","0x108:  2","0x10C: 1","0x110: 0","0x114: 3","0x118: 4","0x11C: 5"],
+									"memoryOutput" : ["0x100: 0","0x104: 1","0x108:  2","0x10C: 1","0x110: 0","0x114: 3","0x118: 4","0x11C: 5"],
+									"regsOutput" : ["$a0: 0x100","$a1: 8","$v0: 6","$ra: 0x828"]
+								}
+							],
+							"statementHtml" : ["Задан целочисленный массив. Найти количество элементов в массиве, которые не меньше всех предыдущих элементов массива"],
+							"solution" : ["addi $v0, $zero, 1","addi $t8, $a0, 4","addi $t0, $zero, 1","  ","iLoop:  ","  ","lw $t7, 0($t8)","addi $t2, $zero, 0","add $t9, $zero, $a0","add $t1, $zero, $t0","  ","jLoop:  ","  ","lw $t6, 0($t9)","sub $t5, $t7, $t6","bgezal $t5, finc","addi $t1, $t1, -1","beq $t1, $zero, m1","addi $t9, $t9, 4","j jLoop ","  ","m1:  ","  ","beq $t2,$t0, inc","addi $t0, $t0, 1","beq $t0, $a1, end","addi $t8, $t8,4","j iLoop ","  ","finc:  ","  ","addi $t2,$t2, 1","jr $ra ","  ","inc:  ","  ","addi $v0, $v0, 1","addi $t0, $t0, 1","beq $t0, $a1, end","addi $t8, $t8,4","j iLoop ","  ","end:  "]
+						},
+						{
+							"name" :"5.7 Сортировка массива \"пузырьком\"",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 8"],
+									"memoryInput" : ["0x100: 1","0x104: 2","0x108:     2","0x10C: 3","0x110: 8","0x114: 5","0x118: 2","0x11C: 1"],
+									"memoryOutput" : ["0x100: 1","0x104: 1","0x108:     2","0x10C: 2","0x110: 2","0x114: 3","0x118: 5","0x11C: 8"],
+									"regsOutput" : ["$a0: 0x100","$a1: 8"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 1"],
+									"memoryInput" : ["0x100: 1"],
+									"memoryOutput" : ["0x100: 1"],
+									"regsOutput" : ["$a0: 0x100","$a1: 1"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 2"],
+									"memoryInput" : ["0x100: 1","0x104: 0"],
+									"memoryOutput" : ["0x100: 0","0x104:     1"],
+									"regsOutput" : ["$a0: 0x100","$a1: 2"]
+								}
+							],
+							"statementHtml" : ["Задан целочисленный массив. Отсортировать массив \"пузырьком\""],
+							"solution" : ["","addi         $t0,          $a1,        -1","blez         $t0,          end","","addi $t9, $zero, 1","addi $t0, $a0, 0","addi $t1, $a1, -1","addi $t8, $a1, 0","  ","addi         $t2, $zero, 4","mult         $t2, $t1","mflo         $t2","add          $t2,          $t2,         $a0","","jLoop:  ","  ","lw $t3, 0($t2)","addi         $t2, $t2, -4","lw $t4, 0($t2)","sub $t5,          $t3,          $t4  ","bltz          $t5,          change","addi $t8, $t8, -1","sub          $t6,          $t9,         $t8","bltz          $t6,          jLoop","","iLoop:","","addi $t9, $t9, 1","sub          $t7,          $t9,        $a1","mflo         $t2","add          $t2,          $t2,         $a0","addi $t8, $a1, 0","blez         $t7,          jLoop","bgtz         $t7,          end","","change:","","sw          $t3,        0($t2)","sw          $t4,        4($t2)","addi $t8, $t8, -1","sub          $t6,          $t9,         $t8","bltz          $t6,          jLoop","bgez        $t6,          iLoop","","end:","","          ",""]
+						},
+						{
+							"name" :"5.8 Сумма четных элементов с нечетным индексом",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 8"],
+									"memoryInput" : ["0x100: 1","0x104: 2","0x108:  3","0x10C: 3","0x110: 7","0x114: 5","0x118: 2","0x11C: 9"],
+									"memoryOutput" : ["0x100: 1","0x104: 2","0x108:  3","0x10C: 3","0x110: 7","0x114: 5","0x118: 2","0x11C: 9"],
+									"regsOutput" : ["$a0: 0x100","$a1: 8","$v0: 2"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 6"],
+									"memoryInput" : ["0x100: 4","0x104: 0","0x108:  2","0x10C: 8","0x110: 7","0x114: 1"],
+									"memoryOutput" : ["0x100: 4","0x104: 0","0x108:  2","0x10C: 8","0x110: 7","0x114: 1"],
+									"regsOutput" : ["$a0: 0x100","$a1: 6","$v0: 8"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 8"],
+									"memoryInput" : ["0x100: 1","0x104:  1","0x108:  5","0x10C: 8","0x110: 3","0x114:  2","0x11C: 9","0x120: 7"],
+									"memoryOutput" : ["0x100: 1","0x104:  1","0x108:  5","0x10C: 8","0x110: 3","0x114:  2","0x11C: 9","0x120: 7"],
+									"regsOutput" : ["$a0: 0x100","$a1: 8","$v0: 10"]
+								}
+							],
+							"statementHtml" : ["Задан целочисленный массив. Найдите сумму четных элементов массива с нечетным индексом. Индексирование начинается с нуля"],
+							"solution" : [""]
+						},
+						{
+							"name" :"5.9 Отрицательная последовательность",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 6"],
+									"memoryInput" : ["0x100: -1","0x104: -1","0x108:  13","0x10C: 2","0x110: -3","0x114: -1"],
+									"memoryOutput" : ["0x100: -1","0x104: -1","0x108:  13","0x10C: 2","0x110: -3","0x114: -1"],
+									"regsOutput" : ["$a0: 0x100","$a1: 6","$v0: 2","$ra: 0x838"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 6"],
+									"memoryInput" : ["0x100: 7","0x104: 1","0x108:  3","0x10C: -4","0x110: -2","0x114: -1"],
+									"memoryOutput" : ["0x100: 7","0x104: 1","0x108:  3","0x10C: -4","0x110: -2","0x114: -1"],
+									"regsOutput" : ["$a0: 0x100","$a1: 6","$v0: 3","$ra: 0x838"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 7"],
+									"memoryInput" : ["0x100: 0","0x104: 1","0x108:  1","0x10C: 5","0x110: 1","0x114: 2","0x118: 9"],
+									"memoryOutput" : ["0x100: 0","0x104: 1","0x108:  1","0x10C: 5","0x110: 1","0x114: 2","0x118: 9"],
+									"regsOutput" : ["$a0: 0x100","$a1: 7","$v0: 0","$ra: 0x838"]
+								}
+							],
+							"statementHtml" : ["Задан целочисленный массив. Подсчитать наибольшее количество расположенных последовательно отрицательных элементов"],
+							"solution" : ["addi $v0, $zero, 0","addi $t0, $zero, 0","add $t3, $zero, $a0","add $t4, $zero, $a1  ","iLoop:  ","  ","lw $t1, 0($t3)","bgtz $t1, if_1","blez $t1, if_2","  ","if_1:  ","  ","addi $t0, $t0, 1","addi $t4, $t4, -1","beq $t4, $zero, end","addi $t3, $t3, 4","j iLoop ","  ","if_2:  ","  ","sub $t2, $v0, $t0","bltzal $t2, ch","addi $t0, $zero, 0","addi $t4, $t4, -1","beq $t4, $zero, end","addi $t3, $t3, 4","j iLoop ","  ","ch:  ","  ","add $v0, $t0, $zero","jr $ra ","","L:","","add $v0, $t0, $zero","addi $t5, $zero, 4","bgtz $t5, endl","","end:  ","  ","sub $t2, $v0, $t0","blez $t2, L","","endl:"]
+						},
+						{
+							"name" :"5.10 Нули вместо повторений",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 8"],
+									"memoryInput" : ["0x100: 1","0x104: 2","0x108:  3","0x10C: 3","0x110: 3","0x114: 5","0x118: 2","0x11C: 2"],
+									"memoryOutput" : ["0x100: 1","0x104: 2","0x108:  3","0x10C: 0","0x110: 0","0x114: 5","0x118: 2","0x11C: 0"],
+									"regsOutput" : ["$a0: 0x100","$a1: 8"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 6"],
+									"memoryInput" : ["0x100: 6","0x104: 0","0x108:  0","0x10C: 28","0x110: 3","0x114: 19"],
+									"memoryOutput" : ["0x100: 6","0x104: 0","0x108:  0","0x10C: 28","0x110: 3","0x114: 19"],
+									"regsOutput" : ["$a0: 0x100","$a1: 6"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 8"],
+									"memoryInput" : ["0x100: 12","0x104:  12","0x108:  1","0x10C: 12","0x110: 12","0x114:  1","0x11C: 12","0x120: 12"],
+									"memoryOutput" : ["0x100: 12","0x104:  0","0x108:  1","0x10C: 12","0x110: 0","0x114:  1","0x11C: 12","0x120: 0"],
+									"regsOutput" : ["$a0: 0x100","$a1: 8"]
+								}
+							],
+							"statementHtml" : ["Задан массив натуральных чисел. Если в массиве встречаются подряд 2 или больше одинаковых чисел, то в этом месте нужно оставить только одно из них, освободившиеся ячейки заполняем нулями"],
+							"solution" : [""]
+						},
+						{
+							"name" :"5.11 Количество разных значений",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 8"],
+									"memoryInput" : ["0x100: 1","0x104: 2","0x108:  3","0x10C: 4","0x110: 5","0x114: 6","0x118: 7","0x11C: 8"],
+									"memoryOutput" : ["0x100: 1","0x104: 2","0x108:  3","0x10C: 4","0x110: 5","0x114: 6","0x118: 7","0x11C: 8"],
+									"regsOutput" : ["$a0: 0x100","$a1: 8","$v0: 8"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 6"],
+									"memoryInput" : ["0x100: 26","0x104: 10","0x108:  0","0x10C: 26","0x110: 3","0x114: 10"],
+									"memoryOutput" : ["0x100: 26","0x104: 10","0x108:  0","0x10C: 26","0x110: 3","0x114: 10"],
+									"regsOutput" : ["$a0: 0x100","$a1: 6","$v0: 4"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 8"],
+									"memoryInput" : ["0x100: 5","0x104:  5","0x108:  5","0x10C: 5","0x110: 5","0x114:  5","0x11C: 5","0x120: 5"],
+									"memoryOutput" : ["0x100: 5","0x104:  5","0x108:  5","0x10C: 5","0x110: 5","0x114:  5","0x11C: 5","0x120: 5"],
+									"regsOutput" : ["$a0: 0x100","$a1: 8","$v0: 1"]
+								}
+							],
+							"statementHtml" : ["Задан массив натуральных чисел. Найти количество различных значений в массиве"],
+							"solution" : [""]
+						},
+						{
+							"name" :"5.12 Первый элемент на последний",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 5"],
+									"memoryInput" : ["0x100: 5","0x104: 4","0x108:  3","0x10C: 2","0x110: 1"],
+									"memoryOutput" : ["0x100: 1","0x104: 2","0x108:  3","0x10C: 4","0x110: 5"],
+									"regsOutput" : ["$a0: 0x100","$a1: 5"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 6"],
+									"memoryInput" : ["0x100: 6","0x104: 2","0x108:  1","0x10C: 4","0x110: 3","0x114: 11"],
+									"memoryOutput" : ["0x100: 11","0x104: 3","0x108:  4","0x10C: 1","0x110: 2","0x114: 6"],
+									"regsOutput" : ["$a0: 0x100","$a1: 6"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 1"],
+									"memoryInput" : ["0x100: 5"],
+									"memoryOutput" : ["0x100: 5"],
+									"regsOutput" : ["$a0: 0x100","$a1: 1"]
+								}
+							],
+							"statementHtml" : ["Задан массив натуральных чисел. Поменять местами первый элемент с последним, второй – с предпоследним и т.д"],
+							"solution" : [""]
+						},
+						{
+							"name" :"6.1 Два отсортированных массива",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 5","$a3: 0x200","$a4: 5","$a5: 0x300"],
+									"memoryInput" : ["0x100: 1","0x104: 3","0x108:  5","0x10C: 7","0x110: 9","","0x200: 2","0x204: 4","0x208:  6","0x20C: 8","0x210: 10"],
+									"memoryOutput" : ["0x100: 1","0x104: 3","0x108:  5","0x10C: 7","0x110: 9","","0x200: 2","0x204: 4","0x208:  6","0x20C: 8","0x210: 10","","0x300: 1","0x304: 2","0x308:  3","0x30C: 4","0x310: 5","0x314: 6","0x318: 7","0x31C:  8","0x320: 9","0x324: 10"],
+									"regsOutput" : ["$a0: 0x100","$a1: 5","$a3: 0x200","$a4: 5","$a5: 0x300"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 4","$a2: 0x200","$a3: 5","$a4: 0x300"],
+									"memoryInput" : ["0x100: 0","0x104: 1","0x108:  1","0x10C: 6","","0x200: 2","0x204: 4","0x208:  5","0x20C: 6","0x210: 9"],
+									"memoryOutput" : ["0x100: 0","0x104: 1","0x108:  1","0x10C: 6","","0x200: 2","0x204: 4","0x208:  5","0x20C: 6","0x210: 9","","0x300: 0","0x304: 1","0x308:  1","0x30C: 2","0x310: 4","0x314: 5","0x318:  6","0x31C: 6","0x320: 9"],
+									"regsOutput" : ["$a0: 0x100","$a1: 4","$a2: 0x200","$a3: 5","$a4: 0x300"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 1","$a2: 0x200","$a3: 1","$a4: 0x300"],
+									"memoryInput" : ["0x100: 3","","0x200: 0"],
+									"memoryOutput" : ["0x100: 3","","0x200: 0","","0x300: 0","0x304: 3"],
+									"regsOutput" : ["$a0: 0x100","$a1: 1","$a2: 0x200","$a3: 1","$a4: 0x300"]
+								}
+							],
+							"statementHtml" : ["Заданы два целочисленных массива, элементы которых упорядочены по неубыванию. Объединить элементы этих двух массивов в третий массив так, чтоб они были упорядочены по неубыванию. Сортировку третьего массива не производить"],
+							"solution" : [""]
+						},
+						{
+							"name" :"6.2 Различные невходящие элементы",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 5","$a3: 0x200","$a4: 5"],
+									"memoryInput" : ["0x100: 1","0x104: 3","0x108:  5","0x10C: 7","0x110: 9","","0x200: 2","0x204: 4","0x208:  6","0x20C: 8","0x210: 10"],
+									"memoryOutput" : ["0x100: 1","0x104: 3","0x108:  5","0x10C: 7","0x110: 9","","0x200: 2","0x204: 4","0x208:  6","0x20C: 8","0x210: 10"],
+									"regsOutput" : ["$a0: 0x100","$a1: 5","$a3: 0x200","$a4: 5","$v0: 5"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 4","$a2: 0x200","$a3: 5"],
+									"memoryInput" : ["0x100: 0","0x104: 0","0x108:  0","0x10C: 0","","0x200: 3","0x204: 5","0x208:  6","0x20C: 8","0x210: 9"],
+									"memoryOutput" : ["0x100: 0","0x104: 0","0x108:  0","0x10C: 0","","0x200: 3","0x204: 5","0x208:  6","0x20C: 8","0x210: 9"],
+									"regsOutput" : ["$a0: 0x100","$a1: 4","$a2: 0x200","$a3: 5","$v0: 1"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 1","$a2: 0x200","$a3: 1"],
+									"memoryInput" : ["0x100: 3","","0x200: 3"],
+									"memoryOutput" : ["0x100: 3","","0x200: 3"],
+									"regsOutput" : ["$a0: 0x100","$a1: 1","$a2: 0x200","$a3: 1","$v0: 0"]
+								}
+							],
+							"statementHtml" : ["Заданы два массива натуральных чисел. Найти количество различных значений из первого массива, не входящих во второй массив"],
+							"solution" : [""]
+						},
+						{
+							"name" :"6.3 Различные входящие элементы",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 5","$a3: 0x200","$a4: 5"],
+									"memoryInput" : ["0x100: 1","0x104: 3","0x108:  5","0x10C: 7","0x110: 9","","0x200: 2","0x204: 4","0x208:  6","0x20C: 8","0x210: 10"],
+									"memoryOutput" : ["0x100: 1","0x104: 3","0x108:  5","0x10C: 7","0x110: 9","","0x200: 2","0x204: 4","0x208:  6","0x20C: 8","0x210: 10"],
+									"regsOutput" : ["$a0: 0x100","$a1: 5","$a3: 0x200","$a4: 5","$v0: 0"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 4","$a2: 0x200","$a3: 4"],
+									"memoryInput" : ["0x100: 10","0x104: 11","0x108:  12","0x10C: 13","","0x200: 13","0x204: 11","0x208:  10","0x20C: 12"],
+									"memoryOutput" : ["0x100: 10","0x104: 11","0x108:  12","0x10C: 13","","0x200: 13","0x204: 11","0x208:  10","0x20C: 12"],
+									"regsOutput" : ["$a0: 0x100","$a1: 4","$a2: 0x200","$a3: 4","$v0: 4"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 1","$a2: 0x200","$a3: 1"],
+									"memoryInput" : ["0x100: 1","","0x200: 3"],
+									"memoryOutput" : ["0x100: 1","","0x200: 3"],
+									"regsOutput" : ["$a0: 0x100","$a1: 1","$a2: 0x200","$a3: 1","$v0: 0"]
+								}
+							],
+							"statementHtml" : ["Заданы два массива натуральных чисел. Найти количество различных значений, входящих в оба массива"],
+							"solution" : [""]
+						},
+						{
+							"name" :"6.4 Различные входящие не в оба массива элементы",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 5","$a3: 0x200","$a4: 5"],
+									"memoryInput" : ["0x100: 1","0x104: 3","0x108:  5","0x10C: 7","0x110: 9","","0x200: 2","0x204: 4","0x208:  6","0x20C: 8","0x210: 10"],
+									"memoryOutput" : ["0x100: 1","0x104: 3","0x108:  5","0x10C: 7","0x110: 9","","0x200: 2","0x204: 4","0x208:  6","0x20C: 8","0x210: 10"],
+									"regsOutput" : ["$a0: 0x100","$a1: 5","$a3: 0x200","$a4: 5","$v0: 10"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 4","$a2: 0x200","$a3: 4"],
+									"memoryInput" : ["0x100: 2","0x104: 3","0x108:  5","0x10C: 7","","0x200: 3","0x204: 8","0x208:  0","0x20C: 2"],
+									"memoryOutput" : ["0x100: 2","0x104: 3","0x108:  5","0x10C: 7","","0x200: 3","0x204: 8","0x208:  0","0x20C: 2"],
+									"regsOutput" : ["$a0: 0x100","$a1: 4","$a2: 0x200","$a3: 4","$v0: 4"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 1","$a2: 0x200","$a3: 1"],
+									"memoryInput" : ["0x100: 1","","0x200: 2"],
+									"memoryOutput" : ["0x100: 1","","0x200: 2"],
+									"regsOutput" : ["$a0: 0x100","$a1: 1","$a2: 0x200","$a3: 1","$v0: 2"]
+								}
+							],
+							"statementHtml" : ["Заданы два массива натуральных чисел. Найти количество различных значений, входящих в один из массивов, но не в оба вместе"],
+							"solution" : [""]
+						},
+						{
+							"name" :"6.5 Объединение массивов",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 5","$a3: 0x200","$a4: 5","$a5: 0x300"],
+									"memoryInput" : ["0x100: 1","0x104: 3","0x108:  5","0x10C: 7","0x110: 9","","0x200: 2","0x204: 4","0x208:  6","0x20C: 8","0x210: 10"],
+									"memoryOutput" : ["0x100: 1","0x104: 3","0x108:  5","0x10C: 7","0x110: 9","","0x200: 2","0x204: 4","0x208:  6","0x20C: 8","0x210: 10","","0x300: 1","0x304: 2","0x308:  3","0x30C: 4","0x310: 5","0x314: 6","0x318: 7","0x31C:  8","0x320: 9","0x324: 10"],
+									"regsOutput" : ["$a0: 0x100","$a1: 5","$a3: 0x200","$a4: 5","$a5: 0x300"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 4","$a2: 0x200","$a3: 5","$a4: 0x300"],
+									"memoryInput" : ["0x100: 3","0x104: 1","0x108:  4","0x10C: 7","","0x200: 5","0x204: 8","0x208:  0","0x20C: 6","0x210: 9"],
+									"memoryOutput" : ["0x100: 3","0x104: 1","0x108:  4","0x10C: 7","","0x200: 5","0x204: 8","0x208:  0","0x20C: 6","0x210: 9","","","0x300: 3","0x304: 5","0x308:  1","0x30C: 8","0x310: 4","0x314: 0","0x318:  7","0x31C: 6","0x320: 9"],
+									"regsOutput" : ["$a0: 0x100","$a1: 4","$a2: 0x200","$a3: 5","$a4: 0x300"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 1","$a2: 0x200","$a3: 1","$a4: 0x300"],
+									"memoryInput" : ["0x100: 5","","0x200: 5"],
+									"memoryOutput" : ["0x100: 5","","0x200: 5","","0x300: 5","0x304: 5"],
+									"regsOutput" : ["$a0: 0x100","$a1: 1","$a2: 0x200","$a3: 1","$a4: 0x300"]
+								}
+							],
+							"statementHtml" : ["Заданы два целочисленных массива. Объединить элементы этих двух массивов в третий массив так, чтобы элементы первого массива были с четными индексами в третьем массиве, а второго – с нечетными"],
+							"solution" : [""]
+						},
+						{
+							"name" :"6.6 Массив адресов",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 5"],
+									"memoryInput" : ["0x100: 0x200","0x104: 0x208","0x108:  0x300","0x10C: 0x120","0x110: 0x304","","0x200: 8","0x208: 6","0x300:  4","0x304: 2","0x120: 10"],
+									"memoryOutput" : ["0x100: 0x304","0x104: 0x300","0x108:  0x208","0x10C: 0x200","0x110: 0x120","","0x200: 8","0x208: 6","0x300:  4","0x304: 2","0x120: 10"],
+									"regsOutput" : ["$a0: 0x100","$a1: 5","$v0: 0"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 6"],
+									"memoryInput" : ["0x100: 0x20C","0x104: 0x304","0x108:  0x12C","0x10C: 0x308","0x110:  0x210","0x114:  0x130","","0x12C:  3","0x130:  1","0x20C:  7","0x210:  0","0x304:  9","0x308:  4"],
+									"memoryOutput" : ["0x100: 0x308","0x104: 0x304","0x108:  0x210","0x10C: 0x20C","0x110:  0x130","0x114:  0x12C","","0x12C:  3","0x130:  1","0x20C:  7","0x210:  0","0x304:  9","0x308:  4"],
+									"regsOutput" : ["$a0: 0x100","$a1: 6","$v0: 2"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 1"],
+									"memoryInput" : ["0x100: 0x200","","0x200: 5"],
+									"memoryOutput" : ["0x100: 0x200","","0x200: 5"],
+									"regsOutput" : ["$a0: 0x100","$a1: 1","$v0: 1"]
+								}
+							],
+							"statementHtml" : ["Заданы два целочисленных массива, причем первый массив хранит адреса элементов второго массива. Отсортировать первый массив по убыванию и проверить, как отсортированы элементы второго массива (0 – по возрастанию, 1 – по убыванию, 2 – не отсортированы)"],
+							"solution" : [""]
+						},
+						{
+							"name" :"6.7 Средний элемент списка",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100"],
+									"memoryInput" : ["0x100: 3","0x104: 0x200","0x108:  5","0x10C: 0x120","0x120: 1","0x124:  0x208","0x200: 8","0x204: 0x108","0x208:  15","0x20C:  0x300","0x300:  4","0x304: 0x308","0x308:  7","0x30C:  0"],
+									"memoryOutput" : ["0x100: 3","0x104: 0x200","0x108:  5","0x10C: 0x208","0x120: 1","0x124:  0x208","0x200: 8","0x204: 0x108","0x208:  15","0x20C:  0x300","0x300:  4","0x304: 0x308","0x308:  7","0x30C:  0"],
+									"regsOutput" : ["$a0: 0x100"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100"],
+									"memoryInput" : ["0x100: 6","0x104: 0x204","0x118:  5","0x11C: 0x134","0x134: 2","0x138:  0x300","0x204: 9","0x208: 0x118","0x300:  4","0x304: 0x308","0x308:  11","0x30C:  0"],
+									"memoryOutput" : ["0x100: 6","0x104: 0x204","0x118:  5","0x11C: 0x134","0x134: 2","0x138:  0x300","0x204: 9","0x208: 0x300","0x300:  4","0x304: 0x308","0x308:  11","0x30C:  0"],
+									"regsOutput" : ["$a0: 0x100"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100"],
+									"memoryInput" : ["0x100: 3","0x104: 0"],
+									"memoryOutput" : ["0x100: 3","0x104: 0"],
+									"regsOutput" : ["$a0: 0x100"]
+								}
+							],
+							"statementHtml" : ["Задан односвязный список. Если в списке больше двух элементов, удалить средний  элемент списка  (или два средних)"],
+							"solution" : [""]
+						},
+						{
+							"name" :"6.8 Сумма максимальных элементов списков",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 0x200"],
+									"memoryInput" : ["0x100: 3","0x104: 0x210","0x108:  5","0x10C: 0x120","0x120: 1","0x124:  0x208","0x208:  15","0x20C:  0x300","0x210: 8","0x214: 0x108","0x300:  4","0x304: 0x308","0x308:  7","0x30C:  0","","0x12C:  3","0x130:  0x224","0x200:  5","0x204:  0x12C","0x224:  6","0x228:  0x310","0x230:  0","0x234:  0","0x310:  11","0x314:  0x230"],
+									"memoryOutput" : ["0x100: 3","0x104: 0x210","0x108:  5","0x10C: 0x120","0x120: 1","0x124:  0x208","0x208:  15","0x20C:  0x300","0x210: 8","0x214: 0x108","0x300:  4","0x304: 0x308","0x308:  7","0x30C:  0","","0x12C:  3","0x130:  0x224","0x200:  5","0x204:  0x12C","0x224:  6","0x228:  0x310","0x230:  0","0x234:  0","0x310:  11","0x314:  0x230"],
+									"regsOutput" : ["$a0: 0x100","$a1: 0x200","$v0: 26"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 0x200"],
+									"memoryInput" : ["0x100: 4","0x104: 0x140","0x120: 1","0x124:  0x208","0x140:  8","0x144:  0x210","0x208:  5","0x20C:  0x300","0x210: 8","0x214: 0x120","0x300:  4","0x304: 0","","","0x12C:  7","0x130:  0x324","0x200:  5","0x204:  0x12C","0x218:  10","0x21C:  0x230","0x230:  0","0x234:  0","0x324:  5","0x328:  0x218"],
+									"memoryOutput" : ["0x100: 4","0x104: 0x140","0x120: 1","0x124:  0x208","0x140:  8","0x144:  0x210","0x208:  5","0x20C:  0x300","0x210: 8","0x214: 0x120","0x300:  4","0x304: 0","","","0x12C:  7","0x130:  0x324","0x200:  5","0x204:  0x12C","0x218:  10","0x21C:  0x230","0x230:  0","0x234:  0","0x324:  5","0x328:  0x218"],
+									"regsOutput" : ["$a0: 0x100","$a1: 0x200","$v0: 18"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 0x200"],
+									"memoryInput" : ["0x100: 3","0x104: 0","","0x200: 4","0x204: 0"],
+									"memoryOutput" : ["0x100: 3","0x104: 0","","0x200: 4","0x204: 0"],
+									"regsOutput" : ["$a0: 0x100","$a1: 0x200","$v0: 7"]
+								}
+							],
+							"statementHtml" : ["Заданы два односвязных списка. Найти сумму максимальных элементов каждого списка"],
+							"solution" : [""]
+						},
+						{
+							"name" :"6.9 Первый на последний",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100"],
+									"memoryInput" : ["0x100: 2","0x104: 0x218","0x108:  8","0x10C: 0x220","0x208:  12","0x20C:  0","0x218: 8","0x21C:  0x108","0x220:  7","0x224:  0x300","0x300:  11","0x304: 0x30C","0x30C:  7","0x310:  0x208"],
+									"memoryOutput" : ["0x100: 12","0x104: 0x218","0x108:  11","0x10C: 0x220","0x208:  2","0x20C:  0","0x218: 7","0x21C:  0x108","0x220:  7","0x224:  0x300","0x300:  8","0x304: 0x30C","0x30C:  8","0x310:  0x208"],
+									"regsOutput" : ["$a0: 0x100"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100"],
+									"memoryInput" : ["0x100: 3","0x104: 0x140","0x120: 1","0x124:  0x208","0x140:  0","0x144:  0x210","0x208:  12","0x20C:  0x300","0x210: 8","0x214: 0x120","0x300:  9","0x304: 0"],
+									"memoryOutput" : ["0x100: 9","0x104: 0x140","0x120: 8","0x124:  0x208","0x140:  12","0x144:  0x210","0x208:  0","0x20C:  0x300","0x210: 1","0x214: 0x120","0x300:  3","0x304: 0"],
+									"regsOutput" : ["$a0: 0x100"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100"],
+									"memoryInput" : ["0x100: 3","0x104: 0"],
+									"memoryOutput" : ["0x100: 3","0x104: 0"],
+									"regsOutput" : ["$a0: 0x100"]
+								}
+							],
+							"statementHtml" : ["Задан односвязный список. Поменять местами первый элемент списка с последним, второй – с предпоследним и т.д"],
+							"solution" : [""]
+						},
+						{
+							"name" :"6.10 Последний элемент",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100"],
+									"memoryInput" : ["0x100: 0","0x104: 3","0x108:  0x218","0x10C: 0x224","0x110:  5","0x114:  0","0x218: 0x100","0x21C:  1","0x220:  0x224","0x224:  0x218","0x228:  9","0x22C:  0x10C"],
+									"memoryOutput" : ["0x100: 0","0x104: 3","0x108:  0x218","0x10C: 0x224","0x110:  5","0x114:  0","0x218: 0x100","0x21C:  1","0x220:  0x224","0x224:  0x218","0x228:  9","0x22C:  0"],
+									"regsOutput" : ["$a0: 0x100"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100"],
+									"memoryInput" : ["0x100: 0","0x104: 4","0x108:  0x140","0x120: 0x20C","0x124:  18","0x128:  0x300","0x140:  0x100","0x144:  0","0x148:  0x20C","0x20C:  0x140","0x210: 8","0x214: 0x120","0x300:  0x120","0x304: 11","0x308:  0"],
+									"memoryOutput" : ["0x100: 0","0x104: 4","0x108:  0x140","0x120: 0x20C","0x124:  18","0x128:  0","0x140:  0x100","0x144:  0","0x148:  0x20C","0x20C:  0x140","0x210: 8","0x214: 0x120","0x300:  0x120","0x304: 11","0x308:  0"],
+									"regsOutput" : ["$a0: 0x100"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100"],
+									"memoryInput" : ["0x100: 0","0x104: 0","0x108: 0"],
+									"memoryOutput" : ["0x100: 0","0x104: 0","0x108: 0"],
+									"regsOutput" : ["$a0: 0x100"]
+								}
+							],
+							"statementHtml" : ["Задан двусвязный список. Если в списке больше одного элемента, удалить последний элемент списка"],
+							"solution" : [""]
+						},
+						{
+							"name" :"6.11 Неспадающая последовательность",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100"],
+									"memoryInput" : ["0x100: 0","0x104: 5","0x108:  0x218","0x10C: 0x224","0x110:  2","0x114:  0x300","0x218: 0x100","0x21C:  11","0x220:  0x224","0x224:  0x218","0x228:  8","0x22C:  0x10C","0x300:  0x10C","0x304:  2","0x308:  0"],
+									"memoryOutput" : ["0x100: 0","0x104: 5","0x108:  0x218","0x10C: 0x224","0x110:  2","0x114:  0x300","0x218: 0x100","0x21C:  11","0x220:  0x224","0x224:  0x218","0x228:  8","0x22C:  0x10C","0x300:  0x10C","0x304:  2","0x308:  0"],
+									"regsOutput" : ["$a0: 0x100","$v0: 2"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100"],
+									"memoryInput" : ["0x100: 0","0x104: 4","0x108:  0x140","0x120: 0x20C","0x124:  18","0x128:  0x300","0x140:  0x100","0x144:  5","0x148:  0x20C","0x20C:  0x140","0x210: 7","0x214: 0x120","0x300:  0x120","0x304: 21","0x308:  0"],
+									"memoryOutput" : ["0x100: 0","0x104: 4","0x108:  0x140","0x120: 0x20C","0x124:  18","0x128:  0x300","0x140:  0x100","0x144:  5","0x148:  0x20C","0x20C:  0x140","0x210: 7","0x214: 0x120","0x300:  0x120","0x304: 21","0x308:  0"],
+									"regsOutput" : ["$a0: 0x100","$v0: 5"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100"],
+									"memoryInput" : ["0x100: 0","0x104: 0","0x108: 0"],
+									"memoryOutput" : ["0x100: 0","0x104: 0","0x108: 0"],
+									"regsOutput" : ["$a0: 0x100","$v0: 1"]
+								}
+							],
+							"statementHtml" : ["Задан двусвязный список. Найти количество элементов в списке, которые не меньше любого из предыдущих элементов списка"],
+							"solution" : [""]
+						},
+						{
+							"name" :"6.12 Массив из списков",
+							"id" : null,
+							"tests" : [
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 0x200","$a2: 0x300"],
+									"memoryInput" : ["0x100: 2","0x104: 0x210","0x108:  1","0x10C: 0x120","0x120: 12","0x124:  0x208","0x208:  6","0x20C:  0x400","0x210: 8","0x214: 0x108","0x400:  7","0x404: 0x408","0x408:  9","0x40C:  0","","0x12C:  1","0x130:  0x224","0x200:  11","0x204:  0x12C","0x224:  3","0x228:  0x410","0x230:  4","0x234:  0","0x410:  7","0x414:  0x230"],
+									"memoryOutput" : ["0x100: 2","0x104: 0x210","0x108:  1","0x10C: 0x120","0x120: 12","0x124:  0x208","0x208:  6","0x20C:  0x400","0x210: 8","0x214: 0x108","0x400:  7","0x404: 0x408","0x408:  9","0x40C:  0","","0x12C:  1","0x130:  0x224","0x200:  11","0x204:  0x12C","0x224:  3","0x228:  0x410","0x230:  4","0x234:  0","0x410:  7","0x414:  0x230","","0x300:  2","0x304:  11","0x308:  8","0x30C:  1","0x310:  1","0x314:  3","0x318:  12","0x31C:  7","0x320:  6","0x324:  4","0x328:  9"],
+									"regsOutput" : ["$a0: 0x100","$a1: 0x200","$a2: 0x300"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 0x200","$a2: 0x300"],
+									"memoryInput" : ["0x100: 3","0x104: 0x140","0x120: 1","0x124:  0x208","0x140:  2","0x144:  0x210","0x208:  7","0x20C:  0x400","0x210: 9","0x214: 0x120","0x400:  14","0x404: 0","","","0x12C:  1","0x130:  0x424","0x200:  3","0x204:  0x12C","0x218:  12","0x21C:  0x230","0x230:  9","0x234:  0","0x424:  5","0x428:  0x218"],
+									"memoryOutput" : ["0x100: 3","0x104: 0x140","0x120: 1","0x124:  0x208","0x140:  2","0x144:  0x210","0x208:  7","0x20C:  0x400","0x210: 9","0x214: 0x120","0x400:  14","0x404: 0","","","0x12C:  1","0x130:  0x424","0x200:  3","0x204:  0x12C","0x218:  12","0x21C:  0x230","0x230:  9","0x234:  0","0x424:  5","0x428:  0x218","","0x300:  3","0x304:  3","0x308:  2","0x30C:  1","0x310:  9","0x314:  5","0x318:  1","0x31C:  12","0x320:  7","0x324:  9","0x328:  14"],
+									"regsOutput" : ["$a0: 0x100","$a1: 0x200","$a2: 0x300"]
+								},
+								{
+									"shared" : true,
+									"regsInput" : ["$a0: 0x100","$a1: 0x200","$a2: 0x300"],
+									"memoryInput" : ["0x100: 7","0x104: 0","","0x200: 2","0x204: 0"],
+									"memoryOutput" : ["0x100: 7","0x104: 0","","0x200: 2","0x204: 0","","0x300: 7","0x304: 2"],
+									"regsOutput" : ["$a0: 0x100","$a1: 0x200","$a2: 0x300"]
+								}
+							],
+							"statementHtml" : ["Заданы два односвязных списка. Создать массив, элементами с четными индексами которого будут элементы первого списка, а с нечетными – второго"],
+							"solution" : [""]
+						}
+					]
+				}
+			],
+			"scoring" : {
+				"classBefore" : 3,
+				"classHold" : 3,
+				"classFrom" : 1,
+				"scoreBudget" : 5,
+				"penaltyLate" : 0.25,
+				"penaltyHold" : 0.5,
+				"requireClean" : false,
+				"maxTeam" : 2
+			},
+			"setup" : {
+				"codeMaxBytes" : 10240,
+				"codeDownloadPattern" :"${stud}${classFrom}${var}.txt",
+				"codeUploadRegex" :".+\\.txt",
+				"reportMaxBytes" : 2097152,
+				"reportUploadRegex" :".+\\.rtf",
+				"codeValidatorCN" :"ToBeDone",
+				"codeExportUriPattern" :"/code/mips/${classFrom}",
+				"reportGenerateUriPattern" :"/report/"
+			}
+		}
+	],
+	"quizBundles" : []
+}

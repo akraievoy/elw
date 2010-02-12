@@ -5,8 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Course {
-	protected final List<Assignment> assignments = new ArrayList<Assignment>();
-	protected final List<Quiz> quizzes = new ArrayList<Quiz>();
+	protected final List<AssignmentBundle> assBundles = new ArrayList<AssignmentBundle>();
+	protected final List<QuizBundle> quizBundles = new ArrayList<QuizBundle>();
 
 	protected String name;
 	protected String id;
@@ -36,21 +36,21 @@ public class Course {
 		this.resourcePath = resourcePath;
 	}
 
-	public Assignment[] getAssignments() {
-		return assignments.toArray(new Assignment[assignments.size()]);
+	public AssignmentBundle[] getAssBundles() {
+		return assBundles.toArray(new AssignmentBundle[assBundles.size()]);
 	}
 
-	public void setAssignments(Assignment[] assignments) {
-		this.assignments.clear();
-		this.assignments.addAll(Arrays.asList(assignments));
+	public void setAssBundles(AssignmentBundle[] assBundles) {
+		this.assBundles.clear();
+		this.assBundles.addAll(Arrays.asList(assBundles));
 	}
 
-	public Quiz[] getQuizzes() {
-		return quizzes.toArray(new Quiz[quizzes.size()]);
+	public QuizBundle[] getQuizBundles() {
+		return quizBundles.toArray(new QuizBundle[quizBundles.size()]);
 	}
 
-	public void setQuizzes(Quiz[] quizzes) {
-		this.quizzes.clear();
-		this.quizzes.addAll(Arrays.asList(quizzes));
+	public void setQuizBundles(QuizBundle[] quizBundles) {
+		this.quizBundles.clear();
+		this.quizBundles.addAll(Arrays.asList(quizBundles));
 	}
 }
