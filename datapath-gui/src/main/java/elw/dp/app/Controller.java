@@ -4,13 +4,15 @@ import elw.dp.mips.DataPath;
 import elw.dp.mips.Reg;
 import elw.dp.mips.asm.Data;
 import elw.dp.mips.asm.MipsAssembler;
-import elw.dp.mips.testing.Task;
-import elw.dp.mips.testing.TestingCase;
 import elw.dp.swing.Swing;
 import elw.dp.ui.SourceEditorFrame;
 import elw.dp.ui.StepperFrame;
-import elw.dp.ui.TaskSelectorFrame;
+import elw.vo.Course;
+import elw.vo.Test;
+import elw.vo.Version;
 import org.akraievoy.gear.G;
+import org.akraievoy.gear.G4Str;
+import org.codehaus.jackson.map.ObjectMapper;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -18,6 +20,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -28,9 +31,6 @@ public class Controller {
 	private static final Logger log = Logger.getLogger(LoadRegistersAction.class.getName());
 
 	Swing.ActionFactory actions = new Swing.ActionFactory(this);
-
-	//  TaskSelector frame
-	TaskSelectorFrame taskSelector;
 
 	//  Source Editor frame
 	SourceEditorFrame sourceEditor;
@@ -44,46 +44,31 @@ public class Controller {
 	MemoryTableModel memoryTableModel;
 
 	//  application state
-	Task selectedTask;
-	TestingCase selectedCase;
+	Version selectedTask;
+	Test selectedCase;
 	DataPath dataPath = new DataPath();
 
 	public void init() throws IOException {
+		final InputStream modelStream = Controller.class.getResourceAsStream("/aos-s10.json");
+		final ObjectMapper mapper = new ObjectMapper();
+		final Course course = mapper.readValue(modelStream, Course.class);
+
+		selectedTask = course.getAssBundles()[0].getAssignments()[0].getVersions()[0];
 		final Properties actionProps = new Properties();
 		actionProps.load(this.getClass().getResourceAsStream("actions.properties"));
 
 		actions.init(actionProps);
 
-		actions.disable("activate");
+		tCaseModel = new DefaultComboBoxModel(selectedTask.getTests());
 
-		getTaskSelector().getActivate().setAction(actions.forKey("activate"));
-		getTaskSelector().getExit().setAction(actions.forKey("exit"));
-		getTaskSelector().getTaskList().getSelectionModel().addListSelectionListener(new TaskListSelectionListener());
+		getSourceEditor().setTitle("DataPath" + " - " + selectedTask.getName());
+		getSourceEditor().getDefinition().setText(G4Str.join(selectedTask.getStatementHtml(), "\n"));
+		getSourceEditor().getTestingCase().setModel(tCaseModel);
 
-		getTaskSelector().setVisible(true);
-	}
+		//  TODO hide this
+		getSourceEditor().getSolution().setText(G4Str.join(selectedTask.getSolution(), "\n"));
 
-	void setSelectedTask(final Task task) {
-		selectedTask = task;
-		tCaseModel = new DefaultComboBoxModel(task.getCases().toArray());
-
-		final JTextPane definition = getTaskSelector().getTaskDefinition();
-		if (selectedTask != null) {
-			definition.setText(selectedTask.getFullDefinition());
-			SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-					definition.scrollToReference("top");
-				}
-			});
-		} else {
-			definition.setText(TaskSelectorFrame.NO_TASK_TEXT);
-		}
-
-		actions.setEnabled("activate", selectedTask != null);
-	}
-
-	public DataPath getDataPath() {
-		return dataPath;
+		getSourceEditor().setVisible(true);
 	}
 
 	public AbstractTableModel getInstructionsModel() {
@@ -108,15 +93,6 @@ public class Controller {
 		}
 
 		return memoryTableModel;
-	}
-
-	public TaskSelectorFrame getTaskSelector() {
-		if (taskSelector == null) {
-			taskSelector = new TaskSelectorFrame();
-			taskSelector.init();
-		}
-
-		return taskSelector;
 	}
 
 	public SourceEditorFrame getSourceEditor() {
@@ -162,10 +138,6 @@ public class Controller {
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			/*
-						final JTextArea instructionsInput = getTaskSelector().getEditorPanel().getInstructionsInput();
-						load(Data.extractCode(instructionsInput.getText()));
-						*/
 		}
 	}
 
@@ -244,10 +216,6 @@ public class Controller {
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			/*
-						final JTextArea input = getTaskSelector().getEditorPanel().getDataInput();
-						load(Data.extractCode(input.getText()));
-						*/
 		}
 	}
 
@@ -259,10 +227,6 @@ public class Controller {
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			/*
-						final JTextArea registersInput = getTaskSelector().getEditorPanel().getRegistersInput();
-						load(Data.extractCode(registersInput.getText()));
-						*/
 		}
 
 		public void load(List<String> codeLines) {
@@ -369,16 +333,6 @@ public class Controller {
 			return;
 		}
 
-		getTaskSelector().setVisible(false);
-
-		getSourceEditor().setTitle(getTaskSelector().getTitle() + " - " + selectedTask.getShortDesc());
-		getSourceEditor().getDefinition().setText(selectedTask.getFullDefinition());
-		getSourceEditor().getTestingCase().setModel(tCaseModel);
-
-		//  TODO hide this
-		getSourceEditor().getSolution().setText(selectedTask.getSampleSolution());
-
-		getSourceEditor().setVisible(true);
 	}
 
 	public void do_exit(ActionEvent e) {
@@ -387,7 +341,7 @@ public class Controller {
 
 
 	public void do_run(ActionEvent e) {
-		TestingCase tCase = (TestingCase) tCaseModel.getSelectedItem();
+		Test tCase = (Test) tCaseModel.getSelectedItem();
 
 		getSourceEditor().setVisible(false);
 
@@ -400,7 +354,6 @@ public class Controller {
 
 	public void do_closeSource(ActionEvent e) {
 		getSourceEditor().setVisible(false);
-		getTaskSelector().setVisible(true);
 	}
 
 	public void do_closeStepper(ActionEvent e) {
