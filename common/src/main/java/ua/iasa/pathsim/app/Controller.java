@@ -1,12 +1,13 @@
 package ua.iasa.pathsim.app;
 
-import com.bws.base.utils.Vm;
 import com.bws.base.swing.Swing;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.AbstractTableModel;
+
+import org.akraievoy.gear.G;
 import ua.iasa.pathsim.Data;
 import ua.iasa.pathsim.app.ui.*;
 import ua.iasa.pathsim.domain.*;
@@ -341,7 +342,7 @@ public class Controller {
             dataPath.execute();
 
         } catch (Throwable t) {
-            log.warning(Vm.report(t));
+            log.warning(G.report(t));
             log.log(Level.INFO, "details", t);
         }
 

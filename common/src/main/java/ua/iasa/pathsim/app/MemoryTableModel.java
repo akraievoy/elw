@@ -1,6 +1,5 @@
 package ua.iasa.pathsim.app;
 
-import com.bws.base.utils.Str;
 import javax.swing.table.AbstractTableModel;
 import ua.iasa.pathsim.Data;
 import ua.iasa.pathsim.domain.*;
@@ -65,7 +64,7 @@ public class MemoryTableModel extends AbstractTableModel {
 
         }
 
-        return Str.EMPTY;
+        return "";
     }
 
     protected String getAccessMod(int address) {

@@ -4,10 +4,11 @@
  */
 package ua.iasa.pathsim.app;
 
-import com.bws.base.utils.Str;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
+
+import org.akraievoy.gear.G4Str;
 import ua.iasa.pathsim.*;
 
 import java.util.*;
@@ -54,7 +55,7 @@ public class LoadRegistersAction extends AbstractAction {
         for (String tempStr : codeLines) {
             final int index = tempStr.indexOf(':');
             final String register = tempStr.substring(0, index);
-            final int lookupIndex = Str.indexOf(register, InstructionsModel.REGS);
+            final int lookupIndex = G4Str.indexOf(register, InstructionsModel.REGS);
             final int registerIndex = lookupIndex > 0 ? lookupIndex : Data.dec2int(register);
             if (registerIndex != 0) {
                 String word = tempStr.substring(index + 1);
@@ -81,7 +82,7 @@ public class LoadRegistersAction extends AbstractAction {
             }
 
             String registerNumber = tempStr.substring(0, index);
-            if (Str.indexOf(registerNumber, InstructionsModel.REGS) <= 0) {
+            if (G4Str.indexOf(registerNumber, InstructionsModel.REGS) <= 0) {
                 if (InstructionsModel.REGS[0].equalsIgnoreCase(registerNumber)) {
                     log.warning("Register '"+InstructionsModel.REGS[0]+"' is Constant Holding 00000000. Its Value CANNOT be Changed!");
                     return false;

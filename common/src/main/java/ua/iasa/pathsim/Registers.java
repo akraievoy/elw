@@ -4,7 +4,6 @@
  */
 package ua.iasa.pathsim;
 
-import com.bws.base.utils.Str;
 import java.awt.*;
 import javax.swing.table.*;
 
@@ -149,7 +148,7 @@ class Registers extends RegMem implements RegistersModel {
                 return getAccessMod(rowIndex);
             }
 
-            return Str.EMPTY;
+            return "";
         }
 
         protected String getAccessMod(int rowIndex) {

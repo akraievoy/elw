@@ -1,7 +1,5 @@
 package ua.iasa.pathsim.domain;
 
-import com.bws.base.utils.Die;
-
 public class InstructionContext {
     protected final Instructions instructions;
     protected final Memory memory;
@@ -36,57 +34,57 @@ public class InstructionContext {
     }
 
     public int getS() {
-        Die.ifNull("instruction", instruction);
-        Die.ifNull("instruction.s", instruction.getS());
+        base.Die.ifNull("instruction", instruction);
+        base.Die.ifNull("instruction.s", instruction.getS());
 
         return registers.getReg(instruction.getS());
     }
 
     public int setS(final int s) {
-        Die.ifNull("instruction", instruction);
-        Die.ifNull("instruction.s", instruction.getS());
+        base.Die.ifNull("instruction", instruction);
+        base.Die.ifNull("instruction.s", instruction.getS());
 
         return registers.setReg(instruction.getS(), s);
     }
 
     public int getT() {
-        Die.ifNull("instruction", instruction);
-        Die.ifNull("instruction.t", instruction.getT());
+        base.Die.ifNull("instruction", instruction);
+        base.Die.ifNull("instruction.t", instruction.getT());
 
         return registers.getReg(instruction.getT());
     }
 
     public int setT(final int t) {
-        Die.ifNull("instruction", instruction);
-        Die.ifNull("instruction.t", instruction.getT());
+        base.Die.ifNull("instruction", instruction);
+        base.Die.ifNull("instruction.t", instruction.getT());
 
         return registers.setReg(instruction.getT(), t);
     }
 
     public int getD() {
-        Die.ifNull("instruction", instruction);
-        Die.ifNull("instruction.d", instruction.getD());
+        base.Die.ifNull("instruction", instruction);
+        base.Die.ifNull("instruction.d", instruction.getD());
 
         return registers.getReg(instruction.getD());
     }
 
     public int setD(final int d) {
-        Die.ifNull("instruction", instruction);
-        Die.ifNull("instruction.d", instruction.getD());
+        base.Die.ifNull("instruction", instruction);
+        base.Die.ifNull("instruction.d", instruction.getD());
 
         return registers.setReg(instruction.getD(), d);
     }
 
     public int getI16() {
-        Die.ifNull("instruction", instruction);
-        Die.ifNull("instruction.i16", instruction.getI16());
+        base.Die.ifNull("instruction", instruction);
+        base.Die.ifNull("instruction.i16", instruction.getI16());
 
         return instruction.getI16();
     }
 
     public int getI26() {
-        Die.ifNull("instruction", instruction);
-        Die.ifNull("instruction.i26", instruction.getI26());
+        base.Die.ifNull("instruction", instruction);
+        base.Die.ifNull("instruction.i26", instruction.getI26());
 
         return instruction.getI26();
     }

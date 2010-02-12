@@ -1,6 +1,5 @@
 package ua.iasa.pathsim.app;
 
-import com.bws.base.utils.Str;
 import javax.swing.table.AbstractTableModel;
 import ua.iasa.pathsim.domain.Instructions;
 import ua.iasa.pathsim.Data;
@@ -54,7 +53,7 @@ public class InstructionsTableModel extends AbstractTableModel {
 
         }
 
-        return Str.EMPTY;
+        return "";
     }
 
     private String groupBy(final String code, final int group) {

@@ -1,6 +1,6 @@
 package ua.iasa.pathsim.domain;
 
-import com.bws.base.utils.*;
+import org.akraievoy.gear.G4Parse;
 
 import java.util.*;
 
@@ -29,17 +29,17 @@ public enum Reg {
             }
         }
 
-        final Long numericValue = Str.parseLong(regGroup, null);
+        final Long numericValue = G4Parse.parse(regGroup, (Long) null);
 
         if (numericValue != null) {
 
             final int regIndex = numericValue.intValue();
-            Die.ifFalse(0 <= regIndex && regIndex < 32, "illegal number of register: " + regIndex);
+            base.Die.ifFalse(0 <= regIndex && regIndex < 32, "illegal number of register: " + regIndex);
 
             return Reg.values()[regIndex];
 
         }
 
-        throw Die.unsupported("failed to parse as register name: '" + regGroup + "'");
+        throw base.Die.unsupported("failed to parse as register name: '" + regGroup + "'");
     }
 }

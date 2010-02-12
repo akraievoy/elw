@@ -1,7 +1,8 @@
 package ua.iasa.pathsim.domain.asm;
 
-import com.bws.base.utils.*;
 import java.io.*;
+
+import base.Vm;
 import ua.iasa.pathsim.domain.Instruction;
 
 import java.util.*;
@@ -66,12 +67,12 @@ public class AssemblerRegistry {
         Properties temples= new Properties();
 
         final InputStream templesStream = AssemblerRegistry.class.getResourceAsStream("templates.properties");
-        Die.ifNull("templeStream", templesStream);
+        base.Die.ifNull("templeStream", templesStream);
 
         try {
             temples.load(templesStream);
         } catch (IOException e) {
-            throw Die.criticalConfigError(e);
+            throw base.Die.criticalConfigError(e);
         }
 
         return create(temples);
@@ -85,19 +86,19 @@ public class AssemblerRegistry {
             final String property = (String) key;
             if (property.endsWith(".syntax")) {
                 final String name = property.substring(0, property.indexOf('.'));
-                Die.ifEmpty("name", name);
+                base.Die.ifEmpty("name", name);
 
                 final String syntax = templates.getProperty(property);
 
                 final String template = templates.getProperty(name + ".template");
-                Die.ifEmpty(name + ".template", template);
-                Die.ifFalse(template.length() == 32, "template.length == " + template.length() + " for " + name);
+                base.Die.ifEmpty(name + ".template", template);
+                base.Die.ifFalse(template.length() == 32, "template.length == " + template.length() + " for " + name);
 
                 final String assemblerClass = templates.getProperty(name + ".assembler");
-                Die.ifEmpty(name + ".assembler", assemblerClass);
+                base.Die.ifEmpty(name + ".assembler", assemblerClass);
 
                 final InstructionAssembler assembler = Vm.tryToCreateByName(assemblerClass, InstructionAssembler.class);
-                Die.ifNull(assemblerClass + ", assembler for " + name, assembler);
+                base.Die.ifNull(assemblerClass + ", assembler for " + name, assembler);
 
                 final InstructionSetup setup = new InstructionSetup(name, assembler, template, syntax);
 
@@ -110,6 +111,6 @@ public class AssemblerRegistry {
 
     void setupInstruction(final InstructionSetup setup) {
         final InstructionSetup prevContent = nameToSetup.put(setup.name, setup);
-        Die.ifNotNull("prevContent (" + setup.name + ")", prevContent);
+        base.Die.ifNotNull("prevContent (" + setup.name + ")", prevContent);
     }
 }

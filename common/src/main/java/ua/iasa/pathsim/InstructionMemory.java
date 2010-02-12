@@ -4,7 +4,6 @@
  */
 package ua.iasa.pathsim;
 
-import com.bws.base.utils.Str;
 import java.awt.*;
 import javax.swing.table.AbstractTableModel;
 import static ua.iasa.pathsim.Data.hex2int;
@@ -32,7 +31,7 @@ class InstructionMemory extends RegMem implements InstructionsModel {
 
     public void initInstructions() {
         Arrays.fill(memory, 0);
-        Arrays.fill(code, Str.EMPTY);
+        Arrays.fill(code, "");
         accessIndex = -1;
         getTableModel().fireTableDataChanged();
     }
@@ -128,7 +127,7 @@ class InstructionMemory extends RegMem implements InstructionsModel {
                 return getAccessMod(rowIndex);
             }
 
-            return Str.EMPTY;
+            return "";
         }
 
         protected String getAccessMod(int rowIndex) {

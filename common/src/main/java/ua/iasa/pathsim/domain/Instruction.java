@@ -1,6 +1,5 @@
 package ua.iasa.pathsim.domain;
 
-import com.bws.base.utils.Die;
 import ua.iasa.pathsim.Data;
 import ua.iasa.pathsim.domain.asm.*;
 
@@ -111,7 +110,7 @@ public class Instruction {
     protected void replaceMask(final String maskSource, final String str) {
         final int srcStart = template.indexOf(maskSource);
 
-        Die.ifFalse(srcStart > 0, "mask '" + maskSource + "' not found in template: '" + template + "'");
+        base.Die.ifFalse(srcStart > 0, "mask '" + maskSource + "' not found in template: '" + template + "'");
 
         template.replace(srcStart, srcStart + maskSource.length(), str);
     }
@@ -142,11 +141,11 @@ public class Instruction {
     }
 
     public int intValue() {
-        Die.ifFalse(isAssembled(), "should be assembled: " + this);
+        base.Die.ifFalse(isAssembled(), "should be assembled: " + this);
 
         final String templateValue = template.toString();
         final String templateBinValue = templateValue.replaceAll("-", "0");
-        Die.ifFalse(templateBinValue.length() == 32, "wrong bit length: '" + templateBinValue + "'");
+        base.Die.ifFalse(templateBinValue.length() == 32, "wrong bit length: '" + templateBinValue + "'");
 
         return Data.bin2int(templateBinValue);
     }

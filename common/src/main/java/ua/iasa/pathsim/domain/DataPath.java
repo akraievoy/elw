@@ -1,6 +1,5 @@
 package ua.iasa.pathsim.domain;
 
-import com.bws.base.utils.*;
 import java.lang.reflect.*;
 
 public class DataPath {
@@ -30,15 +29,15 @@ public class DataPath {
         try {
             method = alu.getClass().getMethod(instruction.getOpName(), InstructionContext.class);
         } catch (NoSuchMethodException e) {
-            throw Die.ifReached(e);
+            throw base.Die.ifReached(e);
         }
 
         try {
             method.invoke(alu, ctx);
         } catch (IllegalAccessException e) {
-            throw Die.ifReached(e);
+            throw base.Die.ifReached(e);
         } catch (InvocationTargetException e) {
-            throw Die.ifReached(e);
+            throw base.Die.ifReached(e);
         }
 
         if (!registers.getWriteRegs().contains(Reg.pc)) {

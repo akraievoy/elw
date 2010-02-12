@@ -4,7 +4,7 @@
  */
 package ua.iasa.pathsim.domain.asm;
 
-import com.bws.base.utils.*;
+import org.akraievoy.gear.G4Str;
 import ua.iasa.pathsim.domain.Instruction;
 
 import java.util.*;
@@ -50,7 +50,7 @@ public class MipsAssembler {
                     asmCode= codeLine;
                 }
 
-                if (!Str.isEmpty(labelList)) {
+                if (!G4Str.isEmpty(labelList)) {
                     final boolean correctSyntax = PATTERN_LABELS.matcher(labelList).matches();
                     if (!correctSyntax) {
                         throw AssemblyException.incorrectLabelList(labelList);
@@ -66,7 +66,7 @@ public class MipsAssembler {
                     }
                 }
 
-                if (!Str.isEmpty(asmCode)) {
+                if (!G4Str.isEmpty(asmCode)) {
                     instructions.add(assemblerRegistry.assemble(asmCode, instructionOffset));
                     instructionOffset++;
                 }

@@ -4,7 +4,7 @@
  */
 package ua.iasa.pathsim;
 
-import com.bws.base.utils.*;
+import org.akraievoy.gear.G4Str;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -41,7 +41,7 @@ public class RegisterControl {
         for (String tempStr : codeLines) {
             final int index = tempStr.indexOf(':');
             final String register = tempStr.substring(0, index);
-            final int lookupIndex = Str.indexOf(register, InstructionsModel.REGS);
+            final int lookupIndex = G4Str.indexOf(register, InstructionsModel.REGS);
             final int registerIndex = lookupIndex > 0 ? lookupIndex : Data.dec2int(register);
             if (registerIndex != 0) {
                 String word = tempStr.substring(index + 1);
@@ -68,7 +68,7 @@ public class RegisterControl {
             }
 
             String registerNumber = tempStr.substring(0, index);
-            if (Str.indexOf(registerNumber, InstructionsModel.REGS) <= 0) {
+            if (G4Str.indexOf(registerNumber, InstructionsModel.REGS) <= 0) {
                 if (InstructionsModel.REGS[0].equalsIgnoreCase(registerNumber)) {
                     log.warning("Register '"+InstructionsModel.REGS[0]+"' is Constant Holding 00000000. Its Value CANNOT be Changed!");
                     return false;

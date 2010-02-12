@@ -3,7 +3,6 @@ package ua.iasa.pathsim.app;
 import javax.swing.table.AbstractTableModel;
 import ua.iasa.pathsim.domain.*;
 import ua.iasa.pathsim.Data;
-import com.bws.base.utils.Str;
 
 public class RegistersTableModel extends AbstractTableModel {
     public static final String COL_NUMBER = "#";
@@ -57,7 +56,7 @@ public class RegistersTableModel extends AbstractTableModel {
 
         }
 
-        return Str.EMPTY;
+        return "";
     }
 
     protected String getAccessMod(Reg rowIndex) {

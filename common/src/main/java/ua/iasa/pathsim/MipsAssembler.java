@@ -4,7 +4,7 @@
  */
 package ua.iasa.pathsim;
 
-import com.bws.base.utils.Str;
+import org.akraievoy.gear.G4Str;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -22,7 +22,7 @@ public class MipsAssembler implements Assembler {
     protected ArrayList<String> codeLines = new ArrayList<String>();
 
     public boolean isRegister(String token) {
-        return Str.contains(InstructionsModel.REGS, token.toUpperCase());
+        return G4Str.contains(InstructionsModel.REGS, token.toUpperCase());
     }
 
     public boolean isConstantRegister(String token) {
@@ -30,7 +30,7 @@ public class MipsAssembler implements Assembler {
     }
 
     public int getRegisterNumber(String token) {
-        return Str.indexOf(token.toUpperCase(), InstructionsModel.REGS);
+        return G4Str.indexOf(token.toUpperCase(), InstructionsModel.REGS);
     }
 
     public String fourFieldInstruction(String[] instructionComponents) {
@@ -421,19 +421,19 @@ public class MipsAssembler implements Assembler {
     public String parse(ArrayList<String> tokens) {
         final String c = tokens.get(0);
         final String instruction;
-        if (Str.contains(new String[]{"ADD", "AND", "OR", "SUB", "SLT", "NOR", "XOR"}, c)) {
+        if (G4Str.contains(new String[]{"ADD", "AND", "OR", "SUB", "SLT", "NOR", "XOR"}, c)) {
             instruction = sixFieldInstruction(rType(tokens));
-        } else if (Str.contains(new String[]{"SLLV", "SRAV", "SRLV"}, c)) {
+        } else if (G4Str.contains(new String[]{"SLLV", "SRAV", "SRLV"}, c)) {
             instruction = sixFieldInstruction(variableShift(tokens));
-        } else if (Str.contains(new String[]{"ADDI", "ANDI", "ORI", "XORI"}, c)) {
+        } else if (G4Str.contains(new String[]{"ADDI", "ANDI", "ORI", "XORI"}, c)) {
             instruction = fourFieldInstruction(immediateType(tokens));
-        } else if (Str.contains(new String[]{"SLL", "SRA", "SRL"}, c)) {
+        } else if (G4Str.contains(new String[]{"SLL", "SRA", "SRL"}, c)) {
             instruction = sixFieldInstruction(immediateShift(tokens));
-        } else if (Str.contains(new String[]{"LW", "SW"}, c)) {
+        } else if (G4Str.contains(new String[]{"LW", "SW"}, c)) {
             instruction = fourFieldInstruction(dataTransfer(tokens));
-        } else if (Str.contains(new String[]{"BEQ", "BNE"}, c)) {
+        } else if (G4Str.contains(new String[]{"BEQ", "BNE"}, c)) {
             instruction = fourFieldInstruction(branch(tokens));
-        } else if (Str.contains(new String[]{"J"}, c)) {
+        } else if (G4Str.contains(new String[]{"J"}, c)) {
             instruction = twoFieldInstruction(jump(tokens));
         } else {throw new Error("A Valid Assembly Operation Expected!");}
 

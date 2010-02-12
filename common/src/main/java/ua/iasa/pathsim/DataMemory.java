@@ -4,7 +4,6 @@
  */
 package ua.iasa.pathsim;
 
-import com.bws.base.utils.Str;
 import java.awt.*;
 import javax.swing.table.AbstractTableModel;
 import static ua.iasa.pathsim.Data.*;
@@ -143,7 +142,7 @@ class DataMemory extends RegMem implements MemoryModel {
                 return getAccessMod(rowIndex);
             }
 
-            return Str.EMPTY;
+            return "";
         }
 
         protected String getAccessMod(int rowIndex) {

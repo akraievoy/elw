@@ -1,6 +1,5 @@
 package ua.iasa.pathsim.domain.asm;
 
-import com.bws.base.utils.Die;
 import ua.iasa.pathsim.domain.*;
 
 import java.util.regex.*;
@@ -39,7 +38,7 @@ public abstract class InstructionAssembler {
             throw AssemblyException.formatUnsupported(template.getCodeLine(), template.getSetup().syntax);
         }
 
-        Die.ifNotEqual("opName", template.getOpName(), matcher.group(1));
+        base.Die.ifNotEqual("opName", template.getOpName(), matcher.group(1));
 
         assembleInternal(matcher, template);
 

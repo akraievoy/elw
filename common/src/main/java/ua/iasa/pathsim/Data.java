@@ -4,13 +4,16 @@
  */
 package ua.iasa.pathsim;
 
-import com.bws.base.utils.*;
+import org.akraievoy.gear.G4Str;
 import ua.iasa.pathsim.domain.asm.AssemblyException;
 
 import java.util.*;
 
 public class Data {
-    public static boolean isHexDigit(char c) {
+	protected static final String DIGITS = "0123456789";
+	protected static final String HEX_DIGITS = "0123456789ABCDEF";
+
+	public static boolean isHexDigit(char c) {
         return '0' <= c && c <= '9' || 'A' <= c && c <= 'F' || 'a' <= c && c <= 'f';
     }
 
@@ -88,7 +91,7 @@ public class Data {
         for (int i = 0; i < hex.length(); i++) {
             final int value = valueOfHex(hex.charAt(i));
             final int invertedValue = 15 - value;
-            result.append(Str.HEX_DIGITS.charAt(invertedValue));
+            result.append(HEX_DIGITS.charAt(invertedValue));
         }
 
         return result.toString();
@@ -140,7 +143,7 @@ public class Data {
 
         while (intermediateValue > 0 || digitCount < numberOfDigits) {
             int digitValue = (int) (intermediateValue % 16);
-            result.insert(0, Str.HEX_DIGITS.charAt(digitValue));
+            result.insert(0, HEX_DIGITS.charAt(digitValue));
             digitCount++;
             intermediateValue /= 16;
         }
@@ -164,7 +167,7 @@ public class Data {
         int digitCount = 0;
         while (intermediateValue > 0 || digitCount < numberOfDigits) {
             int digitValue = (int) (intermediateValue % 10);
-            result.insert(0, Str.DEC_DIGITS.charAt(digitValue));
+            result.insert(0, DIGITS.charAt(digitValue));
             digitCount++;
             intermediateValue /= 10;
         }
@@ -187,7 +190,7 @@ public class Data {
         for (String line : lines) {
             final String codeStr = line.replaceFirst("#.+$", "");
 
-            if (Str.isEmpty(codeStr)) {
+            if (G4Str.isEmpty(codeStr)) {
                 continue;
             }
 
@@ -198,8 +201,8 @@ public class Data {
     }
 
     public static String uint2bin(final int intValue, final int len, final String varName) throws AssemblyException {
-        Die.ifTrue(len <= 0, "len is not positive: " + len);
-        Die.ifTrue(len > 32, "len exceeds int width: " + len);
+        base.Die.ifTrue(len <= 0, "len is not positive: " + len);
+        base.Die.ifTrue(len > 32, "len exceeds int width: " + len);
         AssemblyException.ifExceeds(0, intValue, (1 << len) -  1, varName);
 
         final String binaryString = Integer.toBinaryString(intValue);
@@ -217,8 +220,8 @@ public class Data {
     }
 
     public static String int2bin(final int intValue, final int len, final String varName) throws AssemblyException {
-        Die.ifTrue(len <= 0, "len is not positive: " + len);
-        Die.ifTrue(len > 32, "len exceeds int width: " + len);
+        base.Die.ifTrue(len <= 0, "len is not positive: " + len);
+        base.Die.ifTrue(len > 32, "len exceeds int width: " + len);
 
         if (len < 32) {
             AssemblyException.ifExceeds(-(1 << len - 1), intValue, (1 << len - 1) - 1, varName);

@@ -1,6 +1,7 @@
 package com.bws.base.swing;
 
-import com.bws.base.utils.*;
+import org.akraievoy.gear.G;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.lang.reflect.*;
@@ -118,7 +119,7 @@ public class Swing {
             try {
                 method = targetObject.getClass().getMethod(methName, ActionEvent.class);
             } catch (NoSuchMethodException e) {
-                throw Die.criticalConfigError("'" + targetObject.getClass() + "." + methName + "' not found");
+                throw base.Die.criticalConfigError("'" + targetObject.getClass() + "." + methName + "' not found");
             }
 
             final AbstractAction newAction = new AbstractAction(name) {
@@ -129,17 +130,17 @@ public class Swing {
 
                     } catch (IllegalAccessException e1) {
 
-                        throw Die.criticalConfigError("'" + targetObject.getClass() + "." + methName + "' not accessible");
+                        throw base.Die.criticalConfigError("'" + targetObject.getClass() + "." + methName + "' not accessible");
 
                     } catch (InvocationTargetException ite) {
 
-                        log.log(Level.WARNING, "failed: " + Vm.report(ite), ite);
+                        log.log(Level.WARNING, "failed: " + G.report(ite), ite);
 
                     }
                 }
             };
 
-            Die.ifNotNull("prev action for '" + methodKey + "'", actions.put(methodKey, newAction));
+            base.Die.ifNotNull("prev action for '" + methodKey + "'", actions.put(methodKey, newAction));
 
             return newAction;
         }
@@ -147,7 +148,7 @@ public class Swing {
         public AbstractAction forKey(final String methodKey) {
             final AbstractAction abstractAction = actions.get(methodKey);
 
-            Die.ifNull("action for key '" + methodKey + "'", abstractAction);
+            base.Die.ifNull("action for key '" + methodKey + "'", abstractAction);
 
             return abstractAction;
         }

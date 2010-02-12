@@ -1,6 +1,5 @@
 package ua.iasa.pathsim.app;
 
-import com.bws.base.utils.Str;
 import javax.swing.table.AbstractTableModel;
 import ua.iasa.pathsim.domain.testing.*;
 
@@ -39,6 +38,6 @@ public class TaskListModel extends AbstractTableModel {
             return getTasks()[rowIndex].getShortDesc();
         }
 
-        return Str.EMPTY;
+        return "";
     }
 }
