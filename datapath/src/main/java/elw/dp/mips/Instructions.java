@@ -18,6 +18,10 @@ public class Instructions {
 		return getInternal(address);
 	}
 
+	public boolean hasInstruction(int address) {
+		return addressToInstruction.containsKey(address);
+	}
+
 	public Instruction getInternal(final int address) {
 		if (addressToInstruction.containsKey(address)) {
 			return addressToInstruction.get(address);

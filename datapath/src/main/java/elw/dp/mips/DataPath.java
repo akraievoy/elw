@@ -16,13 +16,17 @@ public class DataPath {
 		ctx = new InstructionContext(instructions, memory, registers);
 	}
 
-	public void execute() {
+	public Instruction execute() {
 		instructions.resetAccess();
 		memory.resetAccess();
 		registers.resetAccess();
 
-		final Instruction instruction = instructions.get(registers.getReg(Reg.pc));
+		final int pc = registers.getReg(Reg.pc);
+		if (!instructions.hasInstruction(pc)) {
+			return null;
+		}
 
+		final Instruction instruction = instructions.get(pc);
 		ctx.setInstruction(instruction);
 
 		final Method method;
@@ -44,6 +48,7 @@ public class DataPath {
 		if (!registers.getWriteRegs().contains(Reg.pc.ordinal())) {
 			ctx.advPc();
 		}
+		return instruction;
 	}
 
 	public Instructions getInstructions() {

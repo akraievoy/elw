@@ -61,6 +61,9 @@ public class Controller {
 	protected final AssembleAction aVerify = new AssembleAction("Verify", false);
 	protected final UpdateTestSelectionAction aUpdateTestSelection = new UpdateTestSelectionAction();
 	protected final TestStepAction aTestStep = new TestStepAction("Step>");
+	protected final RunStepAction aRunStep = new RunStepAction("Step", 1);
+	protected final RunStepAction aRunRun = new RunStepAction("Run", 4096);
+	protected final RunResetAction aRunReset = new RunResetAction("Reset");
 
 	public void init() throws IOException {
 		final InputStream modelStream = Controller.class.getResourceAsStream("/aos-s10.json");
@@ -105,8 +108,20 @@ public class Controller {
 		view.getRunInstructionsTable().setModel(tmInstructions);
 		view.getRunRegsTable().setModel(tmRegs);
 		view.getRunMemTable().setModel(tmMemory);
+		view.getRunStepButton().setAction(aRunStep);
+		view.getRunStepButton().setMnemonic('t');
+		view.getRunRunButton().setAction(aRunRun);
+		view.getRunRunButton().setMnemonic('r');
+		view.getRunResetButton().setAction(aRunReset);
+		view.getRunResetButton().setMnemonic('e');
 
 		log.info("started up, yeah!");
+	}
+
+	protected void fireDataPathChanged() {
+		tmInstructions.fireTableDataChanged();
+		tmMemory.fireTableDataChanged();
+		tmRegs.fireTableDataChanged();
 	}
 
 	protected void selectTest(Test test) {
@@ -175,10 +190,29 @@ public class Controller {
 			dataPath.getMemory().setData(data[0]);
 			dataPath.getRegisters().load(regs[0]);
 			dataPath.getRegisters().setReg(Reg.pc, dataPath.getInstructions().getBase());
-			dataPath.getRegisters().setReg(Reg.ra, dataPath.getInstructions().getBase() - 1);
+			dataPath.getRegisters().setReg(Reg.ra, dataPath.getInstructions().getBase() - 4);
 			Result.success(log, resRef, "Instructions, Data and Regs loaded");
 		} else {
 			Result.failure(log, resRef, "Instructions, Data or Regs NOT loaded!");
+		}
+	}
+
+	public void job_step(JLabel statusLabel, Result[] resRef, final int steps) {
+		setupStatus(statusLabel, "Stepping...");
+		try {
+			for (int step = 0; step < steps; step++) {
+				final Instruction instruction = dataPath.execute();
+				if (instruction != null) {
+					Result.success(log, resRef, "Executed " + instruction.getOpName());
+				} else {
+					Result.success(log, resRef, "Complete");
+					//	TODO proceed with result verification
+					break;
+				}
+			}
+		} catch (Throwable t) {
+			Result.failure(log, resRef, "Failed: " + G.report(t));
+			log.trace("trace", t);
 		}
 	}
 
@@ -245,9 +279,7 @@ public class Controller {
 						setupStatus(statusLabel, resRef[0]);
 						if (resRef[0].isSuccess()) {
 							view.getStrTabbedPane().setSelectedIndex(2);
-							tmInstructions.fireTableDataChanged();
-							tmMemory.fireTableDataChanged();
-							tmRegs.fireTableDataChanged();
+							fireDataPathChanged();
 						}
 					}
 				}
@@ -255,23 +287,61 @@ public class Controller {
 		}
 	}
 
-	public void do_reset(ActionEvent e) {
-		dataPath.reset();
-	}
+	class RunStepAction extends AbstractAction {
+		protected final int steps;
 
-	public void do_step(ActionEvent e) {
-		try {
-
-			dataPath.execute();
-
-		} catch (Throwable t) {
-			log.warn(G.report(t));
-			log.info("details", t);
+		public RunStepAction(final String name, final int steps) {
+			super(name);
+			this.steps = steps;
 		}
 
-		tmInstructions.fireTableDataChanged();
-		tmRegs.fireTableDataChanged();
-		tmMemory.fireTableDataChanged();
+		public void actionPerformed(ActionEvent e) {
+			setEnabled(false);
+			final JLabel statusLabel = view.getRunStatusLabel();
+
+			executor.submit(new Runnable() {
+				public void run() {
+					final Result[] resRef = new Result[]{new Result("status unknown", false)};
+
+					try {
+						job_step(statusLabel, resRef, steps);
+					} finally {
+						setEnabled(true);
+						setupStatus(statusLabel, resRef[0]);
+						if (resRef[0].isSuccess()) {
+							fireDataPathChanged();
+						}
+					}
+				}
+			});
+		}
+	}
+
+	class RunResetAction extends AbstractAction {
+		public RunResetAction(final String name) {
+			super(name);
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			setEnabled(false);
+			final JLabel statusLabel = view.getRunStatusLabel();
+
+			executor.submit(new Runnable() {
+				public void run() {
+					final Result[] resRef = new Result[]{new Result("status unknown", false)};
+
+					try {
+						job_reset(statusLabel, resRef);
+					} finally {
+						setEnabled(true);
+						setupStatus(statusLabel, resRef[0]);
+						if (resRef[0].isSuccess()) {
+							fireDataPathChanged();
+						}
+					}
+				}
+			});
+		}
 	}
 
 	protected class SourceDocumentListener implements DocumentListener {
