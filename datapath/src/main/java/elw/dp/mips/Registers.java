@@ -3,6 +3,8 @@ package elw.dp.mips;
 import gnu.trove.TIntArrayList;
 import gnu.trove.TIntIntHashMap;
 
+import java.util.Arrays;
+
 public class Registers {
 	final TIntIntHashMap regToValue = new TIntIntHashMap();
 
@@ -16,16 +18,16 @@ public class Registers {
 	}
 
 	public int getRegInternal(final Reg reg) {
-		final Integer integer = regToValue.get(reg.ordinal());
+		final int key = reg.ordinal();
 
-		return integer == null ? 0 : integer;
+		return regToValue.get(key);
 	}
 
 	public int setReg(Reg reg, int value) {
-		writeRegs.add(reg.ordinal());
+		final int key = reg.ordinal();
+		writeRegs.add(key);
 
-		final Integer oldValue = regToValue.put(reg.ordinal(), value);
-		return oldValue != null ? oldValue : 0;
+		return regToValue.put(key, value);
 	}
 
 	public void resetAccess() {
@@ -41,13 +43,31 @@ public class Registers {
 		return writeRegs;
 	}
 
-	public void load(final TIntIntHashMap lastLoaded) {
+	public int[] getSetupRegOrdinals() {
+		//	LATER optimize here
+		final int[] keys = regToValue.keys();
+		Arrays.sort(keys);
+		return keys;
+	}
+
+	public Reg[] getSetupRegs() {
+		final int[] regOrdinals = getSetupRegOrdinals();
+		final Reg[] regs = new Reg[regOrdinals.length];
+
+		for (int i = 0; i < regOrdinals.length; i++) {
+			regs[i] = Reg.values()[regOrdinals[i]];
+		}
+
+		return regs;
+	}
+
+	public void load(final TIntIntHashMap regMap) {
 		resetAccess();
 
-		for (Reg reg : Reg.values()) {
-			final int regIndex = reg.ordinal();
-			final int regValue = lastLoaded.containsKey(regIndex) ? lastLoaded.get(regIndex) : 0;
-			regToValue.put(regIndex, regValue);
+		regToValue.clear();
+		final int[] keys = regMap.keys();
+		for (int key : keys) {
+			regToValue.put(key, regMap.get(key));
 		}
 	}
 }

@@ -205,6 +205,7 @@ public class Controller {
 				if (instruction != null) {
 					Result.success(log, resRef, "Executed " + instruction.getOpName());
 				} else {
+//					dataPath.getRegisters()
 					Result.success(log, resRef, "Complete");
 					//	TODO proceed with result verification
 					break;

@@ -29,16 +29,16 @@ public class RegistersTableModel extends AbstractTableModel {
 	}
 
 	public int getRowCount() {
-		return Reg.values().length;
+		return registers.getSetupRegOrdinals().length;
 	}
 
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		final Reg reg = Reg.values()[rowIndex];
+		final Reg reg = Reg.values()[registers.getSetupRegOrdinals()[rowIndex]];
 		final String colName = columns[columnIndex];
 
 		if (COL_NUMBER.equals(colName)) {
 
-			return Data.int2dec(rowIndex, 2);
+			return Data.int2dec(reg.ordinal(), 2);
 
 		} else if (COL_NAME.equals(colName)) {
 
