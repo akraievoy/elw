@@ -8,10 +8,16 @@ import org.akraievoy.gear.G4Str;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class Data {
 	protected static final String DIGITS = "0123456789";
 	protected static final String HEX_DIGITS = "0123456789ABCDEF";
+
+	protected static final Pattern PATTERN_BIN = Pattern.compile("^[0-1]+$");
+	protected static final Pattern PATTERN_OCT = Pattern.compile("^[0-7]+$");
+	protected static final Pattern PATTERN_HEX = Pattern.compile("^[0-9a-fA-F]+$");
+	protected static final Pattern PATTERN_DEC = Pattern.compile("^[0-9]+$");
 
 	public static boolean isHexDigit(char c) {
 		return '0' <= c && c <= '9' || 'A' <= c && c <= 'F' || 'a' <= c && c <= 'f';
@@ -251,6 +257,105 @@ public class Data {
 		}
 
 		return Integer.parseInt(binValue, 2);
+	}
+
+	public static boolean isNum(final String num, int bits) {
+		if (num == null || num.length() == 0) {
+			return false;
+		}
+
+		final StringBuffer numBuf = new StringBuffer(num);
+		if (numBuf.charAt(0) == '-') {
+			numBuf.deleteCharAt(0);
+			if (numBuf.indexOf("-") >= 0 || numBuf.length() == 0) {
+				return false;
+			}
+		}
+
+		if (numBuf.charAt(numBuf.length() - 1) == 'b') {
+			numBuf.deleteCharAt(numBuf.length() - 1);
+			if (numBuf.length() == 0) {
+				return false;
+			}
+			while (numBuf.charAt(0) == '0' && numBuf.length() > 1) {
+				numBuf.deleteCharAt(0);
+			}
+			return numBuf.length() <= bits && PATTERN_BIN.matcher(numBuf).matches();
+		} else if (numBuf.charAt(numBuf.length() - 1) == 'o') {
+			numBuf.deleteCharAt(numBuf.length() - 1);
+			if (numBuf.length() == 0) {
+				return false;
+			}
+			while (numBuf.charAt(0) == '0' && numBuf.length() > 1) {
+				numBuf.deleteCharAt(0);
+			}
+			return (numBuf.length() - 1) * 3 <= bits && PATTERN_OCT.matcher(numBuf).matches() && width(parse(numBuf.toString())) <= bits;
+		} else if (numBuf.charAt(numBuf.length() - 1) == 'h') {
+			numBuf.deleteCharAt(numBuf.length() - 1);
+			if (numBuf.length() == 0) {
+				return false;
+			}
+			while (numBuf.charAt(0) == '0' && numBuf.length() > 1) {
+				numBuf.deleteCharAt(0);
+			}
+			return (numBuf.length() - 1) * 4 <= bits && PATTERN_HEX.matcher(numBuf).matches() && width(parse(numBuf.toString())) <= bits;
+		} else if (numBuf.length() >= 2 && "0x".equals(numBuf.subSequence(0, 2))) {
+			numBuf.delete(0, 2);
+			if (numBuf.length() == 0) {
+				return false;
+			}
+			while (numBuf.charAt(0) == '0' && numBuf.length() > 1) {
+				numBuf.deleteCharAt(0);
+			}
+			return (numBuf.length() - 1) * 4 <= bits && PATTERN_HEX.matcher(numBuf).matches() && width(parse(numBuf.toString())) <= bits;
+		} else {
+			while (numBuf.charAt(0) == '0' && numBuf.length() > 1) {
+				numBuf.deleteCharAt(0);
+			}
+			return (numBuf.length() - 1) * 3 <= bits && PATTERN_DEC.matcher(numBuf).matches() && width(parse(numBuf.toString())) <= bits;
+		}
+	}
+
+	protected static long parse(final String num) {
+		if (num.startsWith("-") && num.lastIndexOf('-') == 0) {
+			return -parse(num.substring(1));
+		}
+
+		if (num.endsWith("b")) {
+			return Long.parseLong(num.substring(0, num.length() - 1), 2);
+		}
+		if (num.endsWith("o")) {
+			return Long.parseLong(num.substring(0, num.length() - 1), 8);
+		}
+		if (num.endsWith("h")) {
+			return Long.parseLong(num.substring(0, num.length() - 1), 16);
+		}
+		if (num.startsWith("0x")) {
+			return Long.parseLong(num.substring(2), 16);
+		}
+
+		return Long.parseLong(num);
+	}
+
+	public static int width(long value) {
+		int msb = 0;
+
+		while (value >= 1l << 16) {
+			value >>= 16;
+			msb += 16;
+		}
+
+		while (value >= 1l << 4) {
+			value >>= 4;
+			msb+= 4;
+		}
+
+		while (value >= 1) {
+			value >>= 1;
+			msb+= 1;
+		}
+
+		return msb;
 	}
 }
 
