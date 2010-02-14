@@ -3,6 +3,7 @@ package elw.dp.app;
 import base.pattern.Result;
 import elw.dp.mips.DataPath;
 import elw.dp.mips.Instruction;
+import elw.dp.mips.Reg;
 import elw.dp.mips.asm.MipsAssembler;
 import elw.dp.ui.DataPathForm;
 import elw.dp.ui.FeedbackAppender;
@@ -21,7 +22,6 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.table.AbstractTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
@@ -46,16 +46,21 @@ public class Controller {
 	protected AtomicLong assembleStamp = new AtomicLong(0);
 	protected Version selectedTask;
 	protected final DefaultComboBoxModel testComboModel = new DefaultComboBoxModel();
+	//	app data (compile/test/run cycle)
+	protected Instruction[] instructions = null;
+	protected TIntIntHashMap[] regs = null;
+	protected TIntIntHashMap[] data = null;
 
-	InstructionsTableModel instructionsTableModel;
-	RegistersTableModel registersTableModel;
-	MemoryTableModel memoryTableModel;
+	InstructionsTableModel tmInstructions = new InstructionsTableModel(dataPath.getInstructions());
+	RegistersTableModel tmRegs = new RegistersTableModel(dataPath.getRegisters());
+	MemoryTableModel tmMemory = new MemoryTableModel(dataPath.getMemory());
 
 	//	actions
 	protected final ScheduledExecutorService executor = new ScheduledThreadPoolExecutor(3);
-	protected final AssembleAction aAssemble = new AssembleAction();
+	protected final AssembleAction aAssemble = new AssembleAction("Assemble>", true);
+	protected final AssembleAction aVerify = new AssembleAction("Verify", false);
 	protected final UpdateTestSelectionAction aUpdateTestSelection = new UpdateTestSelectionAction();
-	protected final TestStepAction aTestStep = new TestStepAction();
+	protected final TestStepAction aTestStep = new TestStepAction("Step>");
 
 	public void init() throws IOException {
 		final InputStream modelStream = Controller.class.getResourceAsStream("/aos-s10.json");
@@ -80,18 +85,28 @@ public class Controller {
 		feedbackAppender.setThreshold(Level.ALL);
 		Logger.getRootLogger().addAppender(feedbackAppender);
 
-		log.info("started up, yeah!");
 		view.getProblemTextPane().setText(G4Str.join(selectedTask.getStatementHtml(), "\n"));
 		view.getTestComboBox().setModel(testComboModel);
 
 		//  TODO hide this
 		view.getSourceTextArea().setText(G4Str.join(selectedTask.getSolution(), "\n"));
 		view.getSourceTextArea().getDocument().addDocumentListener(new SourceDocumentListener());
-		view.getSourceCompileButton().setAction(aAssemble);
+
+		view.getSourceAssembleButton().setAction(aAssemble);
+		view.getSourceAssembleButton().setMnemonic('a');
+		view.getSourceVerifyButton().setAction(aVerify);
+		view.getSourceVerifyButton().setMnemonic('v');
+
 		view.getTestComboBox().setAction(aUpdateTestSelection);
+		view.getTestAddCustomButton().setEnabled(false); //	LATER #163
 		view.getTestStepButton().setAction(aTestStep);
-		                                                           	
-		view.getSourceCompileButton().setMnemonic('c');
+		view.getTestStepButton().setMnemonic('s');
+
+		view.getRunInstructionsTable().setModel(tmInstructions);
+		view.getRunRegsTable().setModel(tmRegs);
+		view.getRunMemTable().setModel(tmMemory);
+
+		log.info("started up, yeah!");
 	}
 
 	protected void selectTest(Test test) {
@@ -111,10 +126,12 @@ public class Controller {
 		final String source = view.getSourceTextArea().getText();
 		final String[] sourceLines = source.split(LINE_SEPARATOR);
 
-		final Instruction[] instructions = assembler.assembleLoad(sourceLines, resRef);
-		if (instructions != null) {
+		final Instruction[] newInstructions = assembler.assembleLoad(sourceLines, resRef);
+		if (newInstructions != null) {
 			assembleStamp.set(System.currentTimeMillis());
-			dataPath.getInstructions().setInstructions(Arrays.asList(instructions));
+			instructions = newInstructions;
+		} else {
+			instructions = null;
 		}
 	}
 
@@ -130,46 +147,47 @@ public class Controller {
 			final String regsText = view.getTestRegsTextArea().getText();
 			final String[] regsLines = regsText.split(LINE_SEPARATOR);
 
-			final TIntIntHashMap[] regs = assembler.loadRegs(regsLines, resRef);
-			if (regs != null && resRef[0].isSuccess()) {
+			final TIntIntHashMap[] newRegs = assembler.loadRegs(regsLines, resRef);
+			if (newRegs != null && resRef[0].isSuccess()) {
 				final String memText = view.getTestMemTextArea().getText();
 				final String[] memLines = memText.split(LINE_SEPARATOR);
-				final TIntIntHashMap[] data = assembler.loadData(memLines, resRef);
+				final TIntIntHashMap[] newData = assembler.loadData(memLines, resRef);
 
-				if (data != null && resRef[0].isSuccess()) {
-					//	TODO: setup the DataPath with all this data we have processed
+				if (newData != null && resRef[0].isSuccess()) {
+					regs = newRegs;
+					data = newData;
+				} else {
+					regs = data = null;
 				}
+			} else {
+				regs = data = null;
 			}
+		} else {
+			regs = data = null;
 		}
 	}
 
-	public AbstractTableModel getInstructionsModel() {
-		if (instructionsTableModel == null) {
-			instructionsTableModel = new InstructionsTableModel(dataPath.getInstructions());
+	protected void job_reset(JLabel statusLabel, Result[] resRef) {
+		setupStatus(statusLabel, "Resetting...");
+
+		if (instructions != null && data != null && regs != null) {
+			dataPath.getInstructions().setInstructions(Arrays.asList(instructions));
+			dataPath.getMemory().setData(data[0]);
+			dataPath.getRegisters().load(regs[0]);
+			dataPath.getRegisters().setReg(Reg.pc, dataPath.getInstructions().getBase());
+			dataPath.getRegisters().setReg(Reg.ra, dataPath.getInstructions().getBase() - 1);
+			Result.success(log, resRef, "Instructions, Data and Regs loaded");
+		} else {
+			Result.failure(log, resRef, "Instructions, Data or Regs NOT loaded!");
 		}
-
-		return instructionsTableModel;
-	}
-
-	public AbstractTableModel getRegistersModel() {
-		if (registersTableModel == null) {
-			registersTableModel = new RegistersTableModel(dataPath.getRegisters());
-		}
-
-		return registersTableModel;
-	}
-
-	public AbstractTableModel getMemoryModel() {
-		if (memoryTableModel == null) {
-			memoryTableModel = new MemoryTableModel(dataPath.getMemory());
-		}
-
-		return memoryTableModel;
 	}
 
 	class AssembleAction extends AbstractAction {
-		public AssembleAction() {
-			super("Assemble");
+		final boolean switchToTest;
+
+		public AssembleAction(final String name, boolean switchToTest) {
+			super(name);
+			this.switchToTest = switchToTest;
 		}
 
 		public void actionPerformed(ActionEvent e) {
@@ -184,6 +202,9 @@ public class Controller {
 					} finally {
 						setEnabled(true);
 						setupStatus(statusLabel, resRef[0]);
+						if (switchToTest && resRef[0].isSuccess()) {
+							view.getStrTabbedPane().setSelectedIndex(1);
+						}
 					}
 				}
 			});
@@ -201,8 +222,8 @@ public class Controller {
 	}
 
 	class TestStepAction extends AbstractAction {
-		public TestStepAction() {
-			super("Step");
+		public TestStepAction(final String name) {
+			super(name);
 		}
 
 		public void actionPerformed(ActionEvent e) {
@@ -215,9 +236,19 @@ public class Controller {
 
 					try {
 						job_loadTest(statusLabel, resRef);
+
+						if (resRef[0].isSuccess()) {
+							job_reset(statusLabel, resRef);
+						}
 					} finally {
 						setEnabled(true);
 						setupStatus(statusLabel, resRef[0]);
+						if (resRef[0].isSuccess()) {
+							view.getStrTabbedPane().setSelectedIndex(2);
+							tmInstructions.fireTableDataChanged();
+							tmMemory.fireTableDataChanged();
+							tmRegs.fireTableDataChanged();
+						}
 					}
 				}
 			});
@@ -238,9 +269,23 @@ public class Controller {
 			log.info("details", t);
 		}
 
-		getInstructionsModel().fireTableDataChanged();
-		getRegistersModel().fireTableDataChanged();
-		getMemoryModel().fireTableDataChanged();
+		tmInstructions.fireTableDataChanged();
+		tmRegs.fireTableDataChanged();
+		tmMemory.fireTableDataChanged();
+	}
+
+	protected class SourceDocumentListener implements DocumentListener {
+		public void insertUpdate(DocumentEvent e) {
+			sourceStamp.set(System.currentTimeMillis());
+		}
+
+		public void removeUpdate(DocumentEvent e) {
+			sourceStamp.set(System.currentTimeMillis());
+		}
+
+		public void changedUpdate(DocumentEvent e) {
+			sourceStamp.set(System.currentTimeMillis());
+		}
 	}
 
 	public static void setupStatus(final JLabel label, final String text) {
@@ -300,19 +345,5 @@ public class Controller {
 				frame.setVisible(true);
 			}
 		});
-	}
-
-	protected class SourceDocumentListener implements DocumentListener {
-		public void insertUpdate(DocumentEvent e) {
-			sourceStamp.set(System.currentTimeMillis());
-		}
-
-		public void removeUpdate(DocumentEvent e) {
-			sourceStamp.set(System.currentTimeMillis());
-		}
-
-		public void changedUpdate(DocumentEvent e) {
-			sourceStamp.set(System.currentTimeMillis());
-		}
 	}
 }

@@ -100,7 +100,7 @@ public class MipsAssembler {
 			final String dataLine = dataLines[lineNum];
 			final String line = dataLine.replaceAll("\\s+", "");
 
-			if (line.startsWith("#")) {
+			if (line.length() == 0 || line.startsWith("#")) {
 				continue;
 			}
 
@@ -136,6 +136,10 @@ public class MipsAssembler {
 						Result.failure(log, resRef, prefix + "address '" + value + "' must be <= 0x" + maxHex);
 						return null;
 					}
+					if (value % 4 > 0) {
+						Result.failure(log, resRef, prefix + "address '" + value + "' must be word-aligned");
+						return null;
+					}
 
 					address = (int) value;
 				}
@@ -156,7 +160,7 @@ public class MipsAssembler {
 			final String dataLine = regsLines[lineNum];
 			final String line = dataLine.replaceAll("\\s+", "");
 
-			if (line.startsWith("#")) {
+			if (line.length() == 0 || line.startsWith("#")) {
 				continue;
 			}
 
@@ -217,7 +221,7 @@ public class MipsAssembler {
 		}
 
 		Result.success(resRef, "Registers validated and loaded fine");
-		return null;
+		return new TIntIntHashMap[] {regsIn, regsOut};
 	}
 }
 

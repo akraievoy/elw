@@ -1,13 +1,16 @@
 package elw.dp.mips;
 
+import gnu.trove.TIntArrayList;
+import gnu.trove.TIntByteHashMap;
+import gnu.trove.TIntIntHashMap;
+
 import java.util.*;
 
 public class Memory {
-	protected Map<Integer, Byte> contentMap = new HashMap<Integer, Byte>();
+	protected TIntByteHashMap contentMap = new TIntByteHashMap();
 
-	protected byte[] content = new byte[0];
-	protected List<Integer> readAdresses = new ArrayList<Integer>();
-	protected List<Integer> writeAdresses = new ArrayList<Integer>();
+	protected TIntArrayList readAdresses = new TIntArrayList();
+	protected TIntArrayList writeAdresses = new TIntArrayList();
 
 	public int getWord(int address) {
 		readAdresses.add(address);
@@ -79,12 +82,12 @@ public class Memory {
 		return setByteInternal(address, newByte);
 	}
 
-	public List<Integer> getReadAdresses() {
-		return Collections.unmodifiableList(readAdresses);
+	public TIntArrayList getReadAdresses() {
+		return readAdresses;
 	}
 
-	public List<Integer> getWriteAdresses() {
-		return Collections.unmodifiableList(writeAdresses);
+	public TIntArrayList getWriteAdresses() {
+		return writeAdresses;
 	}
 
 	public void resetAccess() {
@@ -97,19 +100,19 @@ public class Memory {
 	}
 
 	public int getAddressAt(int index) {
-		//  LATER this is memory drain
-		final List<Integer> addrs = new ArrayList<Integer>(contentMap.keySet());
+		//  LATER optimize this
+		final int[] keys = contentMap.keys();
+		Arrays.sort(keys);
 
-		Collections.sort(addrs);
-
-		return addrs.get(index);
+		return contentMap.get(keys[index]);
 	}
 
-	public void setData(final int[] lastLoaded) {
+	public void setData(final TIntIntHashMap newData) {
 		resetAccess();
 
-		for (int i = 0; i < lastLoaded.length; i++) {
-			setWord(i * 4, lastLoaded[i]);
+		final int[] addresses = newData.keys();
+		for (final int addr : addresses) {
+			setWord(addr, newData.get(addr));
 		}
 	}
 
@@ -118,6 +121,6 @@ public class Memory {
 	}
 
 	public boolean hasByte(final int address) {
-		return contentMap.get(address) != null;
+		return contentMap.containsKey(address);
 	}
 }

@@ -10,7 +10,7 @@ public class DataPathForm {
 	protected JComboBox testComboBox;
 	protected JTabbedPane pclTabbedPane;
 	protected JTextPane logTextPane;
-	protected JButton sourceCompileButton;
+	protected JButton sourceAssembleButton;
 	protected JButton testRunButton;
 	protected JButton testBatchButton;
 	protected JTextArea testMemTextArea;
@@ -28,9 +28,14 @@ public class DataPathForm {
 	protected JPanel rootPanel;
 	protected JLabel testStatusLabel;
 	protected JButton testStepButton;
+	protected JButton sourceVerifyButton;
 
 	public JPanel getRootPanel() {
 		return rootPanel;
+	}
+
+	public JButton getSourceVerifyButton() {
+		return sourceVerifyButton;
 	}
 
 	public JButton getTestStepButton() {
@@ -81,8 +86,8 @@ public class DataPathForm {
 		return runStepButton;
 	}
 
-	public JButton getSourceCompileButton() {
-		return sourceCompileButton;
+	public JButton getSourceAssembleButton() {
+		return sourceAssembleButton;
 	}
 
 	public JLabel getSourceFeedbackLabel() {
@@ -163,27 +168,34 @@ public class DataPathForm {
 		final JPanel panel2 = new JPanel();
 		panel2.setLayout(new GridBagLayout());
 		panel1.add(panel2, BorderLayout.SOUTH);
-		sourceCompileButton = new JButton();
-		sourceCompileButton.setActionCommand("Compile");
-		sourceCompileButton.setLabel("Compile");
-		sourceCompileButton.setText("Compile");
-		sourceCompileButton.setMnemonic('C');
-		sourceCompileButton.setDisplayedMnemonicIndex(0);
+		sourceAssembleButton = new JButton();
+		sourceAssembleButton.setActionCommand("Compile");
+		sourceAssembleButton.setLabel("Assemble");
+		sourceAssembleButton.setMargin(new Insets(3, 3, 3, 5));
+		sourceAssembleButton.setText("Assemble");
 		GridBagConstraints gbc;
 		gbc = new GridBagConstraints();
-		gbc.gridx = 0;
+		gbc.gridx = 1;
 		gbc.gridy = 0;
 		gbc.insets = new Insets(1, 2, 1, 2);
-		panel2.add(sourceCompileButton, gbc);
+		panel2.add(sourceAssembleButton, gbc);
 		sourceFeedbackLabel = new JLabel();
 		sourceFeedbackLabel.setText("...");
 		gbc = new GridBagConstraints();
-		gbc.gridx = 1;
+		gbc.gridx = 2;
 		gbc.gridy = 0;
 		gbc.weightx = 1.0;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0, 4, 0, 0);
 		panel2.add(sourceFeedbackLabel, gbc);
+		sourceVerifyButton = new JButton();
+		sourceVerifyButton.setMargin(new Insets(3, 5, 3, 3));
+		sourceVerifyButton.setText("Verify");
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		panel2.add(sourceVerifyButton, gbc);
 		final JPanel panel3 = new JPanel();
 		panel3.setLayout(new BorderLayout(0, 0));
 		strTabbedPane.addTab("Test", panel3);

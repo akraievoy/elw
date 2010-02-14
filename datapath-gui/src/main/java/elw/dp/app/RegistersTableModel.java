@@ -64,11 +64,11 @@ public class RegistersTableModel extends AbstractTableModel {
 	protected String getAccessMod(Reg rowIndex) {
 		StringBuffer accessMod = new StringBuffer();
 
-		if (registers.getReadRegs().contains(rowIndex)) {
+		if (registers.getReadRegs().contains(rowIndex.ordinal())) {
 			accessMod.append("r");
 		}
 
-		if (registers.getWriteRegs().contains(rowIndex)) {
+		if (registers.getWriteRegs().contains(rowIndex.ordinal())) {
 			accessMod.append("w");
 		}
 

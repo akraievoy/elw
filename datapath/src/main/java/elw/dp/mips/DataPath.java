@@ -41,7 +41,7 @@ public class DataPath {
 			throw base.Die.ifReached(e);
 		}
 
-		if (!registers.getWriteRegs().contains(Reg.pc)) {
+		if (!registers.getWriteRegs().contains(Reg.pc.ordinal())) {
 			ctx.advPc();
 		}
 	}

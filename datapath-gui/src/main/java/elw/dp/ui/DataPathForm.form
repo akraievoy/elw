@@ -52,24 +52,35 @@
                     <properties/>
                     <border type="none"/>
                     <children>
-                      <component id="a7b" class="javax.swing.JButton" binding="sourceCompileButton">
+                      <component id="a7b" class="javax.swing.JButton" binding="sourceAssembleButton">
                         <constraints>
-                          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
                           <gridbag top="1" left="2" bottom="1" right="2" weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
                           <actionCommand value="Compile"/>
-                          <label value="Compile"/>
-                          <text value="&amp;Compile"/>
+                          <label value="Assemble"/>
+                          <margin top="3" left="3" bottom="3" right="5"/>
+                          <text value="Assemble"/>
                         </properties>
                       </component>
                       <component id="41bdd" class="javax.swing.JLabel" binding="sourceFeedbackLabel">
                         <constraints>
-                          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                          <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                           <gridbag top="0" left="4" bottom="0" right="0" weightx="1.0" weighty="0.0"/>
                         </constraints>
                         <properties>
                           <text value="..."/>
+                        </properties>
+                      </component>
+                      <component id="c20" class="javax.swing.JButton" binding="sourceVerifyButton">
+                        <constraints>
+                          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <margin top="3" left="5" bottom="3" right="3"/>
+                          <text value="Verify"/>
                         </properties>
                       </component>
                     </children>

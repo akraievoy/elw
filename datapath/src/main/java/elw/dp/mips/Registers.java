@@ -1,36 +1,31 @@
 package elw.dp.mips;
 
-import java.util.*;
+import gnu.trove.TIntArrayList;
+import gnu.trove.TIntIntHashMap;
 
 public class Registers {
-	final Map<Reg, Integer> regToValue = new HashMap<Reg, Integer>();
+	final TIntIntHashMap regToValue = new TIntIntHashMap();
 
-	final Set<Reg> readRegs = new HashSet<Reg>();
-	final Set<Reg> writeRegs = new HashSet<Reg>();
+	final TIntArrayList readRegs = new TIntArrayList();
+	final TIntArrayList writeRegs = new TIntArrayList();
 
 	public int getReg(Reg reg) {
-		readRegs.add(reg);
+		readRegs.add(reg.ordinal());
 
 		return getRegInternal(reg);
 	}
 
 	public int getRegInternal(final Reg reg) {
-		final Integer integer = regToValue.get(reg);
+		final Integer integer = regToValue.get(reg.ordinal());
 
 		return integer == null ? 0 : integer;
 	}
 
 	public int setReg(Reg reg, int value) {
-		writeRegs.add(reg);
+		writeRegs.add(reg.ordinal());
 
-		final Integer oldValue = regToValue.put(reg, value);
+		final Integer oldValue = regToValue.put(reg.ordinal(), value);
 		return oldValue != null ? oldValue : 0;
-	}
-
-	public void reset() {
-		resetAccess();
-
-		regToValue.clear();
 	}
 
 	public void resetAccess() {
@@ -38,19 +33,21 @@ public class Registers {
 		writeRegs.clear();
 	}
 
-	public Set<Reg> getReadRegs() {
-		return Collections.unmodifiableSet(readRegs);
+	public TIntArrayList getReadRegs() {
+		return readRegs;
 	}
 
-	public Set<Reg> getWriteRegs() {
-		return Collections.unmodifiableSet(writeRegs);
+	public TIntArrayList getWriteRegs() {
+		return writeRegs;
 	}
 
-	public void load(final int[] lastLoaded) {
+	public void load(final TIntIntHashMap lastLoaded) {
 		resetAccess();
 
 		for (Reg reg : Reg.values()) {
-			regToValue.put(reg, lastLoaded[reg.ordinal()]);
+			final int regIndex = reg.ordinal();
+			final int regValue = lastLoaded.containsKey(regIndex) ? lastLoaded.get(regIndex) : 0;
+			regToValue.put(regIndex, regValue);
 		}
 	}
 }
