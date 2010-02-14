@@ -8,9 +8,7 @@ import elw.dp.mips.asm.Data;
 import elw.dp.mips.asm.MipsAssembler;
 import elw.dp.ui.DataPathForm;
 import elw.dp.ui.FeedbackAppender;
-import elw.vo.Course;
-import elw.vo.Test;
-import elw.vo.Version;
+import elw.vo.*;
 import org.akraievoy.gear.G;
 import org.akraievoy.gear.G4Str;
 import org.apache.log4j.BasicConfigurator;
@@ -27,7 +25,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
+import java.util.*;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -39,13 +37,10 @@ public class Controller {
 
 	protected final DataPathForm view = new DataPathForm();
 
-	protected final ScheduledExecutorService executor = new ScheduledThreadPoolExecutor(3);
-	protected final CompileAction compileAction = new CompileAction();
-
 	protected final MipsAssembler assembler = new MipsAssembler();
 	protected DataPath dataPath = new DataPath();
 
-	DefaultComboBoxModel tCaseModel;
+	protected final DefaultComboBoxModel testComboModel = new DefaultComboBoxModel();
 
 	InstructionsTableModel instructionsTableModel;
 	RegistersTableModel registersTableModel;
@@ -55,6 +50,10 @@ public class Controller {
 	Version selectedTask;
 	Test selectedCase;
 
+	protected final ScheduledExecutorService executor = new ScheduledThreadPoolExecutor(3);
+	protected final CompileAction aCompile = new CompileAction();
+	protected final UpdateTestSelectionAction aUpdateTestSelection = new UpdateTestSelectionAction();
+
 	public void init() throws IOException {
 		final InputStream modelStream = Controller.class.getResourceAsStream("/aos-s10.json");
 		final ObjectMapper mapper = new ObjectMapper();
@@ -62,7 +61,11 @@ public class Controller {
 
 		selectedTask = course.getAssBundles()[0].getAssignments()[0].getVersions()[0];
 
-		tCaseModel = new DefaultComboBoxModel(selectedTask.getTests());
+		testComboModel.removeAllElements();
+		for (Test test: selectedTask.getTests()) {
+			testComboModel.addElement(test);
+		}
+		selectTest(selectedTask.getTests()[0]);
 
 		final FeedbackAppender feedbackAppender = new FeedbackAppender(view.getLogTextPane());
 		feedbackAppender.setThreshold(Level.ALL);
@@ -70,11 +73,24 @@ public class Controller {
 
 		log.info("started up, yeah!");
 		view.getProblemTextPane().setText(G4Str.join(selectedTask.getStatementHtml(), "\n"));
-		view.getTestComboBox().setModel(tCaseModel);
+		view.getTestComboBox().setModel(testComboModel);
 
 		//  TODO hide this
 		view.getSourceTextArea().setText(G4Str.join(selectedTask.getSolution(), "\n"));
-		view.getSourceCompileButton().setAction(compileAction);
+
+		view.getSourceCompileButton().setAction(aCompile);
+		view.getTestComboBox().setAction(aUpdateTestSelection);
+	}
+
+	protected void selectTest(Test test) {
+		testComboModel.setSelectedItem(test);
+		final String[] memText = test.getArgs().get("mem") != null ? test.getArgs().get("mem") : G.STRINGS_EMPTY;
+		view.getTestMemTextArea().setText(G4Str.join(memText, LINE_SEPARATOR));
+		final String[] regsText = test.getArgs().get("regs") != null ? test.getArgs().get("regs") : G.STRINGS_EMPTY;
+		view.getTestRegsTextArea().setText(G4Str.join(regsText, LINE_SEPARATOR));
+
+		view.getTestMemTextArea().setEditable(!test.isShared());
+		view.getTestRegsTextArea().setEditable(!test.isShared());
 	}
 
 	public AbstractTableModel getInstructionsModel() {
@@ -133,7 +149,16 @@ public class Controller {
 				}
 			});
 		}
+	}
 
+	class UpdateTestSelectionAction extends AbstractAction {
+		public UpdateTestSelectionAction() {
+			super("Update Test Selection");
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			selectTest((Test) testComboModel.getSelectedItem());
+		}
 	}
 
 	public static void setupStatus(final JLabel label, final String text) {
@@ -353,7 +378,7 @@ public class Controller {
 	}
 
 	public void do_run(ActionEvent e) {
-		Test tCase = (Test) tCaseModel.getSelectedItem();
+		Test tCase = (Test) testComboModel.getSelectedItem();
 	}
 
 	public void do_submit(ActionEvent e) {

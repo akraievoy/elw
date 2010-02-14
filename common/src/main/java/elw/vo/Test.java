@@ -1,43 +1,12 @@
 package elw.vo;
 
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
 public class Test {
-	protected String[] memoryInput;
-	protected String[] memoryOutput;
-	protected String[] regsInput;
-	protected String[] regsOutput;
 	protected boolean shared;
-
-	public String[] getMemoryInput() {
-		return memoryInput;
-	}
-
-	public void setMemoryInput(String[] memoryInput) {
-		this.memoryInput = memoryInput;
-	}
-
-	public String[] getMemoryOutput() {
-		return memoryOutput;
-	}
-
-	public void setMemoryOutput(String[] memoryOutput) {
-		this.memoryOutput = memoryOutput;
-	}
-
-	public String[] getRegsInput() {
-		return regsInput;
-	}
-
-	public void setRegsInput(String[] regsInput) {
-		this.regsInput = regsInput;
-	}
-
-	public String[] getRegsOutput() {
-		return regsOutput;
-	}
-
-	public void setRegsOutput(String[] regsOutput) {
-		this.regsOutput = regsOutput;
-	}
+	protected final SortedMap<String, String[]> args = new TreeMap<String, String[]>();
 
 	public boolean isShared() {
 		return shared;
@@ -45,5 +14,16 @@ public class Test {
 
 	public void setShared(boolean shared) {
 		this.shared = shared;
+	}
+
+	public Map<String, String[]> getArgs() {
+		return args;
+	}
+
+	public void setArgs(Map<String, String[]> args) {
+		this.args.clear();
+		if (args != null) {
+			this.args.putAll(args);
+		}
 	}
 }
