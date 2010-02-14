@@ -23,6 +23,9 @@ public enum Reg {
 	pc, hi, lo; //  those are extended, usages should be cut off by validations
 
 	public final static List<Reg> publicRegs = Arrays.asList(zero, v0, v1, a0, a1, a2, a3, t0, t1, t2, t3, t4, t5, t6, t7, s0, s1, s2, s3, s4, s5, s6, s7, t8, t9, sp, ra, pc);
+	public final static List<Reg> roRegs = Arrays.asList(zero);
+	public final static List<Reg> autoRegs = Arrays.asList(pc, sp, ra);
+	public final static List<Reg> tempRegs = Arrays.asList(t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, pc, hi, lo);
 
 	protected static final Map<String, Reg> byName = new TreeMap<String, Reg>();
 
@@ -63,5 +66,15 @@ public enum Reg {
 		}
 
 		return byName;
+	}
+
+	public static Reg[] values(int[] regOrdinals) {
+		final Reg[] regs = new Reg[regOrdinals.length];
+
+		for (int i = 0; i < regOrdinals.length; i++) {
+			regs[i] = values()[regOrdinals[i]];
+		}
+
+		return regs;
 	}
 }

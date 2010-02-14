@@ -199,8 +199,16 @@ public class MipsAssembler {
 				return null;
 			}
 
-			if (!G.contains(Reg.publicRegs, reg)) {
-				Result.failure(log, resRef, prefix + "register $"+reg.toString()+" is read-only");
+			if (!G.contains(Reg.publicRegs, reg) || G.contains(Reg.roRegs, reg)) {
+				Result.failure(log, resRef, prefix + "register $"+reg.toString()+" is reserved/read-only");
+				return null;
+			}
+			if (G.contains(Reg.autoRegs, reg)) {
+				Result.failure(log, resRef, prefix + "register $"+reg.toString()+" is set/verified automatically");
+				return null;
+			}
+			if (G.contains(Reg.tempRegs, reg)) {
+				Result.failure(log, resRef, prefix + "register $"+reg.toString()+" is temporary");
 				return null;
 			}
 

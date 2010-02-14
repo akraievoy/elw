@@ -1,9 +1,7 @@
 package elw.dp.app;
 
 import base.pattern.Result;
-import elw.dp.mips.DataPath;
-import elw.dp.mips.Instruction;
-import elw.dp.mips.Reg;
+import elw.dp.mips.*;
 import elw.dp.mips.asm.MipsAssembler;
 import elw.dp.ui.DataPathForm;
 import elw.dp.ui.FeedbackAppender;
@@ -189,8 +187,11 @@ public class Controller {
 			dataPath.getInstructions().setInstructions(Arrays.asList(instructions));
 			dataPath.getMemory().setData(data[0]);
 			dataPath.getRegisters().load(regs[0]);
-			dataPath.getRegisters().setReg(Reg.pc, dataPath.getInstructions().getBase());
-			dataPath.getRegisters().setReg(Reg.ra, dataPath.getInstructions().getBase() - 4);
+			dataPath.getRegisters().setReg(Reg.pc, dataPath.getInstructions().getCodeBase());
+			dataPath.getRegisters().setReg(Reg.ra, dataPath.getInstructions().getCodeBase() - 4);
+			dataPath.getRegisters().setReg(Reg.sp, dataPath.getInstructions().getStackBase());
+			regs[1].put(Reg.ra.ordinal(), dataPath.getInstructions().getCodeBase() - 4);
+			regs[1].put(Reg.sp.ordinal(), dataPath.getInstructions().getStackBase());
 			Result.success(log, resRef, "Instructions, Data and Regs loaded");
 		} else {
 			Result.failure(log, resRef, "Instructions, Data or Regs NOT loaded!");
@@ -205,9 +206,13 @@ public class Controller {
 				if (instruction != null) {
 					Result.success(log, resRef, "Executed " + instruction.getOpName());
 				} else {
-//					dataPath.getRegisters()
-					Result.success(log, resRef, "Complete");
-					//	TODO proceed with result verification
+					verifyRegs(resRef);
+					if (resRef[0].isSuccess()) {
+						verifyMem(resRef);
+					}
+					if (resRef[0].isSuccess()) {
+						Result.success(log, resRef, "Test Passed");
+					}
 					break;
 				}
 			}
@@ -215,6 +220,76 @@ public class Controller {
 			Result.failure(log, resRef, "Failed: " + G.report(t));
 			log.trace("trace", t);
 		}
+	}
+
+	protected void verifyMem(Result[] resRef) {
+		final Memory memory = dataPath.getMemory();
+		final TIntIntHashMap expectedMemMap = data[1];
+		final int[] expectedAddrs = expectedMemMap.keys();
+
+		for (int expectedMem : expectedAddrs) {
+			if (!memory.hasWord(expectedMem)) {
+				Result.failure(log, resRef, "Test Failed: expecting data at " + expectedMem + ", but word never set");
+				return;
+			}
+
+			final int value = memory.getWordInternal(expectedMem);
+			final int expectedValue = expectedMemMap.get(expectedMem);
+			if (expectedValue != value) {
+				Result.failure(log, resRef, "Test Failed: expecting " + expectedValue + " at " + expectedMem + ", but found " + value);
+				return;
+			}
+		}
+
+		final Instructions instructions = dataPath.getInstructions();
+		final int memSetBytes = memory.getSize();
+		for (int byteIndex = 0; byteIndex < memSetBytes; byteIndex++) {
+			int byteAddr = memory.getAddressAt(byteIndex);
+			if (instructions.getStackBase() + 4 > byteAddr && dataPath.getInstructions().getMinStackBase() <= byteAddr) {
+				continue;
+			}
+			final int byteAddrAligned = byteAddr - byteAddr % 4;
+			if (expectedMemMap.contains(byteAddrAligned)) {
+				continue;
+			}
+			Result.failure(log, resRef, "Test Failed: expecting clean byte at " + byteAddr + ", but memory corrupted");
+			return;
+		}
+
+		Result.success(log, resRef, "Test Passed Memory Spec");
+	}
+
+	protected void verifyRegs(Result[] resRef) {
+		final Reg[] setupRegs = dataPath.getRegisters().getSetupRegs();
+		final TIntIntHashMap expectedRegMap = regs[1];
+		final Reg[] expectedRegs = Reg.values(expectedRegMap.keys());
+		for (Reg expectedReg : expectedRegs) {
+			if (!G.contains(setupRegs, expectedReg)) {
+				Result.failure(log, resRef, "Test Failed: expecting $" + expectedReg.toString() + ", but register never set");
+				return;
+			}
+
+			final int value = dataPath.getRegisters().getReg(expectedReg);
+			final int expectedValue = expectedRegMap.get(expectedReg.ordinal());
+			if (expectedValue != value) {
+				Result.failure(log, resRef, "Test Failed: expecting $" + expectedReg.toString() + "=" + expectedValue + ", but $" + expectedReg.toString() + "=" + value);
+				return;
+			}
+		}
+
+		for (Reg setupReg : setupRegs) {
+			if (G.contains(Reg.tempRegs, setupReg)) {
+				continue;
+			}
+			if (G.contains(expectedRegs, setupReg)) {
+				continue;
+			}
+
+			Result.failure(log, resRef, "Test Failed: expecting clean $" + setupReg.toString() + ", but register corrupted");
+			return;
+		}
+
+		Result.success(log, resRef, "Test Passed Register Spec");
 	}
 
 	class AssembleAction extends AbstractAction {

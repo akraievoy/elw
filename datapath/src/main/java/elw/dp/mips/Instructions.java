@@ -6,7 +6,10 @@ public class Instructions {
 	protected SortedMap<Integer, Instruction> addressToInstruction = new TreeMap<Integer, Instruction>();
 	protected Set<Integer> readAddresses = new HashSet<Integer>();
 
-	protected int base;
+	protected final Random random = new Random();
+	protected int codeBase;
+	protected int stackBase;
+	protected int minStackBase;
 
 	public void resetAccess() {
 		readAddresses.clear();
@@ -50,18 +53,32 @@ public class Instructions {
 	public void setInstructions(final List<Instruction> instructions) {
 		resetAccess();
 
-		base = (Math.abs(new Random().nextInt()) % 0x1000) * 0x10;
-		int address = base;
+		codeBase = (Math.abs(random.nextInt()) % 0x1000) * 0x10;
+		stackBase = 0x800000 - (Math.abs(random.nextInt()) % 0x1000) * 0x10;
+		minStackBase = stackBase;
 
+		int address = codeBase;
 		addressToInstruction.clear();
-
 		for (Instruction instruction : instructions) {
 			addressToInstruction.put(address, instruction);
 			address += 4;
 		}
 	}
 
-	public int getBase() {
-		return base;
+	public int getCodeBase() {
+		return codeBase;
 	}
+
+	public int getStackBase() {
+		return stackBase;
+	}
+
+	public int getMinStackBase() {
+		return minStackBase;
+	}
+
+	protected void updateMinStack() {
+		minStackBase = Math.min(minStackBase, stackBase);
+	}
+
 }

@@ -48,6 +48,7 @@ public class DataPath {
 		if (!registers.getWriteRegs().contains(Reg.pc.ordinal())) {
 			ctx.advPc();
 		}
+		instructions.updateMinStack();
 		return instruction;
 	}
 

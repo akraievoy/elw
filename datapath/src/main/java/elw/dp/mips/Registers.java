@@ -52,13 +52,8 @@ public class Registers {
 
 	public Reg[] getSetupRegs() {
 		final int[] regOrdinals = getSetupRegOrdinals();
-		final Reg[] regs = new Reg[regOrdinals.length];
 
-		for (int i = 0; i < regOrdinals.length; i++) {
-			regs[i] = Reg.values()[regOrdinals[i]];
-		}
-
-		return regs;
+		return Reg.values(regOrdinals);
 	}
 
 	public void load(final TIntIntHashMap regMap) {
