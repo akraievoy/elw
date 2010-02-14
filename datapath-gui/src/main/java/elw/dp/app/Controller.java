@@ -3,14 +3,13 @@ package elw.dp.app;
 import base.pattern.Result;
 import elw.dp.mips.DataPath;
 import elw.dp.mips.Instruction;
-import elw.dp.mips.Reg;
-import elw.dp.mips.asm.Data;
 import elw.dp.mips.asm.MipsAssembler;
 import elw.dp.ui.DataPathForm;
 import elw.dp.ui.FeedbackAppender;
-import elw.vo.*;
+import elw.vo.Course;
+import elw.vo.Test;
+import elw.vo.Version;
 import gnu.trove.TIntIntHashMap;
-import gnu.trove.TLongLongHashMap;
 import org.akraievoy.gear.G;
 import org.akraievoy.gear.G4Str;
 import org.apache.log4j.BasicConfigurator;
@@ -20,17 +19,17 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.AbstractTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
-import java.util.List;
+import java.util.Arrays;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class Controller {
 	private static final org.slf4j.Logger log = LoggerFactory.getLogger(Controller.class);
@@ -43,6 +42,8 @@ public class Controller {
 	protected DataPath dataPath = new DataPath();
 
 	//  application state
+	protected AtomicLong sourceStamp = new AtomicLong(1); // NOTE: no modifications still require assembly to run before stepping
+	protected AtomicLong assembleStamp = new AtomicLong(0);
 	protected Version selectedTask;
 	protected final DefaultComboBoxModel testComboModel = new DefaultComboBoxModel();
 
@@ -52,7 +53,7 @@ public class Controller {
 
 	//	actions
 	protected final ScheduledExecutorService executor = new ScheduledThreadPoolExecutor(3);
-	protected final CompileAction aCompile = new CompileAction();
+	protected final AssembleAction aAssemble = new AssembleAction();
 	protected final UpdateTestSelectionAction aUpdateTestSelection = new UpdateTestSelectionAction();
 	protected final TestStepAction aTestStep = new TestStepAction();
 
@@ -63,8 +64,14 @@ public class Controller {
 
 		selectedTask = course.getAssBundles()[0].getAssignments()[0].getVersions()[0];
 
+
 		testComboModel.removeAllElements();
-		for (Test test: selectedTask.getTests()) {
+		int testId = 0;
+		for (Test test : selectedTask.getTests()) {
+			testId ++;
+			test.setId(String.valueOf(testId));
+			test.setId("#" + String.valueOf(testId));
+			
 			testComboModel.addElement(test);
 		}
 		selectTest(selectedTask.getTests()[0]);
@@ -79,11 +86,11 @@ public class Controller {
 
 		//  TODO hide this
 		view.getSourceTextArea().setText(G4Str.join(selectedTask.getSolution(), "\n"));
-
-		view.getSourceCompileButton().setAction(aCompile);
+		view.getSourceTextArea().getDocument().addDocumentListener(new SourceDocumentListener());
+		view.getSourceCompileButton().setAction(aAssemble);
 		view.getTestComboBox().setAction(aUpdateTestSelection);
 		view.getTestStepButton().setAction(aTestStep);
-
+		                                                           	
 		view.getSourceCompileButton().setMnemonic('c');
 	}
 
@@ -96,6 +103,44 @@ public class Controller {
 
 		view.getTestMemTextArea().setEditable(!test.isShared());
 		view.getTestRegsTextArea().setEditable(!test.isShared());
+	}
+
+	protected void job_assemble(final JLabel statusLabel, final Result[] resRef) {
+		setupStatus(statusLabel, "Assembling...");
+
+		final String source = view.getSourceTextArea().getText();
+		final String[] sourceLines = source.split(LINE_SEPARATOR);
+
+		final Instruction[] instructions = assembler.assembleLoad(sourceLines, resRef);
+		if (instructions != null) {
+			assembleStamp.set(System.currentTimeMillis());
+			dataPath.getInstructions().setInstructions(Arrays.asList(instructions));
+		}
+	}
+
+	protected void job_loadTest(final JLabel statusLabel, Result[] resRef) {
+		final boolean assemble = assembleStamp.get() < sourceStamp.get();
+		if (assemble) {
+			job_assemble(statusLabel, resRef);
+		}
+
+		if (!assemble || resRef[0].isSuccess()) {
+			setupStatus(statusLabel, "Loading Regs and Mem...");
+
+			final String regsText = view.getTestRegsTextArea().getText();
+			final String[] regsLines = regsText.split(LINE_SEPARATOR);
+
+			final TIntIntHashMap[] regs = assembler.loadRegs(regsLines, resRef);
+			if (regs != null && resRef[0].isSuccess()) {
+				final String memText = view.getTestMemTextArea().getText();
+				final String[] memLines = memText.split(LINE_SEPARATOR);
+				final TIntIntHashMap[] data = assembler.loadData(memLines, resRef);
+
+				if (data != null && resRef[0].isSuccess()) {
+					//	TODO: setup the DataPath with all this data we have processed
+				}
+			}
+		}
 	}
 
 	public AbstractTableModel getInstructionsModel() {
@@ -122,34 +167,23 @@ public class Controller {
 		return memoryTableModel;
 	}
 
-	class CompileAction extends AbstractAction {
-		public CompileAction() {
-			super("Compile");
+	class AssembleAction extends AbstractAction {
+		public AssembleAction() {
+			super("Assemble");
 		}
 
 		public void actionPerformed(ActionEvent e) {
 			setEnabled(false);
 			final JLabel statusLabel = view.getSourceFeedbackLabel();
-			setupStatus(statusLabel, "Compiling...");
 
 			executor.submit(new Runnable() {
 				public void run() {
-					final Result[] resRef = new Result[] {new Result("status unknown", false)};
+					final Result[] resRef = new Result[]{new Result("status unknown", false)};
 					try {
-						final String source = view.getSourceTextArea().getText();
-						final String[] sourceLines = source.split(LINE_SEPARATOR);
-
-						final Instruction[] instructions = assembler.assembleLoad(sourceLines, resRef);
-						if (instructions != null) {
-							dataPath.getInstructions().setInstructions(Arrays.asList(instructions));
-						}
+						job_assemble(statusLabel, resRef);
 					} finally {
-						SwingUtilities.invokeLater(new Runnable() {
-							public void run() {
-								setEnabled(true);
-								setupStatus(statusLabel, resRef[0]);
-							}
-						});
+						setEnabled(true);
+						setupStatus(statusLabel, resRef[0]);
 					}
 				}
 			});
@@ -173,34 +207,17 @@ public class Controller {
 
 		public void actionPerformed(ActionEvent e) {
 			setEnabled(false);
-
 			final JLabel statusLabel = view.getTestStatusLabel();
-			setupStatus(statusLabel, "Initializing stepping...");
 
 			executor.submit(new Runnable() {
 				public void run() {
-					final Result[] resRef = new Result[] {new Result("status unknown", false)};
+					final Result[] resRef = new Result[]{new Result("status unknown", false)};
+
 					try {
-						final String regsText = view.getTestRegsTextArea().getText();
-						final String[] regsLines = regsText.split(LINE_SEPARATOR);
-
-						final TIntIntHashMap[] regs = assembler.loadRegs(regsLines, resRef);
-						if (regs != null && resRef[0].isSuccess()) {
-							final String memText = view.getTestMemTextArea().getText();
-							final String[] memLines = memText.split(LINE_SEPARATOR);
-							final TIntIntHashMap[] data = assembler.loadData(memLines, resRef);
-
-							if (data != null && resRef[0].isSuccess()) {
-								//	TODO: setup the DataPath with all this data we have processed
-							}
-						}
+						job_loadTest(statusLabel, resRef);
 					} finally {
-						SwingUtilities.invokeLater(new Runnable() {
-							public void run() {
-								setEnabled(true);
-								setupStatus(statusLabel, resRef[0]);
-							}
-						});
+						setEnabled(true);
+						setupStatus(statusLabel, resRef[0]);
 					}
 				}
 			});
@@ -227,15 +244,35 @@ public class Controller {
 	}
 
 	public static void setupStatus(final JLabel label, final String text) {
-		label.setText(text);
-		label.setToolTipText(text);
-		label.setForeground(Color.DARK_GRAY);
+		if (SwingUtilities.isEventDispatchThread()) {
+			label.setText(text);
+			label.setToolTipText(text);
+			label.setForeground(Color.DARK_GRAY);
+		} else {
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					label.setText(text);
+					label.setToolTipText(text);
+					label.setForeground(Color.DARK_GRAY);
+				}
+			});
+		}
 	}
 
 	public static void setupStatus(final JLabel label, final Result result) {
-		label.setToolTipText(result.getMessage());
-		label.setText(result.getMessage());
-		label.setForeground(result.isSuccess() ? Color.GREEN.darker().darker() : Color.RED.darker().darker());
+		if (SwingUtilities.isEventDispatchThread()) {
+			label.setToolTipText(result.getMessage());
+			label.setText(result.getMessage());
+			label.setForeground(result.isSuccess() ? Color.GREEN.darker().darker() : Color.RED.darker().darker());
+		} else {
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					label.setToolTipText(result.getMessage());
+					label.setText(result.getMessage());
+					label.setForeground(result.isSuccess() ? Color.GREEN.darker().darker() : Color.RED.darker().darker());
+				}
+			});
+		}
 	}
 
 	public static void main(String[] args) throws IOException {
@@ -254,10 +291,28 @@ public class Controller {
 		frame.setTitle("DataPath");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		frame.getContentPane().add(instance.view.getRootPanel());
-		frame.pack();
-		frame.setSize(600, 400);
-		frame.setLocation(20, 20);
-		frame.setVisible(true);
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				frame.getContentPane().add(instance.view.getRootPanel());
+				frame.pack();
+				frame.setSize(600, 400);
+				frame.setLocation(20, 20);
+				frame.setVisible(true);
+			}
+		});
+	}
+
+	protected class SourceDocumentListener implements DocumentListener {
+		public void insertUpdate(DocumentEvent e) {
+			sourceStamp.set(System.currentTimeMillis());
+		}
+
+		public void removeUpdate(DocumentEvent e) {
+			sourceStamp.set(System.currentTimeMillis());
+		}
+
+		public void changedUpdate(DocumentEvent e) {
+			sourceStamp.set(System.currentTimeMillis());
+		}
 	}
 }

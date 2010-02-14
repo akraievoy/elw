@@ -1,7 +1,6 @@
 package elw.vo;
 
-public class Question {
-	protected String id;
+public class Question extends IdName {
 	protected String[] statement;
 	protected String[] answers;
 	protected String[] options;
@@ -13,14 +12,6 @@ public class Question {
 
 	public void setAnswers(String[] answers) {
 		this.answers = answers;
-	}
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
 	}
 
 	public String[] getOptions() {

@@ -4,29 +4,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Course {
+public class Course extends IdName {
 	protected final List<AssignmentBundle> assBundles = new ArrayList<AssignmentBundle>();
 	protected final List<QuizBundle> quizBundles = new ArrayList<QuizBundle>();
 
-	protected String name;
-	protected String id;
 	protected String resourcePath;
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
 
 	public String getResourcePath() {
 		return resourcePath;
