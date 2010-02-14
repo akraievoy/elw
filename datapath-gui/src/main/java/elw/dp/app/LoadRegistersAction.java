@@ -15,7 +15,6 @@ import javax.swing.text.JTextComponent;
 import java.awt.event.ActionEvent;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Logger;
 
 public class LoadRegistersAction extends AbstractAction {
 	private static final org.slf4j.Logger log = LoggerFactory.getLogger(LoadRegistersAction.class);

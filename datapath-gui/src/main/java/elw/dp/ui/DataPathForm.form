@@ -10,9 +10,10 @@
       <splitpane id="9b6a7">
         <constraints border-constraint="Center"/>
         <properties>
-          <dividerLocation value="291"/>
+          <dividerLocation value="300"/>
           <oneTouchExpandable value="true"/>
           <orientation value="0"/>
+          <resizeWeight value="1.0"/>
         </properties>
         <border type="none"/>
         <children>
@@ -59,7 +60,7 @@
                         <properties>
                           <actionCommand value="Compile"/>
                           <label value="Compile"/>
-                          <text value="Compile"/>
+                          <text value="&amp;Compile"/>
                         </properties>
                       </component>
                       <component id="41bdd" class="javax.swing.JLabel" binding="sourceFeedbackLabel">
@@ -99,17 +100,22 @@
                       <component id="37807" class="javax.swing.JComboBox" binding="testComboBox">
                         <constraints>
                           <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                          <gridbag weightx="0.2" weighty="0.0"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
                         </constraints>
-                        <properties/>
+                        <properties>
+                          <minimumSize width="64" height="25"/>
+                          <preferredSize width="64" height="25"/>
+                        </properties>
                       </component>
                       <component id="2ec89" class="javax.swing.JButton" binding="testAddCustomButton">
                         <constraints>
                           <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
-                          <gridbag top="1" left="2" bottom="1" right="2" weightx="0.0" weighty="0.0"/>
+                          <gridbag top="5" left="2" bottom="5" right="1" weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
-                          <text value="Custom"/>
+                          <margin top="1" left="3" bottom="1" right="3"/>
+                          <text value="+"/>
+                          <toolTipText value="Add an editable copy of selected test"/>
                         </properties>
                       </component>
                       <component id="f53b6" class="javax.swing.JToolBar$Separator">
@@ -127,29 +133,41 @@
                       </component>
                       <component id="c8fce" class="javax.swing.JButton" binding="testRunButton">
                         <constraints>
-                          <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
-                          <gridbag top="1" left="2" bottom="1" right="1" weightx="0.0" weighty="0.0"/>
+                          <grid row="0" column="5" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag top="1" left="1" bottom="1" right="1" weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
+                          <margin top="3" left="3" bottom="3" right="3"/>
                           <text value="Run"/>
                         </properties>
                       </component>
-                      <component id="969e8" class="javax.swing.JButton" binding="testStepButton">
+                      <component id="969e8" class="javax.swing.JButton" binding="testBatchButton">
                         <constraints>
-                          <grid row="0" column="5" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <grid row="0" column="6" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
                           <gridbag top="1" left="1" bottom="1" right="2" weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
-                          <text value="Step"/>
+                          <margin top="3" left="3" bottom="3" right="5"/>
+                          <text value="&amp;Batch"/>
                         </properties>
                       </component>
                       <component id="87942" class="javax.swing.JLabel" binding="testStatusLabel">
                         <constraints>
-                          <grid row="0" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                          <grid row="0" column="7" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                           <gridbag top="0" left="2" bottom="0" right="0" weightx="1.0" weighty="0.0"/>
                         </constraints>
                         <properties>
                           <text value="..."/>
+                        </properties>
+                      </component>
+                      <component id="dc7f6" class="javax.swing.JButton" binding="testStepButton">
+                        <constraints>
+                          <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="1" use-parent-layout="false"/>
+                          <gridbag top="1" left="2" bottom="1" right="1" weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <margin top="3" left="5" bottom="3" right="3"/>
+                          <text value="Step"/>
                         </properties>
                       </component>
                     </children>
@@ -168,9 +186,16 @@
                         <properties/>
                         <border type="none"/>
                         <children>
-                          <component id="ba032" class="javax.swing.JTextArea" binding="testRegsTextArea">
+                          <component id="2fe19" class="javax.swing.JTextArea" binding="testMemTextArea">
                             <constraints/>
-                            <properties/>
+                            <properties>
+                              <columns value="20"/>
+                              <font name="Courier New"/>
+                              <lineWrap value="false"/>
+                              <rows value="10"/>
+                              <text value=""/>
+                              <toolTipText value="Memory Input/Output"/>
+                            </properties>
                           </component>
                         </children>
                       </scrollpane>
@@ -181,9 +206,14 @@
                         <properties/>
                         <border type="none"/>
                         <children>
-                          <component id="2fe19" class="javax.swing.JTextArea" binding="testMemTextArea">
+                          <component id="ba032" class="javax.swing.JTextArea" binding="testRegsTextArea">
                             <constraints/>
-                            <properties/>
+                            <properties>
+                              <columns value="20"/>
+                              <font name="Courier New"/>
+                              <rows value="10"/>
+                              <toolTipText value="Register Input/Output"/>
+                            </properties>
                           </component>
                         </children>
                       </scrollpane>
@@ -365,7 +395,12 @@
                     <children>
                       <component id="2d7d5" class="javax.swing.JTextArea" binding="clipTextArea">
                         <constraints/>
-                        <properties/>
+                        <properties>
+                          <columns value="40"/>
+                          <font name="Courier New"/>
+                          <rows value="10"/>
+                          <toolTipText value="Store your temp clips of text here"/>
+                        </properties>
                       </component>
                     </children>
                   </scrollpane>

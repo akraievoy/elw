@@ -316,7 +316,7 @@ public class Data {
 		}
 	}
 
-	protected static long parse(final String num) {
+	public static long parse(final String num) {
 		if (num.startsWith("-") && num.lastIndexOf('-') == 0) {
 			return -parse(num.substring(1));
 		}

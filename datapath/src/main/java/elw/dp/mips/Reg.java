@@ -4,6 +4,8 @@ import org.akraievoy.gear.G4Parse;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 public enum Reg {
 	zero, at, v0, v1,
@@ -20,11 +22,12 @@ public enum Reg {
 
 	pc, hi, lo; //  those are extended, usages should be cut off by validations
 
-	public final static List<Reg> publicRegs = Arrays.asList(zero, v0, v1, a0, a1, a2, a3, t0, t1, t2, t3, t4, t5, t6, t7, s0, s1, s2, s3, s4, s5, s6, s7, t8, t9, sp, ra);
+	public final static List<Reg> publicRegs = Arrays.asList(zero, v0, v1, a0, a1, a2, a3, t0, t1, t2, t3, t4, t5, t6, t7, s0, s1, s2, s3, s4, s5, s6, s7, t8, t9, sp, ra, pc);
+
+	protected static final Map<String, Reg> byName = new TreeMap<String, Reg>();
 
 	public static Reg fromString(String regGroup) {
 		for (Reg reg : values()) {
-
 			if (reg.toString().equalsIgnoreCase(regGroup)) {
 				return reg;
 			}
@@ -42,5 +45,23 @@ public enum Reg {
 		}
 
 		throw base.Die.unsupported("failed to parse as register name: '" + regGroup + "'");
+	}
+
+	protected static TreeMap<String, Reg> createByNameMap() {
+		final TreeMap<String, Reg> byNameMap = new TreeMap<String, Reg>();
+
+		for (Reg reg : values()) {
+			byName.put(reg.toString().toLowerCase(), reg);
+		}
+
+		return byNameMap;
+	}
+
+	public synchronized static Map<String, Reg> getByName() {
+		if (byName.isEmpty()) {
+			byName.putAll(createByNameMap());
+		}
+
+		return byName;
 	}
 }

@@ -12,7 +12,7 @@ public class DataPathForm {
 	protected JTextPane logTextPane;
 	protected JButton sourceCompileButton;
 	protected JButton testRunButton;
-	protected JButton testStepButton;
+	protected JButton testBatchButton;
 	protected JTextArea testMemTextArea;
 	protected JTextArea testRegsTextArea;
 	protected JButton testAddCustomButton;
@@ -27,9 +27,14 @@ public class DataPathForm {
 	protected JLabel runStatusLabel;
 	protected JPanel rootPanel;
 	protected JLabel testStatusLabel;
+	protected JButton testStepButton;
 
 	public JPanel getRootPanel() {
 		return rootPanel;
+	}
+
+	public JButton getTestStepButton() {
+		return testStepButton;
 	}
 
 	public JLabel getTestStatusLabel() {
@@ -116,8 +121,8 @@ public class DataPathForm {
 		return testRunButton;
 	}
 
-	public JButton getTestStepButton() {
-		return testStepButton;
+	public JButton getTestBatchButton() {
+		return testBatchButton;
 	}
 
 	{
@@ -138,9 +143,10 @@ public class DataPathForm {
 		rootPanel = new JPanel();
 		rootPanel.setLayout(new BorderLayout(0, 0));
 		final JSplitPane splitPane1 = new JSplitPane();
-		splitPane1.setDividerLocation(291);
+		splitPane1.setDividerLocation(300);
 		splitPane1.setOneTouchExpandable(true);
 		splitPane1.setOrientation(0);
+		splitPane1.setResizeWeight(1.0);
 		rootPanel.add(splitPane1, BorderLayout.CENTER);
 		strTabbedPane = new JTabbedPane();
 		strTabbedPane.setTabPlacement(3);
@@ -161,6 +167,8 @@ public class DataPathForm {
 		sourceCompileButton.setActionCommand("Compile");
 		sourceCompileButton.setLabel("Compile");
 		sourceCompileButton.setText("Compile");
+		sourceCompileButton.setMnemonic('C');
+		sourceCompileButton.setDisplayedMnemonicIndex(0);
 		GridBagConstraints gbc;
 		gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -191,18 +199,21 @@ public class DataPathForm {
 		gbc.insets = new Insets(0, 2, 0, 2);
 		panel4.add(label1, gbc);
 		testComboBox = new JComboBox();
+		testComboBox.setMinimumSize(new Dimension(64, 25));
+		testComboBox.setPreferredSize(new Dimension(64, 25));
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 0;
-		gbc.weightx = 0.2;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		panel4.add(testComboBox, gbc);
 		testAddCustomButton = new JButton();
-		testAddCustomButton.setText("Custom");
+		testAddCustomButton.setMargin(new Insets(1, 3, 1, 3));
+		testAddCustomButton.setText("+");
+		testAddCustomButton.setToolTipText("Add an editable copy of selected test");
 		gbc = new GridBagConstraints();
 		gbc.gridx = 2;
 		gbc.gridy = 0;
-		gbc.insets = new Insets(1, 2, 1, 2);
+		gbc.insets = new Insets(5, 2, 5, 1);
 		panel4.add(testAddCustomButton, gbc);
 		final JToolBar.Separator toolBar$Separator1 = new JToolBar.Separator();
 		gbc = new GridBagConstraints();
@@ -210,39 +221,62 @@ public class DataPathForm {
 		gbc.gridy = 0;
 		panel4.add(toolBar$Separator1, gbc);
 		testRunButton = new JButton();
+		testRunButton.setMargin(new Insets(3, 3, 3, 3));
 		testRunButton.setText("Run");
-		gbc = new GridBagConstraints();
-		gbc.gridx = 4;
-		gbc.gridy = 0;
-		gbc.insets = new Insets(1, 2, 1, 1);
-		panel4.add(testRunButton, gbc);
-		testStepButton = new JButton();
-		testStepButton.setText("Step");
 		gbc = new GridBagConstraints();
 		gbc.gridx = 5;
 		gbc.gridy = 0;
+		gbc.insets = new Insets(1, 1, 1, 1);
+		panel4.add(testRunButton, gbc);
+		testBatchButton = new JButton();
+		testBatchButton.setMargin(new Insets(3, 3, 3, 5));
+		testBatchButton.setText("Batch");
+		testBatchButton.setMnemonic('B');
+		testBatchButton.setDisplayedMnemonicIndex(0);
+		gbc = new GridBagConstraints();
+		gbc.gridx = 6;
+		gbc.gridy = 0;
 		gbc.insets = new Insets(1, 1, 1, 2);
-		panel4.add(testStepButton, gbc);
+		panel4.add(testBatchButton, gbc);
 		testStatusLabel = new JLabel();
 		testStatusLabel.setText("...");
 		gbc = new GridBagConstraints();
-		gbc.gridx = 6;
+		gbc.gridx = 7;
 		gbc.gridy = 0;
 		gbc.weightx = 1.0;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(0, 2, 0, 0);
 		panel4.add(testStatusLabel, gbc);
+		testStepButton = new JButton();
+		testStepButton.setMargin(new Insets(3, 5, 3, 3));
+		testStepButton.setText("Step");
+		gbc = new GridBagConstraints();
+		gbc.gridx = 4;
+		gbc.gridy = 0;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.insets = new Insets(1, 2, 1, 1);
+		panel4.add(testStepButton, gbc);
 		final JSplitPane splitPane2 = new JSplitPane();
 		splitPane2.setResizeWeight(0.5);
 		panel3.add(splitPane2, BorderLayout.CENTER);
 		final JScrollPane scrollPane2 = new JScrollPane();
 		splitPane2.setRightComponent(scrollPane2);
-		testRegsTextArea = new JTextArea();
-		scrollPane2.setViewportView(testRegsTextArea);
+		testMemTextArea = new JTextArea();
+		testMemTextArea.setColumns(20);
+		testMemTextArea.setFont(new Font("Courier New", testMemTextArea.getFont().getStyle(), testMemTextArea.getFont().getSize()));
+		testMemTextArea.setLineWrap(false);
+		testMemTextArea.setRows(10);
+		testMemTextArea.setText("");
+		testMemTextArea.setToolTipText("Memory Input/Output");
+		scrollPane2.setViewportView(testMemTextArea);
 		final JScrollPane scrollPane3 = new JScrollPane();
 		splitPane2.setLeftComponent(scrollPane3);
-		testMemTextArea = new JTextArea();
-		scrollPane3.setViewportView(testMemTextArea);
+		testRegsTextArea = new JTextArea();
+		testRegsTextArea.setColumns(20);
+		testRegsTextArea.setFont(new Font("Courier New", testRegsTextArea.getFont().getStyle(), testRegsTextArea.getFont().getSize()));
+		testRegsTextArea.setRows(10);
+		testRegsTextArea.setToolTipText("Register Input/Output");
+		scrollPane3.setViewportView(testRegsTextArea);
 		final JPanel panel5 = new JPanel();
 		panel5.setLayout(new BorderLayout(0, 0));
 		strTabbedPane.addTab("Run", panel5);
@@ -321,6 +355,10 @@ public class DataPathForm {
 		final JScrollPane scrollPane8 = new JScrollPane();
 		panel9.add(scrollPane8, BorderLayout.CENTER);
 		clipTextArea = new JTextArea();
+		clipTextArea.setColumns(40);
+		clipTextArea.setFont(new Font("Courier New", clipTextArea.getFont().getStyle(), clipTextArea.getFont().getSize()));
+		clipTextArea.setRows(10);
+		clipTextArea.setToolTipText("Store your temp clips of text here");
 		scrollPane8.setViewportView(clipTextArea);
 		final JPanel panel10 = new JPanel();
 		panel10.setLayout(new BorderLayout(0, 0));

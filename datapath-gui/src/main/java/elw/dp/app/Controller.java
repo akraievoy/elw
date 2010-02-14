@@ -9,6 +9,8 @@ import elw.dp.mips.asm.MipsAssembler;
 import elw.dp.ui.DataPathForm;
 import elw.dp.ui.FeedbackAppender;
 import elw.vo.*;
+import gnu.trove.TIntIntHashMap;
+import gnu.trove.TLongLongHashMap;
 import org.akraievoy.gear.G;
 import org.akraievoy.gear.G4Str;
 import org.apache.log4j.BasicConfigurator;
@@ -40,19 +42,19 @@ public class Controller {
 	protected final MipsAssembler assembler = new MipsAssembler();
 	protected DataPath dataPath = new DataPath();
 
+	//  application state
+	protected Version selectedTask;
 	protected final DefaultComboBoxModel testComboModel = new DefaultComboBoxModel();
 
 	InstructionsTableModel instructionsTableModel;
 	RegistersTableModel registersTableModel;
 	MemoryTableModel memoryTableModel;
 
-	//  application state
-	Version selectedTask;
-	Test selectedCase;
-
+	//	actions
 	protected final ScheduledExecutorService executor = new ScheduledThreadPoolExecutor(3);
 	protected final CompileAction aCompile = new CompileAction();
 	protected final UpdateTestSelectionAction aUpdateTestSelection = new UpdateTestSelectionAction();
+	protected final TestStepAction aTestStep = new TestStepAction();
 
 	public void init() throws IOException {
 		final InputStream modelStream = Controller.class.getResourceAsStream("/aos-s10.json");
@@ -80,6 +82,9 @@ public class Controller {
 
 		view.getSourceCompileButton().setAction(aCompile);
 		view.getTestComboBox().setAction(aUpdateTestSelection);
+		view.getTestStepButton().setAction(aTestStep);
+
+		view.getSourceCompileButton().setMnemonic('c');
 	}
 
 	protected void selectTest(Test test) {
@@ -161,167 +166,44 @@ public class Controller {
 		}
 	}
 
-	public static void setupStatus(final JLabel label, final String text) {
-		label.setText(text);
-		label.setToolTipText(text);
-		label.setForeground(Color.DARK_GRAY);
-	}
-
-	public static void setupStatus(final JLabel label, final Result result) {
-		label.setToolTipText(result.getMessage());
-		label.setText(result.getMessage());
-		label.setForeground(result.isSuccess() ? Color.GREEN.darker().darker() : Color.RED.darker().darker());
-	}
-
-	class LoadDataAction extends AbstractAction {
-		int[] lastLoaded = new int[0];
-
-		public LoadDataAction() {
-			super("Load Data");
+	class TestStepAction extends AbstractAction {
+		public TestStepAction() {
+			super("Step");
 		}
 
-		public void listReload() {
-			dataPath.getMemory().setData(lastLoaded);
-		}
+		public void actionPerformed(ActionEvent e) {
+			setEnabled(false);
 
-		public void load(List<String> temp) {
-			int maxAddress = validateInput(temp);
-			if (maxAddress < 0) {
-				log.info("Please correct validation errors. Data loading terminated.");
-				return;
-			}
+			final JLabel statusLabel = view.getTestStatusLabel();
+			setupStatus(statusLabel, "Initializing stepping...");
 
-			lastLoaded = new int[maxAddress];
-			for (String tempStr : temp) {
-				int index = tempStr.indexOf(":");
-				String address = tempStr.substring(0, index);
-				int word = Data.hex2int(tempStr.substring(index + 1));
-				int memoryIndex = Data.hex2int(address) / 4;
-				lastLoaded[memoryIndex] = word;
-			}
+			executor.submit(new Runnable() {
+				public void run() {
+					final Result[] resRef = new Result[] {new Result("status unknown", false)};
+					try {
+						final String regsText = view.getTestRegsTextArea().getText();
+						final String[] regsLines = regsText.split(LINE_SEPARATOR);
 
-			listReload();
+						final TIntIntHashMap[] regs = assembler.loadRegs(regsLines, resRef);
+						if (regs != null && resRef[0].isSuccess()) {
+							final String memText = view.getTestMemTextArea().getText();
+							final String[] memLines = memText.split(LINE_SEPARATOR);
+							final TIntIntHashMap[] data = assembler.loadData(memLines, resRef);
 
-			log.info("Data Successfully Loaded!");
-		}
-
-		public int validateInput(List<String> temp) {
-			int maxAddress = 0;
-			for (String tempStr : temp) {
-				int index = tempStr.indexOf(":");
-				if (index == -1 || index == 0) {
-					log.warn("Data item '" + tempStr + "' must be given with an address.");
-					return -1;
-				}
-
-				String address = tempStr.substring(0, index);
-				if (!Data.isHexPositive(address)) {
-					log.warn("Address '" + address + "' must be an hexadecimal number.");
-					return -1;
-				}
-
-				long addressValue = Data.hex2long(address);
-
-				if (addressValue > Integer.MAX_VALUE) {
-					log.warn("Address '" + address + "' must not exceed " + Integer.toString(Integer.MAX_VALUE, 16));
-					return -1;
-				}
-
-				maxAddress = Math.max(maxAddress, (int) addressValue);
-
-				String word = tempStr.substring(index + 1);
-				if (word.length() != 8) {
-					log.warn("'" + word + "' must have 8 hex digits!");
-					return -1;
-				}
-				for (int j = 0; j < word.length(); j++) {
-					int digit = word.charAt(j);
-					if ((digit < '0' || digit > '9') &&
-							(digit < 'A' || digit > 'F')) {
-						log.warn("'" + word + "' has an ILLEGAL character (not a Hex digit).");
-						return -1;
+							if (data != null && resRef[0].isSuccess()) {
+								//	TODO: setup the DataPath with all this data we have processed
+							}
+						}
+					} finally {
+						SwingUtilities.invokeLater(new Runnable() {
+							public void run() {
+								setEnabled(true);
+								setupStatus(statusLabel, resRef[0]);
+							}
+						});
 					}
 				}
-			}
-
-			return maxAddress;
-		}
-
-		public void actionPerformed(ActionEvent e) {
-		}
-	}
-
-	class LoadRegistersAction extends AbstractAction {
-		protected final int[] lastLoaded = new int[Reg.values().length];
-
-		public LoadRegistersAction() {
-			super("Load registers");
-		}
-
-		public void actionPerformed(ActionEvent e) {
-		}
-
-		public void load(List<String> codeLines) {
-			final boolean validated = validateInput(codeLines);
-
-			if (!validated) {
-				log.info("Please correct validation errors. Register loading terminated.");
-				return;
-			}
-
-			Arrays.fill(this.lastLoaded, 0);
-			for (String tempStr : codeLines) {
-				final int index = tempStr.indexOf(':');
-				final String regToken = tempStr.substring(0, index);
-				final Reg reg = Reg.fromString(regToken);
-				final String word = tempStr.substring(index + 1);
-
-				lastLoaded[reg.ordinal()] = Data.hex2int(word);
-			}
-
-			listReload();
-
-			log.info("Registers Successfully Loaded!");
-		}
-
-		private boolean validateInput(List<String> codeLines) {
-			if (codeLines.isEmpty()) {
-				log.info("Registers NOT loaded - empty source");
-				return false;
-			}
-
-			for (String tempStr : codeLines) {
-				int index = tempStr.indexOf(':');
-				if (index == -1 || index == 0) {
-					log.warn("'" + tempStr + "' must have reg:value format.");
-					return false;
-				}
-
-				String registerNumber = tempStr.substring(0, index);
-				final Reg reg = Reg.fromString(registerNumber);
-				if (reg == Reg.zero) {
-					log.warn("Register '" + reg + "' is Constant Holding 00000000. Its Value CANNOT be Changed!");
-					return false;
-				}
-
-				final String word = tempStr.substring(index + 1);
-				if (word.length() > 8) {
-					log.warn("'" + word + "' must have not more than 8 hex digits.");
-					return false;
-				}
-
-				if (!Data.isHexPositive(word)) {
-					log.warn("'" + word + "' is not a legal hex number.");
-					return false;
-				}
-			}
-
-			return true;
-		}
-
-		public void listReload() {
-			dataPath.getRegisters().load(lastLoaded);
-			dataPath.getRegisters().setReg(Reg.pc, dataPath.getInstructions().getBase());
+			});
 		}
 	}
 
@@ -344,6 +226,18 @@ public class Controller {
 		getMemoryModel().fireTableDataChanged();
 	}
 
+	public static void setupStatus(final JLabel label, final String text) {
+		label.setText(text);
+		label.setToolTipText(text);
+		label.setForeground(Color.DARK_GRAY);
+	}
+
+	public static void setupStatus(final JLabel label, final Result result) {
+		label.setToolTipText(result.getMessage());
+		label.setText(result.getMessage());
+		label.setForeground(result.isSuccess() ? Color.GREEN.darker().darker() : Color.RED.darker().darker());
+	}
+
 	public static void main(String[] args) throws IOException {
 		BasicConfigurator.configure();
 
@@ -362,29 +256,8 @@ public class Controller {
 
 		frame.getContentPane().add(instance.view.getRootPanel());
 		frame.pack();
+		frame.setSize(600, 400);
+		frame.setLocation(20, 20);
 		frame.setVisible(true);
-	}
-
-	class TaskListSelectionListener implements ListSelectionListener {
-		public void valueChanged(ListSelectionEvent e) {
-		}
-	}
-
-	public void do_activate(ActionEvent e) {
-		if (selectedTask == null) {
-			return;
-		}
-
-	}
-
-	public void do_run(ActionEvent e) {
-		Test tCase = (Test) testComboModel.getSelectedItem();
-	}
-
-	public void do_submit(ActionEvent e) {
-		//  TODO do something here
-	}
-
-	public void do_closeStepper(ActionEvent e) {
 	}
 }
