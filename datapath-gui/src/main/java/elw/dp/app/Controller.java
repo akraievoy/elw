@@ -141,8 +141,8 @@ public class Controller {
 		view.getTestMemTextArea().setEditable(!test.isShared());
 		view.getTestRegsTextArea().setEditable(!test.isShared());
 
-		setupStatus(view.getTestStatusLabel(), "...");
-		setupStatus(view.getRunStatusLabel(), "...");
+		setupStatus(view.getTestStatusLabel());
+		setupStatus(view.getRunStatusLabel());
 	}
 
 	protected void job_assemble(final JLabel statusLabel, final Result[] resRef) {
@@ -411,6 +411,7 @@ public class Controller {
 						setupStatus(statusLabel, resRef[0]);
 						if (resRef[0].isSuccess()) {
 							view.getStrTabbedPane().setSelectedIndex(2);
+							setupStatus(view.getRunStatusLabel());
 							fireDataPathChanged();
 						}
 					}
@@ -533,21 +534,25 @@ public class Controller {
 	protected class SourceDocumentListener implements DocumentListener {
 		public void insertUpdate(DocumentEvent e) {
 			sourceStamp.set(System.currentTimeMillis());
-			setupStatus(view.getSourceFeedbackLabel(), "...");
-			setupStatus(view.getTestStatusLabel(), "...");
+			setupStatus(view.getSourceFeedbackLabel());
+			setupStatus(view.getTestStatusLabel());
 		}
 
 		public void removeUpdate(DocumentEvent e) {
 			sourceStamp.set(System.currentTimeMillis());
-			setupStatus(view.getSourceFeedbackLabel(), "...");
-			setupStatus(view.getTestStatusLabel(), "...");
+			setupStatus(view.getSourceFeedbackLabel());
+			setupStatus(view.getTestStatusLabel());
 		}
 
 		public void changedUpdate(DocumentEvent e) {
 			sourceStamp.set(System.currentTimeMillis());
-			setupStatus(view.getSourceFeedbackLabel(), "...");
-			setupStatus(view.getTestStatusLabel(), "...");
+			setupStatus(view.getSourceFeedbackLabel());
+			setupStatus(view.getTestStatusLabel());
 		}
+	}
+
+	public static void setupStatus(final JLabel label) {
+		setupStatus(label, "...");
 	}
 
 	public static void setupStatus(final JLabel label, final String text) {
