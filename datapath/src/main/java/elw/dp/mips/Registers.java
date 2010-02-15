@@ -65,4 +65,10 @@ public class Registers {
 			regToValue.put(key, regMap.get(key));
 		}
 	}
+
+	public void unset(int[] regs) {
+		for (int reg : regs) {
+			regToValue.remove(reg);
+		}
+	}
 }

@@ -133,16 +133,20 @@ public class Alu {
 		final int s = ctx.getS();
 		final int t = ctx.getT();
 
-		ctx.getRegisters().setReg(Reg.lo, s * t);
-		//ctx.getRegisters().setReg(Reg.hi, s % t);
+		final long value = ((long) s & 0xFFFFFFFFL) * ((long) t & 0xFFFFFFFFL);
+
+		ctx.getRegisters().setReg(Reg.lo, (int) value);
+		ctx.getRegisters().setReg(Reg.hi, (int) (value >> 32));
 	}
 
 	public void mult(final InstructionContext ctx) {
 		final int s = ctx.getS();
 		final int t = ctx.getT();
 
-		ctx.getRegisters().setReg(Reg.lo, s * t);
-		//ctx.getRegisters().setReg(Reg.hi, s % t);
+		final long value = (long) s * t;
+
+		ctx.getRegisters().setReg(Reg.lo, (int) value);
+		ctx.getRegisters().setReg(Reg.hi, (int) (value >> 32));
 	}
 
 	public void noop(final InstructionContext ctx) {

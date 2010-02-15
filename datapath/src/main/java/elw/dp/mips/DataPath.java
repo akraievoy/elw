@@ -1,5 +1,7 @@
 package elw.dp.mips;
 
+import gnu.trove.TIntArrayList;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -11,6 +13,7 @@ public class DataPath {
 	protected final Alu alu = new Alu();
 
 	protected final InstructionContext ctx;
+	int stepsToWipeHiLo = -1;
 
 	public DataPath() {
 		ctx = new InstructionContext(instructions, memory, registers);
@@ -45,9 +48,26 @@ public class DataPath {
 			throw base.Die.ifReached(e);
 		}
 
-		if (!registers.getWriteRegs().contains(Reg.pc.ordinal())) {
+		final TIntArrayList writeRegs = registers.getWriteRegs();
+		final TIntArrayList readRegs = registers.getReadRegs();
+
+		if (!writeRegs.contains(Reg.pc.ordinal())) {
 			ctx.advPc();
 		}
+
+		final boolean hiLoWritten = writeRegs.contains(Reg.hi.ordinal()) || writeRegs.contains(Reg.lo.ordinal());
+		final boolean hiLoRead = readRegs.contains(Reg.hi.ordinal()) || readRegs.contains(Reg.lo.ordinal());
+
+		if (hiLoWritten) {
+			stepsToWipeHiLo = 2;
+		} else if (hiLoRead && stepsToWipeHiLo > 0) {
+			stepsToWipeHiLo--;
+		}
+		if (!hiLoWritten && (!hiLoRead || stepsToWipeHiLo == 0)) {
+			registers.unset(new int[] {Reg.hi.ordinal(), Reg.lo.ordinal()});
+			stepsToWipeHiLo = -1;
+		}
+
 		instructions.updateMinStack();
 		return instruction;
 	}
