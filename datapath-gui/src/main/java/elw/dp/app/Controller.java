@@ -59,6 +59,8 @@ public class Controller {
 	protected final AssembleAction aVerify = new AssembleAction("Verify", false);
 	protected final UpdateTestSelectionAction aUpdateTestSelection = new UpdateTestSelectionAction();
 	protected final TestStepAction aTestStep = new TestStepAction("Step>");
+	protected final TestRunAction aTestRun = new TestRunAction("Run", 16384);
+	protected final TestBatchAction aTestBatch = new TestBatchAction("Batch", 16384);
 	protected final RunStepAction aRunStep = new RunStepAction("Step", 1);
 	protected final RunStepAction aRunRun = new RunStepAction("Run", 4096);
 	protected final RunResetAction aRunReset = new RunResetAction("Reset");
@@ -102,6 +104,10 @@ public class Controller {
 		view.getTestAddCustomButton().setEnabled(false); //	LATER #163
 		view.getTestStepButton().setAction(aTestStep);
 		view.getTestStepButton().setMnemonic('s');
+		view.getTestRunButton().setAction(aTestRun);
+		view.getTestRunButton().setMnemonic('r');
+		view.getTestBatchButton().setAction(aTestBatch);
+		view.getTestBatchButton().setMnemonic('b');
 
 		view.getRunInstructionsTable().setModel(tmInstructions);
 		view.getRunRegsTable().setModel(tmRegs);
@@ -148,22 +154,29 @@ public class Controller {
 		}
 	}
 
-	protected void job_loadTest(final JLabel statusLabel, Result[] resRef) {
+	protected void job_loadTest(final JLabel statusLabel, Result[] resRef, final Test test) {
 		final boolean assemble = assembleStamp.get() < sourceStamp.get();
 		if (assemble) {
 			job_assemble(statusLabel, resRef);
 		}
 
 		if (!assemble || resRef[0].isSuccess()) {
-			setupStatus(statusLabel, "Loading Regs and Mem...");
-
+			setupStatus(statusLabel, "Loading Regs and Mem for " + test.getName() + "...");
+//	LATER #163
+/*
 			final String regsText = view.getTestRegsTextArea().getText();
 			final String[] regsLines = regsText.split(LINE_SEPARATOR);
+*/
+			final String[] regsLines = test.getArgs().get("regs") != null ? test.getArgs().get("regs") : G.STRINGS_EMPTY;
 
 			final TIntIntHashMap[] newRegs = assembler.loadRegs(regsLines, resRef);
 			if (newRegs != null && resRef[0].isSuccess()) {
+//	LATER #163
+/*
 				final String memText = view.getTestMemTextArea().getText();
 				final String[] memLines = memText.split(LINE_SEPARATOR);
+*/
+				final String[] memLines = test.getArgs().get("mem") != null ? test.getArgs().get("mem") : G.STRINGS_EMPTY;
 				final TIntIntHashMap[] newData = assembler.loadData(memLines, resRef);
 
 				if (newData != null && resRef[0].isSuccess()) {
@@ -198,27 +211,64 @@ public class Controller {
 		}
 	}
 
-	public void job_step(JLabel statusLabel, Result[] resRef, final int steps) {
+	public boolean job_step(JLabel statusLabel, Result[] resRef, final int steps) {
 		setupStatus(statusLabel, "Stepping...");
-		try {
-			for (int step = 0; step < steps; step++) {
-				final Instruction instruction = dataPath.execute();
-				if (instruction != null) {
-					Result.success(log, resRef, "Executed " + instruction.getOpName());
-				} else {
-					verifyRegs(resRef);
-					if (resRef[0].isSuccess()) {
-						verifyMem(resRef);
-					}
-					if (resRef[0].isSuccess()) {
-						Result.success(log, resRef, "Test Passed");
-					}
-					break;
+
+		for (int step = 0; step < steps; step++) {
+			final Instruction instruction = dataPath.execute();
+			if (instruction != null) {
+				Result.success(log, resRef, "Executed " + instruction.getOpName());
+			} else {
+				verifyRegs(resRef);
+				if (resRef[0].isSuccess()) {
+					verifyMem(resRef);
 				}
+				if (resRef[0].isSuccess()) {
+					Result.success(log, resRef, "Test Passed");
+				}
+				return true;
 			}
-		} catch (Throwable t) {
-			Result.failure(log, resRef, "Failed: " + G.report(t));
-			log.trace("trace", t);
+		}
+
+		return false;
+	}
+
+	public boolean job_run(JLabel statusLabel, Result[] resRef, final Test test, final int steps) {
+		setupStatus(statusLabel, "Running...");
+		job_loadTest(statusLabel, resRef, test);
+		if (resRef[0].isSuccess()) {
+			job_reset(statusLabel, resRef);
+		}
+		if (resRef[0].isSuccess()) {
+			if (!job_step(statusLabel, resRef, steps)) {
+				Result.failure(log, resRef, "Execution timed out");
+			} else {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public void job_batch(JLabel statusLabel, Result[] resRef, final int steps) {
+		setupStatus(statusLabel, "Running...");
+
+		int failCount = 0;
+		for (Test test : selectedTask.getTests()) {
+			try {
+				if (!job_run(statusLabel, resRef, test, steps)) {
+					failCount++;
+				}
+			} catch (Throwable t) {
+				failCount++;
+				Result.failure(log, resRef, "Failed: " + G.report(t));
+				log.trace("trace", t);
+			}
+		}
+
+		if (failCount > 0) {
+			Result.failure(log, resRef, failCount + " of " + selectedTask.getTests().length + " tests failed");
+		} else {
+			Result.success(log, resRef, selectedTask.getTests().length + " tests passed");
 		}
 	}
 
@@ -345,7 +395,7 @@ public class Controller {
 					final Result[] resRef = new Result[]{new Result("status unknown", false)};
 
 					try {
-						job_loadTest(statusLabel, resRef);
+						job_loadTest(statusLabel, resRef, (Test) testComboModel.getSelectedItem());
 
 						if (resRef[0].isSuccess()) {
 							job_reset(statusLabel, resRef);
@@ -381,6 +431,9 @@ public class Controller {
 
 					try {
 						job_step(statusLabel, resRef, steps);
+					} catch (Throwable t) {
+						Result.failure(log, resRef, "Failed: " + G.report(t));
+						log.trace("trace", t);
 					} finally {
 						setEnabled(true);
 						setupStatus(statusLabel, resRef[0]);
@@ -414,6 +467,63 @@ public class Controller {
 						if (resRef[0].isSuccess()) {
 							fireDataPathChanged();
 						}
+					}
+				}
+			});
+		}
+	}
+
+	class TestRunAction extends AbstractAction {
+		protected final int steps;
+
+		public TestRunAction(final String name, final int steps) {
+			super(name);
+			this.steps = steps;
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			setEnabled(false);
+			final JLabel statusLabel = view.getTestStatusLabel();
+
+			executor.submit(new Runnable() {
+				public void run() {
+					final Result[] resRef = new Result[]{new Result("status unknown", false)};
+
+					try {
+						job_run(statusLabel, resRef, (Test) Controller.this.testComboModel.getSelectedItem(), steps);
+					} catch (Throwable t) {
+						Result.failure(log, resRef, "Failed: " + G.report(t));
+						log.trace("trace", t);
+					} finally {
+						setEnabled(true);
+						setupStatus(statusLabel, resRef[0]);
+					}
+				}
+			});
+		}
+	}
+
+	class TestBatchAction extends AbstractAction {
+		protected final int steps;
+
+		public TestBatchAction(final String name, final int steps) {
+			super(name);
+			this.steps = steps;
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			setEnabled(false);
+			final JLabel statusLabel = view.getTestStatusLabel();
+
+			executor.submit(new Runnable() {
+				public void run() {
+					final Result[] resRef = new Result[]{new Result("status unknown", false)};
+
+					try {
+						job_batch(statusLabel, resRef, steps);
+					} finally {
+						setEnabled(true);
+						setupStatus(statusLabel, resRef[0]);
 					}
 				}
 			});
