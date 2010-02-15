@@ -239,7 +239,7 @@ public class Controller {
 		return false;
 	}
 
-	public boolean job_run(JLabel statusLabel, Result[] resRef, final Test test, final int steps) {
+	public void job_run(JLabel statusLabel, Result[] resRef, final Test test, final int steps) {
 		setupStatus(statusLabel, "Running...");
 		job_loadTest(statusLabel, resRef, test);
 		if (resRef[0].isSuccess()) {
@@ -248,11 +248,8 @@ public class Controller {
 		if (resRef[0].isSuccess()) {
 			if (!job_step(statusLabel, resRef, steps)) {
 				Result.failure(log, resRef, "Execution timed out");
-			} else {
-				return true;
 			}
 		}
-		return false;
 	}
 
 	public void job_batch(JLabel statusLabel, Result[] resRef, final int steps) {
@@ -260,8 +257,10 @@ public class Controller {
 
 		int failCount = 0;
 		for (Test test : selectedTask.getTests()) {
+			final Result[] localResRef = {new Result("test status unknown", false)};
 			try {
-				if (!job_run(statusLabel, resRef, test, steps)) {
+				job_run(statusLabel, localResRef, test, steps);
+				if (!localResRef[0].isSuccess()) {
 					failCount++;
 				}
 			} catch (Throwable t) {
