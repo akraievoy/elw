@@ -39,6 +39,9 @@ public class Controller {
 	protected final MipsAssembler assembler = new MipsAssembler();
 	protected DataPath dataPath = new DataPath();
 
+	//	static setup, may be spring-injected at some time
+	protected final int runSteps = 16384;
+
 	//  application state
 	protected AtomicLong sourceStamp = new AtomicLong(1); // NOTE: no modifications still require assembly to run before stepping
 	protected AtomicLong assembleStamp = new AtomicLong(0);
@@ -59,10 +62,10 @@ public class Controller {
 	protected final AssembleAction aVerify = new AssembleAction("Verify", false);
 	protected final UpdateTestSelectionAction aUpdateTestSelection = new UpdateTestSelectionAction();
 	protected final TestStepAction aTestStep = new TestStepAction("Step>");
-	protected final TestRunAction aTestRun = new TestRunAction("Run", 16384);
-	protected final TestBatchAction aTestBatch = new TestBatchAction("Batch", 16384);
+	protected final TestRunAction aTestRun = new TestRunAction("Run");
+	protected final TestBatchAction aTestBatch = new TestBatchAction("Batch");
 	protected final RunStepAction aRunStep = new RunStepAction("Step", 1);
-	protected final RunStepAction aRunRun = new RunStepAction("Run", 4096);
+	protected final RunStepAction aRunRun = new RunStepAction("Run", runSteps);
 	protected final RunResetAction aRunReset = new RunResetAction("Reset");
 
 	public void init() throws IOException {
@@ -137,6 +140,9 @@ public class Controller {
 
 		view.getTestMemTextArea().setEditable(!test.isShared());
 		view.getTestRegsTextArea().setEditable(!test.isShared());
+
+		setupStatus(view.getTestStatusLabel(), "...");
+		setupStatus(view.getRunStatusLabel(), "...");
 	}
 
 	protected void job_assemble(final JLabel statusLabel, final Result[] resRef) {
@@ -474,11 +480,8 @@ public class Controller {
 	}
 
 	class TestRunAction extends AbstractAction {
-		protected final int steps;
-
-		public TestRunAction(final String name, final int steps) {
+		public TestRunAction(final String name) {
 			super(name);
-			this.steps = steps;
 		}
 
 		public void actionPerformed(ActionEvent e) {
@@ -490,7 +493,7 @@ public class Controller {
 					final Result[] resRef = new Result[]{new Result("status unknown", false)};
 
 					try {
-						job_run(statusLabel, resRef, (Test) Controller.this.testComboModel.getSelectedItem(), steps);
+						job_run(statusLabel, resRef, (Test) Controller.this.testComboModel.getSelectedItem(), runSteps);
 					} catch (Throwable t) {
 						Result.failure(log, resRef, "Failed: " + G.report(t));
 						log.trace("trace", t);
@@ -504,11 +507,8 @@ public class Controller {
 	}
 
 	class TestBatchAction extends AbstractAction {
-		protected final int steps;
-
-		public TestBatchAction(final String name, final int steps) {
+		public TestBatchAction(final String name) {
 			super(name);
-			this.steps = steps;
 		}
 
 		public void actionPerformed(ActionEvent e) {
@@ -520,7 +520,7 @@ public class Controller {
 					final Result[] resRef = new Result[]{new Result("status unknown", false)};
 
 					try {
-						job_batch(statusLabel, resRef, steps);
+						job_batch(statusLabel, resRef, runSteps);
 					} finally {
 						setEnabled(true);
 						setupStatus(statusLabel, resRef[0]);
@@ -533,14 +533,20 @@ public class Controller {
 	protected class SourceDocumentListener implements DocumentListener {
 		public void insertUpdate(DocumentEvent e) {
 			sourceStamp.set(System.currentTimeMillis());
+			setupStatus(view.getSourceFeedbackLabel(), "...");
+			setupStatus(view.getTestStatusLabel(), "...");
 		}
 
 		public void removeUpdate(DocumentEvent e) {
 			sourceStamp.set(System.currentTimeMillis());
+			setupStatus(view.getSourceFeedbackLabel(), "...");
+			setupStatus(view.getTestStatusLabel(), "...");
 		}
 
 		public void changedUpdate(DocumentEvent e) {
 			sourceStamp.set(System.currentTimeMillis());
+			setupStatus(view.getSourceFeedbackLabel(), "...");
+			setupStatus(view.getTestStatusLabel(), "...");
 		}
 	}
 
