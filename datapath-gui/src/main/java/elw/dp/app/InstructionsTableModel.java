@@ -11,7 +11,7 @@ public class InstructionsTableModel extends AbstractTableModel {
 	public static final String COL_CODE = "Code";
 	public static final String COL_ACC = "Acc";
 
-	protected final String[] columns = new String[]{COL_ADDR, COL_BIN, COL_ACC, COL_CODE};
+	protected final String[] columns = new String[]{COL_ACC, COL_ADDR, COL_BIN, COL_CODE};
 	protected final Instructions instructions;
 
 	public InstructionsTableModel(Instructions instructions) {
@@ -36,7 +36,7 @@ public class InstructionsTableModel extends AbstractTableModel {
 
 		if (COL_ADDR.equals(colName)) {
 
-			return Data.int2dec(address, 2);
+			return Data.int2hex(address, 2);
 
 		} else if (COL_BIN.equals(colName)) {
 

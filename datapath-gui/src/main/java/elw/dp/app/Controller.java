@@ -3,8 +3,10 @@ package elw.dp.app;
 import base.pattern.Result;
 import elw.dp.mips.*;
 import elw.dp.mips.asm.MipsAssembler;
+import elw.dp.ui.AccessTrackingCellRenderer;
 import elw.dp.ui.DataPathForm;
 import elw.dp.ui.FeedbackAppender;
+import elw.dp.ui.RendererFactory;
 import elw.vo.Course;
 import elw.vo.Test;
 import elw.vo.Version;
@@ -112,9 +114,30 @@ public class Controller {
 		view.getTestBatchButton().setAction(aTestBatch);
 		view.getTestBatchButton().setMnemonic('b');
 
-		view.getRunInstructionsTable().setModel(tmInstructions);
-		view.getRunRegsTable().setModel(tmRegs);
-		view.getRunMemTable().setModel(tmMemory);
+		final RendererFactory rFactory = new RendererFactory();
+
+		final JTable instrTable = view.getRunInstructionsTable();
+		instrTable.setModel(tmInstructions);
+		rFactory.install(instrTable);
+		rFactory.findColByName(instrTable, InstructionsTableModel.COL_ACC).setMaxWidth(18);
+		rFactory.findColByName(instrTable, InstructionsTableModel.COL_ADDR).setMaxWidth(80);
+		rFactory.findColByName(instrTable, InstructionsTableModel.COL_CODE).setMaxWidth(120);
+
+		final JTable regsTable = view.getRunRegsTable();
+		regsTable.setModel(tmRegs);
+		rFactory.install(regsTable);
+		rFactory.findColByName(regsTable, RegistersTableModel.COL_ACC).setMaxWidth(18);
+		rFactory.findColByName(regsTable, RegistersTableModel.COL_NAME).setMaxWidth(32);
+		rFactory.findColByName(regsTable, RegistersTableModel.COL_NUMBER).setMaxWidth(32);
+		rFactory.findColByName(regsTable, RegistersTableModel.COL_HEX).setMaxWidth(96);
+		rFactory.findColByName(regsTable, RegistersTableModel.COL_DEC).setMaxWidth(96);
+
+		final JTable memTable = view.getRunMemTable();
+		memTable.setModel(tmMemory);
+		rFactory.install(memTable);
+		rFactory.findColByName(memTable, MemoryTableModel.COL_ACC).setMaxWidth(18);
+		rFactory.findColByName(memTable, MemoryTableModel.COL_ADDR).setMaxWidth(80);
+
 		view.getRunStepButton().setAction(aRunStep);
 		view.getRunStepButton().setMnemonic('t');
 		view.getRunRunButton().setAction(aRunRun);
@@ -324,7 +347,7 @@ public class Controller {
 				return;
 			}
 
-			final int value = dataPath.getRegisters().getReg(expectedReg);
+			final int value = dataPath.getRegisters().getRegInternal(expectedReg);
 			final int expectedValue = expectedRegMap.get(expectedReg.ordinal());
 			if (expectedValue != value) {
 				Result.failure(log, resRef, "Test Failed: expecting $" + expectedReg.toString() + "=" + expectedValue + ", but $" + expectedReg.toString() + "=" + value);
@@ -595,15 +618,19 @@ public class Controller {
 			System.out.println("Error setting native LAF: " + e);
 		}
 
-		final Controller instance = new Controller();
-		instance.init();
-
-		final JFrame frame = new JFrame();
-		frame.setTitle("DataPath");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
+				final Controller instance = new Controller();
+				try {
+					instance.init();
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+
+				final JFrame frame = new JFrame();
+				frame.setTitle("DataPath");
+				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
 				frame.getContentPane().add(instance.view.getRootPanel());
 				frame.pack();
 				frame.setSize(600, 400);

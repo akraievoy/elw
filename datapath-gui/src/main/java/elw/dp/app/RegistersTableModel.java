@@ -11,9 +11,9 @@ public class RegistersTableModel extends AbstractTableModel {
 	public static final String COL_NAME = "Name";
 	public static final String COL_HEX = "Hex";
 	public static final String COL_DEC = "Dec";
-	public static final String COL_ACC = "Access";
+	public static final String COL_ACC = InstructionsTableModel.COL_ACC;
 
-	protected final String[] columns = new String[]{COL_NUMBER, COL_NAME, COL_HEX, COL_DEC, COL_ACC};
+	protected final String[] columns = new String[]{COL_ACC, COL_NUMBER, COL_NAME, COL_HEX, COL_DEC};
 	protected final Registers registers;
 
 	public RegistersTableModel(Registers registers) {

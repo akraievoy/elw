@@ -10,9 +10,9 @@ public class MemoryTableModel extends AbstractTableModel {
 	public static final String COL_HEX = "Hex8";
 	public static final String COL_HEX_WORD = "Hex32";
 	public static final String COL_DEC_WORD = "Dec32";
-	public static final String COL_ACC = "Access";
+	public static final String COL_ACC = InstructionsTableModel.COL_ACC;
 
-	protected final String[] columns = new String[]{COL_ADDR, COL_ACC, COL_HEX_WORD, COL_DEC_WORD, COL_HEX};
+	protected final String[] columns = new String[]{COL_ACC, COL_ADDR, COL_HEX_WORD, COL_DEC_WORD, COL_HEX};
 	protected final Memory memory;
 
 	public MemoryTableModel(Memory memory) {
