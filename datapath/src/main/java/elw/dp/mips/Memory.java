@@ -48,26 +48,11 @@ public class Memory {
 	}
 
 	public byte getByteInternal(final int address) {
-		final Byte contentByte = contentMap.get(address);
-
-		if (contentByte != null) {
-			return contentByte;
-		}
-
-		final byte newValue = getDefaultByte();
-
-		contentMap.put(address, newValue);
-
-		return newValue;
-	}
-
-	static byte getDefaultByte() {
-		return (byte) (new Random().nextInt() & 0xFF);
+		return contentMap.get(address);
 	}
 
 	byte setByteInternal(int address, byte value) {
-		final Byte oldByte = contentMap.put(address, value);
-		return oldByte != null ? oldByte : getDefaultByte();
+		return contentMap.put(address, value);
 	}
 
 	public byte getByte(int address) {
@@ -104,12 +89,13 @@ public class Memory {
 		final int[] keys = contentMap.keys();
 		Arrays.sort(keys);
 
-		return contentMap.get(keys[index]);
+		return keys[index];
 	}
 
 	public void setData(final TIntIntHashMap newData) {
 		resetAccess();
 
+		contentMap.clear();
 		final int[] addresses = newData.keys();
 		for (final int addr : addresses) {
 			setWord(addr, newData.get(addr));
