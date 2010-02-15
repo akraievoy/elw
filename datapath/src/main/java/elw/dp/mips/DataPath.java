@@ -30,22 +30,24 @@ public class DataPath {
 		}
 
 		final Instruction instruction = instructions.get(pc);
-		ctx.setInstruction(instruction);
+		if (instruction != null) {
+			ctx.setInstruction(instruction);
 
-		final Method method;
+			final Method method;
 
-		try {
-			method = alu.getClass().getMethod(instruction.getOpName(), InstructionContext.class);
-		} catch (NoSuchMethodException e) {
-			throw base.Die.ifReached(e);
-		}
+			try {
+				method = alu.getClass().getMethod(instruction.getOpName(), InstructionContext.class);
+			} catch (NoSuchMethodException e) {
+				throw base.Die.ifReached(e);
+			}
 
-		try {
-			method.invoke(alu, ctx);
-		} catch (IllegalAccessException e) {
-			throw base.Die.ifReached(e);
-		} catch (InvocationTargetException e) {
-			throw base.Die.ifReached(e);
+			try {
+				method.invoke(alu, ctx);
+			} catch (IllegalAccessException e) {
+				throw base.Die.ifReached(e);
+			} catch (InvocationTargetException e) {
+				throw base.Die.ifReached(e);
+			}
 		}
 
 		final TIntArrayList writeRegs = registers.getWriteRegs();

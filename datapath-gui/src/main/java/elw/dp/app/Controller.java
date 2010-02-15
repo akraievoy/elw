@@ -26,6 +26,7 @@ import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicLong;
@@ -68,6 +69,7 @@ public class Controller {
 	protected final RunStepAction aRunStep = new RunStepAction("Step", 1);
 	protected final RunStepAction aRunRun = new RunStepAction("Run", runSteps);
 	protected final RunResetAction aRunReset = new RunResetAction("Reset");
+	protected final HashMap<String,Integer> labelIndex = new HashMap<String, Integer>();
 
 	public void init() throws IOException {
 		final InputStream modelStream = Controller.class.getResourceAsStream("/aos-s10.json");
@@ -179,7 +181,7 @@ public class Controller {
 		final String source = view.getSourceTextArea().getText();
 		final String[] sourceLines = source.split(LINE_SEPARATOR);
 
-		final Instruction[] newInstructions = assembler.assembleLoad(sourceLines, resRef);
+		final Instruction[] newInstructions = assembler.loadInstructions(sourceLines, resRef, labelIndex);
 		if (newInstructions != null) {
 			assembleStamp.set(System.currentTimeMillis());
 			instructions = newInstructions;
@@ -231,7 +233,7 @@ public class Controller {
 		setupStatus(statusLabel, "Resetting...");
 
 		if (instructions != null && data != null && regs != null) {
-			dataPath.getInstructions().setInstructions(Arrays.asList(instructions));
+			dataPath.getInstructions().setInstructions(Arrays.asList(instructions), labelIndex);
 			dataPath.getMemory().setData(data[0]);
 			dataPath.getRegisters().load(regs[0]);
 			dataPath.getRegisters().setReg(Reg.pc, dataPath.getInstructions().getCodeBase());

@@ -1,17 +1,20 @@
 package elw.dp.app;
 
+import elw.dp.mips.Instruction;
 import elw.dp.mips.Instructions;
 import elw.dp.mips.asm.Data;
+import org.akraievoy.gear.G4Str;
 
 import javax.swing.table.AbstractTableModel;
 
 public class InstructionsTableModel extends AbstractTableModel {
 	public static final String COL_ADDR = "Addr";
 	public static final String COL_BIN = "Hex";
+	public static final String COL_LABELS = "Labels";
 	public static final String COL_CODE = "Code";
 	public static final String COL_ACC = "rw";
 
-	protected final String[] columns = new String[]{COL_ACC, COL_ADDR, COL_BIN, COL_CODE};
+	protected final String[] columns = new String[]{COL_ACC, COL_ADDR, COL_BIN, COL_CODE, COL_LABELS};
 	protected final Instructions instructions;
 
 	public InstructionsTableModel(Instructions instructions) {
@@ -37,12 +40,23 @@ public class InstructionsTableModel extends AbstractTableModel {
 		if (COL_ADDR.equals(colName)) {
 			return Data.int2hex(address, 2);
 		} else if (COL_BIN.equals(colName)) {
-			final String code = instructions.getInternal(address).getBinaryCode();
-			return groupBy(code, 4);
+			final Instruction internal = instructions.getInternal(address);
+			if (internal != null) {
+				final String code = internal.getBinaryCode();
+				return groupBy(code, 4);
+			}
 		} else if (COL_CODE.equals(colName)) {
-			return instructions.getInternal(address).getCodeLine();
+			final Instruction internal = instructions.getInternal(address);
+			if (internal != null) {
+				return internal.getCodeLine();
+			}
 		} else if (COL_ACC.equals(colName)) {
 			return getAccessMod(address);
+		} else if (COL_LABELS.equals(colName)) {
+			final Instruction internal = instructions.getInternal(address);
+			if (internal != null) {
+				return G4Str.join(internal.getLabels(), ", ");
+			}
 		}
 
 		return "";

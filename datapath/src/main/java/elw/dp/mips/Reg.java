@@ -29,27 +29,6 @@ public enum Reg {
 
 	protected static final Map<String, Reg> byName = new TreeMap<String, Reg>();
 
-	public static Reg fromString(String regGroup) {
-		for (Reg reg : values()) {
-			if (reg.toString().equalsIgnoreCase(regGroup)) {
-				return reg;
-			}
-		}
-
-		final Long numericValue = G4Parse.parse(regGroup, (Long) null);
-
-		if (numericValue != null) {
-
-			final int regIndex = numericValue.intValue();
-			base.Die.ifFalse(0 <= regIndex && regIndex < 32, "illegal number of register: " + regIndex);
-
-			return Reg.values()[regIndex];
-
-		}
-
-		throw base.Die.unsupported("failed to parse as register name: '" + regGroup + "'");
-	}
-
 	protected static TreeMap<String, Reg> createByNameMap() {
 		final TreeMap<String, Reg> byNameMap = new TreeMap<String, Reg>();
 

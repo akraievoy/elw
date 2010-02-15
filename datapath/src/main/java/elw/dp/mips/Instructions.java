@@ -30,7 +30,7 @@ public class Instructions {
 			return addressToInstruction.get(address);
 		}
 
-		return Instruction.NOOP;
+		return null;
 	}
 
 	public int getSize() {
@@ -50,7 +50,7 @@ public class Instructions {
 		return Collections.unmodifiableSet(readAddresses);
 	}
 
-	public void setInstructions(final List<Instruction> instructions) {
+	public void setInstructions(final List<Instruction> instructions, HashMap<String, Integer> labelIndex) {
 		resetAccess();
 
 		codeBase = (Math.abs(random.nextInt()) % 0x1000) * 0x10;
@@ -60,6 +60,7 @@ public class Instructions {
 		int address = codeBase;
 		addressToInstruction.clear();
 		for (Instruction instruction : instructions) {
+			instruction.resolve(codeBase, labelIndex);	//	update the abs. addresses, if any
 			addressToInstruction.put(address, instruction);
 			address += 4;
 		}

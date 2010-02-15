@@ -2,6 +2,7 @@ package elw.dp.mips;
 
 import gnu.trove.TIntArrayList;
 import gnu.trove.TIntIntHashMap;
+import org.akraievoy.gear.G;
 
 import java.util.Arrays;
 
@@ -27,7 +28,16 @@ public class Registers {
 		final int key = reg.ordinal();
 		writeRegs.add(key);
 
-		return regToValue.put(key, value);
+		return setRegInternal(reg, value);
+	}
+
+	public int setRegInternal(Reg reg, int value) {
+		if (G.contains(Reg.roRegs, reg)) {
+			//	LATER log
+			return 0;
+		}
+
+		return regToValue.put(reg.ordinal(), value);
 	}
 
 	public void resetAccess() {

@@ -4,10 +4,6 @@
  */
 package elw.dp.mips.asm;
 
-import org.akraievoy.gear.G4Str;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Pattern;
 
 public class Data {
@@ -189,76 +185,6 @@ public class Data {
 		return int2dec(word, 1);
 	}
 
-	public static List<String> extractCode(final String rawText) {
-		final List<String> result = new ArrayList<String>();
-		final String[] lines = rawText.split("\n");
-
-		for (String line : lines) {
-			final String codeStr = line.replaceFirst("#.+$", "");
-
-			if (G4Str.isEmpty(codeStr)) {
-				continue;
-			}
-
-			result.add(codeStr.trim());
-		}
-
-		return result;
-	}
-
-	public static String uint2bin(final int intValue, final int len, final String varName) throws AssemblyException {
-		base.Die.ifTrue(len <= 0, "len is not positive: " + len);
-		base.Die.ifTrue(len > 32, "len exceeds int width: " + len);
-		AssemblyException.ifExceeds(0, intValue, (1 << len) - 1, varName);
-
-		final String binaryString = Integer.toBinaryString(intValue);
-
-		if (binaryString.length() == len) {
-			return binaryString;
-		}
-
-		final StringBuffer binaryBuffer = new StringBuffer(binaryString);
-		while (binaryBuffer.length() < len) {
-			binaryBuffer.insert(0, "0");
-		}
-
-		return binaryBuffer.toString();
-	}
-
-	public static String int2bin(final int intValue, final int len, final String varName) throws AssemblyException {
-		base.Die.ifTrue(len <= 0, "len is not positive: " + len);
-		base.Die.ifTrue(len > 32, "len exceeds int width: " + len);
-
-		if (len < 32) {
-			AssemblyException.ifExceeds(-(1 << len - 1), intValue, (1 << len - 1) - 1, varName);
-		}
-
-		final String binaryString = Integer.toBinaryString(intValue);
-
-		if (binaryString.length() > len) {  //  this holds true only for negatives, given validations above work fine
-			return binaryString.substring(binaryString.length() - len);
-		}
-
-		if (binaryString.length() == len) {
-			return binaryString;
-		}
-
-		final StringBuffer binaryBuffer = new StringBuffer(binaryString);
-		while (binaryBuffer.length() < len) {
-			binaryBuffer.insert(0, "0");
-		}
-
-		return binaryBuffer.toString();
-	}
-
-	public static int bin2int(final String binValue) {
-		if (binValue.startsWith("1")) {
-			return (int) (Long.parseLong(binValue, 2) + Integer.MIN_VALUE);
-		}
-
-		return Integer.parseInt(binValue, 2);
-	}
-
 	public static String str(final long val, final int radix, final int digits) {
 		final StringBuffer str = new StringBuffer(Long.toString(val, radix));
 
@@ -270,14 +196,20 @@ public class Data {
 		return str.toString();
 	}
 
+	public static long comp(long val, int digits) {
+		return val < 0 ? (2 << digits) - val : val;
+	}
+
 	public static boolean isNum(final String num, int bits) {
 		if (num == null || num.length() == 0) {
 			return false;
 		}
 
-		final StringBuffer numBuf = new StringBuffer(num);
+		final StringBuffer numBuf = new StringBuffer(num.toLowerCase());
+		int sign = 0;
 		if (numBuf.charAt(0) == '-') {
 			numBuf.deleteCharAt(0);
+			sign = 1;
 			if (numBuf.indexOf("-") >= 0 || numBuf.length() == 0) {
 				return false;
 			}
@@ -291,7 +223,7 @@ public class Data {
 			while (numBuf.charAt(0) == '0' && numBuf.length() > 1) {
 				numBuf.deleteCharAt(0);
 			}
-			return numBuf.length() <= bits && PATTERN_BIN.matcher(numBuf).matches();
+			return numBuf.length() <= bits - sign && PATTERN_BIN.matcher(numBuf).matches();
 		} else if (numBuf.charAt(numBuf.length() - 1) == 'o') {
 			numBuf.deleteCharAt(numBuf.length() - 1);
 			if (numBuf.length() == 0) {
@@ -300,7 +232,7 @@ public class Data {
 			while (numBuf.charAt(0) == '0' && numBuf.length() > 1) {
 				numBuf.deleteCharAt(0);
 			}
-			return (numBuf.length() - 1) * 3 <= bits && PATTERN_OCT.matcher(numBuf).matches() && width(parse(numBuf.toString())) <= bits;
+			return (numBuf.length() - 1) * 3 <= bits && PATTERN_OCT.matcher(numBuf).matches() && width(Long.parseLong(numBuf.toString(), 8)) <= bits - sign;
 		} else if (numBuf.charAt(numBuf.length() - 1) == 'h') {
 			numBuf.deleteCharAt(numBuf.length() - 1);
 			if (numBuf.length() == 0) {
@@ -309,7 +241,7 @@ public class Data {
 			while (numBuf.charAt(0) == '0' && numBuf.length() > 1) {
 				numBuf.deleteCharAt(0);
 			}
-			return (numBuf.length() - 1) * 4 <= bits && PATTERN_HEX.matcher(numBuf).matches() && width(parse(numBuf.toString())) <= bits;
+			return (numBuf.length() - 1) * 4 <= bits && PATTERN_HEX.matcher(numBuf).matches() && width(Long.parseLong(numBuf.toString(), 16)) <= bits - sign;
 		} else if (numBuf.length() >= 2 && "0x".equals(numBuf.subSequence(0, 2))) {
 			numBuf.delete(0, 2);
 			if (numBuf.length() == 0) {
@@ -318,12 +250,12 @@ public class Data {
 			while (numBuf.charAt(0) == '0' && numBuf.length() > 1) {
 				numBuf.deleteCharAt(0);
 			}
-			return (numBuf.length() - 1) * 4 <= bits && PATTERN_HEX.matcher(numBuf).matches() && width(parse(numBuf.toString())) <= bits;
+			return (numBuf.length() - 1) * 4 <= bits && PATTERN_HEX.matcher(numBuf).matches() && width(Long.parseLong(numBuf.toString(), 16)) <= bits - sign;
 		} else {
 			while (numBuf.charAt(0) == '0' && numBuf.length() > 1) {
 				numBuf.deleteCharAt(0);
 			}
-			return (numBuf.length() - 1) * 3 <= bits && PATTERN_DEC.matcher(numBuf).matches() && width(parse(numBuf.toString())) <= bits;
+			return (numBuf.length() - 1) * 3 <= bits && PATTERN_DEC.matcher(numBuf).matches() && width(parse(numBuf.toString())) <= bits - sign;
 		}
 	}
 
