@@ -37,25 +37,15 @@ public class RegistersTableModel extends AbstractTableModel {
 		final String colName = columns[columnIndex];
 
 		if (COL_NUMBER.equals(colName)) {
-
-			return Data.int2dec(reg.ordinal(), 2);
-
+			return Data.str(reg.ordinal(), 2, 5);
 		} else if (COL_NAME.equals(colName)) {
-
-			return reg.toString();
-
+			return "$"+reg.toString();
 		} else if (COL_HEX.equals(colName)) {
-
-			return Data.int2hex(registers.getRegInternal(reg), 8);
-
+			return Data.str(registers.getRegInternal(reg), 16, 8);
 		} else if (COL_DEC.equals(colName)) {
-
-			return Data.int2dec(registers.getRegInternal(reg));
-
+			return Data.str(registers.getRegInternal(reg), 10, 1);
 		} else if (COL_ACC.equals(colName)) {
-
 			return getAccessMod(reg);
-
 		}
 
 		return "";

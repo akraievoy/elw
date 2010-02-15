@@ -36,33 +36,21 @@ public class MemoryTableModel extends AbstractTableModel {
 		final int address = memory.getAddressAt(rowIndex);
 
 		if (COL_ADDR.equals(colName)) {
-
-			return Data.int2hex(address, 4);
-
+			return Data.str(address, 16, 8);
 		} else if (COL_HEX.equals(colName)) {
-
-			return Data.int2hex(memory.getByteInternal(address), 2);
-
+			return Data.str(((long) memory.getByteInternal(address)) & 0xFF, 2, 8);
 		} else if (COL_HEX_WORD.equals(colName)) {
-
 			if (!memory.hasWord(address)) {
 				return "?";
 			}
-
-			return Data.int2hex(memory.getWordInternal(address), 8);
-
+			return Data.str(memory.getWordInternal(address), 16, 8);
 		} else if (COL_DEC_WORD.equals(colName)) {
-
 			if (!memory.hasWord(address)) {
 				return "?";
 			}
-
-			return Data.int2dec(memory.getWordInternal(address));
-
+			return Data.str(memory.getWordInternal(address), 10, 0);
 		} else if (COL_ACC.equals(colName)) {
-
 			return getAccessMod(address);
-
 		}
 
 		return "";

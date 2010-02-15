@@ -3,7 +3,6 @@ package elw.dp.app;
 import base.pattern.Result;
 import elw.dp.mips.*;
 import elw.dp.mips.asm.MipsAssembler;
-import elw.dp.ui.AccessTrackingCellRenderer;
 import elw.dp.ui.DataPathForm;
 import elw.dp.ui.FeedbackAppender;
 import elw.dp.ui.RendererFactory;
@@ -122,20 +121,26 @@ public class Controller {
 		rFactory.findColByName(instrTable, InstructionsTableModel.COL_ACC).setMaxWidth(18);
 		rFactory.findColByName(instrTable, InstructionsTableModel.COL_ADDR).setMaxWidth(80);
 		rFactory.findColByName(instrTable, InstructionsTableModel.COL_CODE).setMaxWidth(120);
+		rFactory.findColByName(instrTable, InstructionsTableModel.COL_CODE).setMinWidth(100);
 
 		final JTable regsTable = view.getRunRegsTable();
 		regsTable.setModel(tmRegs);
 		rFactory.install(regsTable);
 		rFactory.findColByName(regsTable, RegistersTableModel.COL_ACC).setMaxWidth(18);
-		rFactory.findColByName(regsTable, RegistersTableModel.COL_NAME).setMaxWidth(32);
-		rFactory.findColByName(regsTable, RegistersTableModel.COL_NUMBER).setMaxWidth(32);
+		rFactory.findColByName(regsTable, RegistersTableModel.COL_NAME).setMinWidth(32);
+		rFactory.findColByName(regsTable, RegistersTableModel.COL_NAME).setMaxWidth(40);
+		rFactory.findColByName(regsTable, RegistersTableModel.COL_NUMBER).setMaxWidth(72);
+		rFactory.findColByName(regsTable, RegistersTableModel.COL_NUMBER).setMinWidth(64);
+		rFactory.findColByName(regsTable, RegistersTableModel.COL_HEX).setMinWidth(72);
 		rFactory.findColByName(regsTable, RegistersTableModel.COL_HEX).setMaxWidth(96);
+		rFactory.findColByName(regsTable, RegistersTableModel.COL_DEC).setMinWidth(72);
 		rFactory.findColByName(regsTable, RegistersTableModel.COL_DEC).setMaxWidth(96);
 
 		final JTable memTable = view.getRunMemTable();
 		memTable.setModel(tmMemory);
 		rFactory.install(memTable);
 		rFactory.findColByName(memTable, MemoryTableModel.COL_ACC).setMaxWidth(18);
+		rFactory.findColByName(memTable, MemoryTableModel.COL_ADDR).setMinWidth(72);
 		rFactory.findColByName(memTable, MemoryTableModel.COL_ADDR).setMaxWidth(80);
 
 		view.getRunStepButton().setAction(aRunStep);

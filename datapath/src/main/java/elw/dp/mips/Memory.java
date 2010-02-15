@@ -24,7 +24,7 @@ public class Memory {
 		final byte byte2 = getByteInternal(address + 2);
 		final byte byte3 = getByteInternal(address + 3);
 
-		return byte0 << 24 | byte1 << 16 | byte2 << 8 | byte3;
+		return (byte0 << 24) | ((byte1 << 16) & 0xFF0000) | ((byte2 << 8) & 0xFF00) | ((int) byte3 & 0xFF);
 	}
 
 	public int setWord(int address, int newWord) {

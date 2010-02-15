@@ -259,6 +259,17 @@ public class Data {
 		return Integer.parseInt(binValue, 2);
 	}
 
+	public static String str(final long val, final int radix, final int digits) {
+		final StringBuffer str = new StringBuffer(Long.toString(val, radix));
+
+		final int offs = str.charAt(0) == '-' ? 1 : 0;
+		while (str.length() < digits + offs) {
+			str.insert(offs, '0');
+		}
+
+		return str.toString();
+	}
+
 	public static boolean isNum(final String num, int bits) {
 		if (num == null || num.length() == 0) {
 			return false;
