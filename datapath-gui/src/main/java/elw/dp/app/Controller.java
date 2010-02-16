@@ -30,11 +30,13 @@ import java.util.HashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.regex.Pattern;
 
 public class Controller {
 	private static final org.slf4j.Logger log = LoggerFactory.getLogger(Controller.class);
 
 	protected static final String LINE_SEPARATOR = System.getProperty("line.separator");
+	protected static final Pattern PATTERN_LINE_SEPARATOR = Pattern.compile("\r|\r\n|\n");
 
 	protected final DataPathForm view = new DataPathForm();
 
@@ -185,7 +187,7 @@ public class Controller {
 		setupStatus(statusLabel, "Assembling...");
 
 		final String source = view.getSourceTextArea().getText();
-		final String[] sourceLines = source.split(LINE_SEPARATOR);
+		final String[] sourceLines = PATTERN_LINE_SEPARATOR.split(source);
 
 		final Instruction[] newInstructions = assembler.loadInstructions(sourceLines, resRef, labelIndex);
 		if (newInstructions != null) {
