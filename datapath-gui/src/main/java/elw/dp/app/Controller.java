@@ -229,8 +229,10 @@ public class Controller {
 		}
 	}
 
-	protected void job_reset(JLabel statusLabel, Result[] resRef) {
-		setupStatus(statusLabel, "Resetting...");
+	protected void job_reset(JLabel statusLabel, Result[] resRef, final boolean reportResetting) {
+		if (reportResetting) {
+			setupStatus(statusLabel, "Resetting...");
+		}
 
 		if (instructions != null && data != null && regs != null) {
 			dataPath.getInstructions().setInstructions(Arrays.asList(instructions), labelIndex);
@@ -247,13 +249,17 @@ public class Controller {
 		}
 	}
 
-	public boolean job_step(JLabel statusLabel, Result[] resRef, final int steps) {
-		setupStatus(statusLabel, "Stepping...");
+	public boolean job_step(JLabel statusLabel, Result[] resRef, final int steps, final boolean reportStepping) {
+		if (reportStepping) {
+			setupStatus(statusLabel, "Stepping...");
+		}
 
 		for (int step = 0; step < steps; step++) {
 			final Instruction instruction = dataPath.execute();
 			if (instruction != null) {
-				Result.success(log, resRef, "Executed " + instruction.getOpName());
+				if (step == 0) {
+					Result.success(log, resRef, "Executed " + instruction.getOpName());
+				}
 			} else {
 				verifyRegs(resRef);
 				if (resRef[0].isSuccess()) {
@@ -269,27 +275,30 @@ public class Controller {
 		return false;
 	}
 
-	public void job_run(JLabel statusLabel, Result[] resRef, final Test test, final int steps) {
-		setupStatus(statusLabel, "Running...");
+	public void job_run(JLabel statusLabel, Result[] resRef, final Test test, final int steps, final boolean reportRunning) {
+		if (reportRunning) {
+			setupStatus(statusLabel, "Running...");
+		}
 		job_loadTest(statusLabel, resRef, test);
 		if (resRef[0].isSuccess()) {
-			job_reset(statusLabel, resRef);
+			job_reset(statusLabel, resRef, reportRunning);
 		}
 		if (resRef[0].isSuccess()) {
-			if (!job_step(statusLabel, resRef, steps)) {
+			if (!job_step(statusLabel, resRef, steps, false)) {
 				Result.failure(log, resRef, "Execution timed out");
 			}
 		}
 	}
 
 	public void job_batch(JLabel statusLabel, Result[] resRef, final int steps) {
-		setupStatus(statusLabel, "Running...");
-
 		int failCount = 0;
-		for (Test test : selectedTask.getTests()) {
+		Test[] tests = selectedTask.getTests();
+		for (int i = 0, testsLength = selectedTask.getTests().length; i < testsLength; i++) {
+			Test test = selectedTask.getTests()[i];
+			setupStatus(statusLabel, "Running test " + i + " of " + testsLength + "...");
 			final Result[] localResRef = {new Result("test status unknown", false)};
 			try {
-				job_run(statusLabel, localResRef, test, steps);
+				job_run(statusLabel, localResRef, test, steps, false);
 				if (!localResRef[0].isSuccess()) {
 					failCount++;
 				}
@@ -433,7 +442,7 @@ public class Controller {
 						job_loadTest(statusLabel, resRef, (Test) testComboModel.getSelectedItem());
 
 						if (resRef[0].isSuccess()) {
-							job_reset(statusLabel, resRef);
+							job_reset(statusLabel, resRef, true);
 						}
 					} finally {
 						setEnabled(true);
@@ -466,7 +475,7 @@ public class Controller {
 					final Result[] resRef = new Result[]{new Result("status unknown", false)};
 
 					try {
-						job_step(statusLabel, resRef, steps);
+						job_step(statusLabel, resRef, steps, true);
 					} catch (Throwable t) {
 						Result.failure(log, resRef, "Failed: " + G.report(t));
 						log.trace("trace", t);
@@ -496,7 +505,7 @@ public class Controller {
 					final Result[] resRef = new Result[]{new Result("status unknown", false)};
 
 					try {
-						job_reset(statusLabel, resRef);
+						job_reset(statusLabel, resRef, true);
 					} finally {
 						setEnabled(true);
 						setupStatus(statusLabel, resRef[0]);
@@ -523,7 +532,7 @@ public class Controller {
 					final Result[] resRef = new Result[]{new Result("status unknown", false)};
 
 					try {
-						job_run(statusLabel, resRef, (Test) Controller.this.testComboModel.getSelectedItem(), runSteps);
+						job_run(statusLabel, resRef, (Test) Controller.this.testComboModel.getSelectedItem(), runSteps, true);
 					} catch (Throwable t) {
 						Result.failure(log, resRef, "Failed: " + G.report(t));
 						log.trace("trace", t);
