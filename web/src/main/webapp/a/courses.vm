@@ -1,0 +1,12 @@
+#* @vtlvariable name="courses" type="elw.vo.Course[]" *#
+<html>
+<head>
+	<meta content="text/html; charset=UTF-8">
+	<title>Course List</title>
+</head>
+<body style="text-align: left;">
+#foreach($course in $courses)
+<a href="course?id=${course.id}">${course.name}</a>
+#end
+</body>
+</html>

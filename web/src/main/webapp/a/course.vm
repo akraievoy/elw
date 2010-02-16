@@ -1,0 +1,23 @@
+#* @vtlvariable name="course" type="elw.vo.Course" *#
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta content="text/html; charset=UTF-8">
+	<title>Course ${course.name} Structure</title>
+</head>
+<body style="text-align: left;">
+Assignment bundles:
+<ul>
+#foreach($assBundle in $course.assBundles)#set($bunI = $velocityCount)
+		<li>Assignments:<ol>
+#foreach($ass in $assBundle.assignments)#set($assI = $velocityCount)
+			<li>Versions: <ol>
+#foreach($ver in $ass.versions)#set($verI = $velocityCount)
+				<li><a href="launch?path=${course.id}--${bunI}--${ass.id}--${ver.id}">$ver.name</a></li>
+#end
+			</ol> </li>
+#end
+		</ol> </li>
+#end
+</ul>
+</body>
+</html>

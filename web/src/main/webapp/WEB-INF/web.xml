@@ -4,21 +4,18 @@
 		 version="2.4">
 	<display-name>web</display-name>
 
-	<context-param>
-		<param-name>contextConfigLocation</param-name>
-		<param-value>
-			classpath:/codebistro/bt/server/bquick-server.xml
-		</param-value>
-	</context-param>
-
 	<servlet>
-		<servlet-name>spring-mvc</servlet-name>
+		<servlet-name>elw-mvc</servlet-name>
 		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>spring-mvc</servlet-name>
-		<url-pattern>/support/*</url-pattern>
+		<servlet-name>elw-mvc</servlet-name>
+		<url-pattern>/a/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>elw-mvc</servlet-name>
+		<url-pattern>/s/*</url-pattern>
 	</servlet-mapping>
 
 	<welcome-file-list>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:sec="http://www.springframework.org/schema/security"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xsi:schemaLocation=
+			   "http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-2.0.4.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd"
+	   default-init-method="start"
+	   default-destroy-method="stop"
+	default-autowire="constructor">
+
+	<bean id="handlerMapping" class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping">
+		<property name="alwaysUseFullPath" value="true"/>
+	</bean>
+
+	<bean id="methodNameResolver" class="org.springframework.web.servlet.mvc.multiaction.InternalPathMethodNameResolver">
+		<property name="prefix" value="do_"/>
+	</bean>
+
+	<bean id="mapper" class="elw.dao.MapperFactory" factory-method="createMapper"/>
+	<bean id="courseDao" class="elw.dao.CourseDao"/>
+
+	<bean name="/a/*" class="elw.web.AdminController">
+		<property name="methodNameResolver" ref="methodNameResolver"/>
+	</bean>
+
+	<bean id="viewResolver"
+		  class="org.springframework.web.servlet.view.velocity.VelocityViewResolver">
+		<property name="prefix" value=""/>
+		<property name="suffix" value=".vm"/>
+	</bean>
+
+	<bean id="velocityConfig"
+		  class="org.springframework.web.servlet.view.velocity.VelocityConfigurer">
+		<property name="resourceLoaderPath" value="/"/>
+	</bean>
+</beans>
