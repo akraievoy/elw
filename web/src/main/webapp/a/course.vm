@@ -7,15 +7,19 @@
 <body style="text-align: left;">
 Assignment bundles:
 <ul>
-#foreach($assBundle in $course.assBundles)#set($bunI = $velocityCount)
+#foreach($assBundle in $course.assBundles)#set($bunI = $velocityCount - 1)
 		<li>Assignments:<ol>
-#foreach($ass in $assBundle.assignments)#set($assI = $velocityCount)
+ #foreach($ass in $assBundle.assignments)#set($assI = $velocityCount)
+  #if($ass.id)
 			<li>Versions: <ol>
-#foreach($ver in $ass.versions)#set($verI = $velocityCount)
+   #foreach($ver in $ass.versions)#set($verI = $velocityCount)
+    #if($ver.id)
 				<li><a href="launch?path=${course.id}--${bunI}--${ass.id}--${ver.id}">$ver.name</a></li>
-#end
+    #end
+   #end
 			</ol> </li>
-#end
+  #end
+ #end
 		</ol> </li>
 #end
 </ul>

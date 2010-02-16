@@ -47,6 +47,7 @@ public class Controller {
 	//  application state
 	protected AtomicLong sourceStamp = new AtomicLong(1); // NOTE: no modifications still require assembly to run before stepping
 	protected AtomicLong assembleStamp = new AtomicLong(0);
+
 	protected Version selectedTask;
 	protected final DefaultComboBoxModel testComboModel = new DefaultComboBoxModel();
 	//	app data (compile/test/run cycle)
@@ -71,13 +72,18 @@ public class Controller {
 	protected final RunResetAction aRunReset = new RunResetAction("Reset");
 	protected final HashMap<String,Integer> labelIndex = new HashMap<String, Integer>();
 
-	public void init() throws IOException {
-		final InputStream modelStream = Controller.class.getResourceAsStream("/aos-s10.json");
-		final ObjectMapper mapper = new ObjectMapper();
-		final Course course = mapper.readValue(modelStream, Course.class);
+	public void setSelectedTask(Version selectedTask) {
+		this.selectedTask = selectedTask;
+	}
 
-		selectedTask = course.getAssBundles()[0].getAssignments()[0].getVersions()[0];
+	public DataPathForm getView() {
+		return view;
+	}
 
+	public void init() {
+		if (selectedTask == null) {
+			throw new IllegalStateException("No selected task");
+		}
 
 		testComboModel.removeAllElements();
 		int testId = 0;
@@ -625,34 +631,4 @@ public class Controller {
 		}
 	}
 
-	public static void main(String[] args) throws IOException {
-		BasicConfigurator.configure();
-
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (Exception e) {
-			System.out.println("Error setting native LAF: " + e);
-		}
-
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				final Controller instance = new Controller();
-				try {
-					instance.init();
-				} catch (IOException e) {
-					throw new RuntimeException(e);
-				}
-
-				final JFrame frame = new JFrame();
-				frame.setTitle("DataPath");
-				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-				frame.getContentPane().add(instance.view.getRootPanel());
-				frame.pack();
-				frame.setSize(600, 400);
-				frame.setLocation(20, 20);
-				frame.setVisible(true);
-			}
-		});
-	}
 }

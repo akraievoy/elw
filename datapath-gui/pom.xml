@@ -48,6 +48,10 @@
 						<phase>package</phase>
 						<configuration>
 							<tasks>
+								<signjar storepass="ohnonotagain" alias="mykey" keystore="${basedir}/../ext/cert/keystore">
+										<fileset file="${basedir}/target/${project.artifactId}-${project.version}-jar-with-dependencies.jar" />
+								</signjar>
+
 								<copy
 										file="${basedir}/target/${project.artifactId}-${project.version}-jar-with-dependencies.jar"
 										tofile="${basedir}/../web/src/main/webapp/code/${project.artifactId}-${project.version}-full.jar"
