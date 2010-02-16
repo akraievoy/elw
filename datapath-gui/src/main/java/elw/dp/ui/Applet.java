@@ -14,6 +14,12 @@ public class Applet extends JApplet{
 	protected Controller instance;
 
 	public void init() {
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (Exception e) {
+			System.out.println("Error setting native LAF: " + e);
+		}
+
 		BasicConfigurator.configure();
 
 		final ObjectMapper mapper = new ObjectMapper();
