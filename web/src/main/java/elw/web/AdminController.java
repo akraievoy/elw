@@ -104,7 +104,13 @@ public class AdminController extends MultiActionController {
 		final StringWriter verSw = new StringWriter();
 		mapper.writeValue(verSw, ver);
 
-		model.put("ver", verSw.toString().replaceAll("&", "&amp;").replaceAll("\"", "&quot;"));
+		final Version verNoSolution = mapper.readValue(verSw.toString(), Version.class);
+		verNoSolution.setSolution(new String[] {"#  your code","#    goes here", "#      :)"});
+
+		final StringWriter verNsSw = new StringWriter();
+		mapper.writeValue(verNsSw, verNoSolution);
+
+		model.put("ver", verNsSw.toString().replaceAll("&", "&amp;").replaceAll("\"", "&quot;"));
 
 		return new ModelAndView("a/launch", model);
 	}
