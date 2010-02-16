@@ -5,7 +5,7 @@
 	<title>Launching assignment version</title>
 </head>
 <body style="text-align: center;">
-<object classid="clsid:8AD9C840-044E-11D1-B3E9-00805F499D93" width="600" height="400">
+<object classid="clsid:8AD9C840-044E-11D1-B3E9-00805F499D93" width="800" height="600">
 	<param name="type" value="application/x-java-applet;version=1.5"/>
 	<param name="code" value="elw.dp.ui.Applet"/>
 ##        <param name="codebase" value = "${baseUrl}"/>
@@ -13,7 +13,7 @@
 	<param name="archive" value="../code/datapath-gui-1.3-full.jar"/>
 	<param name="ver" value="$ver"/>
 	<comment>
-		<embed width="600" height="400"
+		<embed width="800" height="600"
 					 type="application/x-java-applet;version=1.5" pluginspage="http://java.sun.com/j2se/1.5.0/download.html"
 					 code="elw.dp.ui.Applet"
 		##                        codebase="${baseUrl}"
