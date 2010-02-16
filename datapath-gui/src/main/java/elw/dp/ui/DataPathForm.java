@@ -156,6 +156,7 @@ public class DataPathForm {
 		strTabbedPane = new JTabbedPane();
 		strTabbedPane.setFocusable(true);
 		strTabbedPane.setTabPlacement(3);
+		strTabbedPane.setToolTipText("Solution Source / Test selection / Stepping");
 		splitPane1.setLeftComponent(strTabbedPane);
 		final JPanel panel1 = new JPanel();
 		panel1.setLayout(new BorderLayout(0, 0));
@@ -164,7 +165,7 @@ public class DataPathForm {
 		panel1.add(scrollPane1, BorderLayout.CENTER);
 		sourceTextArea = new JTextArea();
 		sourceTextArea.setColumns(60);
-		sourceTextArea.setFont(new Font("Courier New", sourceTextArea.getFont().getStyle(), sourceTextArea.getFont().getSize()));
+		sourceTextArea.setFont(new Font("Courier New", sourceTextArea.getFont().getStyle(), 13));
 		sourceTextArea.setRows(8);
 		sourceTextArea.setToolTipText("<html>Here your MIPS solution code goes.<br/>One instruction per line.</html>");
 		scrollPane1.setViewportView(sourceTextArea);
@@ -295,7 +296,7 @@ public class DataPathForm {
 		splitPane2.setRightComponent(scrollPane2);
 		testMemTextArea = new JTextArea();
 		testMemTextArea.setColumns(20);
-		testMemTextArea.setFont(new Font("Courier New", testMemTextArea.getFont().getStyle(), testMemTextArea.getFont().getSize()));
+		testMemTextArea.setFont(new Font("Courier New", testMemTextArea.getFont().getStyle(), 13));
 		testMemTextArea.setLineWrap(false);
 		testMemTextArea.setRows(10);
 		testMemTextArea.setText("");
@@ -305,7 +306,7 @@ public class DataPathForm {
 		splitPane2.setLeftComponent(scrollPane3);
 		testRegsTextArea = new JTextArea();
 		testRegsTextArea.setColumns(20);
-		testRegsTextArea.setFont(new Font("Courier New", testRegsTextArea.getFont().getStyle(), testRegsTextArea.getFont().getSize()));
+		testRegsTextArea.setFont(new Font("Courier New", testRegsTextArea.getFont().getStyle(), 13));
 		testRegsTextArea.setRows(10);
 		testRegsTextArea.setToolTipText("<html>Register Input/Output<br/><br/>Format:<br/>$reg:input:expected</html>");
 		scrollPane3.setViewportView(testRegsTextArea);
@@ -384,6 +385,7 @@ public class DataPathForm {
 		runMemTable = new JTable();
 		scrollPane6.setViewportView(runMemTable);
 		pclTabbedPane = new JTabbedPane();
+		pclTabbedPane.setToolTipText("Problem statement / Code snippets / System Log.");
 		splitPane1.setRightComponent(pclTabbedPane);
 		final JPanel panel11 = new JPanel();
 		panel11.setLayout(new BorderLayout(0, 0));
@@ -392,6 +394,7 @@ public class DataPathForm {
 		panel11.add(scrollPane7, BorderLayout.CENTER);
 		problemTextPane = new JTextPane();
 		problemTextPane.setEditable(false);
+		problemTextPane.setToolTipText("Problem statement goes here...");
 		scrollPane7.setViewportView(problemTextPane);
 		final JPanel panel12 = new JPanel();
 		panel12.setLayout(new BorderLayout(0, 0));
@@ -400,7 +403,7 @@ public class DataPathForm {
 		panel12.add(scrollPane8, BorderLayout.CENTER);
 		clipTextArea = new JTextArea();
 		clipTextArea.setColumns(40);
-		clipTextArea.setFont(new Font("Courier New", clipTextArea.getFont().getStyle(), clipTextArea.getFont().getSize()));
+		clipTextArea.setFont(new Font("Courier New", clipTextArea.getFont().getStyle(), 13));
 		clipTextArea.setRows(10);
 		clipTextArea.setToolTipText("Store your temp clips of text here");
 		scrollPane8.setViewportView(clipTextArea);
@@ -411,7 +414,7 @@ public class DataPathForm {
 		panel13.add(scrollPane9, BorderLayout.CENTER);
 		logTextPane = new JTextPane();
 		logTextPane.setEditable(false);
-		logTextPane.setFont(new Font("Courier New", logTextPane.getFont().getStyle(), logTextPane.getFont().getSize()));
+		logTextPane.setFont(new Font("Courier New", logTextPane.getFont().getStyle(), 13));
 		scrollPane9.setViewportView(logTextPane);
 	}
 

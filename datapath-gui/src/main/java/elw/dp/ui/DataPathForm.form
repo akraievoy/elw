@@ -24,6 +24,7 @@
             <properties>
               <focusable value="true"/>
               <tabPlacement value="3"/>
+              <toolTipText value="Solution Source / Test selection / Stepping"/>
             </properties>
             <border type="none"/>
             <children>
@@ -43,7 +44,7 @@
                         <constraints/>
                         <properties>
                           <columns value="60"/>
-                          <font name="Courier New"/>
+                          <font name="Courier New" size="13"/>
                           <rows value="8"/>
                           <toolTipText value="&lt;html&gt;Here your MIPS solution code goes.&lt;br/&gt;One instruction per line.&lt;/html&gt;"/>
                         </properties>
@@ -226,7 +227,7 @@
                             <constraints/>
                             <properties>
                               <columns value="20"/>
-                              <font name="Courier New"/>
+                              <font name="Courier New" size="13"/>
                               <lineWrap value="false"/>
                               <rows value="10"/>
                               <text value=""/>
@@ -246,7 +247,7 @@
                             <constraints/>
                             <properties>
                               <columns value="20"/>
-                              <font name="Courier New"/>
+                              <font name="Courier New" size="13"/>
                               <rows value="10"/>
                               <toolTipText value="&lt;html&gt;Register Input/Output&lt;br/&gt;&lt;br/&gt;Format:&lt;br/&gt;$reg:input:expected&lt;/html&gt;"/>
                             </properties>
@@ -406,7 +407,9 @@
             <constraints>
               <splitpane position="right"/>
             </constraints>
-            <properties/>
+            <properties>
+              <toolTipText value="Problem statement / Code snippets / System Log."/>
+            </properties>
             <border type="none"/>
             <children>
               <grid id="a8995" layout-manager="BorderLayout" hgap="0" vgap="0">
@@ -425,6 +428,7 @@
                         <constraints/>
                         <properties>
                           <editable value="false"/>
+                          <toolTipText value="Problem statement goes here..."/>
                         </properties>
                       </component>
                     </children>
@@ -447,7 +451,7 @@
                         <constraints/>
                         <properties>
                           <columns value="40"/>
-                          <font name="Courier New"/>
+                          <font name="Courier New" size="13"/>
                           <rows value="10"/>
                           <toolTipText value="Store your temp clips of text here"/>
                         </properties>
@@ -472,7 +476,7 @@
                         <constraints/>
                         <properties>
                           <editable value="false"/>
-                          <font name="Courier New"/>
+                          <font name="Courier New" size="13"/>
                         </properties>
                       </component>
                     </children>
