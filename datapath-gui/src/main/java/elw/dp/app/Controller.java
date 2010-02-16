@@ -412,11 +412,15 @@ public class Controller {
 					try {
 						job_assemble(statusLabel, resRef);
 					} finally {
-						setEnabled(true);
-						setupStatus(statusLabel, resRef[0]);
-						if (switchToTest && resRef[0].isSuccess()) {
-							view.getStrTabbedPane().setSelectedIndex(1);
-						}
+						SwingUtilities.invokeLater(new Runnable() {
+							public void run() {
+								setEnabled(true);
+								setupStatus(statusLabel, resRef[0]);
+								if (switchToTest && resRef[0].isSuccess()) {
+									view.getStrTabbedPane().setSelectedIndex(1);
+								}
+							}
+						});
 					}
 				}
 			});
@@ -453,13 +457,18 @@ public class Controller {
 							job_reset(statusLabel, resRef, true);
 						}
 					} finally {
-						setEnabled(true);
-						setupStatus(statusLabel, resRef[0]);
-						if (resRef[0].isSuccess()) {
-							view.getStrTabbedPane().setSelectedIndex(2);
-							setupStatus(view.getRunStatusLabel());
-							fireDataPathChanged();
-						}
+						SwingUtilities.invokeLater(new Runnable() {
+							public void run() {
+								setEnabled(true);
+								setupStatus(statusLabel, resRef[0]);
+
+								if (resRef[0].isSuccess()) {
+									view.getStrTabbedPane().setSelectedIndex(2);
+									setupStatus(view.getRunStatusLabel());
+									fireDataPathChanged();
+								}
+							}
+						});
 					}
 				}
 			});
@@ -488,11 +497,15 @@ public class Controller {
 						Result.failure(log, resRef, "Failed: " + G.report(t));
 						log.trace("trace", t);
 					} finally {
-						setEnabled(true);
-						setupStatus(statusLabel, resRef[0]);
-						if (resRef[0].isSuccess()) {
-							fireDataPathChanged();
-						}
+						SwingUtilities.invokeLater(new Runnable() {
+							public void run() {
+								setEnabled(true);
+								setupStatus(statusLabel, resRef[0]);
+								if (resRef[0].isSuccess()) {
+									fireDataPathChanged();
+								}
+							}
+						});
 					}
 				}
 			});
@@ -515,11 +528,15 @@ public class Controller {
 					try {
 						job_reset(statusLabel, resRef, true);
 					} finally {
-						setEnabled(true);
-						setupStatus(statusLabel, resRef[0]);
-						if (resRef[0].isSuccess()) {
-							fireDataPathChanged();
-						}
+						SwingUtilities.invokeLater(new Runnable() {
+							public void run() {
+								SwingUtilities.invokeLater(new Runnable() {
+									public void run() {
+
+									}
+								});
+							}
+						});
 					}
 				}
 			});
@@ -545,8 +562,12 @@ public class Controller {
 						Result.failure(log, resRef, "Failed: " + G.report(t));
 						log.trace("trace", t);
 					} finally {
-						setEnabled(true);
-						setupStatus(statusLabel, resRef[0]);
+						SwingUtilities.invokeLater(new Runnable() {
+							public void run() {
+								setEnabled(true);
+								setupStatus(statusLabel, resRef[0]);
+							}
+						});
 					}
 				}
 			});
@@ -569,8 +590,12 @@ public class Controller {
 					try {
 						job_batch(statusLabel, resRef, runSteps);
 					} finally {
-						setEnabled(true);
-						setupStatus(statusLabel, resRef[0]);
+						SwingUtilities.invokeLater(new Runnable() {
+							public void run() {
+								setEnabled(true);
+								setupStatus(statusLabel, resRef[0]);
+							}
+						});
 					}
 				}
 			});

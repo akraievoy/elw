@@ -154,6 +154,7 @@ public class DataPathForm {
 		splitPane1.setResizeWeight(1.0);
 		rootPanel.add(splitPane1, BorderLayout.CENTER);
 		strTabbedPane = new JTabbedPane();
+		strTabbedPane.setFocusable(true);
 		strTabbedPane.setTabPlacement(3);
 		splitPane1.setLeftComponent(strTabbedPane);
 		final JPanel panel1 = new JPanel();
@@ -164,12 +165,15 @@ public class DataPathForm {
 		sourceTextArea = new JTextArea();
 		sourceTextArea.setColumns(60);
 		sourceTextArea.setFont(new Font("Courier New", sourceTextArea.getFont().getStyle(), sourceTextArea.getFont().getSize()));
+		sourceTextArea.setRows(8);
+		sourceTextArea.setToolTipText("<html>Here your MIPS solution code goes.<br/>One instruction per line.</html>");
 		scrollPane1.setViewportView(sourceTextArea);
 		final JPanel panel2 = new JPanel();
 		panel2.setLayout(new GridBagLayout());
 		panel1.add(panel2, BorderLayout.SOUTH);
 		sourceAssembleButton = new JButton();
 		sourceAssembleButton.setActionCommand("Compile");
+		sourceAssembleButton.setFocusable(false);
 		sourceAssembleButton.setLabel("Assemble");
 		sourceAssembleButton.setMargin(new Insets(3, 3, 3, 5));
 		sourceAssembleButton.setText("Assemble");
@@ -180,6 +184,7 @@ public class DataPathForm {
 		gbc.insets = new Insets(1, 1, 1, 2);
 		panel2.add(sourceAssembleButton, gbc);
 		sourceVerifyButton = new JButton();
+		sourceVerifyButton.setFocusable(false);
 		sourceVerifyButton.setMargin(new Insets(3, 5, 3, 3));
 		sourceVerifyButton.setText("Verify");
 		gbc = new GridBagConstraints();
@@ -225,6 +230,7 @@ public class DataPathForm {
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		panel5.add(testComboBox, gbc);
 		testAddCustomButton = new JButton();
+		testAddCustomButton.setFocusable(false);
 		testAddCustomButton.setMargin(new Insets(1, 3, 1, 3));
 		testAddCustomButton.setText("+");
 		testAddCustomButton.setToolTipText("Add an editable copy of selected test");
@@ -239,6 +245,7 @@ public class DataPathForm {
 		gbc.gridy = 0;
 		panel5.add(toolBar$Separator1, gbc);
 		testRunButton = new JButton();
+		testRunButton.setFocusable(false);
 		testRunButton.setMargin(new Insets(3, 3, 3, 3));
 		testRunButton.setText("Run");
 		gbc = new GridBagConstraints();
@@ -247,6 +254,7 @@ public class DataPathForm {
 		gbc.insets = new Insets(1, 1, 1, 1);
 		panel5.add(testRunButton, gbc);
 		testBatchButton = new JButton();
+		testBatchButton.setFocusable(false);
 		testBatchButton.setMargin(new Insets(3, 3, 3, 5));
 		testBatchButton.setText("Batch");
 		testBatchButton.setMnemonic('B');
@@ -257,6 +265,7 @@ public class DataPathForm {
 		gbc.insets = new Insets(1, 1, 1, 2);
 		panel5.add(testBatchButton, gbc);
 		testStepButton = new JButton();
+		testStepButton.setFocusable(false);
 		testStepButton.setMargin(new Insets(3, 5, 3, 3));
 		testStepButton.setText("Step");
 		gbc = new GridBagConstraints();
@@ -290,7 +299,7 @@ public class DataPathForm {
 		testMemTextArea.setLineWrap(false);
 		testMemTextArea.setRows(10);
 		testMemTextArea.setText("");
-		testMemTextArea.setToolTipText("Memory Input/Output");
+		testMemTextArea.setToolTipText("<html>Memory Input/Output<br/><br/>Format:<br/>address:input:expected</html>");
 		scrollPane2.setViewportView(testMemTextArea);
 		final JScrollPane scrollPane3 = new JScrollPane();
 		splitPane2.setLeftComponent(scrollPane3);
@@ -298,7 +307,7 @@ public class DataPathForm {
 		testRegsTextArea.setColumns(20);
 		testRegsTextArea.setFont(new Font("Courier New", testRegsTextArea.getFont().getStyle(), testRegsTextArea.getFont().getSize()));
 		testRegsTextArea.setRows(10);
-		testRegsTextArea.setToolTipText("Register Input/Output");
+		testRegsTextArea.setToolTipText("<html>Register Input/Output<br/><br/>Format:<br/>$reg:input:expected</html>");
 		scrollPane3.setViewportView(testRegsTextArea);
 		final JPanel panel7 = new JPanel();
 		panel7.setLayout(new BorderLayout(0, 0));
@@ -307,6 +316,7 @@ public class DataPathForm {
 		panel8.setLayout(new GridBagLayout());
 		panel7.add(panel8, BorderLayout.SOUTH);
 		runStepButton = new JButton();
+		runStepButton.setFocusable(false);
 		runStepButton.setMargin(new Insets(3, 5, 3, 3));
 		runStepButton.setText("Step");
 		gbc = new GridBagConstraints();
@@ -315,6 +325,7 @@ public class DataPathForm {
 		gbc.insets = new Insets(1, 2, 1, 1);
 		panel8.add(runStepButton, gbc);
 		runRunButton = new JButton();
+		runRunButton.setFocusable(false);
 		runRunButton.setMargin(new Insets(3, 3, 3, 5));
 		runRunButton.setText("Run");
 		gbc = new GridBagConstraints();
@@ -328,6 +339,7 @@ public class DataPathForm {
 		gbc.gridy = 0;
 		panel8.add(toolBar$Separator2, gbc);
 		runResetButton = new JButton();
+		runResetButton.setFocusable(false);
 		runResetButton.setMargin(new Insets(3, 5, 3, 5));
 		runResetButton.setText("Reset");
 		gbc = new GridBagConstraints();

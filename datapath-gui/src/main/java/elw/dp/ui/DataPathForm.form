@@ -22,6 +22,7 @@
               <splitpane position="left"/>
             </constraints>
             <properties>
+              <focusable value="true"/>
               <tabPlacement value="3"/>
             </properties>
             <border type="none"/>
@@ -43,6 +44,8 @@
                         <properties>
                           <columns value="60"/>
                           <font name="Courier New"/>
+                          <rows value="8"/>
+                          <toolTipText value="&lt;html&gt;Here your MIPS solution code goes.&lt;br/&gt;One instruction per line.&lt;/html&gt;"/>
                         </properties>
                       </component>
                     </children>
@@ -59,6 +62,7 @@
                         </constraints>
                         <properties>
                           <actionCommand value="Compile"/>
+                          <focusable value="false"/>
                           <label value="Assemble"/>
                           <margin top="3" left="3" bottom="3" right="5"/>
                           <text value="Assemble"/>
@@ -70,6 +74,7 @@
                           <gridbag top="1" left="2" bottom="1" right="1" weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
+                          <focusable value="false"/>
                           <margin top="3" left="5" bottom="3" right="3"/>
                           <text value="Verify"/>
                         </properties>
@@ -132,6 +137,7 @@
                           <gridbag top="5" left="2" bottom="5" right="1" weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
+                          <focusable value="false"/>
                           <margin top="1" left="3" bottom="1" right="3"/>
                           <text value="+"/>
                           <toolTipText value="Add an editable copy of selected test"/>
@@ -156,6 +162,7 @@
                           <gridbag top="1" left="1" bottom="1" right="1" weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
+                          <focusable value="false"/>
                           <margin top="3" left="3" bottom="3" right="3"/>
                           <text value="Run"/>
                         </properties>
@@ -166,6 +173,7 @@
                           <gridbag top="1" left="1" bottom="1" right="2" weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
+                          <focusable value="false"/>
                           <margin top="3" left="3" bottom="3" right="5"/>
                           <text value="&amp;Batch"/>
                         </properties>
@@ -176,6 +184,7 @@
                           <gridbag top="1" left="2" bottom="1" right="1" weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
+                          <focusable value="false"/>
                           <margin top="3" left="5" bottom="3" right="3"/>
                           <text value="Step"/>
                         </properties>
@@ -221,7 +230,7 @@
                               <lineWrap value="false"/>
                               <rows value="10"/>
                               <text value=""/>
-                              <toolTipText value="Memory Input/Output"/>
+                              <toolTipText value="&lt;html&gt;Memory Input/Output&lt;br/&gt;&lt;br/&gt;Format:&lt;br/&gt;address:input:expected&lt;/html&gt;"/>
                             </properties>
                           </component>
                         </children>
@@ -239,7 +248,7 @@
                               <columns value="20"/>
                               <font name="Courier New"/>
                               <rows value="10"/>
-                              <toolTipText value="Register Input/Output"/>
+                              <toolTipText value="&lt;html&gt;Register Input/Output&lt;br/&gt;&lt;br/&gt;Format:&lt;br/&gt;$reg:input:expected&lt;/html&gt;"/>
                             </properties>
                           </component>
                         </children>
@@ -266,6 +275,7 @@
                           <gridbag top="1" left="2" bottom="1" right="1" weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
+                          <focusable value="false"/>
                           <margin top="3" left="5" bottom="3" right="3"/>
                           <text value="Step"/>
                         </properties>
@@ -276,6 +286,7 @@
                           <gridbag top="1" left="1" bottom="1" right="2" weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
+                          <focusable value="false"/>
                           <margin top="3" left="3" bottom="3" right="5"/>
                           <text value="Run"/>
                         </properties>
@@ -296,6 +307,7 @@
                           <gridbag top="1" left="2" bottom="1" right="2" weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
+                          <focusable value="false"/>
                           <margin top="3" left="5" bottom="3" right="5"/>
                           <text value="Reset"/>
                         </properties>
