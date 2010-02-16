@@ -67,10 +67,10 @@ public class MipsAssembler {
 		final List<String> labels = new ArrayList<String>();
 		int instructionIndex = 0;
 		for (int lineIndex = 0, codeLinesLength = codeLines.length; lineIndex < codeLinesLength; lineIndex++) {
-			final String prefix = "Code(line " + lineIndex + "): ";
+			final String prefix = "Code(line " + (lineIndex + 1) + "): ";
 			final String codeLine = codeLines[lineIndex].trim();
 
-			if (codeLine.startsWith("#")) {
+			if (codeLine.startsWith("#") || codeLine.isEmpty()) {
 				continue;
 			}
 
@@ -115,7 +115,7 @@ public class MipsAssembler {
 				removeOpName(syntax);	//	it must be the same as code stated above
 
 				Instruction inst = new Instruction(
-						desc, codeLine, instructionIndex, lineIndex,
+						desc, codeLine, instructionIndex, lineIndex + 1,
 						labels.toArray(new String[labels.size()])
 				);
 
@@ -125,14 +125,14 @@ public class MipsAssembler {
 					trim(syntax);
 					trim(code);
 
-					final String prefixBefore = prefix + "before argument " + argIndex + " ";
+					final String prefixBefore = prefix + "before arg. " + argIndex + " ";
 					if (checkSeparator(',', syntax, code, resRef, prefixBefore) ||
 							checkSeparator('(', syntax, code, resRef, prefixBefore) ||
 							checkSeparator(')', syntax, code, resRef, prefixBefore)) {
 						return true;
 					}
 
-					final String prefixOn = prefix + "on argument " + argIndex + " ";
+					final String prefixOn = prefix + "arg. " + argIndex + " ";
 					if (parseReg(Instruction.T_REG_D, syntax, code, desc, inst, resRef, prefixOn) ||
 							parseReg(Instruction.T_REG_T, syntax, code, desc, inst, resRef, prefixOn) ||
 							parseReg(Instruction.T_REG_S, syntax, code, desc, inst, resRef, prefixOn)) {
@@ -153,6 +153,12 @@ public class MipsAssembler {
 						//	unable to cut any of tokens
 						throw new IllegalStateException("syntax broken: " + desc.syntax() + " -> " + syntax.toString());
 					}
+
+					argIndex++;
+				}
+				if (code.length() > 0) {
+					Result.failure(log, resRef, prefix + "redundant code '" + code.toString() + "'");
+					return true;
 				}
 
 				instructions.add(inst);
@@ -165,7 +171,7 @@ public class MipsAssembler {
 	}
 
 	protected static void trim(StringBuilder syntax) {
-		while (syntax.charAt(0)==' ') {
+		while (syntax.charAt(0) == ' ') {
 			syntax.deleteCharAt(0);
 		}
 	}
@@ -297,7 +303,7 @@ public class MipsAssembler {
 				continue;
 			}
 
-			final String prefix = "Memory(line " + lineNum + "): ";
+			final String prefix = "Memory(line " + (lineNum + 1) + "): ";
 			final String[] tokens = line.split(":");
 			if (tokens.length != 3) {
 				Result.failure(log, resRef, prefix + "must be in format addr:valueIn:valueOut");
@@ -357,7 +363,7 @@ public class MipsAssembler {
 				continue;
 			}
 
-			final String prefix = "Registers(line " + lineNum + "): ";
+			final String prefix = "Registers(line " + (lineNum + 1) + "): ";
 			final String[] tokens = line.split(":");
 			if (tokens.length != 3) {
 				Result.failure(log, resRef, prefix + "must be in format register:valueIn:valueOut");
