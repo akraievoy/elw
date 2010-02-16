@@ -20,7 +20,6 @@ public class Applet extends JApplet{
 
 		Version ver = null;
 		final String verStr = getParameter("ver");
-		System.out.println("verStr = '" + verStr + "'");
 		try {
 			ver = mapper.readValue(verStr, Version.class);
 		} catch (IOException e) {
@@ -29,14 +28,22 @@ public class Applet extends JApplet{
 
 		final Controller controller = new Controller();
 		controller.setSelectedTask(ver);
-		controller.init();
-		instance = controller;
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				controller.init();
+				instance = controller;
+			}
+		});
 	}
 
 	public void start() {
-		if (instance != null) {
-			getRootPane().setLayout(new BorderLayout());
-			getRootPane().add(instance.getView().getRootPanel(), BorderLayout.CENTER);
-		}
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				if (instance != null) {
+					getContentPane().setLayout(new BorderLayout());
+					getContentPane().add(instance.getView().getRootPanel(), BorderLayout.CENTER);
+				}
+			}
+		});
 	}
 }
