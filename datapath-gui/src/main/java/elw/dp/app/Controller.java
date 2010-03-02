@@ -347,7 +347,7 @@ public class Controller {
 		final int memSetBytes = memory.getSize();
 		for (int byteIndex = 0; byteIndex < memSetBytes; byteIndex++) {
 			int byteAddr = memory.getAddressAt(byteIndex);
-			if (instructions.getStackBase() + 4 > byteAddr && dataPath.getInstructions().getMinStackBase() <= byteAddr) {
+			if (instructions.getStackBase() > byteAddr && instructions.getMinStackBase() <= byteAddr) {
 				continue;
 			}
 			final int byteAddrAligned = byteAddr - byteAddr % 4;
@@ -530,11 +530,7 @@ public class Controller {
 					} finally {
 						SwingUtilities.invokeLater(new Runnable() {
 							public void run() {
-								SwingUtilities.invokeLater(new Runnable() {
-									public void run() {
-
-									}
-								});
+								setEnabled(true);
 							}
 						});
 					}

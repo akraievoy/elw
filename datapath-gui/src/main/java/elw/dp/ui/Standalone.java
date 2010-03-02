@@ -29,7 +29,7 @@ public class Standalone {
 					final ObjectMapper mapper = new ObjectMapper();
 					final Course course = mapper.readValue(modelStream, Course.class);
 
-					version = course.getAssBundles()[0].getAssignments()[0].getVersions()[0];
+					version = course.getAssBundles()[0].getAssignments()[1].getVersions()[1];
 				} catch (IOException e) {
 					throw new RuntimeException(e);
 				}

@@ -78,8 +78,8 @@ public class Instructions {
 		return minStackBase;
 	}
 
-	protected void updateMinStack() {
-		minStackBase = Math.min(minStackBase, stackBase);
+	protected void updateMinStack(int spValue) {
+		minStackBase = Math.min(minStackBase, spValue);
 	}
 
 }

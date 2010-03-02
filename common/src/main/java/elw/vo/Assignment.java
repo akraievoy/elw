@@ -7,6 +7,7 @@ import java.util.List;
 public class Assignment extends IdName {
 	protected final List<Version> versions = new ArrayList<Version>();
 	protected TaskScoring scoring = null;
+	protected boolean shared = false;
 
 	public Version[] getVersions() {
 		return versions.toArray(new Version[versions.size()]);
@@ -23,5 +24,13 @@ public class Assignment extends IdName {
 
 	public void setScoring(TaskScoring scoring) {
 		this.scoring = scoring;
+	}
+
+	public boolean isShared() {
+		return shared;
+	}
+
+	public void setShared(boolean shared) {
+		this.shared = shared;
 	}
 }

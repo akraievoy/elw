@@ -203,7 +203,9 @@ public class StudentController extends MultiActionController {
 		final StringWriter verNsSw = new StringWriter();
 		mapper.writeValue(verNsSw, verNoSolution);
 
-		model.put("ver", verNsSw.toString().replaceAll("&", "&amp;").replaceAll("\"", "&quot;"));
+		final String solutionStr = ass.isShared() ? verSw.toString() : verNsSw.toString();
+
+		model.put("ver", solutionStr.replaceAll("&", "&amp;").replaceAll("\"", "&quot;"));
 
 		return new ModelAndView("s/launch", model);
 	}

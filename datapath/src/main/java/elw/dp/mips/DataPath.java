@@ -70,7 +70,7 @@ public class DataPath {
 			stepsToWipeHiLo = -1;
 		}
 
-		instructions.updateMinStack();
+		instructions.updateMinStack(registers.getRegInternal(Reg.sp));
 		return instruction;
 	}
 

@@ -40,21 +40,27 @@ public class MipsAssembler {
 		labelIndex.clear();
 		final List<Instruction> instructions = new ArrayList<Instruction>();
 
-		if (loadInstructionsFirstPass(codeLines, instructions, labelIndex, resRef)) {
+		try {
+			if (loadInstructionsFirstPass(codeLines, instructions, labelIndex, resRef)) {
+				return null;
+			}
+
+			for (Instruction instruction : instructions) {
+				final String prefix = "Code(line " + instruction.getLineIndex() + "): ";
+
+				if (instruction.resolve(0, labelIndex)) {
+					Result.failure(log, resRef, prefix + "missing label '" + instruction.getAddr() + "'");
+					return null;
+				}
+				if (!instruction.isAssembled()) {
+					Result.failure(log, resRef, prefix + "instruction assembly incomplete: " + instruction);
+					return null;
+				}
+			}
+		} catch (Exception e) {
+			Result.failure(log, resRef, "failed: " + e.getMessage());
+			log.warn("failed:", e);
 			return null;
-		}
-
-		for (Instruction instruction : instructions) {
-			final String prefix = "Code(line " + instruction.getLineIndex() + "): ";
-
-			if (instruction.resolve(0, labelIndex)) {
-				Result.failure(log, resRef, prefix + "missing label '" + instruction.getAddr() + "'");
-				return null;
-			}
-			if (!instruction.isAssembled()) {
-				Result.failure(log, resRef, prefix + "instruction assembly incomplete: " + instruction);
-				return null;
-			}
 		}
 
 		Result.success(log, resRef, "Instructions Assembled");
@@ -171,7 +177,7 @@ public class MipsAssembler {
 	}
 
 	protected static void trim(StringBuilder syntax) {
-		while (syntax.charAt(0) == ' ') {
+		while (syntax.length() > 0 && syntax.charAt(0) == ' ') {
 			syntax.deleteCharAt(0);
 		}
 	}
@@ -253,7 +259,7 @@ public class MipsAssembler {
 
 	protected static boolean checkSeparator(final char sep, StringBuilder syntax, StringBuilder code, Result[] resRef, String prefix) {
 		if (syntax.charAt(0) == sep) {
-			if (code.charAt(0) == sep) {
+			if (code.length() > 0 && code.charAt(0) == sep) {
 				syntax.delete(0, 1);
 				code.delete(0, 1);
 			} else {
