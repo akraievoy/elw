@@ -48,7 +48,7 @@ public class InstructionsTableModel extends AbstractTableModel {
 		} else if (COL_CODE.equals(colName)) {
 			final Instruction internal = instructions.getInternal(address);
 			if (internal != null) {
-				return internal.getCodeLine();
+				return internal.getCodeLine().replace("\t", "  ");
 			}
 		} else if (COL_ACC.equals(colName)) {
 			return getAccessMod(address);
