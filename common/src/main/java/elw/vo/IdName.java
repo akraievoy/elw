@@ -56,10 +56,10 @@ public class IdName {
 		return found;
 	}
 
-	public static <E extends IdName> E findByName(final E[] elems, String name) {
+	public static <E extends IdName> E findByName(final E[] elems, String name, final boolean ignoreCase) {
 		E found = null;
 		for (E e : elems) {
-			if (name.equals(e.getName())) {
+			if ((ignoreCase && name.equalsIgnoreCase(e.getName())) || name.equals(e.getName())) {
 				found = e;
 				break;
 			}

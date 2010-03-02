@@ -60,7 +60,7 @@ public class GroupDao {
 				if (groupFile.getName().equals(course.getId() + ".json")) {
 					groupCache.put(course.getId(), course);
 				} else {
-					log.warn("wrong course id at file {}", groupFile.getPath());
+					log.warn("wrong id at file {}", groupFile.getPath());
 				}
 			} catch (IOException e) {
 				log.warn("failed to read {}: {}", groupFile.getPath(), G.report(e));

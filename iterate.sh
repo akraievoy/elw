@@ -8,7 +8,7 @@ while echo '------------->' && sleep 5; do {
     mkdir -p /usr/share/jetty/elw-data/enroll;
     chown -R jetty:adm /usr/share/jetty/elw-data;
     cp -v datapath/src/main/resources/aos-s10.json /usr/share/jetty/elw-data/courses;
-    cp -v datapath/src/main/resources/group*.json /usr/share/jetty/elw-data/groups;
+    cp -v datapath/src/main/resources/ka*.json /usr/share/jetty/elw-data/groups;
     cp -v datapath/src/main/resources/enroll*.json /usr/share/jetty/elw-data/enroll;
     service jetty stop
     rm /var/log/jetty/*;

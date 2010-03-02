@@ -82,11 +82,11 @@ public class StudentController extends MultiActionController {
 			Message.addWarn(req, "fields NOT set");
 		} else {
 			final Group[] groups = groupDao.findAllGroups();
-			final Group group = IdName.findByName(groups, groupName);
+			final Group group = IdName.findByName(groups, groupName, true);
 
 			if (group != null) {
 				final Student[] students = group.getStudents();
-				final Student student = IdName.findByName(students, studentName);
+				final Student student = IdName.findByName(students, studentName, true);
 
 				if (student != null) {
 					session.setAttribute(S_GROUP, group);
