@@ -6,7 +6,7 @@ import java.util.List;
 
 public class AssignmentBundle {
 	protected final List<Assignment> assignments = new ArrayList<Assignment>();
-	protected Scoring scoring = null;
+	protected BundleScoring scoring = null;
 	protected AssignmentSetup setup = null;
 
 	public Assignment[] getAssignments() {
@@ -18,11 +18,11 @@ public class AssignmentBundle {
 		this.assignments.addAll(Arrays.asList(assignments));
 	}
 
-	public Scoring getScoring() {
+	public BundleScoring getScoring() {
 		return scoring;
 	}
 
-	public void setScoring(Scoring scoring) {
+	public void setScoring(BundleScoring scoring) {
 		this.scoring = scoring;
 	}
 

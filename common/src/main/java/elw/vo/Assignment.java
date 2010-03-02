@@ -6,6 +6,7 @@ import java.util.List;
 
 public class Assignment extends IdName {
 	protected final List<Version> versions = new ArrayList<Version>();
+	protected TaskScoring scoring = null;
 
 	public Version[] getVersions() {
 		return versions.toArray(new Version[versions.size()]);
@@ -14,5 +15,13 @@ public class Assignment extends IdName {
 	public void setVersions(Version[] versions) {
 		this.versions.clear();
 		this.versions.addAll(Arrays.asList(versions));
+	}
+
+	public TaskScoring getScoring() {
+		return scoring;
+	}
+
+	public void setScoring(TaskScoring scoring) {
+		this.scoring = scoring;
 	}
 }

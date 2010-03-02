@@ -6,7 +6,7 @@ import java.util.List;
 
 public class QuizBundle {
 	protected final List<Quiz> quizzes = new ArrayList<Quiz>();
-	protected Scoring scoring;
+	protected BundleScoring scoring;
 
 	public Quiz[] getQuizzes() {
 		return quizzes.toArray(new Quiz[quizzes.size()]);
@@ -17,11 +17,11 @@ public class QuizBundle {
 		this.quizzes.addAll(Arrays.asList(quizzes));
 	}
 
-	public Scoring getScoringSetup() {
+	public BundleScoring getScoring() {
 		return scoring;
 	}
 
-	public void setScoringSetup(Scoring scoring) {
+	public void setScoring(BundleScoring scoring) {
 		this.scoring = scoring;
 	}
 }

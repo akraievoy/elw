@@ -5,12 +5,12 @@ public class Score {
 		NO_ERRORS_DETECTED, MINOR_STYLE_ISSUES, RESTYLING_REQUIRED, ESSENTIAL_ERROR, HEAVY_REUSE, FORMAT_ERROR, GRADE_PENDING
 	}
 
-	protected int[] studentIds;
+	protected String enrollmentId;
+	protected String[] studentIds;
 	protected int classIndex;
 	protected Grade grade;
 	protected int score;
-	protected long codeSubmissionStamp;
-	protected long reportSubmissionStamp;
+	protected long gradeStamp;
 	protected long scoreStamp;
 
 	public int getClassIndex() {
@@ -21,11 +21,11 @@ public class Score {
 		this.classIndex = classIndex;
 	}
 
-	public int[] getStudentIds() {
+	public String[] getStudentIds() {
 		return studentIds;
 	}
 
-	public void setStudentIds(int[] studentIds) {
+	public void setStudentIds(String[] studentIds) {
 		this.studentIds = studentIds;
 	}
 
@@ -45,20 +45,12 @@ public class Score {
 		this.scoreStamp = scoreStamp;
 	}
 
-	public long getCodeSubmissionStamp() {
-		return codeSubmissionStamp;
+	public long getGradeStamp() {
+		return gradeStamp;
 	}
 
-	public void setCodeSubmissionStamp(long codeSubmissionStamp) {
-		this.codeSubmissionStamp = codeSubmissionStamp;
-	}
-
-	public long getReportSubmissionStamp() {
-		return reportSubmissionStamp;
-	}
-
-	public void setReportSubmissionStamp(long reportSubmissionStamp) {
-		this.reportSubmissionStamp = reportSubmissionStamp;
+	public void setGradeStamp(long gradeStamp) {
+		this.gradeStamp = gradeStamp;
 	}
 
 	public Grade getGrade() {
@@ -67,5 +59,13 @@ public class Score {
 
 	public void setGrade(Grade grade) {
 		this.grade = grade;
+	}
+
+	public String getEnrollmentId() {
+		return enrollmentId;
+	}
+
+	public void setEnrollmentId(String enrollmentId) {
+		this.enrollmentId = enrollmentId;
 	}
 }

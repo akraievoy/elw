@@ -3,6 +3,7 @@ package elw.vo;
 public class AssignmentScore extends Score {
 	protected String assignmentId;
 	protected String assignmentVersionId;
+	protected long codeStamp;
 
 	public String getAssignmentVersionId() {
 		return assignmentVersionId;
@@ -20,4 +21,11 @@ public class AssignmentScore extends Score {
 		this.assignmentId = assignmentId;
 	}
 
+	public long getCodeStamp() {
+		return codeStamp;
+	}
+
+	public void setCodeStamp(long codeStamp) {
+		this.codeStamp = codeStamp;
+	}
 }

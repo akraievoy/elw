@@ -6,7 +6,8 @@ public class Shift {
 	}
 
 	protected Type type;
-	protected int studentId;
+	protected String enrollmentId;
+	protected String studentId;
 	protected int classIndex;
 
 	public int getClassIndex() {
@@ -17,11 +18,11 @@ public class Shift {
 		this.classIndex = classIndex;
 	}
 
-	public int getStudentId() {
+	public String getStudentId() {
 		return studentId;
 	}
 
-	public void setStudentId(int studentId) {
+	public void setStudentId(String studentId) {
 		this.studentId = studentId;
 	}
 
@@ -31,5 +32,13 @@ public class Shift {
 
 	public void setType(Type type) {
 		this.type = type;
+	}
+
+	public String getEnrollmentId() {
+		return enrollmentId;
+	}
+
+	public void setEnrollmentId(String enrollmentId) {
+		this.enrollmentId = enrollmentId;
 	}
 }

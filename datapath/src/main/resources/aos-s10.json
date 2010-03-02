@@ -4,6 +4,13 @@
 			{
 				"name":"Лабораторная №1",
 				"id":"1.lw1",
+				"scoring": {
+					"scoreBudget":5,
+					"classBefore":4,
+					"classFrom":1,
+					"classHold":4,
+					"requireClean":false
+				},
 				"versions":[
 					{
 						"name":"Сдвиг влево",
@@ -210,6 +217,13 @@
 			{
 				"name":"Лабораторная №2",
 				"id":null,
+				"scoring": {
+					"scoreBudget":5,
+					"classBefore":4,
+					"classFrom":2,
+					"classHold":3,
+					"requireClean":false
+				},
 				"versions":[
 					{
 						"name":"1.11 Проверка на 0",
@@ -1746,7 +1760,7 @@
 				]
 			}
 		],
-		"scoring":{"classBefore":3,"classHold":3,"classFrom":1,"scoreBudget":5,"penaltyLate":0.25,"penaltyHold":0.5,"requireClean":false,"maxTeam":2},
+		"scoring":{"penaltyLate":0.1,"penaltyHold":0.1,"maxTeam":2},
 		"setup":{"codeMaxBytes":10240,"codeDownloadPattern":"${stud}${classFrom}${var}.txt","codeUploadRegex":".+\\.txt","reportMaxBytes":2097152,"reportUploadRegex":".+\\.rtf","codeValidatorCN":"ToBeDone","codeExportUriPattern":"/code/mips/${classFrom}","reportGenerateUriPattern":"/report/"}
 	}
 ],"resourcePath":"res/aos-s10","quizBundles":[]}
