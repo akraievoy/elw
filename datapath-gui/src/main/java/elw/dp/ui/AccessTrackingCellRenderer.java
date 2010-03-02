@@ -23,7 +23,7 @@ public class AccessTrackingCellRenderer implements TableCellRenderer {
 		Component cell = wrapped.getTableCellRendererComponent(table, obj, isSelected, hasFocus, row, column);
 
 		final int accCol = factory.lookupAccessColumn(table);
-		if (accCol < 0) {
+		if (accCol < 0 || isSelected) {
 			return cell;
 		}
 
