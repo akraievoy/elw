@@ -19,7 +19,7 @@
 
 	<filter>
 		<filter-name>contentTypeFilter</filter-name>
-		<filter-class>HtmlContentTypeFilter</filter-class>
+		<filter-class>elw.miniweb.HtmlContentTypeFilter</filter-class>
 	</filter>
 
 	<filter-mapping>

@@ -1,3 +1,5 @@
+package elw.miniweb;
+
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;

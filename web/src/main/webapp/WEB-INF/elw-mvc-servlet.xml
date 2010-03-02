@@ -18,7 +18,9 @@
 	</bean>
 
 	<bean id="mapper" class="elw.dao.MapperFactory" factory-method="createMapper"/>
+
 	<bean id="courseDao" class="elw.dao.CourseDao"/>
+	<bean id="groupDao" class="elw.dao.GroupDao"/>
 
 	<bean name="/a/*" class="elw.web.AdminController">
 		<property name="methodNameResolver" ref="methodNameResolver"/>

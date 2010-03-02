@@ -1,0 +1,37 @@
+#header {
+	background-color: #ccccff;
+	border-bottom: #6666ff 1px dashed;
+	text-align: center;
+	font-size: larger;
+}
+
+#nav {
+	float: left;
+}
+
+#cred {
+	float: right;
+	font-weight: bold;
+}
+
+#main {
+	clear: both;
+	text-align: left;
+}
+
+#messages div {
+	text-align: center;
+}
+
+#messages .warn {
+	color: #999900;
+}
+
+#messages .err {
+	color: #990000;
+}
+
+#messages .info {
+	color: #009900;
+}
+

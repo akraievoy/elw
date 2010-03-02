@@ -43,4 +43,28 @@ public class IdName {
 		result = 31 * result + (id != null ? id.hashCode() : 0);
 		return result;
 	}
+
+	public static <E extends IdName> E findById(final E[] elems, String id) {
+		E found = null;
+		for (E e : elems) {
+			if (id.equals(e.getId())) {
+				found = e;
+				break;
+			}
+		}
+
+		return found;
+	}
+
+	public static <E extends IdName> E findByName(final E[] elems, String name) {
+		E found = null;
+		for (E e : elems) {
+			if (name.equals(e.getName())) {
+				found = e;
+				break;
+			}
+		}
+
+		return found;
+	}
 }

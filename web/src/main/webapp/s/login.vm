@@ -1,11 +1,12 @@
 #* @vtlvariable name="elw_messages" type="elw.miniweb.Message[]" *#
 #* @vtlvariable name="elw_student" type="elw.vo.Student" *#
 #* @vtlvariable name="elw_group" type="elw.vo.Group" *#
-#* @vtlvariable name="courses" type="elw.vo.Course[]" *#
+#* @vtlvariable name="groupName" type="java.lang.String" *#
+#* @vtlvariable name="studentName" type="java.lang.String" *#
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta content="text/html; charset=UTF-8">
-	<title>Course List</title>
+	<title>Login</title>
 	<link href="../css/elw.css" type="text/css" rel="stylesheet"/>
 </head>
 <body>
@@ -20,9 +21,11 @@
 #end
 </div>
 <div id=main>
-	#foreach($course in $courses)
-	<a href="course?id=${course.id}">${course.name}</a>
-	#end
+	<form method="POST" action="loginPost">
+		<div style="margin: 1em;">Group:&nbsp;<input type="text" name="groupName" value="$!groupName"/></div>
+		<div style="margin: 1em;">Last name&nbsp;first name:&nbsp;<input type="text" name="studentName" value="$!studentName"/></div>
+		<div style="margin: 1em; padding-left: 24em;"><input type="submit" value="Go"/></div>
+	</form>
 </div>
 </body>
 </html>
