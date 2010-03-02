@@ -133,7 +133,7 @@ public class Instruction {
 			return getReg(T_REG_S).ordinal();
 		}
 		if (T_REG_T.equals(id)) {
-			return getReg(T_REG_D).ordinal();
+			return getReg(T_REG_T).ordinal();
 		}
 		if (T_H5.equals(id)) {
 			return (int) Data.comp(h, 5);
