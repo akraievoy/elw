@@ -1,6 +1,7 @@
 package elw.web;
 
 import elw.dao.CourseDao;
+import elw.dao.EnrollDao;
 import elw.dao.GroupDao;
 import elw.miniweb.Message;
 import elw.vo.*;
@@ -18,6 +19,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 public class StudentController extends MultiActionController {
 	private static final Logger log = LoggerFactory.getLogger(StudentController.class);
@@ -28,11 +30,14 @@ public class StudentController extends MultiActionController {
 
 	protected final CourseDao courseDao;
 	protected final GroupDao groupDao;
+	protected final EnrollDao enrollDao;
+
 	protected final ObjectMapper mapper = new ObjectMapper();
 
-	public StudentController(CourseDao courseDao, GroupDao groupDao) {
+	public StudentController(CourseDao courseDao, GroupDao groupDao, EnrollDao enrollDao) {
 		this.courseDao = courseDao;
 		this.groupDao = groupDao;
+		this.enrollDao = enrollDao;
 	}
 
 	protected HashMap<String, Object> auth(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
@@ -114,8 +119,13 @@ public class StudentController extends MultiActionController {
 			return null;
 		}
 
+		final Group group = (Group) req.getSession().getAttribute(S_GROUP);
+
+		final String groupId = group.getId();
+		List<Course> courses = enrollDao.findCoursesByGroupId(groupId);
+
+		model.put("courses", courses.toArray(new Course[courses.size()]));
 		model.put(S_MESSAGES, Message.drainMessages(req));
-		model.put("courses", courseDao.findAllCourses());
 
 		return new ModelAndView("s/courses", model);
 	}

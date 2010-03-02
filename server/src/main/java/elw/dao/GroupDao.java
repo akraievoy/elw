@@ -1,6 +1,5 @@
 package elw.dao;
 
-import elw.vo.Course;
 import elw.vo.Group;
 import org.akraievoy.gear.G;
 import org.codehaus.jackson.map.ObjectMapper;

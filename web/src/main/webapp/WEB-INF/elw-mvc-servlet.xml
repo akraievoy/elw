@@ -22,6 +22,8 @@
 	<bean id="courseDao" class="elw.dao.CourseDao"/>
 	<bean id="groupDao" class="elw.dao.GroupDao"/>
 
+	<bean id="enrollmentDao" class="elw.dao.EnrollDao"/>
+
 	<bean name="/a/*" class="elw.web.AdminController">
 		<property name="methodNameResolver" ref="methodNameResolver"/>
 	</bean>

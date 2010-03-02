@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Enrollment extends IdName{
+public class Enrollment extends IdName {
 	protected String groupId;
 	protected String courseId;
 
@@ -30,7 +30,7 @@ public class Enrollment extends IdName{
 		return classes.toArray(new Class[classes.size()]);
 	}
 
-	public void setClasss(Class[] classes) {
+	public void setClasses(Class[] classes) {
 		this.classes.clear();
 		this.classes.addAll(Arrays.asList(classes));
 	}
