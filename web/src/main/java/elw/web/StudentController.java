@@ -16,22 +16,24 @@ import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.HashMap;
 
-public class AdminController extends MultiActionController {
-	private static final Logger log = LoggerFactory.getLogger(AdminController.class);
+public class StudentController extends MultiActionController {
+	private static final Logger log = LoggerFactory.getLogger(StudentController.class);
 
 	protected final CourseDao courseDao;
 	protected final ObjectMapper mapper = new ObjectMapper();
 
-	public AdminController(CourseDao courseDao) {
+	public StudentController(CourseDao courseDao) {
 		this.courseDao = courseDao;
 	}
+
+	
 
 	public ModelAndView do_courses(final HttpServletRequest req, final HttpServletResponse resp) {
 		final HashMap<String, Object> model = new HashMap<String, Object>();
 
 		model.put("courses", courseDao.findAllCourses());
 
-		return new ModelAndView("a/courses", model);
+		return new ModelAndView("s/courses", model);
 	}
 
 	public ModelAndView do_course(final HttpServletRequest req, final HttpServletResponse resp) {
@@ -45,7 +47,7 @@ public class AdminController extends MultiActionController {
 
 		model.put("course", course);
 
-		return new ModelAndView("a/course", model);
+		return new ModelAndView("s/course", model);
 	}
 
 	public ModelAndView do_launch(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
@@ -103,7 +105,7 @@ public class AdminController extends MultiActionController {
 
 		model.put("ver", verNsSw.toString().replaceAll("&", "&amp;").replaceAll("\"", "&quot;"));
 
-		return new ModelAndView("a/launch", model);
+		return new ModelAndView("s/launch", model);
 	}
 
 	protected static <E extends IdName> E findIdName(final E[] elems, String id) {

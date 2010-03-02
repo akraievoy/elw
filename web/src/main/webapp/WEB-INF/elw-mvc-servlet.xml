@@ -23,6 +23,9 @@
 	<bean name="/a/*" class="elw.web.AdminController">
 		<property name="methodNameResolver" ref="methodNameResolver"/>
 	</bean>
+	<bean name="/s/*" class="elw.web.StudentController">
+		<property name="methodNameResolver" ref="methodNameResolver"/>
+	</bean>
 
 	<bean id="viewResolver"
 		  class="org.springframework.web.servlet.view.velocity.VelocityViewResolver">
@@ -30,8 +33,13 @@
 		<property name="suffix" value=".vm"/>
 	</bean>
 
-	<bean id="velocityConfig"
-		  class="org.springframework.web.servlet.view.velocity.VelocityConfigurer">
+	<bean id="velocityConfig" class="org.springframework.web.servlet.view.velocity.VelocityConfigurer">
 		<property name="resourceLoaderPath" value="/"/>
+		<property name="velocityPropertiesMap">
+			<map>
+				<entry key="input.encoding" value="UTF-8"/>
+				<entry key="output.encoding" value="UTF-8"/>
+			</map>
+		</property>
 	</bean>
 </beans>
