@@ -3,13 +3,14 @@ while echo '------------->' && sleep 5; do {
   if sudo -u anton mvn clean package; then
     rm /var/lib/jetty/webapps/elw.war;
     cp -v web/target/web-1.3.war /var/lib/jetty/webapps/elw.war;
+    rm -r /usr/share/jetty/elw-data
     mkdir -p /usr/share/jetty/elw-data/courses;
     mkdir -p /usr/share/jetty/elw-data/groups;
     mkdir -p /usr/share/jetty/elw-data/enroll;
+    cp -v elw-data/courses/aos-s10.json /usr/share/jetty/elw-data/courses;
+    cp -v elw-data/groups/ka*.json /usr/share/jetty/elw-data/groups;
+    cp -v elw-data/enroll/enroll*.json /usr/share/jetty/elw-data/enroll;
     chown -R jetty:adm /usr/share/jetty/elw-data;
-    cp -v datapath/src/main/resources/aos-s10.json /usr/share/jetty/elw-data/courses;
-    cp -v datapath/src/main/resources/ka*.json /usr/share/jetty/elw-data/groups;
-    cp -v datapath/src/main/resources/enroll*.json /usr/share/jetty/elw-data/enroll;
     service jetty stop
     rm /var/log/jetty/*;
     service jetty start
