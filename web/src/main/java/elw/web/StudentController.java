@@ -55,6 +55,7 @@ public class StudentController extends MultiActionController {
 
 		model.put(S_GROUP, group);
 		model.put(S_STUD, student);
+		model.put(S_MESSAGES, Message.drainMessages(req));
 
 		return model;
 	}
@@ -125,11 +126,11 @@ public class StudentController extends MultiActionController {
 		List<Course> courses = enrollDao.findCoursesByGroupId(groupId);
 
 		model.put("courses", courses.toArray(new Course[courses.size()]));
-		model.put(S_MESSAGES, Message.drainMessages(req));
 
 		return new ModelAndView("s/courses", model);
 	}
 
+	//	LATER check enrollment also
 	public ModelAndView do_course(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
 		final HashMap<String, Object> model = auth(req, resp);
 		if (model == null) {
@@ -138,10 +139,14 @@ public class StudentController extends MultiActionController {
 
 		final Course course = courseDao.findCourse(req.getParameter("id"));
 		if (course == null) {
-			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			Message.addWarn(req, "course not found");
+			resp.sendRedirect("courses");
 			return null;
 		}
 
+		final Student student = (Student) req.getSession(true).getAttribute(S_STUD);
+		final int studId = Integer.parseInt(student.getId());
+		model.put("studId", studId);
 		model.put("course", course);
 
 		return new ModelAndView("s/course", model);
@@ -156,24 +161,23 @@ public class StudentController extends MultiActionController {
 		final String path = req.getParameter("path");
 		final String[] ids = path.split("--");
 		if (ids.length != 4) {
-			log.warn("malformed path {}", Arrays.toString(ids));
-
-			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			Message.addWarn(req, "malformed path:" + Arrays.toString(ids));
+			resp.sendRedirect("courses");
 			return null;
 		}
 
 		final String courseId = ids[0];
 		final Course course = courseDao.findCourse(courseId);
 		if (course == null) {
-			log.warn("course not found by id {}", courseId);
-			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			Message.addWarn(req, "course not found by id " + courseId);
+			resp.sendRedirect("courses");
 			return null;
 		}
 
 		final int assBundleIndex = G4Parse.parse(ids[1], -1);
 		if (assBundleIndex < 0 || course.getAssBundles().length <= assBundleIndex) {
-			log.warn("bundle not found by index {}", assBundleIndex);
-			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			Message.addWarn(req, "bundle not found by index " + assBundleIndex);
+			resp.sendRedirect("course?id=" + course.getId());
 			return null;
 		}
 
@@ -181,16 +185,25 @@ public class StudentController extends MultiActionController {
 		final AssignmentBundle bundle = course.getAssBundles()[assBundleIndex];
 		final Assignment ass = IdName.findById(bundle.getAssignments(), assId);
 		if (ass == null) {
-			log.warn("assignment not found by id {}", assId);
-			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			Message.addWarn(req, "assignment not found by id " + assId);
+			resp.sendRedirect("course?id=" + course.getId());
 			return null;
 		}
 
-		final String verId = ids[3];
-		final Version ver = IdName.findById(ass.getVersions(), verId);
+		final String verIdStr = ids[3];
+		final Version ver = IdName.findById(ass.getVersions(), verIdStr);
 		if (ver == null) {
-			log.warn("assignment not found by id {}", verId);
-			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			Message.addWarn(req, "version not found by id " + verIdStr);
+			resp.sendRedirect("course?id=" + course.getId());
+			return null;
+		}
+
+		final Student student = (Student) req.getSession(true).getAttribute(S_STUD);
+		final int studId = Integer.parseInt(student.getId());
+		final int verIdx = IdName.indexOfId(ass.getVersions(), ver.getId());
+		if (!ass.isShared() && (studId) % ass.getVersions().length != verIdx ) {
+			Message.addWarn(req, "variant mismatch");
+			resp.sendRedirect("course?id=" + course.getId());
 			return null;
 		}
 

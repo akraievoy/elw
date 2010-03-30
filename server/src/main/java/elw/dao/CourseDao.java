@@ -72,6 +72,10 @@ public class CourseDao {
 	public synchronized Course findCourse(final String id) {
 		refreshCache();
 
+		if (id == null) {
+			return null;
+		}
+
 		return courseCache.get(id);
 	}
 

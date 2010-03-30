@@ -1,7 +1,8 @@
 #* @vtlvariable name="elw_messages" type="elw.miniweb.Message[]" *#
 #* @vtlvariable name="elw_student" type="elw.vo.Student" *#
 #* @vtlvariable name="elw_group" type="elw.vo.Group" *#
-#* @vtlvariable name="courses" type="elw.vo.Course[]" *#
+#* @vtlvariable name="course" type="elw.vo.Course" *#
+#* @vtlvariable name="studId" type="java.lang.Integer" *#
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta content="text/html; charset=UTF-8">
@@ -26,13 +27,21 @@
 			<li>Assignments:<ol>
 	 #foreach($ass in $assBundle.assignments)#set($assI = $velocityCount)
 		#if($ass.id)
-				<li>Versions: <ol>
-		 #foreach($ver in $ass.versions)#set($verI = $velocityCount)
-			#if($ver.id)
+				<li>$ass.name :
+			#if($ass.shared)
+					<ol>
+				#foreach($ver in $ass.versions)#set($verI = $velocityCount)
+					#if($ver.id)
 					<li><a href="launch?path=${course.id}--${bunI}--${ass.id}--${ver.id}">$ver.name</a></li>
+					#end
+		 		#end
+					</ol>
+				</li>
+			#else
+				#set($verIdx = $studId % $ass.versions.size())
+				#set($ver = $ass.versions.get($verIdx))
+				<a href="launch?path=${course.id}--${bunI}--${ass.id}--${ver.id}">$ver.name</a>
 			#end
-		 #end
-				</ol> </li>
 		#end
 	 #end
 			</ol> </li>

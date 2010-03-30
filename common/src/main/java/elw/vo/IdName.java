@@ -56,6 +56,19 @@ public class IdName {
 		return found;
 	}
 
+	public static <E extends IdName> int indexOfId(final E[] elems, String id) {
+		int found = -1;
+		for (int i = 0, elemsLength = elems.length; i < elemsLength; i++) {
+			final E e = elems[i];
+			if (id.equals(e.getId())) {
+				found = i;
+				break;
+			}
+		}
+
+		return found;
+	}
+
 	public static <E extends IdName> E findByName(final E[] elems, String name, final boolean ignoreCase) {
 		E found = null;
 		for (E e : elems) {
