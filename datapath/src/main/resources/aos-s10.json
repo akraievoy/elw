@@ -463,7 +463,7 @@
 			{
 				"name":"Лабораторная №2",
 				"id":"3.lw2",
-				"shared":true,
+				"shared":false,
 				"scoring": {
 					"scoreBudget":5,
 					"classBefore":4,
