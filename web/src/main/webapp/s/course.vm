@@ -24,7 +24,7 @@
 	Assignment bundles:
 	<ul>
 	#foreach($assBundle in $course.assBundles)#set($bunI = $velocityCount - 1)
-			<li>Assignments:<ol>
+			<li>Assignments:<ul>
 	 #foreach($ass in $assBundle.assignments)#set($assI = $velocityCount)
 		#if($ass.id)
 				<li>$ass.name :
@@ -44,7 +44,7 @@
 			#end
 		#end
 	 #end
-			</ol> </li>
+			</ul> </li>
 	#end
 	</ul>
 </div>
