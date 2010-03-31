@@ -1,6 +1,7 @@
 #* @vtlvariable name="elw_messages" type="elw.miniweb.Message[]" *#
 #* @vtlvariable name="elw_student" type="elw.vo.Student" *#
 #* @vtlvariable name="elw_group" type="elw.vo.Group" *#
+#* @vtlvariable name="verBean" type="elw.vo.Version" *#
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta content="text/html; charset=UTF-8">
@@ -19,21 +20,24 @@
 #end
 </div>
 <div id=main>
-<div>&nbsp;</div>
+<div>$verBean.name&nbsp;</div>
 <div style="text-align:center;">	<object classid="clsid:8AD9C840-044E-11D1-B3E9-00805F499D93" width="800" height="600">
 		<param name="type" value="application/x-java-applet;version=1.5"/>
 		<param name="code" value="elw.dp.ui.Applet"/>
 	##        <param name="codebase" value = "${baseUrl}"/>
-
 		<param name="archive" value="../code/datapath-gui-1.3-full.jar"/>
 		<param name="ver" value="$ver"/>
+		<param name="upHeader" value="$upHeader"/>
+		<param name="upPath" value="$upPath"/>
 		<comment>
 			<embed width="800" height="600"
 						 type="application/x-java-applet;version=1.5" pluginspage="http://java.sun.com/j2se/1.5.0/download.html"
 						 code="elw.dp.ui.Applet"
 			##                        codebase="${baseUrl}"
-														archive="../code/datapath-gui-1.3-full.jar"
-						 ver="$ver">
+						 archive="../code/datapath-gui-1.3-full.jar"
+						 ver="$ver"
+						 upHeader="$upHeader"
+						 upPath="$upPath"
 				<noembed>
 					No Java Support.
 				</noembed>

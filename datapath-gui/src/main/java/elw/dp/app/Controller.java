@@ -6,16 +6,13 @@ import elw.dp.mips.asm.MipsAssembler;
 import elw.dp.ui.DataPathForm;
 import elw.dp.ui.FeedbackAppender;
 import elw.dp.ui.RendererFactory;
-import elw.vo.Course;
 import elw.vo.Test;
 import elw.vo.Version;
 import gnu.trove.TIntIntHashMap;
 import org.akraievoy.gear.G;
 import org.akraievoy.gear.G4Str;
-import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
@@ -25,6 +22,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.concurrent.ScheduledExecutorService;
@@ -51,8 +51,13 @@ public class Controller {
 	protected AtomicLong assembleStamp = new AtomicLong(0);
 
 	protected Version selectedTask;
+	protected String uploadUrl;
+	protected String uploadHeader;
+	protected String uploadPath;
+
 	protected final DefaultComboBoxModel testComboModel = new DefaultComboBoxModel();
 	//	app data (compile/test/run cycle)
+	protected final HashMap<String,Integer> labelIndex = new HashMap<String, Integer>();
 	protected Instruction[] instructions = null;
 	protected TIntIntHashMap[] regs = null;
 	protected TIntIntHashMap[] data = null;
@@ -65,6 +70,7 @@ public class Controller {
 	protected final ScheduledExecutorService executor = new ScheduledThreadPoolExecutor(3);
 	protected final AssembleAction aAssemble = new AssembleAction("Assemble>", true);
 	protected final AssembleAction aVerify = new AssembleAction("Verify", false);
+	protected final SubmitAction aSubmit = new SubmitAction("Submit");
 	protected final UpdateTestSelectionAction aUpdateTestSelection = new UpdateTestSelectionAction();
 	protected final TestStepAction aTestStep = new TestStepAction("Step>");
 	protected final TestRunAction aTestRun = new TestRunAction("Run");
@@ -72,10 +78,21 @@ public class Controller {
 	protected final RunStepAction aRunStep = new RunStepAction("Step", 1);
 	protected final RunStepAction aRunRun = new RunStepAction("Run", runSteps);
 	protected final RunResetAction aRunReset = new RunResetAction("Reset");
-	protected final HashMap<String,Integer> labelIndex = new HashMap<String, Integer>();
 
 	public void setSelectedTask(Version selectedTask) {
 		this.selectedTask = selectedTask;
+	}
+
+	public void setUploadUrl(String uploadUrl) {
+		this.uploadUrl = uploadUrl;
+	}
+
+	public void setUploadHeader(String uploadHeader) {
+		this.uploadHeader = uploadHeader;
+	}
+
+	public void setUploadPath(String uploadPath) {
+		this.uploadPath = uploadPath;
 	}
 
 	public DataPathForm getView() {
@@ -113,6 +130,8 @@ public class Controller {
 		view.getSourceAssembleButton().setMnemonic('a');
 		view.getSourceVerifyButton().setAction(aVerify);
 		view.getSourceVerifyButton().setMnemonic('v');
+		view.getSourceSubmitButton().setAction(aSubmit);
+		view.getSourceSubmitButton().setMnemonic('u');
 
 		view.getTestComboBox().setAction(aUpdateTestSelection);
 		view.getTestAddCustomButton().setEnabled(false); //	LATER #163
@@ -196,6 +215,64 @@ public class Controller {
 		} else {
 			instructions = null;
 		}
+	}
+
+	protected void job_submit(final JLabel statusLabel, final Result[] resRef, String sourceText) {
+		if (uploadUrl == null || uploadUrl.length() == 0) {
+			Result.failure(log, resRef, "Upload URL not set");
+			return;
+		}
+		if (uploadPath == null || uploadPath.length() == 0) {
+			Result.failure(log, resRef, "Upload Path not set");
+			return;
+		}
+
+		setupStatus(statusLabel, "Submitting...");
+
+		final byte[] textBytes = sourceText.getBytes();
+
+		OutputStream up = null;
+		InputStream down = null;
+		try {
+			final HttpURLConnection connection = (HttpURLConnection) new URL(uploadUrl+"?path="+uploadPath).openConnection();
+			connection.setFixedLengthStreamingMode(textBytes.length);
+			connection.setRequestMethod("POST");
+			connection.setDoOutput(true);
+			connection.setRequestProperty("Content-type", "text");
+			connection.setRequestProperty("Accept", "text");
+			if (uploadHeader != null && uploadHeader.length() > 0) {
+				connection.setRequestProperty("Cookie", uploadHeader);
+			}
+
+			up = connection.getOutputStream();
+			up.write(sourceText.getBytes());
+			up.flush();
+
+			if (connection.getResponseCode() != 200) {
+				Result.failure(log, resRef, "Failed: " + connection.getResponseMessage());
+				return;
+			}
+		} catch (IOException e) {
+			Result.failure(log, resRef, e.getMessage());
+			return;
+		} finally {
+			if (up != null) {
+				try {
+					up.close();
+				} catch (IOException e) {
+					log.info("ignoring", e);
+				}
+			}
+			if (down != null) {
+				try {
+					down.close();
+				} catch (IOException e) {
+					log.info("ignoring", e);
+				}
+			}
+		}
+
+		Result.success(log, resRef, "Submitted");
 	}
 
 	protected void job_loadTest(final JLabel statusLabel, Result[] resRef, final Test test) {
@@ -419,6 +496,34 @@ public class Controller {
 								if (switchToTest && resRef[0].isSuccess()) {
 									view.getStrTabbedPane().setSelectedIndex(1);
 								}
+							}
+						});
+					}
+				}
+			});
+		}
+	}
+
+	class SubmitAction extends AbstractAction {
+		public SubmitAction(final String name) {
+			super(name);
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			setEnabled(false);
+			final JLabel statusLabel = view.getSourceFeedbackLabel();
+			final String sourceText = view.getSourceTextArea().getText();
+
+			executor.submit(new Runnable() {
+				public void run() {
+					final Result[] resRef = new Result[]{new Result("status unknown", false)};
+					try {
+						job_submit(statusLabel, resRef, sourceText);
+					} finally {
+						SwingUtilities.invokeLater(new Runnable() {
+							public void run() {
+								setEnabled(true);
+								setupStatus(statusLabel, resRef[0]);
 							}
 						});
 					}

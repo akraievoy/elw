@@ -218,7 +218,84 @@ public class StudentController extends MultiActionController {
 
 		final String solutionStr = ass.isShared() ? verSw.toString() : verNsSw.toString();
 
+		model.put("verBean", ver);
 		model.put("ver", solutionStr.replaceAll("&", "&amp;").replaceAll("\"", "&quot;"));
+		model.put("upHeader", "JSESSIONID=" + req.getSession(true).getId());
+		model.put("upPath", path);
+
+		return new ModelAndView("s/launch", model);
+	}
+
+	public ModelAndView do_uploadzzz(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+		final HashMap<String, Object> model = auth(req, resp);
+		if (model == null) {
+			return null;
+		}
+
+		final String path = req.getParameter("path");
+		final String[] ids = path.split("--");
+		if (ids.length != 4) {
+			Message.addWarn(req, "malformed path:" + Arrays.toString(ids));
+			resp.sendRedirect("courses");
+			return null;
+		}
+
+		final String courseId = ids[0];
+		final Course course = courseDao.findCourse(courseId);
+		if (course == null) {
+			Message.addWarn(req, "course not found by id " + courseId);
+			resp.sendRedirect("courses");
+			return null;
+		}
+
+		final int assBundleIndex = G4Parse.parse(ids[1], -1);
+		if (assBundleIndex < 0 || course.getAssBundles().length <= assBundleIndex) {
+			Message.addWarn(req, "bundle not found by index " + assBundleIndex);
+			resp.sendRedirect("course?id=" + course.getId());
+			return null;
+		}
+
+		final String assId = ids[2];
+		final AssignmentBundle bundle = course.getAssBundles()[assBundleIndex];
+		final Assignment ass = IdName.findById(bundle.getAssignments(), assId);
+		if (ass == null) {
+			Message.addWarn(req, "assignment not found by id " + assId);
+			resp.sendRedirect("course?id=" + course.getId());
+			return null;
+		}
+
+		final String verIdStr = ids[3];
+		final Version ver = IdName.findById(ass.getVersions(), verIdStr);
+		if (ver == null) {
+			Message.addWarn(req, "version not found by id " + verIdStr);
+			resp.sendRedirect("course?id=" + course.getId());
+			return null;
+		}
+
+		final Student student = (Student) req.getSession(true).getAttribute(S_STUD);
+		final int studId = Integer.parseInt(student.getId());
+		final int verIdx = IdName.indexOfId(ass.getVersions(), ver.getId());
+		if (!ass.isShared() && (studId) % ass.getVersions().length != verIdx ) {
+			Message.addWarn(req, "variant mismatch");
+			resp.sendRedirect("course?id=" + course.getId());
+			return null;
+		}
+
+		final StringWriter verSw = new StringWriter();
+		mapper.writeValue(verSw, ver);
+
+		final Version verNoSolution = mapper.readValue(verSw.toString(), Version.class);
+		verNoSolution.setSolution(new String[]{"#  your code", "#    goes here", "#      :)"});
+
+		final StringWriter verNsSw = new StringWriter();
+		mapper.writeValue(verNsSw, verNoSolution);
+
+		final String solutionStr = ass.isShared() ? verSw.toString() : verNsSw.toString();
+
+		model.put("verBean", ver);
+		model.put("ver", solutionStr.replaceAll("&", "&amp;").replaceAll("\"", "&quot;"));
+		model.put("upHeader", "JSESSIONID=" + req.getSession(true).getId());
+		model.put("upPath", path);
 
 		return new ModelAndView("s/launch", model);
 	}

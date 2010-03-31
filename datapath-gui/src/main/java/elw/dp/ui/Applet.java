@@ -5,12 +5,16 @@ import elw.vo.Version;
 import org.akraievoy.gear.G;
 import org.apache.log4j.BasicConfigurator;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
 
 public class Applet extends JApplet{
+	private static final Logger log = LoggerFactory.getLogger(Applet.class);
+
 	protected Controller instance;
 
 	public void init() {
@@ -34,6 +38,10 @@ public class Applet extends JApplet{
 
 		final Controller controller = new Controller();
 		controller.setSelectedTask(ver);
+		controller.setUploadUrl(getCodeBase().toString() + "upload");
+		controller.setUploadHeader(getParameter("upHeader"));
+		controller.setUploadPath(getParameter("upPath"));
+
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				controller.init();

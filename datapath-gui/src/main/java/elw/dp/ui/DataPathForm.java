@@ -29,6 +29,7 @@ public class DataPathForm {
 	protected JLabel testStatusLabel;
 	protected JButton testStepButton;
 	protected JButton sourceVerifyButton;
+	protected JButton sourceSubmitButton;
 
 	public JPanel getRootPanel() {
 		return rootPanel;
@@ -36,6 +37,10 @@ public class DataPathForm {
 
 	public JButton getSourceVerifyButton() {
 		return sourceVerifyButton;
+	}
+
+	public JButton getSourceSubmitButton() {
+		return sourceSubmitButton;
 	}
 
 	public JButton getTestStepButton() {
@@ -176,13 +181,13 @@ public class DataPathForm {
 		sourceAssembleButton.setActionCommand("Compile");
 		sourceAssembleButton.setFocusable(false);
 		sourceAssembleButton.setLabel("Assemble");
-		sourceAssembleButton.setMargin(new Insets(3, 3, 3, 5));
+		sourceAssembleButton.setMargin(new Insets(3, 3, 3, 3));
 		sourceAssembleButton.setText("Assemble");
 		GridBagConstraints gbc;
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 0;
-		gbc.insets = new Insets(1, 1, 1, 2);
+		gbc.insets = new Insets(1, 1, 1, 1);
 		panel2.add(sourceAssembleButton, gbc);
 		sourceVerifyButton = new JButton();
 		sourceVerifyButton.setFocusable(false);
@@ -197,7 +202,7 @@ public class DataPathForm {
 		final JPanel panel3 = new JPanel();
 		panel3.setLayout(new BorderLayout(0, 0));
 		gbc = new GridBagConstraints();
-		gbc.gridx = 2;
+		gbc.gridx = 3;
 		gbc.gridy = 0;
 		gbc.weightx = 1.0;
 		gbc.fill = GridBagConstraints.BOTH;
@@ -208,6 +213,15 @@ public class DataPathForm {
 		sourceFeedbackLabel.setText("...");
 		sourceFeedbackLabel.setToolTipText("Source pane status");
 		panel3.add(sourceFeedbackLabel, BorderLayout.CENTER);
+		sourceSubmitButton = new JButton();
+		sourceSubmitButton.setMargin(new Insets(3, 3, 3, 5));
+		sourceSubmitButton.setText("Submit");
+		gbc = new GridBagConstraints();
+		gbc.gridx = 2;
+		gbc.gridy = 0;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.insets = new Insets(1, 1, 1, 2);
+		panel2.add(sourceSubmitButton, gbc);
 		final JPanel panel4 = new JPanel();
 		panel4.setLayout(new BorderLayout(0, 0));
 		strTabbedPane.addTab("Test", panel4);
@@ -395,6 +409,7 @@ public class DataPathForm {
 		problemTextPane = new JTextPane();
 		problemTextPane.setEditable(false);
 		problemTextPane.setToolTipText("Problem statement goes here...");
+		problemTextPane.putClientProperty("JEditorPane.honorDisplayProperties", Boolean.TRUE);
 		scrollPane7.setViewportView(problemTextPane);
 		final JPanel panel12 = new JPanel();
 		panel12.setLayout(new BorderLayout(0, 0));
@@ -415,6 +430,7 @@ public class DataPathForm {
 		logTextPane = new JTextPane();
 		logTextPane.setEditable(false);
 		logTextPane.setFont(new Font("Courier New", logTextPane.getFont().getStyle(), 13));
+		logTextPane.putClientProperty("JEditorPane.honorDisplayProperties", Boolean.TRUE);
 		scrollPane9.setViewportView(logTextPane);
 	}
 
