@@ -5,6 +5,7 @@ import elw.dao.EnrollDao;
 import elw.dao.GroupDao;
 import elw.miniweb.Message;
 import elw.vo.*;
+import org.akraievoy.gear.G4Io;
 import org.akraievoy.gear.G4Parse;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
@@ -15,6 +16,7 @@ import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Arrays;
@@ -226,7 +228,7 @@ public class StudentController extends MultiActionController {
 		return new ModelAndView("s/launch", model);
 	}
 
-	public ModelAndView do_uploadzzz(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+	public ModelAndView do_upload(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
 		final HashMap<String, Object> model = auth(req, resp);
 		if (model == null) {
 			return null;
@@ -235,23 +237,20 @@ public class StudentController extends MultiActionController {
 		final String path = req.getParameter("path");
 		final String[] ids = path.split("--");
 		if (ids.length != 4) {
-			Message.addWarn(req, "malformed path:" + Arrays.toString(ids));
-			resp.sendRedirect("courses");
+			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "malformed path:" + Arrays.toString(ids));
 			return null;
 		}
 
 		final String courseId = ids[0];
 		final Course course = courseDao.findCourse(courseId);
 		if (course == null) {
-			Message.addWarn(req, "course not found by id " + courseId);
-			resp.sendRedirect("courses");
+			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "course not found by id " + courseId);
 			return null;
 		}
 
 		final int assBundleIndex = G4Parse.parse(ids[1], -1);
 		if (assBundleIndex < 0 || course.getAssBundles().length <= assBundleIndex) {
-			Message.addWarn(req, "bundle not found by index " + assBundleIndex);
-			resp.sendRedirect("course?id=" + course.getId());
+			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "bundle not found by index " + assBundleIndex);
 			return null;
 		}
 
@@ -259,16 +258,14 @@ public class StudentController extends MultiActionController {
 		final AssignmentBundle bundle = course.getAssBundles()[assBundleIndex];
 		final Assignment ass = IdName.findById(bundle.getAssignments(), assId);
 		if (ass == null) {
-			Message.addWarn(req, "assignment not found by id " + assId);
-			resp.sendRedirect("course?id=" + course.getId());
+			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "assignment not found by id " + assId);
 			return null;
 		}
 
 		final String verIdStr = ids[3];
 		final Version ver = IdName.findById(ass.getVersions(), verIdStr);
 		if (ver == null) {
-			Message.addWarn(req, "version not found by id " + verIdStr);
-			resp.sendRedirect("course?id=" + course.getId());
+			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "version not found by id " + verIdStr);
 			return null;
 		}
 
@@ -276,27 +273,30 @@ public class StudentController extends MultiActionController {
 		final int studId = Integer.parseInt(student.getId());
 		final int verIdx = IdName.indexOfId(ass.getVersions(), ver.getId());
 		if (!ass.isShared() && (studId) % ass.getVersions().length != verIdx ) {
-			Message.addWarn(req, "variant mismatch");
-			resp.sendRedirect("course?id=" + course.getId());
+			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "variant mismatch");
 			return null;
 		}
 
-		final StringWriter verSw = new StringWriter();
-		mapper.writeValue(verSw, ver);
+		final Group group = (Group) req.getSession(true).getAttribute(S_GROUP);
+		final File coursesDir = new File(System.getProperty("user.home"), "elw-data");
+		final File studDir = new File(coursesDir, "uploads/" + course.getId() + "." + group.getId() + "/" + student.getId() + "." + student.getName() + "/");
+		final File assDir = new File(studDir, assBundleIndex + "." + assId + "." + ver.getId());
 
-		final Version verNoSolution = mapper.readValue(verSw.toString(), Version.class);
-		verNoSolution.setSolution(new String[]{"#  your code", "#    goes here", "#      :)"});
+		if (!assDir.mkdirs()) {
+			log.warn("failed to create dir: " + assDir.getPath());
+			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "failed to create target dir");
+			return null;
+		}
 
-		final StringWriter verNsSw = new StringWriter();
-		mapper.writeValue(verNsSw, verNoSolution);
+		final File targetFile = new File(assDir, String.valueOf(System.currentTimeMillis()));
 
-		final String solutionStr = ass.isShared() ? verSw.toString() : verNsSw.toString();
+		try {
+			G4Io.writeToFile(req.getReader(), targetFile);
+		} catch (IOException e) {
+			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+		}
 
-		model.put("verBean", ver);
-		model.put("ver", solutionStr.replaceAll("&", "&amp;").replaceAll("\"", "&quot;"));
-		model.put("upHeader", "JSESSIONID=" + req.getSession(true).getId());
-		model.put("upPath", path);
-
-		return new ModelAndView("s/launch", model);
+		resp.setStatus(HttpServletResponse.SC_OK);
+		return null;
 	}
 }
