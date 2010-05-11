@@ -1,8 +1,10 @@
+WA_DIR=/usr/share/java/webapps
 while echo '------------->' && sleep 5; do {
   cd /home/anton/Documents/projects/mipsEmu;
   if sudo -u anton mvn clean package; then
-    rm /var/lib/jetty/webapps/elw.war;
-    cp -v web/target/web-1.3.war /var/lib/jetty/webapps/elw.war;
+    mkdir $WA_DIR;
+    rm $WA_DIR/elw.war;
+    cp -v web/target/web-1.3.war $WA_DIR/elw.war;
     rm -r /usr/share/jetty/elw-data
     mkdir -p /usr/share/jetty/elw-data/courses;
     mkdir -p /usr/share/jetty/elw-data/groups;

@@ -42,13 +42,17 @@ public class StudentController extends MultiActionController {
 		this.enrollDao = enrollDao;
 	}
 
-	protected HashMap<String, Object> auth(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+	protected HashMap<String, Object> auth(final HttpServletRequest req, final HttpServletResponse resp, final boolean redirect) throws IOException {
 		final Group group = (Group) req.getSession(true).getAttribute(S_GROUP);
 		final Student student = (Student) req.getSession(true).getAttribute(S_STUD);
 
 		if (group == null || student == null) {
-			Message.addWarn(req, "Login required");
-			resp.sendRedirect("login");
+			if (redirect) {
+				Message.addWarn(req, "Login required");
+				resp.sendRedirect("login");
+			} else {
+				resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Login required");
+			}
 
 			return null;
 		}
@@ -117,7 +121,7 @@ public class StudentController extends MultiActionController {
 	}
 
 	public ModelAndView do_courses(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		final HashMap<String, Object> model = auth(req, resp);
+		final HashMap<String, Object> model = auth(req, resp, true);
 		if (model == null) {
 			return null;
 		}
@@ -134,7 +138,7 @@ public class StudentController extends MultiActionController {
 
 	//	LATER check enrollment also
 	public ModelAndView do_course(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		final HashMap<String, Object> model = auth(req, resp);
+		final HashMap<String, Object> model = auth(req, resp, true);
 		if (model == null) {
 			return null;
 		}
@@ -155,62 +159,13 @@ public class StudentController extends MultiActionController {
 	}
 
 	public ModelAndView do_launch(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		final HashMap<String, Object> model = auth(req, resp);
-		if (model == null) {
-			return null;
-		}
-
-		final String path = req.getParameter("path");
-		final String[] ids = path.split("--");
-		if (ids.length != 4) {
-			Message.addWarn(req, "malformed path:" + Arrays.toString(ids));
-			resp.sendRedirect("courses");
-			return null;
-		}
-
-		final String courseId = ids[0];
-		final Course course = courseDao.findCourse(courseId);
-		if (course == null) {
-			Message.addWarn(req, "course not found by id " + courseId);
-			resp.sendRedirect("courses");
-			return null;
-		}
-
-		final int assBundleIndex = G4Parse.parse(ids[1], -1);
-		if (assBundleIndex < 0 || course.getAssBundles().length <= assBundleIndex) {
-			Message.addWarn(req, "bundle not found by index " + assBundleIndex);
-			resp.sendRedirect("course?id=" + course.getId());
-			return null;
-		}
-
-		final String assId = ids[2];
-		final AssignmentBundle bundle = course.getAssBundles()[assBundleIndex];
-		final Assignment ass = IdName.findById(bundle.getAssignments(), assId);
-		if (ass == null) {
-			Message.addWarn(req, "assignment not found by id " + assId);
-			resp.sendRedirect("course?id=" + course.getId());
-			return null;
-		}
-
-		final String verIdStr = ids[3];
-		final Version ver = IdName.findById(ass.getVersions(), verIdStr);
-		if (ver == null) {
-			Message.addWarn(req, "version not found by id " + verIdStr);
-			resp.sendRedirect("course?id=" + course.getId());
-			return null;
-		}
-
-		final Student student = (Student) req.getSession(true).getAttribute(S_STUD);
-		final int studId = Integer.parseInt(student.getId());
-		final int verIdx = IdName.indexOfId(ass.getVersions(), ver.getId());
-		if (!ass.isShared() && (studId) % ass.getVersions().length != verIdx ) {
-			Message.addWarn(req, "variant mismatch");
-			resp.sendRedirect("course?id=" + course.getId());
+		VersionLookup lookup = versionLookup(req, resp, false);
+		if (lookup == null) {
 			return null;
 		}
 
 		final StringWriter verSw = new StringWriter();
-		mapper.writeValue(verSw, ver);
+		mapper.writeValue(verSw, lookup.getVer());
 
 		final Version verNoSolution = mapper.readValue(verSw.toString(), Version.class);
 		verNoSolution.setSolution(new String[]{"#  your code", "#    goes here", "#      :)"});
@@ -218,71 +173,29 @@ public class StudentController extends MultiActionController {
 		final StringWriter verNsSw = new StringWriter();
 		mapper.writeValue(verNsSw, verNoSolution);
 
-		final String solutionStr = ass.isShared() ? verSw.toString() : verNsSw.toString();
+		final String solutionStr = lookup.getAss().isShared() ? verSw.toString() : verNsSw.toString();
 
-		model.put("verBean", ver);
+		final HashMap<String, Object> model = lookup.getModel();
+		model.put("verBean", lookup.getVer());
 		model.put("ver", solutionStr.replaceAll("&", "&amp;").replaceAll("\"", "&quot;"));
 		model.put("upHeader", "JSESSIONID=" + req.getSession(true).getId());
-		model.put("upPath", path);
+		model.put("upPath", lookup.getPath());
 
 		return new ModelAndView("s/launch", model);
 	}
 
 	public ModelAndView do_upload(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		final HashMap<String, Object> model = auth(req, resp);
-		if (model == null) {
-			return null;
-		}
-
-		final String path = req.getParameter("path");
-		final String[] ids = path.split("--");
-		if (ids.length != 4) {
-			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "malformed path:" + Arrays.toString(ids));
-			return null;
-		}
-
-		final String courseId = ids[0];
-		final Course course = courseDao.findCourse(courseId);
-		if (course == null) {
-			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "course not found by id " + courseId);
-			return null;
-		}
-
-		final int assBundleIndex = G4Parse.parse(ids[1], -1);
-		if (assBundleIndex < 0 || course.getAssBundles().length <= assBundleIndex) {
-			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "bundle not found by index " + assBundleIndex);
-			return null;
-		}
-
-		final String assId = ids[2];
-		final AssignmentBundle bundle = course.getAssBundles()[assBundleIndex];
-		final Assignment ass = IdName.findById(bundle.getAssignments(), assId);
-		if (ass == null) {
-			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "assignment not found by id " + assId);
-			return null;
-		}
-
-		final String verIdStr = ids[3];
-		final Version ver = IdName.findById(ass.getVersions(), verIdStr);
-		if (ver == null) {
-			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "version not found by id " + verIdStr);
-			return null;
-		}
-
-		final Student student = (Student) req.getSession(true).getAttribute(S_STUD);
-		final int studId = Integer.parseInt(student.getId());
-		final int verIdx = IdName.indexOfId(ass.getVersions(), ver.getId());
-		if (!ass.isShared() && (studId) % ass.getVersions().length != verIdx ) {
-			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "variant mismatch");
+		VersionLookup lookup = versionLookup(req, resp, false);
+		if (lookup == null) {
 			return null;
 		}
 
 		final Group group = (Group) req.getSession(true).getAttribute(S_GROUP);
 		final File coursesDir = new File(System.getProperty("user.home"), "elw-data");
-		final File studDir = new File(coursesDir, "uploads/" + course.getId() + "." + group.getId() + "/" + student.getId() + "." + student.getName() + "/");
-		final File assDir = new File(studDir, assBundleIndex + "." + assId + "." + ver.getId());
+		final File studDir = new File(coursesDir, "uploads/" + lookup.getCourse().getId() + "." + group.getId() + "/" + lookup.getStudent().getId() + "." + lookup.getStudent().getName() + "/");
+		final File assDir = new File(studDir, lookup.getAssBundleIndex() + "." + lookup.getAssId() + "." + lookup.getVer().getId());
 
-		if (!assDir.mkdirs()) {
+		if (!assDir.isDirectory() && !assDir.mkdirs()) {
 			log.warn("failed to create dir: " + assDir.getPath());
 			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "failed to create target dir");
 			return null;
@@ -298,5 +211,134 @@ public class StudentController extends MultiActionController {
 
 		resp.setStatus(HttpServletResponse.SC_OK);
 		return null;
+	}
+
+	protected VersionLookup versionLookup(HttpServletRequest req, HttpServletResponse resp, final boolean redirect) throws IOException {
+		final VersionLookup vl = new VersionLookup();
+		vl.model = auth(req, resp, redirect);
+		if (vl.model == null) {
+			return null;
+		}
+
+		vl.path = req.getParameter("path");
+		final String[] ids = vl.path.split("--");
+		if (ids.length != 4) {
+			if (redirect) {
+				Message.addWarn(req, "malformed path:" + Arrays.toString(ids));
+				resp.sendRedirect("courses");
+			} else {
+				resp.sendError(HttpServletResponse.SC_NOT_FOUND, "malformed path:" + Arrays.toString(ids));
+			}
+			return null;
+		}
+
+		final String courseId = ids[0];
+		vl.course = courseDao.findCourse(courseId);
+		if (vl.course == null) {
+			if (redirect) {
+				Message.addWarn(req, "course not found by id " + courseId);
+				resp.sendRedirect("courses");
+			} else {
+				resp.sendError(HttpServletResponse.SC_NOT_FOUND, "course not found by id " + courseId);
+			}
+			return null;
+		}
+
+		vl.assBundleIndex = G4Parse.parse(ids[1], -1);
+		if (vl.assBundleIndex < 0 || vl.course.getAssBundles().length <= vl.assBundleIndex) {
+			if (redirect) {
+				Message.addWarn(req, "bundle not found by index " + vl.assBundleIndex);
+				resp.sendRedirect("course?id=" + vl.course.getId());
+			} else {
+				resp.sendError(HttpServletResponse.SC_NOT_FOUND, "bundle not found by index " + vl.assBundleIndex);
+			}
+			return null;
+		}
+
+		vl.assId = ids[2];
+		final AssignmentBundle bundle = vl.course.getAssBundles()[vl.assBundleIndex];
+		vl.ass = IdName.findById(bundle.getAssignments(), vl.assId);
+		if (vl.ass == null) {
+			if (redirect) {
+				Message.addWarn(req, "assignment not found by id " + vl.assId);
+				resp.sendRedirect("course?id=" + vl.course.getId());
+			} else {
+				resp.sendError(HttpServletResponse.SC_NOT_FOUND, "assignment not found by id " + vl.assId);
+			}
+			return null;
+		}
+
+		final String verIdStr = ids[3];
+		vl.ver = IdName.findById(vl.ass.getVersions(), verIdStr);
+		if (vl.ver == null) {
+			if (redirect) {
+				Message.addWarn(req, "version not found by id " + verIdStr);
+				resp.sendRedirect("course?id=" + vl.course.getId());
+			} else {
+				resp.sendError(HttpServletResponse.SC_NOT_FOUND, "version not found by id " + verIdStr);
+			}
+			return null;
+		}
+
+		vl.student = (Student) req.getSession(true).getAttribute(S_STUD);
+		final int studId = Integer.parseInt(vl.student.getId());
+		final int verIdx = IdName.indexOfId(vl.ass.getVersions(), vl.ver.getId());
+		if (!vl.ass.isShared() && (studId) % vl.ass.getVersions().length != verIdx) {
+			if (redirect) {
+				Message.addWarn(req, "variant mismatch");
+				resp.sendRedirect("course?id=" + vl.course.getId());
+			} else {
+				resp.sendError(HttpServletResponse.SC_NOT_FOUND, "variant mismatch");
+			}
+			return null;
+		}
+
+		return vl;
+	}
+
+	static class VersionLookup {
+		protected HashMap<String, Object> model;
+		protected String path;
+		protected Course course;
+		protected int assBundleIndex;
+		protected String assId;
+		protected Assignment ass;
+		protected Version ver;
+		protected Student student;
+
+		public VersionLookup() {
+		}
+
+		public Course getCourse() {
+			return course;
+		}
+
+		public int getAssBundleIndex() {
+			return assBundleIndex;
+		}
+
+		public String getAssId() {
+			return assId;
+		}
+
+		public Version getVer() {
+			return ver;
+		}
+
+		public Student getStudent() {
+			return student;
+		}
+
+		public Assignment getAss() {
+			return ass;
+		}
+
+		public HashMap<String, Object> getModel() {
+			return model;
+		}
+
+		public String getPath() {
+			return path;
+		}
 	}
 }
