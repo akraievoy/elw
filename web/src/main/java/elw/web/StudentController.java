@@ -1,11 +1,8 @@
 package elw.web;
 
-import elw.dao.CourseDao;
-import elw.dao.EnrollDao;
-import elw.dao.GroupDao;
+import elw.dao.*;
 import elw.miniweb.Message;
 import elw.vo.*;
-import org.akraievoy.gear.G4Io;
 import org.akraievoy.gear.G4Parse;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
@@ -16,7 +13,7 @@ import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.File;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Arrays;
@@ -35,11 +32,13 @@ public class StudentController extends MultiActionController {
 	protected final EnrollDao enrollDao;
 
 	protected final ObjectMapper mapper = new ObjectMapper();
+	private final CodeDao codeDao;
 
-	public StudentController(CourseDao courseDao, GroupDao groupDao, EnrollDao enrollDao) {
+	public StudentController(CourseDao courseDao, GroupDao groupDao, EnrollDao enrollDao, final CodeDao codeDao) {
 		this.courseDao = courseDao;
 		this.groupDao = groupDao;
 		this.enrollDao = enrollDao;
+		this.codeDao = codeDao;
 	}
 
 	protected HashMap<String, Object> auth(final HttpServletRequest req, final HttpServletResponse resp, final boolean redirect) throws IOException {
@@ -159,24 +158,30 @@ public class StudentController extends MultiActionController {
 	}
 
 	public ModelAndView do_launch(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		VersionLookup lookup = versionLookup(req, resp, false);
+		VersionLookup lookup = versionLookup(req, resp, true);
 		if (lookup == null) {
 			return null;
 		}
 
 		final StringWriter verSw = new StringWriter();
 		mapper.writeValue(verSw, lookup.getVer());
+		final Version verCopy = mapper.readValue(verSw.toString(), Version.class);
 
-		final Version verNoSolution = mapper.readValue(verSw.toString(), Version.class);
-		verNoSolution.setSolution(new String[]{"#  your code", "#    goes here", "#      :)"});
+		final Group group = (Group) req.getSession(true).getAttribute(S_GROUP);
+		final AssignmentPath path = lookup.createPath(group);
+		final long lastStamp = codeDao.findLastStamp(path);
 
-		final StringWriter verNsSw = new StringWriter();
-		mapper.writeValue(verNsSw, verNoSolution);
+		if (!lookup.getAss().isShared() || lastStamp >= 0) {
+			verCopy.setSolution(codeDao.findCodeByStamp(path, lastStamp));
+		}
 
-		final String solutionStr = lookup.getAss().isShared() ? verSw.toString() : verNsSw.toString();
+		final StringWriter verCopySol = new StringWriter();
+		mapper.writeValue(verCopySol, verCopy);
+		final String solutionStr = verCopySol.toString();
 
 		final HashMap<String, Object> model = lookup.getModel();
-		model.put("verBean", lookup.getVer());
+		model.put("verBean", verCopy);
+		//	LATER use HTTP instead of applet parameter for passing the problem/code to applet
 		model.put("ver", solutionStr.replaceAll("&", "&amp;").replaceAll("\"", "&quot;"));
 		model.put("upHeader", "JSESSIONID=" + req.getSession(true).getId());
 		model.put("upPath", lookup.getPath());
@@ -191,20 +196,9 @@ public class StudentController extends MultiActionController {
 		}
 
 		final Group group = (Group) req.getSession(true).getAttribute(S_GROUP);
-		final File coursesDir = new File(System.getProperty("user.home"), "elw-data");
-		final File studDir = new File(coursesDir, "uploads/" + lookup.getCourse().getId() + "." + group.getId() + "/" + lookup.getStudent().getId() + "." + lookup.getStudent().getName() + "/");
-		final File assDir = new File(studDir, lookup.getAssBundleIndex() + "." + lookup.getAssId() + "." + lookup.getVer().getId());
-
-		if (!assDir.isDirectory() && !assDir.mkdirs()) {
-			log.warn("failed to create dir: " + assDir.getPath());
-			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "failed to create target dir");
-			return null;
-		}
-
-		final File targetFile = new File(assDir, String.valueOf(System.currentTimeMillis()));
-
+		final BufferedReader codeReader = req.getReader();
 		try {
-			G4Io.writeToFile(req.getReader(), targetFile);
+			codeDao.createCode(lookup.createPath(group), codeReader);
 		} catch (IOException e) {
 			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 		}
@@ -339,6 +333,13 @@ public class StudentController extends MultiActionController {
 
 		public String getPath() {
 			return path;
+		}
+
+		protected AssignmentPath createPath(Group group) {
+			return new AssignmentPath(
+					getCourse().getId(), group.getId(), getStudent(),
+					getAssBundleIndex(), getAssId(), getVer().getId()
+			);
 		}
 	}
 }
