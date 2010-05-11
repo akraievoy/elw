@@ -30,9 +30,11 @@ public class StudentController extends MultiActionController {
 	protected final CourseDao courseDao;
 	protected final GroupDao groupDao;
 	protected final EnrollDao enrollDao;
+	protected final CodeDao codeDao;
 
 	protected final ObjectMapper mapper = new ObjectMapper();
-	private final CodeDao codeDao;
+
+	protected final long cacheBustingToken = System.currentTimeMillis();
 
 	public StudentController(CourseDao courseDao, GroupDao groupDao, EnrollDao enrollDao, final CodeDao codeDao) {
 		this.courseDao = courseDao;
@@ -185,6 +187,7 @@ public class StudentController extends MultiActionController {
 		model.put("ver", solutionStr.replaceAll("&", "&amp;").replaceAll("\"", "&quot;"));
 		model.put("upHeader", "JSESSIONID=" + req.getSession(true).getId());
 		model.put("upPath", lookup.getPath());
+		model.put("cacheBustingToken", cacheBustingToken);
 
 		return new ModelAndView("s/launch", model);
 	}

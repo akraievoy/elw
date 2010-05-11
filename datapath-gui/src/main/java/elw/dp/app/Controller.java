@@ -230,23 +230,23 @@ public class Controller {
 
 		setupStatus(statusLabel, "Submitting...");
 
-		final byte[] textBytes = sourceText.getBytes();
-
 		OutputStream up = null;
 		InputStream down = null;
 		try {
+			final byte[] textBytes = sourceText.getBytes("UTF-8");
+
 			final HttpURLConnection connection = (HttpURLConnection) new URL(uploadUrl+"?path="+uploadPath).openConnection();
 			connection.setFixedLengthStreamingMode(textBytes.length);
 			connection.setRequestMethod("POST");
 			connection.setDoOutput(true);
-			connection.setRequestProperty("Content-type", "text");
+			connection.setRequestProperty("Content-type", "text; charset=UTF-8");
 			connection.setRequestProperty("Accept", "text");
 			if (uploadHeader != null && uploadHeader.length() > 0) {
 				connection.setRequestProperty("Cookie", uploadHeader);
 			}
 
 			up = connection.getOutputStream();
-			up.write(sourceText.getBytes());
+			up.write(textBytes);
 			up.flush();
 
 			if (connection.getResponseCode() != 200) {
