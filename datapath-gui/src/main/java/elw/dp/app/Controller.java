@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.concurrent.ScheduledExecutorService;
@@ -249,7 +250,7 @@ public class Controller {
 			up.flush();
 
 			if (connection.getResponseCode() != 200) {
-				Result.failure(log, resRef, "Failed: " + connection.getResponseMessage());
+				Result.failure(log, resRef, "Failed: " + URLDecoder.decode(connection.getResponseMessage()));
 				return;
 			}
 		} catch (IOException e) {
