@@ -20,7 +20,7 @@
 </div>
 <div id=main>
 	<div style="margin: 5em; padding: 3em; font-weight: bold; background-color: #ffee99;">
-		Only *.rtf uploads up to 2 MBytes, please.
+		Only *.rtf uploads up to $uploadLimit, please.
 	</div>
 	<form method="POST" enctype="multipart/form-data" action="uploadReport?path=$upPath">
 		Report file: <input type="file" name="report"/><br/><br/><br/>

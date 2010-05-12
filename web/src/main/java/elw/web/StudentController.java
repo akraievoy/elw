@@ -4,6 +4,12 @@ import elw.dao.*;
 import elw.miniweb.Message;
 import elw.vo.*;
 import org.akraievoy.gear.G4Parse;
+import org.akraievoy.gear.G4mat;
+import org.apache.commons.fileupload.FileItemIterator;
+import org.apache.commons.fileupload.FileItemStream;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,9 +19,7 @@ import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.StringWriter;
+import java.io.*;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -31,16 +35,19 @@ public class StudentController extends MultiActionController {
 	protected final GroupDao groupDao;
 	protected final EnrollDao enrollDao;
 	protected final CodeDao codeDao;
+	private final ReportDao reportDao;
 
 	protected final ObjectMapper mapper = new ObjectMapper();
 
 	protected final long cacheBustingToken = System.currentTimeMillis();
+	private static final int UPLOAD_LIMIT = 2 * 1024 * 1024;
 
-	public StudentController(CourseDao courseDao, GroupDao groupDao, EnrollDao enrollDao, final CodeDao codeDao) {
+	public StudentController(CourseDao courseDao, GroupDao groupDao, EnrollDao enrollDao, final CodeDao codeDao, ReportDao reportDao) {
 		this.courseDao = courseDao;
 		this.groupDao = groupDao;
 		this.enrollDao = enrollDao;
 		this.codeDao = codeDao;
+		this.reportDao = reportDao;
 	}
 
 	protected HashMap<String, Object> auth(final HttpServletRequest req, final HttpServletResponse resp, final boolean redirect) throws IOException {
@@ -159,7 +166,7 @@ public class StudentController extends MultiActionController {
 		return new ModelAndView("s/course", model);
 	}
 
-	public ModelAndView do_uploadReport(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+	public ModelAndView do_uploadReport(final HttpServletRequest req, final HttpServletResponse resp) throws IOException, FileUploadException {
 		VersionLookup lookup = versionLookup(req, resp, true);
 		if (lookup == null) {
 			return null;
@@ -171,8 +178,59 @@ public class StudentController extends MultiActionController {
 			return null;
 		}
 
-		Message.addWarn(req, "not implemented yet");
-		resp.sendRedirect("uploadPage?path="+lookup.getPath());
+		if (req.getContentLength() > UPLOAD_LIMIT) {
+			Message.addWarn(req, "apparently you're trying to upload more than " + G4mat.formatMem(UPLOAD_LIMIT));
+			resp.sendRedirect("uploadPage?path="+lookup.getPath());
+			return null;
+		}
+
+		final DiskFileItemFactory fif = new DiskFileItemFactory();
+		fif.setRepository(new File(System.getProperty("java.io.tmpdir")));
+		fif.setSizeThreshold(2 * UPLOAD_LIMIT);
+
+		final ServletFileUpload sfu = new ServletFileUpload(fif);
+
+		final FileItemIterator fii = sfu.getItemIterator(req);
+		int fileCount = 0;
+		while (fii.hasNext()) {
+			final FileItemStream item = fii.next();
+			if (item.isFormField()) {
+					continue;
+			}
+
+			if (fileCount > 0) {
+				Message.addWarn(req, "one file per upload, please");
+				resp.sendRedirect("uploadPage?path="+lookup.getPath());
+				return null;
+			}
+
+			final String fileName = item.getName();
+			if (!fileName.endsWith(".rtf")) {
+				Message.addWarn(req, "is that an .rtf file or what?");
+				resp.sendRedirect("uploadPage?path="+lookup.getPath());
+				return null;
+			}
+
+			final String contentType = item.getContentType();
+			if (!"application/rtf".equalsIgnoreCase(contentType)) {
+				Message.addWarn(req, "contentType is '" + contentType + "', which is not what is expected for an .rtf file");
+				resp.sendRedirect("uploadPage?path="+lookup.getPath());
+				return null;
+			}
+
+			final InputStream itemIs = item.openStream();
+			final Group group = (Group) req.getSession(true).getAttribute(S_GROUP);
+			reportDao.createReport(lookup.createPath(group), itemIs);
+			fileCount++;
+		}
+
+		if (fileCount == 1) {
+			Message.addInfo(req, "Your upload has succeeded");
+			resp.sendRedirect("uploadPage?path="+lookup.getPath());
+		} else {
+			Message.addWarn(req, "Something went terribly wrong");
+			resp.sendRedirect("uploadPage?path="+lookup.getPath());
+		}
 
 		return null;
 	}
@@ -193,6 +251,7 @@ public class StudentController extends MultiActionController {
 		model.put("verBean", lookup.getVer());
 		model.put("upPath", lookup.getPath());
 		model.put("course", lookup.getCourse());
+		model.put("uploadLimit", G4mat.formatMem(UPLOAD_LIMIT));
 
 		return new ModelAndView("s/uploadPage", model);
 	}
