@@ -228,6 +228,9 @@ public class MipsAssembler {
 			final String regToken = scanChunk(code, ",()");
 			syntax.delete(0, regId.length());
 			final Reg reg = parseReg(regToken, log, resRef, prefixOn);
+			if (reg == null) {
+				return true;
+			}
 			if (!G.contains(Reg.publicRegs, reg)) {
 				Result.failure(log, resRef, prefixOn + "direct ref to $" + reg.toString());
 				return true;
