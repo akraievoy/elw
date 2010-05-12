@@ -5,15 +5,14 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta content="text/html; charset=UTF-8">
-	<title>Course List</title>
+	<title>My Courses</title>
 	<link href="../css/elw.css" type="text/css" rel="stylesheet"/>
 </head>
 <body>
 <div id="header">
-#if($elw_group)#if($elw_student)#set($auth="true") #end #end
-	<div id="nav">#if($auth)#end</div>
+	<div id="nav"><span style="font-weight: bold">My Courses</span></div>
 	&nbsp;
-	<div id="cred">[&nbsp;#if($auth)$elw_group.name&nbsp;$elw_student.name#{else}Anonymous#end &nbsp;]</div>
+	<div id="cred">[&nbsp;$elw_group.name&nbsp;$elw_student.name&nbsp;]</div>
 </div>
 <div id=messages>#foreach($m in $elw_messages)
 	<div class="$m.type">$m.message</div>

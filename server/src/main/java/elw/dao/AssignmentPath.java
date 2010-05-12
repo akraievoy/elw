@@ -45,9 +45,29 @@ public class AssignmentPath {
 		return verId;
 	}
 
-	protected File getRoot(File uploadsDir) {
-		final File studDir = new File(uploadsDir, "" + getCourseId() + "." + getGroupId() + "/" + getStudent().getId() + "." + getStudent().getName() + "/");
-		final File assDir = new File(studDir, getAssBundleIdx() + "." + getAssId() + "." + getVerId());
-		return assDir;
+	protected File getCodeRoot(File uploadsDir) {
+		return new File(
+				getStudentRoot(uploadsDir),
+				getAssDirName()
+		);
+	}
+
+	protected File getReportRoot(File uploadsDir) {
+		return new File(
+				getStudentRoot(uploadsDir),
+				getAssDirName() + "-doc"
+		);
+	}
+
+	protected String getAssDirName() {
+		return getAssBundleIdx() + "." + getAssId() + "." + getVerId();
+	}
+
+	protected File getStudentRoot(File uploadsDir) {
+		return new File(
+				uploadsDir,
+				"" + getCourseId() + "." + getGroupId() + "/"
+				+ getStudent().getId() + "." + getStudent().getName() + "/"
+		);
 	}
 }

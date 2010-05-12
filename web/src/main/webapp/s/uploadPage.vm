@@ -1,0 +1,31 @@
+#* @vtlvariable name="elw_messages" type="elw.miniweb.Message[]" *#
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta content="text/html; charset=UTF-8">
+	<title>$verBean.name - Report</title>
+	<link href="../css/elw.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<div id="header">
+	<div id="nav">
+		<a href="courses">My Courses</a> &gt;
+		<a href="course?id=${course.id}">${course.name}</a> &gt;
+		<span style="font-weight: bold">$verBean.name - Report</span></div>
+	&nbsp;
+	<div id="cred">[&nbsp;$elw_group.name&nbsp;$elw_student.name&nbsp;]</div>
+</div>
+<div id=messages>#foreach($m in $elw_messages)
+	<div class="$m.type">$m.message</div>
+#end
+</div>
+<div id=main>
+	<div style="margin: 5em; padding: 3em; font-weight: bold; background-color: #ffee99;">
+		Only *.rtf uploads up to 2 MBytes, please.
+	</div>
+	<form method="POST" enctype="multipart/form-data" action="uploadReport?path=$upPath">
+		Report file: <input type="file" name="report"/><br/><br/><br/>
+		<input style="margin-left: 20em;" type="submit" value="Submit"/>
+	</form>
+</div>
+</body>
+</html>

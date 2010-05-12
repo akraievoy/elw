@@ -11,42 +11,45 @@
 </head>
 <body>
 <div id="header">
-#if($elw_group)#if($elw_student)#set($auth="true") #end #end
-	<div id="nav">#if($auth)#end</div>
+	<div id="nav"><a href="courses">My Courses</a> &gt; <span style="font-weight: bold">${course.name}</span></div>
 	&nbsp;
-	<div id="cred">[&nbsp;#if($auth)$elw_group.name&nbsp;$elw_student.name#{else}Anonymous#end &nbsp;]</div>
+	<div id="cred">[&nbsp;$elw_group.name&nbsp;$elw_student.name&nbsp;]</div>
 </div>
 <div id=messages>#foreach($m in $elw_messages)
 	<div class="$m.type">$m.message</div>
 #end
 </div>
 <div id=main>
-	Assignment bundles:
-	<ul>
+	<table><tbody>
+	<tr><td style="padding-left: 2em;" colspan=3>Assignment bundles:</td></tr>
 	#foreach($assBundle in $course.assBundles)#set($bunI = $velocityCount - 1)
-			<li>Assignments:<ul>
+	<tr><td style="padding-left: 3em;" colspan=3>Assignments:</td></tr>
 	 #foreach($ass in $assBundle.assignments)#set($assI = $velocityCount)
 		#if($ass.id)
-				<li>$ass.name :
 			#if($ass.shared)
-					<ol>
+	<tr><td style="padding-left: 5em;" colspan=3>$ass.name&nbsp;:&nbsp;</td></tr>
 				#foreach($ver in $ass.versions)#set($verI = $velocityCount)
 					#if($ver.id)
-					<li><a href="launch?path=${course.id}--${bunI}--${ass.id}--${ver.id}">$ver.name</a></li>
+	<tr>
+		<td style="padding-left: 8em;">$ver.name</td>
+		<td style="padding-left: 1em; padding-right: 1em;">[&nbsp;<a href="launch?path=${course.id}--${bunI}--${ass.id}--${ver.id}">Code</a>&nbsp;]</td>
+		<td style="padding-left: 1em; padding-right: 1em;"></td>
+	</tr>
 					#end
 		 		#end
-					</ol>
-				</li>
 			#else
 				#set($verIdx = $studId % $ass.versions.size())
 				#set($ver = $ass.versions.get($verIdx))
-				<a href="launch?path=${course.id}--${bunI}--${ass.id}--${ver.id}">$ver.name</a>
+	<tr>
+		<td style="padding-left: 5em;">$ass.name&nbsp;:&nbsp;$ver.name</td>
+		<td style="padding-left: 1em; padding-right: 1em;">[&nbsp;<a href="launch?path=${course.id}--${bunI}--${ass.id}--${ver.id}">Code</a>&nbsp;]</td>
+		<td style="padding-left: 1em; padding-right: 1em;">[&nbsp;<a href="uploadPage?path=${course.id}--${bunI}--${ass.id}--${ver.id}">Report</a>&nbsp;]</td>
+	</tr>
 			#end
 		#end
 	 #end
-			</ul> </li>
 	#end
-	</ul>
+	</tbody></table>
 </div>
 </body>
 </html>

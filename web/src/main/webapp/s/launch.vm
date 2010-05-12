@@ -5,22 +5,23 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta content="text/html; charset=UTF-8">
-	<title>Launching Assignment Version</title>
+	<title>$verBean.name - Code</title>
 	<link href="../css/elw.css" type="text/css" rel="stylesheet"/>
 </head>
 <body>
 <div id="header">
-#if($elw_group)#if($elw_student)#set($auth="true") #end #end
-	<div id="nav">#if($auth)#end</div>
+	<div id="nav">
+		<a href="courses">My Courses</a> &gt;
+		<a href="course?id=${course.id}">${course.name}</a> &gt;
+		<span style="font-weight: bold">$verBean.name - Code</span></div>
 	&nbsp;
-	<div id="cred">[&nbsp;#if($auth)$elw_group.name&nbsp;$elw_student.name#{else}Anonymous#end &nbsp;]</div>
+	<div id="cred">[&nbsp;$elw_group.name&nbsp;$elw_student.name&nbsp;]</div>
 </div>
 <div id=messages>#foreach($m in $elw_messages)
 	<div class="$m.type">$m.message</div>
 #end
 </div>
 <div id=main>
-<div>$verBean.name&nbsp;</div>
 <div style="text-align:center;">	<object classid="clsid:8AD9C840-044E-11D1-B3E9-00805F499D93" width="800" height="600">
 		<param name="type" value="application/x-java-applet;version=1.5"/>
 		<param name="code" value="elw.dp.ui.Applet"/>

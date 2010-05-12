@@ -7,33 +7,28 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Dealing with persisting, enumerating and retrieving code uploads.
  */
-public class CodeDao {
-	private static final Logger log = LoggerFactory.getLogger(CodeDao.class);
-
-	protected static final String[] CODE_DEFAULT = new String[]{"#  your code", "#    goes here", "#      :)"};
+public class ReportDao {
+	private static final Logger log = LoggerFactory.getLogger(ReportDao.class);
 
 	protected File uploadsDir = new File(System.getProperty("user.home"), "elw-data/uploads");
 
-	public void createCode(AssignmentPath assignmentPath, BufferedReader codeReader) throws IOException {
-		final File assDir = assignmentPath.getCodeRoot(uploadsDir);
+	public void createReport(AssignmentPath assignmentPath, InputStream in) throws IOException {
+		final File assDir = assignmentPath.getReportRoot(uploadsDir);
 
 		if (!assDir.isDirectory() && !assDir.mkdirs()) {
 			throw new IOException("failed to create dir: " + assDir.getPath());
 		}
 
 		final File targetFile = new File(assDir, String.valueOf(System.currentTimeMillis()));
-		//	FIXME this is fine only till server uses UTF-8
-		G4Io.writeToFile(codeReader, targetFile);
+		G4Io.writeToFile(in, targetFile);
 	}
 
 	public long[] findAllStamps(AssignmentPath assignmentPath) {
-		final File assDir = assignmentPath.getCodeRoot(uploadsDir);
+		final File assDir = assignmentPath.getReportRoot(uploadsDir);
 
 		if (!assDir.isDirectory()) {
 			return new long[0];
@@ -73,19 +68,19 @@ public class CodeDao {
 		return stamps.length > 0 ? stamps[stamps.length - 1] : -1;
 	}
 
-	public String[] findLastCode(AssignmentPath assignmentPath) throws IOException {
-		return findCodeByStamp(assignmentPath, findLastStamp(assignmentPath));
+	public InputStream findLastReport(AssignmentPath assignmentPath) throws IOException {
+		return findReportByStamp(assignmentPath, findLastStamp(assignmentPath));
 	}
 
-	public String[] findCodeByStamp(AssignmentPath assignmentPath, long stamp) throws IOException {
+	public InputStream findReportByStamp(AssignmentPath assignmentPath, long stamp) throws IOException {
 		if (stamp < 0) {
-			return CODE_DEFAULT;
+			return null;
 		}
 
-		final File assDir = assignmentPath.getCodeRoot(uploadsDir);
+		final File assDir = assignmentPath.getReportRoot(uploadsDir);
 
 		if (!assDir.isDirectory()) {
-			return CODE_DEFAULT;
+			return null;
 		}
 
 		final String[] fileNames = assDir.list();
@@ -106,29 +101,9 @@ public class CodeDao {
 		}
 
 		if (stampFileName == null) {
-			return CODE_DEFAULT;
+			return null;
 		}
 
-		final List<String> codeList = new ArrayList<String>();
-		FileReader reader = null;
-		try {
-			//	FIXME this is fine only till server uses UTF-8
-			reader = new FileReader(new File(assDir, stampFileName));
-			final BufferedReader codeIn = new BufferedReader(reader);
-			String codeLine;
-			while ((codeLine = codeIn.readLine()) != null) {
-				codeList.add(codeLine);
-			}
-		} finally {
-			if (reader != null) {
-				try {
-					reader.close();
-				} catch (IOException e) {
-					log.debug("failed on close", e);
-				}
-			}
-		}
-
-		return codeList.toArray(new String[codeList.size()]);
+		return new FileInputStream(new File(assDir, stampFileName));
 	}
 }

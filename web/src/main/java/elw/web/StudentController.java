@@ -159,6 +159,44 @@ public class StudentController extends MultiActionController {
 		return new ModelAndView("s/course", model);
 	}
 
+	public ModelAndView do_uploadReport(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+		VersionLookup lookup = versionLookup(req, resp, true);
+		if (lookup == null) {
+			return null;
+		}
+
+		if (lookup.getAss().isShared()) {
+			Message.addWarn(req, "shared assignment do not require any reports");
+			resp.sendRedirect("course?id=" + lookup.course.getId());
+			return null;
+		}
+
+		Message.addWarn(req, "not implemented yet");
+		resp.sendRedirect("uploadPage?path="+lookup.getPath());
+
+		return null;
+	}
+
+	public ModelAndView do_uploadPage(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+		VersionLookup lookup = versionLookup(req, resp, true);
+		if (lookup == null) {
+			return null;
+		}
+
+		if (lookup.getAss().isShared()) {
+			Message.addWarn(req, "shared assignments do not require any reports");
+			resp.sendRedirect("course?id=" + lookup.course.getId());
+			return null;
+		}
+
+		final HashMap<String, Object> model = lookup.getModel();
+		model.put("verBean", lookup.getVer());
+		model.put("upPath", lookup.getPath());
+		model.put("course", lookup.getCourse());
+
+		return new ModelAndView("s/uploadPage", model);
+	}
+
 	public ModelAndView do_launch(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
 		VersionLookup lookup = versionLookup(req, resp, true);
 		if (lookup == null) {
@@ -188,6 +226,7 @@ public class StudentController extends MultiActionController {
 		model.put("upHeader", "JSESSIONID=" + req.getSession(true).getId());
 		model.put("upPath", lookup.getPath());
 		model.put("cacheBustingToken", cacheBustingToken);
+		model.put("course", lookup.getCourse());
 
 		return new ModelAndView("s/launch", model);
 	}
@@ -218,6 +257,16 @@ public class StudentController extends MultiActionController {
 		}
 
 		vl.path = req.getParameter("path");
+		if (vl.path == null) {
+			if (redirect) {
+				Message.addWarn(req, "no assignment path");
+				resp.sendRedirect("courses");
+			} else {
+				resp.sendError(HttpServletResponse.SC_NOT_FOUND, "no assignment path");
+			}
+			return null;
+		}
+
 		final String[] ids = vl.path.split("--");
 		if (ids.length != 4) {
 			if (redirect) {
