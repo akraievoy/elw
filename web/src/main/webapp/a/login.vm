@@ -1,0 +1,46 @@
+#* @vtlvariable name="elw_messages" type="elw.miniweb.Message[]" *#
+#* @vtlvariable name="elw_student" type="elw.vo.Student" *#
+#* @vtlvariable name="elw_group" type="elw.vo.Group" *#
+#* @vtlvariable name="groupName" type="java.lang.String" *#
+#* @vtlvariable name="studentName" type="java.lang.String" *#
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta content="text/html; charset=UTF-8">
+	<title>Login (Admin Area)</title>
+	<link href="../css/elw.css" type="text/css" rel="stylesheet"/>
+	<script type="text/javascript" src="../js/jquery.js"></script>
+	<script type="text/javascript" src="../js/jquery.sha1.js"></script>
+</head>
+<body>
+<div id="header">
+	<div id="nav"><span style="font-weight: bold">Login (Admin Area)</span></div>
+	<div id="cred">[&nbsp;Admin&nbsp;]</div>
+	&nbsp;
+</div>
+<div id=messages>#foreach($m in $elw_messages)
+	<div class="$m.type">$m.message</div>
+#end
+</div>
+<div id=main>
+	<form method="POST" action="loginPost" id="elw_formLoginPost">
+		<input type="hidden" value="$nonce" name="nonce" id="elw_inputNonce"/>
+		<input type="hidden" value="" name="hash" id="elw_inputHash"/>
+		<div style="margin: 1em;">Password:&nbsp;<input type="password" value="" id="elw_inputPassword"/></div>
+		<div style="margin: 1em; padding-left: 24em;"><input type="submit" value="Go" id="elw_buttonGo"/></div>
+	</form>
+</div>
+</body>
+<script type="text/javascript">
+  jQuery(document).ready(function() {
+		jQuery("#elw_formLoginPost").submit(function(evt) {
+			jQuery("#elw_inputHash").val(
+				jQuery.sha1(jQuery("#elw_inputNonce").val() + "-->" + jQuery("#elw_inputPassword").val())
+			);
+			//	just in case some lame browser would still submit cleartext password field despite it has no name at all
+			jQuery("#elw_inputPassword").val("");
+		});
+
+		jQuery("#elw_inputPassword").focus();
+	});
+</script>
+</html>

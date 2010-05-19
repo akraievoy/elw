@@ -1,0 +1,23 @@
+#* @vtlvariable name="course" type="elw.vo.Course" *#
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta content="text/html; charset=UTF-8">
+	<title>Login (Admin Area)</title>
+	<link href="../css/elw.css" type="text/css" rel="stylesheet"/>
+	<script type="text/javascript" src="../js/jquery.js"></script>
+	<script type="text/javascript" src="../js/jquery.sha1.js"></script>
+</head>
+<body>
+<div id="header">
+	<div id="nav"><span style="font-weight: bold">Index</span></div>
+	<div id="cred">[&nbsp;#if($auth)Admin#{else}Anonymous#end&nbsp;]</div>
+	&nbsp;
+</div>
+<div id=messages>#foreach($m in $elw_messages)
+	<div class="$m.type">$m.message</div>
+#end
+</div>
+<div id=main>
+</div>
+</body>
+</html>

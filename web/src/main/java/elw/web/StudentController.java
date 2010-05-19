@@ -24,12 +24,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-public class StudentController extends MultiActionController {
+public class StudentController extends MultiActionController implements WebSymbols {
 	private static final Logger log = LoggerFactory.getLogger(StudentController.class);
-
-	public static final String S_GROUP = "elw_group";
-	public static final String S_STUD = "elw_student";
-	public static final String S_MESSAGES = "elw_messages";
 
 	protected final CourseDao courseDao;
 	protected final GroupDao groupDao;
