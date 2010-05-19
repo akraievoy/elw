@@ -1,6 +1,8 @@
 package elw.web;
 
+import base.pattern.Result;
 import elw.dao.CourseDao;
+import elw.dp.mips.MipsValidator;
 import elw.miniweb.Message;
 import elw.vo.*;
 import org.akraievoy.gear.G4Parse;
@@ -157,20 +159,27 @@ public class AdminController extends MultiActionController implements WebSymbols
 			return null;
 		}
 
-		final HashMap<String, String> testData = new HashMap<String, String>();
 		if ("true".equalsIgnoreCase(req.getParameter("test"))) {
-			for (AssignmentBundle bundle : course.getAssBundles()) {
+			final HashMap<String, Result> testResults = new HashMap<String, Result>();
+			final MipsValidator validator = new MipsValidator();
+			for (int bunI = 0, assBundlesLength = course.getAssBundles().length; bunI < assBundlesLength; bunI++) {
+				AssignmentBundle bundle = course.getAssBundles()[bunI];
 				for (Assignment ass : bundle.getAssignments()) {
 					for (Version ver : ass.getVersions()) {
-						
+						final Result[] resRef = {new Result("unknown", false)};
+						validator.batch(resRef, ver, ver.getSolution());
+						testResults.put(
+								course.getId() + "--" + bunI + "--" + ass.getId() + "--" + ver.getId(),
+								resRef[0]
+						);
 					}
 				}
 			}
+			model.put("testResults", testResults);
 		}
 
 		model.put("auth", req.getSession(true).getAttribute(S_ADMIN));
 		model.put("course", course);
-		model.put("testData", testData);
 
 		return new ModelAndView("a/course", model);
 	}

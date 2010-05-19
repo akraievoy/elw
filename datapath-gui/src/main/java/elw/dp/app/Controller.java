@@ -37,9 +37,6 @@ public class Controller {
 
 	protected final DataPathForm view = new DataPathForm();
 
-	//	static setup, may be spring-injected at some time
-	protected final int runSteps = 16384;
-
 	//  application state
 	protected AtomicLong sourceStamp = new AtomicLong(1); // NOTE: no modifications still require assembly to run before stepping
 	protected AtomicLong assembleStamp = new AtomicLong(0);
@@ -68,7 +65,7 @@ public class Controller {
 	protected final TestRunAction aTestRun = new TestRunAction("Run");
 	protected final TestBatchAction aTestBatch = new TestBatchAction("Batch");
 	protected final RunStepAction aRunStep = new RunStepAction("Step", 1);
-	protected final RunStepAction aRunRun = new RunStepAction("Run", runSteps);
+	protected final RunStepAction aRunRun = new RunStepAction("Run", validator.getRunSteps());
 	protected final RunResetAction aRunReset = new RunResetAction("Reset");
 
 	public void setSelectedTask(Version selectedTask) {
@@ -479,7 +476,8 @@ public class Controller {
 					try {
 						setupStatus(statusLabel, "Running...");
 
-						validator.run(resRef, (Test) Controller.this.testComboModel.getSelectedItem(), runSteps, getSource());
+						final Test test = (Test) testComboModel.getSelectedItem();
+						validator.run(resRef, test, getSource());
 					} catch (Throwable t) {
 						Result.failure(log, resRef, "Failed: " + G.report(t));
 						log.trace("trace", t);
@@ -510,7 +508,7 @@ public class Controller {
 					final Result[] resRef = new Result[]{new Result("status unknown", false)};
 
 					try {
-						validator.batch(resRef, runSteps, selectedTask, getSource());
+						validator.batch(resRef, selectedTask, getSource());
 					} finally {
 						SwingUtilities.invokeLater(new Runnable() {
 							public void run() {

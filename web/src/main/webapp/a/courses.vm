@@ -22,7 +22,7 @@
 <tr>
 	<td style="padding-left: 2em;">${course.name}</td>
 	<td style="padding-left: 1em; padding-right: 1em;">[&nbsp;<a href="course?id=${course.id}">Structure</a>&nbsp;]</td>
-	<td style="padding-left: 1em; padding-right: 1em;">[&nbsp;<a href="courseTest?id=${course.id}&test=true">Structure + Test</a>&nbsp;]</td>
+	<td style="padding-left: 1em; padding-right: 1em;">[&nbsp;<a href="course?id=${course.id}&test=true">Structure + Test</a>&nbsp;]</td>
 </tr>
 #end
 </tbody></table>

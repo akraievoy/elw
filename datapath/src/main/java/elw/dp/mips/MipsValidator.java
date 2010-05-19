@@ -23,9 +23,19 @@ public class MipsValidator {
 	protected Instruction[] instructions = null;
 	protected TIntIntHashMap[] regs = null;
 	protected TIntIntHashMap[] data = null;
+	//	static setup, may be spring-injected at some time
+	protected int runSteps = 16384;
 
 	public DataPath getDataPath() {
 		return dataPath;
+	}
+
+	public int getRunSteps() {
+		return runSteps;
+	}
+
+	public void setRunSteps(int runSteps) {
+		this.runSteps = runSteps;
 	}
 
 	public Instruction[] assemble(Result[] resRef, String[] sourceLines) {
@@ -167,7 +177,7 @@ public class MipsValidator {
 		Result.success(log, resRef, "Test Passed Register Spec");
 	}
 
-	public void run(Result[] resRef, final Test test, final int steps, final String[] code) {
+	public void run(Result[] resRef, final Test test, final String[] code) {
 		assemble(resRef, code);
 		if (resRef[0].isSuccess()) {
 			loadTest(resRef, test);
@@ -176,20 +186,20 @@ public class MipsValidator {
 			reset(resRef);
 		}
 		if (resRef[0].isSuccess()) {
-			if (!step(resRef, steps)) {
+			if (!step(resRef, runSteps)) {
 				Result.failure(log, resRef, "Execution timed out");
 			}
 		}
 	}
 
-	public void batch(Result[] resRef, final int steps, final Version task, final String[] code) {
+	public void batch(Result[] resRef, final Version task, final String[] code) {
 		int failCount = 0;
 		Test[] tests = task.getTests();
 		for (int i = 0, testsLength = tests.length; i < testsLength; i++) {
 			Test test = tests[i];
 			final Result[] localResRef = {new Result("test status unknown", false)};
 			try {
-				run(localResRef, test, steps, code);
+				run(localResRef, test, code);
 				if (!localResRef[0].isSuccess()) {
 					failCount++;
 				}
