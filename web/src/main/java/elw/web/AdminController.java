@@ -30,7 +30,9 @@ public class AdminController extends MultiActionController implements WebSymbols
 	protected static final String PASSWORD = System.getProperty("elw.admin.password", "swordfish");
 
 	protected final CourseDao courseDao;
+
 	protected final ObjectMapper mapper = new ObjectMapper();
+	protected final long cacheBustingToken = System.currentTimeMillis();
 
 	public AdminController(CourseDao courseDao) {
 		this.courseDao = courseDao;
@@ -104,8 +106,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 	public static String renderBytes(byte[] checkSum) {
 		final StringBuffer result = new StringBuffer();
 
-		for (int i = 0; i < checkSum.length; i++) {
-			byte checkByte = checkSum[i];
+		for (byte checkByte : checkSum) {
 			result.append(Integer.toString((checkByte & 0xff) + 0x100, 16).substring(1));
 		}
 
@@ -234,13 +235,12 @@ public class AdminController extends MultiActionController implements WebSymbols
 		final StringWriter verSw = new StringWriter();
 		mapper.writeValue(verSw, ver);
 
-		final Version verNoSolution = mapper.readValue(verSw.toString(), Version.class);
-		verNoSolution.setSolution(new String[] {"#  your code","#    goes here", "#      :)"});
-
-		final StringWriter verNsSw = new StringWriter();
-		mapper.writeValue(verNsSw, verNoSolution);
-
-		model.put("ver", verNsSw.toString().replaceAll("&", "&amp;").replaceAll("\"", "&quot;"));
+		//	LATER use HTTP instead of applet parameter for passing the problem/code to applet
+		model.put("ver", verSw.toString().replaceAll("&", "&amp;").replaceAll("\"", "&quot;"));
+		model.put("verBean", ver);
+		model.put("cacheBustingToken", cacheBustingToken);
+		model.put("course", course);
+		model.put("auth", req.getSession(true).getAttribute(S_ADMIN));
 
 		return new ModelAndView("a/launch", model);
 	}

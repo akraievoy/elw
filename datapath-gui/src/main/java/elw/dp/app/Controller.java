@@ -138,8 +138,8 @@ public class Controller {
 		rFactory.install(instrTable);
 		rFactory.findColByName(instrTable, InstructionsTableModel.COL_ACC).setMaxWidth(18);
 		rFactory.findColByName(instrTable, InstructionsTableModel.COL_ADDR).setMaxWidth(80);
-		rFactory.findColByName(instrTable, InstructionsTableModel.COL_CODE).setMaxWidth(120);
-		rFactory.findColByName(instrTable, InstructionsTableModel.COL_CODE).setMinWidth(100);
+		rFactory.findColByName(instrTable, InstructionsTableModel.COL_CODE).setMaxWidth(240);
+		rFactory.findColByName(instrTable, InstructionsTableModel.COL_CODE).setMinWidth(160);
 
 		final JTable regsTable = view.getRunRegsTable();
 		regsTable.setModel(tmRegs);

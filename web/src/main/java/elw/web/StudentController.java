@@ -34,8 +34,8 @@ public class StudentController extends MultiActionController implements WebSymbo
 	private final ReportDao reportDao;
 
 	protected final ObjectMapper mapper = new ObjectMapper();
-
 	protected final long cacheBustingToken = System.currentTimeMillis();
+
 	private static final int UPLOAD_LIMIT = 2 * 1024 * 1024;
 
 	public StudentController(CourseDao courseDao, GroupDao groupDao, EnrollDao enrollDao, final CodeDao codeDao, ReportDao reportDao) {

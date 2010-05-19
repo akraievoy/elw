@@ -18,7 +18,7 @@ public class CourseDao {
 	private static final Logger log = LoggerFactory.getLogger(CourseDao.class);
 
 	protected final ObjectMapper mapper;
-	protected int cacheTime = 180000;
+	protected int cacheTime = 60000;
 
 	final Map<String, Course> courseCache = new TreeMap<String, Course>();
 
@@ -41,6 +41,8 @@ public class CourseDao {
 
 	public void refreshCache() {
 		final long now = System.currentTimeMillis();
+		final long prevStamp = cacheStamp;
+
 		if (now - cacheStamp >= cacheTime) {
 			cacheStamp = now;
 		} else {
@@ -55,6 +57,10 @@ public class CourseDao {
 		});
 
 		for (File courseFile : courseFiles) {
+			if (courseFile.lastModified() < prevStamp) {
+				log.warn("{} not modified since last read", courseFile.getPath());
+				continue;
+			}
 			try {
 				final Course course = mapper.readValue(courseFile, Course.class);
 				if (courseFile.getName().equals(course.getId() + ".json")) {
