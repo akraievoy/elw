@@ -2,13 +2,11 @@ package elw.dp.app;
 
 import base.pattern.Result;
 import elw.dp.mips.*;
-import elw.dp.mips.asm.MipsAssembler;
 import elw.dp.ui.DataPathForm;
 import elw.dp.ui.FeedbackAppender;
 import elw.dp.ui.RendererFactory;
 import elw.vo.Test;
 import elw.vo.Version;
-import gnu.trove.TIntIntHashMap;
 import org.akraievoy.gear.G;
 import org.akraievoy.gear.G4Str;
 import org.apache.log4j.Level;
@@ -26,8 +24,6 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicLong;
@@ -40,9 +36,6 @@ public class Controller {
 	protected static final Pattern PATTERN_LINE_SEPARATOR = Pattern.compile("\r|\r\n|\n");
 
 	protected final DataPathForm view = new DataPathForm();
-
-	protected final MipsAssembler assembler = new MipsAssembler();
-	protected DataPath dataPath = new DataPath();
 
 	//	static setup, may be spring-injected at some time
 	protected final int runSteps = 16384;
@@ -58,14 +51,12 @@ public class Controller {
 
 	protected final DefaultComboBoxModel testComboModel = new DefaultComboBoxModel();
 	//	app data (compile/test/run cycle)
-	protected final HashMap<String,Integer> labelIndex = new HashMap<String, Integer>();
-	protected Instruction[] instructions = null;
-	protected TIntIntHashMap[] regs = null;
-	protected TIntIntHashMap[] data = null;
 
-	InstructionsTableModel tmInstructions = new InstructionsTableModel(dataPath.getInstructions());
-	RegistersTableModel tmRegs = new RegistersTableModel(dataPath.getRegisters());
-	MemoryTableModel tmMemory = new MemoryTableModel(dataPath.getMemory());
+	private final MipsValidator validator = new MipsValidator();
+
+	InstructionsTableModel tmInstructions = new InstructionsTableModel(validator.getDataPath().getInstructions());
+	RegistersTableModel tmRegs = new RegistersTableModel(validator.getDataPath().getRegisters());
+	MemoryTableModel tmMemory = new MemoryTableModel(validator.getDataPath().getMemory());
 
 	//	actions
 	protected final ScheduledExecutorService executor = new ScheduledThreadPoolExecutor(3);
@@ -206,16 +197,17 @@ public class Controller {
 	protected void job_assemble(final JLabel statusLabel, final Result[] resRef) {
 		setupStatus(statusLabel, "Assembling...");
 
-		final String source = view.getSourceTextArea().getText();
-		final String[] sourceLines = PATTERN_LINE_SEPARATOR.split(source);
-
-		final Instruction[] newInstructions = assembler.loadInstructions(sourceLines, resRef, labelIndex);
+		final String[] sourceLines = getSource();
+		final Instruction[] newInstructions = validator.assemble(resRef, sourceLines);
 		if (newInstructions != null) {
 			assembleStamp.set(System.currentTimeMillis());
-			instructions = newInstructions;
-		} else {
-			instructions = null;
 		}
+	}
+
+	protected String[] getSource() {
+		final String source = view.getSourceTextArea().getText();
+		
+		return PATTERN_LINE_SEPARATOR.split(source);
 	}
 
 	protected void job_submit(final JLabel statusLabel, final Result[] resRef, String sourceText) {
@@ -250,7 +242,7 @@ public class Controller {
 			up.flush();
 
 			if (connection.getResponseCode() != 200) {
-				Result.failure(log, resRef, "Failed: " + URLDecoder.decode(connection.getResponseMessage()));
+				Result.failure(log, resRef, "Failed: " + URLDecoder.decode(connection.getResponseMessage(), "UTF-8"));
 				return;
 			}
 		} catch (IOException e) {
@@ -283,193 +275,13 @@ public class Controller {
 		}
 
 		if (!assemble || resRef[0].isSuccess()) {
+			//	LATER #163
+			//	TODO test.getName() seems to return null in most cases
 			setupStatus(statusLabel, "Loading Regs and Mem for " + test.getName() + "...");
-//	LATER #163
-/*
-			final String regsText = view.getTestRegsTextArea().getText();
-			final String[] regsLines = regsText.split(LINE_SEPARATOR);
-*/
-			final String[] regsLines = test.getArgs().get("regs") != null ? test.getArgs().get("regs") : G.STRINGS_EMPTY;
-
-			final TIntIntHashMap[] newRegs = assembler.loadRegs(regsLines, resRef);
-			if (newRegs != null && resRef[0].isSuccess()) {
-//	LATER #163
-/*
-				final String memText = view.getTestMemTextArea().getText();
-				final String[] memLines = memText.split(LINE_SEPARATOR);
-*/
-				final String[] memLines = test.getArgs().get("mem") != null ? test.getArgs().get("mem") : G.STRINGS_EMPTY;
-				final TIntIntHashMap[] newData = assembler.loadData(memLines, resRef);
-
-				if (newData != null && resRef[0].isSuccess()) {
-					regs = newRegs;
-					data = newData;
-				} else {
-					regs = data = null;
-				}
-			} else {
-				regs = data = null;
-			}
+			validator.loadTest(resRef, test);
 		} else {
-			regs = data = null;
+			validator.clearTest();
 		}
-	}
-
-	protected void job_reset(JLabel statusLabel, Result[] resRef, final boolean reportResetting) {
-		if (reportResetting) {
-			setupStatus(statusLabel, "Resetting...");
-		}
-
-		if (instructions != null && data != null && regs != null) {
-			dataPath.getInstructions().setInstructions(Arrays.asList(instructions), labelIndex);
-			dataPath.getMemory().setData(data[0]);
-			dataPath.getRegisters().load(regs[0]);
-			dataPath.getRegisters().setReg(Reg.pc, dataPath.getInstructions().getCodeBase());
-			dataPath.getRegisters().setReg(Reg.ra, dataPath.getInstructions().getCodeBase() - 4);
-			dataPath.getRegisters().setReg(Reg.sp, dataPath.getInstructions().getStackBase());
-			regs[1].put(Reg.ra.ordinal(), dataPath.getInstructions().getCodeBase() - 4);
-			regs[1].put(Reg.sp.ordinal(), dataPath.getInstructions().getStackBase());
-			Result.success(log, resRef, "Instructions, Data and Regs loaded");
-		} else {
-			Result.failure(log, resRef, "Instructions, Data or Regs NOT loaded!");
-		}
-	}
-
-	public boolean job_step(JLabel statusLabel, Result[] resRef, final int steps, final boolean reportStepping) {
-		if (reportStepping) {
-			setupStatus(statusLabel, "Stepping...");
-		}
-
-		for (int step = 0; step < steps; step++) {
-			final Instruction instruction = dataPath.execute();
-			if (instruction != null) {
-				if (step == 0) {
-					Result.success(log, resRef, "Executed " + instruction.getOpName());
-				}
-			} else {
-				verifyRegs(resRef);
-				if (resRef[0].isSuccess()) {
-					verifyMem(resRef);
-				}
-				if (resRef[0].isSuccess()) {
-					Result.success(log, resRef, "Test Passed");
-				}
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	public void job_run(JLabel statusLabel, Result[] resRef, final Test test, final int steps, final boolean reportRunning) {
-		if (reportRunning) {
-			setupStatus(statusLabel, "Running...");
-		}
-		job_loadTest(statusLabel, resRef, test);
-		if (resRef[0].isSuccess()) {
-			job_reset(statusLabel, resRef, reportRunning);
-		}
-		if (resRef[0].isSuccess()) {
-			if (!job_step(statusLabel, resRef, steps, false)) {
-				Result.failure(log, resRef, "Execution timed out");
-			}
-		}
-	}
-
-	public void job_batch(JLabel statusLabel, Result[] resRef, final int steps) {
-		int failCount = 0;
-		Test[] tests = selectedTask.getTests();
-		for (int i = 0, testsLength = selectedTask.getTests().length; i < testsLength; i++) {
-			Test test = selectedTask.getTests()[i];
-			setupStatus(statusLabel, "Running test " + i + " of " + testsLength + "...");
-			final Result[] localResRef = {new Result("test status unknown", false)};
-			try {
-				job_run(statusLabel, localResRef, test, steps, false);
-				if (!localResRef[0].isSuccess()) {
-					failCount++;
-				}
-			} catch (Throwable t) {
-				failCount++;
-				Result.failure(log, resRef, "Failed: " + G.report(t));
-				log.trace("trace", t);
-			}
-		}
-
-		if (failCount > 0) {
-			Result.failure(log, resRef, failCount + " of " + selectedTask.getTests().length + " tests failed");
-		} else {
-			Result.success(log, resRef, selectedTask.getTests().length + " tests passed");
-		}
-	}
-
-	protected void verifyMem(Result[] resRef) {
-		final Memory memory = dataPath.getMemory();
-		final TIntIntHashMap expectedMemMap = data[1];
-		final int[] expectedAddrs = expectedMemMap.keys();
-
-		for (int expectedMem : expectedAddrs) {
-			if (!memory.hasWord(expectedMem)) {
-				Result.failure(log, resRef, "Test Failed: expecting data at " + expectedMem + ", but word never set");
-				return;
-			}
-
-			final int value = memory.getWordInternal(expectedMem);
-			final int expectedValue = expectedMemMap.get(expectedMem);
-			if (expectedValue != value) {
-				Result.failure(log, resRef, "Test Failed: expecting " + expectedValue + " at " + expectedMem + ", but found " + value);
-				return;
-			}
-		}
-
-		final Instructions instructions = dataPath.getInstructions();
-		final int memSetBytes = memory.getSize();
-		for (int byteIndex = 0; byteIndex < memSetBytes; byteIndex++) {
-			int byteAddr = memory.getAddressAt(byteIndex);
-			if (instructions.getStackBase() > byteAddr && instructions.getMinStackBase() <= byteAddr) {
-				continue;
-			}
-			final int byteAddrAligned = byteAddr - byteAddr % 4;
-			if (expectedMemMap.contains(byteAddrAligned)) {
-				continue;
-			}
-			Result.failure(log, resRef, "Test Failed: expecting clean byte at " + byteAddr + ", but memory corrupted");
-			return;
-		}
-
-		Result.success(log, resRef, "Test Passed Memory Spec");
-	}
-
-	protected void verifyRegs(Result[] resRef) {
-		final Reg[] setupRegs = dataPath.getRegisters().getSetupRegs();
-		final TIntIntHashMap expectedRegMap = regs[1];
-		final Reg[] expectedRegs = Reg.values(expectedRegMap.keys());
-		for (Reg expectedReg : expectedRegs) {
-			if (!G.contains(setupRegs, expectedReg)) {
-				Result.failure(log, resRef, "Test Failed: expecting $" + expectedReg.toString() + ", but register never set");
-				return;
-			}
-
-			final int value = dataPath.getRegisters().getRegInternal(expectedReg);
-			final int expectedValue = expectedRegMap.get(expectedReg.ordinal());
-			if (expectedValue != value) {
-				Result.failure(log, resRef, "Test Failed: expecting $" + expectedReg.toString() + "=" + expectedValue + ", but $" + expectedReg.toString() + "=" + value);
-				return;
-			}
-		}
-
-		for (Reg setupReg : setupRegs) {
-			if (G.contains(Reg.tempRegs, setupReg)) {
-				continue;
-			}
-			if (G.contains(expectedRegs, setupReg)) {
-				continue;
-			}
-
-			Result.failure(log, resRef, "Test Failed: expecting clean $" + setupReg.toString() + ", but register corrupted");
-			return;
-		}
-
-		Result.success(log, resRef, "Test Passed Register Spec");
 	}
 
 	class AssembleAction extends AbstractAction {
@@ -560,7 +372,9 @@ public class Controller {
 						job_loadTest(statusLabel, resRef, (Test) testComboModel.getSelectedItem());
 
 						if (resRef[0].isSuccess()) {
-							job_reset(statusLabel, resRef, true);
+							setupStatus(statusLabel, "Resetting...");
+
+							validator.reset(resRef);
 						}
 					} finally {
 						SwingUtilities.invokeLater(new Runnable() {
@@ -598,7 +412,9 @@ public class Controller {
 					final Result[] resRef = new Result[]{new Result("status unknown", false)};
 
 					try {
-						job_step(statusLabel, resRef, steps, true);
+						setupStatus(statusLabel, "Stepping...");
+
+						validator.step(resRef, steps);
 					} catch (Throwable t) {
 						Result.failure(log, resRef, "Failed: " + G.report(t));
 						log.trace("trace", t);
@@ -632,7 +448,9 @@ public class Controller {
 					final Result[] resRef = new Result[]{new Result("status unknown", false)};
 
 					try {
-						job_reset(statusLabel, resRef, true);
+						setupStatus(statusLabel, "Resetting...");
+
+						validator.reset(resRef);
 					} finally {
 						SwingUtilities.invokeLater(new Runnable() {
 							public void run() {
@@ -659,7 +477,9 @@ public class Controller {
 					final Result[] resRef = new Result[]{new Result("status unknown", false)};
 
 					try {
-						job_run(statusLabel, resRef, (Test) Controller.this.testComboModel.getSelectedItem(), runSteps, true);
+						setupStatus(statusLabel, "Running...");
+
+						validator.run(resRef, (Test) Controller.this.testComboModel.getSelectedItem(), runSteps, getSource());
 					} catch (Throwable t) {
 						Result.failure(log, resRef, "Failed: " + G.report(t));
 						log.trace("trace", t);
@@ -690,7 +510,7 @@ public class Controller {
 					final Result[] resRef = new Result[]{new Result("status unknown", false)};
 
 					try {
-						job_batch(statusLabel, resRef, runSteps);
+						validator.batch(resRef, runSteps, selectedTask, getSource());
 					} finally {
 						SwingUtilities.invokeLater(new Runnable() {
 							public void run() {
@@ -759,5 +579,4 @@ public class Controller {
 			});
 		}
 	}
-
 }

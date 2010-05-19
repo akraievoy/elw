@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 public class MipsAssembler implements Assembler {
 	private static final org.slf4j.Logger log = LoggerFactory.getLogger(MipsAssembler.class);

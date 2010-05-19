@@ -2,11 +2,29 @@
 <html>
 <head>
 	<meta content="text/html; charset=UTF-8">
-	<title>Course List</title>
+	<title>Course List : ELW Admin</title>
+	<link href="../css/elw.css" type="text/css" rel="stylesheet"/>
+	<script type="text/javascript" src="../js/jquery.js"></script>
+	<script type="text/javascript" src="../js/jquery.sha1.js"></script>
 </head>
 <body style="text-align: left;">
-#foreach($course in $courses)
-<a href="course?id=${course.id}">${course.name}</a>
+<div id="header">
+	<div id="nav"><a href="index">Index</a> &gt; <span style="font-weight: bold">Courses</span></div>
+	<div id="cred">[&nbsp;#if($auth)Admin#{else}Anonymous#end&nbsp;]</div>
+	&nbsp;
+</div>
+<div id=messages>#foreach($m in $elw_messages)
+	<div class="$m.type">$m.message</div>
 #end
+</div>
+<table><tbody>
+#foreach($course in $courses)
+<tr>
+	<td style="padding-left: 2em;">${course.name}</td>
+	<td style="padding-left: 1em; padding-right: 1em;">[&nbsp;<a href="course?id=${course.id}">Structure</a>&nbsp;]</td>
+	<td style="padding-left: 1em; padding-right: 1em;">[&nbsp;<a href="courseTest?id=${course.id}&test=true">Structure + Test</a>&nbsp;]</td>
+</tr>
+#end
+</tbody></table>
 </body>
 </html>

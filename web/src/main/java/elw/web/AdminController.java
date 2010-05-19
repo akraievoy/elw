@@ -24,7 +24,7 @@ import java.util.HashMap;
 public class AdminController extends MultiActionController implements WebSymbols {
 	private static final Logger log = LoggerFactory.getLogger(AdminController.class);
 
-	protected static final int NONCE_TIMEOUT_MILLIS = 5000;
+	protected static final int NONCE_TIMEOUT_MILLIS = 10000;
 	protected static final String PASSWORD = System.getProperty("elw.admin.password", "swordfish");
 
 	protected final CourseDao courseDao;
@@ -66,7 +66,6 @@ public class AdminController extends MultiActionController implements WebSymbols
 		return new ModelAndView("a/login", model);
 	}
 
-	//	FIXME
 	public ModelAndView do_loginPost(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
 		final String nonce = req.getParameter("nonce");
 		final String hash = req.getParameter("hash");
@@ -140,6 +139,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 			return null;
 		}
 
+		model.put("auth", req.getSession(true).getAttribute(S_ADMIN));
 		model.put("courses", courseDao.findAllCourses());
 
 		return new ModelAndView("a/courses", model);
@@ -157,7 +157,20 @@ public class AdminController extends MultiActionController implements WebSymbols
 			return null;
 		}
 
+		final HashMap<String, String> testData = new HashMap<String, String>();
+		if ("true".equalsIgnoreCase(req.getParameter("test"))) {
+			for (AssignmentBundle bundle : course.getAssBundles()) {
+				for (Assignment ass : bundle.getAssignments()) {
+					for (Version ver : ass.getVersions()) {
+						
+					}
+				}
+			}
+		}
+
+		model.put("auth", req.getSession(true).getAttribute(S_ADMIN));
 		model.put("course", course);
+		model.put("testData", testData);
 
 		return new ModelAndView("a/course", model);
 	}
