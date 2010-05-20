@@ -26,8 +26,8 @@
 	<tr><td style="padding-left: 3em;" colspan=3>Assignments:</td></tr>
 	 #foreach($ass in $assBundle.assignments)#set($assI = $velocityCount)
 		#if($ass.id)
+	<tr><td style="padding-left: 5em; border-bottom: #CCCCCC dotted 1px; background-color: #EEEEEE;" colspan=3>$ass.name&nbsp;:&nbsp;</td></tr>
 			#if($ass.shared)
-	<tr><td style="padding-left: 5em;" colspan=3>$ass.name&nbsp;:&nbsp;</td></tr>
 				#foreach($ver in $ass.versions)#set($verI = $velocityCount)
 					#if($ver.id)
 	<tr>
@@ -41,7 +41,7 @@
 				#set($verIdx = $studId % $ass.versions.size())
 				#set($ver = $ass.versions.get($verIdx))
 	<tr>
-		<td style="padding-left: 5em;">$ass.name&nbsp;:&nbsp;$ver.name</td>
+		<td style="padding-left: 8em;">$ver.name</td>
 		<td style="padding-left: 1em; padding-right: 1em;">[&nbsp;<a href="launch?path=${course.id}--${bunI}--${ass.id}--${ver.id}">Code</a>&nbsp;]</td>
 		<td style="padding-left: 1em; padding-right: 1em;">[&nbsp;<a href="uploadPage?path=${course.id}--${bunI}--${ass.id}--${ver.id}">Report</a>&nbsp;]</td>
 	</tr>

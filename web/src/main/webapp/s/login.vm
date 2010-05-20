@@ -21,11 +21,15 @@
 #end
 </div>
 <div id=main>
-	<form method="POST" action="loginPost">
-		<div style="margin: 1em;">Group:&nbsp;<input type="text" name="groupName" value="$!groupName"/></div>
-		<div style="margin: 1em;">Last name&nbsp;first name:&nbsp;<input type="text" name="studentName" value="$!studentName"/></div>
-		<div style="margin: 1em; padding-left: 24em;"><input type="submit" value="Go"/></div>
-	</form>
+	<div class="formArea" style="height: 7em;">
+		<form method="POST" action="loginPost">
+			<div class="formLabel">Group:</div>
+			<div class="formField"><input type="text" name="groupName" value="$!groupName"/></div>
+			<div class="formLabel">Last name&nbsp;first name:</div>
+			<div class="formField"><input type="text" name="studentName" value="$!studentName"/></div>
+			<div class="formButtons"><input type="submit" value="Go"/></div>
+		</form>
+	</div>
 </div>
 </body>
 </html>

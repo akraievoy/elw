@@ -22,12 +22,15 @@
 #end
 </div>
 <div id=main>
+<div class="formArea" style="height: 5em;">
 	<form method="POST" action="loginPost" id="elw_formLoginPost">
 		<input type="hidden" value="$nonce" name="nonce" id="elw_inputNonce"/>
 		<input type="hidden" value="" name="hash" id="elw_inputHash"/>
-		<div style="margin: 1em;">Password:&nbsp;<input type="password" value="" id="elw_inputPassword"/></div>
-		<div style="margin: 1em; padding-left: 24em;"><input type="submit" value="Go" id="elw_buttonGo"/></div>
+		<div class="formLabel">Password:</div>
+		<div class="formField"><input type="password" value="" id="elw_inputPassword"/></div>
+		<div class="formButtons"><input type="submit" value="Go" id="elw_buttonGo"/></div>
 	</form>
+</div>
 </div>
 </body>
 <script type="text/javascript">

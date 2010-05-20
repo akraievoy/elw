@@ -19,13 +19,16 @@
 #end
 </div>
 <div id=main>
-	<div style="margin: 5em; padding: 3em; font-weight: bold; background-color: #ffee99;">
-		Only *.rtf uploads up to $uploadLimit, please.
+	<div class="formArea" style="height: 7em;">
+		<div style="padding: 0.2em; font-weight: bold; background-color: #ffee99;">
+			Only *.rtf uploads up to $uploadLimit, please.
+		</div>
+		<form method="POST" enctype="multipart/form-data" action="uploadReport?path=$upPath">
+			<div class="formLabel">Report file:</div>
+			<div class="formField"><input type="file" name="report"/></div>
+			<div class="formButtons"><input type="submit" value="Upload"/></div>
+		</form>
 	</div>
-	<form method="POST" enctype="multipart/form-data" action="uploadReport?path=$upPath">
-		Report file: <input type="file" name="report"/><br/><br/><br/>
-		<input style="margin-left: 20em;" type="submit" value="Submit"/>
-	</form>
 </div>
 </body>
 </html>
