@@ -113,15 +113,16 @@ public class MipsValidator {
 		final int[] expectedAddrs = expectedMemMap.keys();
 
 		for (int expectedMem : expectedAddrs) {
+			final String expectedMemHex = Integer.toString(expectedMem, 16);
 			if (!memory.hasWord(expectedMem)) {
-				Result.failure(log, resRef, "Test Failed: expecting data at " + expectedMem + ", but word never set");
+				Result.failure(log, resRef, "Test Failed: expecting data at 0x" + expectedMemHex + ", but word never set");
 				return;
 			}
 
 			final int value = memory.getWordInternal(expectedMem);
 			final int expectedValue = expectedMemMap.get(expectedMem);
 			if (expectedValue != value) {
-				Result.failure(log, resRef, "Test Failed: expecting " + expectedValue + " at " + expectedMem + ", but found " + value);
+				Result.failure(log, resRef, "Test Failed: expecting " + expectedValue + " at 0x" + expectedMemHex + ", but found " + value);
 				return;
 			}
 		}
@@ -137,7 +138,8 @@ public class MipsValidator {
 			if (expectedMemMap.contains(byteAddrAligned)) {
 				continue;
 			}
-			Result.failure(log, resRef, "Test Failed: expecting clean byte at " + byteAddr + ", but memory corrupted");
+			final String byteAddrHex = Integer.toString(byteAddr, 16);
+			Result.failure(log, resRef, "Test Failed: expecting clean byte at 0x" + byteAddrHex + ", but memory corrupted");
 			return;
 		}
 
