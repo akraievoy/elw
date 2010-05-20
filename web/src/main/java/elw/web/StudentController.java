@@ -124,6 +124,12 @@ public class StudentController extends MultiActionController implements WebSymbo
 		return null;
 	}
 
+	public ModelAndView do_logout(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+		req.getSession(true).invalidate();
+		resp.sendRedirect("courses");
+		return null;
+	}
+
 	public ModelAndView do_courses(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
 		final HashMap<String, Object> model = auth(req, resp, true);
 		if (model == null) {

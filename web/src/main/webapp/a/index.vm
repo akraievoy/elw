@@ -10,7 +10,7 @@
 <body>
 <div id="header">
 	<div id="nav"><span style="font-weight: bold">Index</span></div>
-	<div id="cred">[&nbsp;#if($auth)Admin#{else}Anonymous#end&nbsp;]</div>
+	<div id="cred">#if($auth)[&nbsp;Admin&nbsp;]&nbsp;[&nbsp;<a href="logout">X</a>&nbsp;]#{else}[&nbsp;Anonymous&nbsp;]#end</div>
 	&nbsp;
 </div>
 <div id=messages>#foreach($m in $elw_messages)

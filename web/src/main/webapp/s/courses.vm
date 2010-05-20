@@ -12,7 +12,7 @@
 <div id="header">
 	<div id="nav"><span style="font-weight: bold">My Courses</span></div>
 	&nbsp;
-	<div id="cred">[&nbsp;$elw_group.name&nbsp;$elw_student.name&nbsp;]</div>
+	<div id="cred">[&nbsp;$elw_group.name&nbsp;$elw_student.name&nbsp;]&nbsp;[&nbsp;<a href="logout">X</a>&nbsp;]</div>
 </div>
 <div id=messages>#foreach($m in $elw_messages)
 	<div class="$m.type">$m.message</div>

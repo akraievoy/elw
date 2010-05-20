@@ -87,6 +87,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 
 				if (hashExpected.equalsIgnoreCase(hash)) {
 					session.setAttribute(S_ADMIN, Boolean.TRUE);
+					session.setMaxInactiveInterval(300);
 					Message.addInfo(req, "Admin area : logged on");
 					resp.sendRedirect("index");
 					return null;
@@ -123,6 +124,12 @@ public class AdminController extends MultiActionController implements WebSymbols
 		} catch (UnsupportedEncodingException e) {
 			throw new IOException(e);
 		}
+	}
+
+	public ModelAndView do_logout(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+		req.getSession(true).invalidate();
+		resp.sendRedirect("index");
+		return null;
 	}
 
 	public ModelAndView do_index(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {

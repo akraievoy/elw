@@ -6,15 +6,15 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta content="text/html; charset=UTF-8">
-	<title>Login (Admin Area)</title>
+	<title>Login : ELW Admin</title>
 	<link href="../css/elw.css" type="text/css" rel="stylesheet"/>
 	<script type="text/javascript" src="../js/jquery.js"></script>
 	<script type="text/javascript" src="../js/jquery.sha1.js"></script>
 </head>
 <body>
 <div id="header">
-	<div id="nav"><span style="font-weight: bold">Login (Admin Area)</span></div>
-	<div id="cred">[&nbsp;Admin&nbsp;]</div>
+	<div id="nav"><span style="font-weight: bold">Login</span></div>
+	<div id="cred">#if($auth)[&nbsp;Admin&nbsp;]&nbsp;[&nbsp;<a href="logout">X</a>&nbsp;]#{else}[&nbsp;Anonymous&nbsp;]#end</div>
 	&nbsp;
 </div>
 <div id=messages>#foreach($m in $elw_messages)
