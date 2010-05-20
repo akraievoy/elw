@@ -214,7 +214,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 			}
 
 			final String contentType = item.getContentType();
-			if (!"application/rtf".equalsIgnoreCase(contentType)) {
+			if (!"application/rtf".equalsIgnoreCase(contentType) && !"application/msword".equalsIgnoreCase(contentType)) {
 				Message.addWarn(req, "contentType is '" + contentType + "', which is not what is expected for an .rtf file");
 				resp.sendRedirect("uploadPage?path="+lookup.getPath());
 				return null;
