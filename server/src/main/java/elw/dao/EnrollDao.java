@@ -69,7 +69,7 @@ public class EnrollDao {
 		}
 	}
 
-	public synchronized Enrollment findGroup(final String id) {
+	public synchronized Enrollment findEnrollment(final String id) {
 		refreshCache();
 
 		return enrollCache.get(id);

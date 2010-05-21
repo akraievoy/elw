@@ -1,6 +1,8 @@
 package elw.web;
 
+import base.pattern.Result;
 import elw.dao.*;
+import elw.dp.mips.MipsValidator;
 import elw.miniweb.Message;
 import elw.vo.*;
 import org.akraievoy.gear.G4Parse;
@@ -107,7 +109,12 @@ public class StudentController extends MultiActionController implements WebSymbo
 					session.removeAttribute("groupName");
 					session.removeAttribute("studentName");
 
-					resp.sendRedirect("courses");
+					List<Course> courses = enrollDao.findCoursesByGroupId(group.getId());
+					if (courses.size() == 1) {
+						resp.sendRedirect("course?id="+courses.get(0).getId());
+					} else {
+						resp.sendRedirect("courses");
+					}
 					return null;
 				} else {
 					Message.addWarn(req, "no such student");
@@ -146,16 +153,30 @@ public class StudentController extends MultiActionController implements WebSymbo
 		return new ModelAndView("s/courses", model);
 	}
 
-	//	LATER check enrollment also
 	public ModelAndView do_course(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
 		final HashMap<String, Object> model = auth(req, resp, true);
 		if (model == null) {
 			return null;
 		}
 
+		final Group group = (Group) req.getSession(true).getAttribute(S_GROUP);
 		final Course course = courseDao.findCourse(req.getParameter("id"));
 		if (course == null) {
-			Message.addWarn(req, "course not found");
+			Message.addWarn(req, "course not found (or not enrolled)");
+			resp.sendRedirect("courses");
+			return null;
+		}
+
+		final Enrollment[] enrollments = enrollDao.findEnrollmentsForGroupId(group.getId());
+		Enrollment enr = null;
+		for (Enrollment e : enrollments) {
+			if (e.getCourseId().equals(course.getId())) {
+				enr = e;
+				break;
+			}
+		}
+		if (enr == null) {
+			Message.addWarn(req, "course not enrolled");
 			resp.sendRedirect("courses");
 			return null;
 		}
@@ -164,10 +185,30 @@ public class StudentController extends MultiActionController implements WebSymbo
 		final int studId = Integer.parseInt(student.getId());
 		model.put("studId", studId);
 		model.put("course", course);
+		model.put("enr", enr);
+
+/*		final HashMap<String, Result> testResults = new HashMap<String, Result>();
+		final MipsValidator validator = new MipsValidator();
+		for (int bunI = 0, assBundlesLength = course.getAssBundles().length; bunI < assBundlesLength; bunI++) {
+			AssignmentBundle bundle = course.getAssBundles()[bunI];
+			for (Assignment ass : bundle.getAssignments()) {
+				for (Version ver : ass.getVersions()) {
+					final Result[] resRef = {new Result("unknown", false)};
+					validator.batch(resRef, ver, ver.getSolution());
+					testResults.put(
+							course.getId() + "--" + bunI + "--" + ass.getId() + "--" + ver.getId(),
+							resRef[0]
+					);
+				}
+			}
+		}
+		model.put("testResults", testResults);
+*/
 
 		return new ModelAndView("s/course", model);
 	}
 
+	//	LATER check enrollment also
 	public ModelAndView do_uploadReport(final HttpServletRequest req, final HttpServletResponse resp) throws IOException, FileUploadException {
 		VersionLookup lookup = versionLookup(req, resp, true);
 		if (lookup == null) {

@@ -26,8 +26,13 @@
 	<tr><td style="padding-left: 3em;" colspan=3>Assignments:</td></tr>
 	 #foreach($ass in $assBundle.assignments)#set($assI = $velocityCount)
 		#if($ass.id)
-	<tr><td style="padding-left: 5em; border-bottom: #CCCCCC dotted 1px; background-color: #EEEEEE;" colspan=3>$ass.name&nbsp;:&nbsp;</td></tr>
 			#if($ass.shared)
+	<tr><td style="padding-left: 5em; border-bottom: #CCCCCC dotted 1px; background-color: #EEEEEE;" colspan=3>
+		$ass.name
+		<div style="float: right">
+			Opens $enr.classes.get($ass.scoring.classFrom).niceDate, due $enr.classes.get($ass.scoring.classReportDue).niceDate
+		</div>
+	</td></tr>
 				#foreach($ver in $ass.versions)#set($verI = $velocityCount)
 					#if($ver.id)
 	<tr>
@@ -38,6 +43,13 @@
 					#end
 		 		#end
 			#else
+	<tr><td style="padding-left: 5em; border-bottom: #CCCCCC dotted 1px; background-color: #EEEEEE;" colspan=3>
+		$ass.name
+		<div style="float: right">
+			$ass.scoring.scoreBudget pts.
+			Opens $enr.classes.get($ass.scoring.classFrom).niceDate, due $enr.classes.get($ass.scoring.classReportDue).niceDate
+		</div>
+	</td></tr>
 				#set($verIdx = $studId % $ass.versions.size())
 				#set($ver = $ass.versions.get($verIdx))
 	<tr>

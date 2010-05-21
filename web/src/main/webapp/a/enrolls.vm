@@ -1,0 +1,46 @@
+#* @vtlvariable name="courses" type="elw.vo.Course[]" *#
+<html>
+<head>
+	<meta content="text/html; charset=UTF-8">
+	<title>Enrollments List : ELW Admin</title>
+	<link href="../css/elw.css" type="text/css" rel="stylesheet"/>
+	<script type="text/javascript" src="../js/jquery.js"></script>
+	<script type="text/javascript" src="../js/jquery.sha1.js"></script>
+</head>
+<body style="text-align: left;">
+<div id="header">
+	<div id="nav"><a href="index">Index</a> &gt; <span style="font-weight: bold">Enrollments</span></div>
+	<div id="cred">#if($auth)[&nbsp;Admin&nbsp;]&nbsp;[&nbsp;<a href="logout">X</a>&nbsp;]#{else}[&nbsp;Anonymous&nbsp;]#end</div>
+	&nbsp;
+</div>
+<div id=messages>#foreach($m in $elw_messages)
+	<div class="$m.type">$m.message</div>
+#end
+</div>
+<table><tbody>
+#foreach($enr in $enrolls)
+<tr style="border-bottom: #CCCCCC dotted 1px; background-color: #EEEEEE;">
+	<td style="padding-left: 1em;">${enr.name}&nbsp;<span class="extra">(id&nbsp;:&nbsp;${enr.id})</span></td>
+	<td style="padding-left: 1em; padding-right: 1em;">$groups.get($enr.groupId).name&nbsp;<span class="extra">(id&nbsp;:&nbsp;$enr.groupId)</span></td>
+	<td style="padding-left: 1em; padding-right: 1em;">$courses.get($enr.courseId).name&nbsp;<span class="extra">(id&nbsp;:&nbsp;$enr.courseId)</span></td>
+</tr>
+	#foreach($cl in $enr.classes)
+	<tr >
+		<td style="padding-left: 2em;">$cl.niceDate</td>
+		<td style="padding-left: 1em; padding-right: 1em;">$cl.fromTime -- $cl.toTime</td>
+		<td style="padding-left: 1em; padding-right: 1em;">
+		#if($cl.today)
+			<span style="font-weight:bold">Today#if($cl.current)&nbsp;Current#end</span>
+		#else
+			#if($cl.passed)Passed $cl.dayDiff days ago
+			#else
+				Due in $cl.dayDiff days
+			#end
+		#end
+		</td>
+	</tr>
+	#end
+#end
+</tbody></table>
+</body>
+</html>

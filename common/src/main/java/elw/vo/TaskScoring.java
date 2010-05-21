@@ -3,8 +3,8 @@ package elw.vo;
 public class TaskScoring {
 	protected int scoreBudget;
 	protected int classFrom;
-	protected int classBefore;
-	protected int classHold;
+	protected int classCodeDue;
+	protected int classReportDue;
 	protected boolean requireClean;
 
 	public boolean isRequireClean() {
@@ -15,12 +15,12 @@ public class TaskScoring {
 		this.requireClean = requireClean;
 	}
 
-	public int getClassBefore() {
-		return classBefore;
+	public int getClassCodeDue() {
+		return classCodeDue;
 	}
 
-	public void setClassBefore(int classBefore) {
-		this.classBefore = classBefore;
+	public void setClassCodeDue(int classCodeDue) {
+		this.classCodeDue = classCodeDue;
 	}
 
 	public int getClassFrom() {
@@ -31,12 +31,12 @@ public class TaskScoring {
 		this.classFrom = classFrom;
 	}
 
-	public int getClassHold() {
-		return classHold;
+	public int getClassReportDue() {
+		return classReportDue;
 	}
 
-	public void setClassHold(int classHold) {
-		this.classHold = classHold;
+	public void setClassReportDue(int classReportDue) {
+		this.classReportDue = classReportDue;
 	}
 
 	public int getScoreBudget() {

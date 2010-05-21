@@ -2,6 +2,8 @@ package elw.web;
 
 import base.pattern.Result;
 import elw.dao.CourseDao;
+import elw.dao.EnrollDao;
+import elw.dao.GroupDao;
 import elw.dp.mips.MipsValidator;
 import elw.miniweb.Message;
 import elw.vo.*;
@@ -22,6 +24,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 
 public class AdminController extends MultiActionController implements WebSymbols {
 	private static final Logger log = LoggerFactory.getLogger(AdminController.class);
@@ -30,12 +33,16 @@ public class AdminController extends MultiActionController implements WebSymbols
 	protected static final String PASSWORD = System.getProperty("elw.admin.password", "swordfish");
 
 	protected final CourseDao courseDao;
+	protected final GroupDao groupDao;
+	protected final EnrollDao enrollDao;
 
 	protected final ObjectMapper mapper = new ObjectMapper();
 	protected final long cacheBustingToken = System.currentTimeMillis();
 
-	public AdminController(CourseDao courseDao) {
+	public AdminController(CourseDao courseDao, EnrollDao enrollDao, GroupDao groupDao) {
 		this.courseDao = courseDao;
+		this.enrollDao = enrollDao;
+		this.groupDao = groupDao;
 	}
 
 	protected HashMap<String, Object> auth(final HttpServletRequest req, final HttpServletResponse resp, final boolean redirect) throws IOException {
@@ -250,6 +257,27 @@ public class AdminController extends MultiActionController implements WebSymbols
 		model.put("auth", req.getSession(true).getAttribute(S_ADMIN));
 
 		return new ModelAndView("a/launch", model);
+	}
+
+	public ModelAndView do_enrolls(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+		final HashMap<String, Object> model = auth(req, resp, true);
+		if (model == null) {
+			return null;
+		}
+
+		model.put("auth", req.getSession(true).getAttribute(S_ADMIN));
+		final Enrollment[] enrolls = enrollDao.findAllEnrollments();
+		final Map<String, Group> groups = new HashMap<String, Group>();
+		final Map<String, Course> courses = new HashMap<String, Course>();
+		for (Enrollment enr : enrolls) {
+			groups.put(enr.getGroupId(), groupDao.findGroup(enr.getGroupId()));
+			courses.put(enr.getCourseId(), courseDao.findCourse(enr.getCourseId()));
+		}
+		model.put("enrolls", enrolls);
+		model.put("groups", groups);
+		model.put("courses", courses);
+
+		return new ModelAndView("a/enrolls", model);
 	}
 
 	protected static <E extends IdName> E findIdName(final E[] elems, String id) {

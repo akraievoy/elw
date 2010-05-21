@@ -6,10 +6,10 @@
 				"id":"1.lw1.a",
 				"shared":false,
 				"scoring": {
-					"scoreBudget":5,
-					"classBefore":4,
-					"classFrom":1,
-					"classHold":4,
+					"classFrom":0,
+					"classCodeDue":3,
+					"classReportDue":7,
+					"scoreBudget":2,
 					"requireClean":false
 				},
 				"versions":[
@@ -140,10 +140,10 @@
 				"id":"1.lw1.b",
 				"shared":false,
 				"scoring": {
-					"scoreBudget":5,
-					"classBefore":4,
-					"classFrom":1,
-					"classHold":4,
+					"classFrom":0,
+					"classCodeDue":3,
+					"classReportDue":7,
+					"scoreBudget":2,
 					"requireClean":false
 				},
 				"versions":[
@@ -272,13 +272,12 @@
 			{
 				"name":"Лабораторная №1(в) - Запись/чтение",
 				"id":"1.lw1.c",
-
 				"shared":false,
 				"scoring": {
-					"scoreBudget":5,
-					"classBefore":4,
-					"classFrom":1,
-					"classHold":4,
+					"classFrom":0,
+					"classCodeDue":3,
+					"classReportDue":7,
+					"scoreBudget":2,
 					"requireClean":false
 				},
 				"versions":[
@@ -389,10 +388,10 @@
 				"id":"1.cp1",
 				"shared":true,
 				"scoring": {
-					"scoreBudget":2,
-					"classBefore":4,
-					"classFrom":2,
-					"classHold":3,
+					"classFrom":1,
+					"classCodeDue":2,
+					"classReportDue":2,
+					"scoreBudget":0,
 					"requireClean":false
 				},
 				"versions":[
@@ -495,10 +494,10 @@
 				"id":"3.lw2",
 				"shared":false,
 				"scoring": {
-					"scoreBudget":5,
-					"classBefore":4,
-					"classFrom":2,
-					"classHold":3,
+					"classFrom":3,
+					"classCodeDue":3,
+					"classReportDue":7,
+					"scoreBudget":7,
 					"requireClean":false
 				},
 				"versions":[
@@ -749,10 +748,10 @@
 				"id":"4.lw3",
 				"shared": false,
 				"scoring": {
-					"scoreBudget":5,
-					"classBefore":4,
-					"classFrom":2,
-					"classHold":3,
+					"classFrom":6,
+					"classCodeDue":6,
+					"classReportDue":7,
+					"scoreBudget":8,
 					"requireClean":false
 				},
 				"versions":[
@@ -1348,10 +1347,10 @@
 				"id":"5.lw4",
 				"shared": false,
 				"scoring": {
-					"scoreBudget":5,
-					"classBefore":4,
-					"classFrom":2,
-					"classHold":3,
+					"classFrom":6,
+					"classCodeDue":7,
+					"classReportDue":8,
+					"scoreBudget":9,
 					"requireClean":false
 				},
 				"versions":[
@@ -1666,10 +1665,10 @@
 				"id":"6.lw5",
 				"shared": false,
 				"scoring": {
-					"scoreBudget":5,
-					"classBefore":4,
-					"classFrom":2,
-					"classHold":3,
+					"classFrom":6,
+					"classCodeDue":7,
+					"classReportDue":8,
+					"scoreBudget":10,
 					"requireClean":false
 				},
 				"versions":[
