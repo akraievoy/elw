@@ -179,6 +179,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 		model.put("enr", enr);
 
 		final HashMap<String, CodeMeta> codeMetas = new HashMap<String, CodeMeta>();
+		final HashMap<String, ReportMeta> reportMetas = new HashMap<String, ReportMeta>();
 		for (int bunI = 0, assBundlesLength = course.getAssBundles().length; bunI < assBundlesLength; bunI++) {
 			AssignmentBundle bundle = course.getAssBundles()[bunI];
 			for (Assignment ass : bundle.getAssignments()) {
@@ -193,10 +194,13 @@ public class StudentController extends MultiActionController implements WebSymbo
 					);
 					final long lastStamp = codeDao.findLastStamp(assPath);
 					codeMetas.put(path, codeDao.findMetaByStamp(assPath, lastStamp));
+					final long lastStampReport = reportDao.findLastStamp(assPath);
+					reportMetas.put(path, reportDao.findMetaByStamp(assPath, lastStampReport));
 				}
 			}
 		}
 		model.put("codeMetas", codeMetas);
+		model.put("reportMetas", reportMetas);
 
 		return new ModelAndView("s/course", model);
 	}
@@ -254,7 +258,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 			}
 
 			final InputStream itemIs = item.openStream();
-			reportDao.createReport(lookup.createPath(), itemIs);
+			reportDao.createReport(lookup.createPath(), itemIs, resolveRemoteAddress(req));
 			fileCount++;
 		}
 
@@ -331,13 +335,17 @@ public class StudentController extends MultiActionController implements WebSymbo
 
 		final BufferedReader codeReader = req.getReader();
 		try {
-			codeDao.createCode(lookup.createPath(), codeReader, req.getRemoteAddr());
+			codeDao.createCode(lookup.createPath(), codeReader, resolveRemoteAddress(req));
 		} catch (IOException e) {
 			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 		}
 
 		resp.setStatus(HttpServletResponse.SC_OK);
 		return null;
+	}
+
+	protected static String resolveRemoteAddress(HttpServletRequest req) {
+		return req.getRemoteAddr();
 	}
 
 	protected VersionLookup versionLookup(HttpServletRequest req, HttpServletResponse resp, final boolean redirect) throws IOException {

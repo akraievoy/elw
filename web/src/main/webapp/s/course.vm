@@ -70,6 +70,7 @@
 					#set($ver = $ass.versions.get($verIdx))
 					#set($path = "${course.id}--${bunI}--${ass.id}--${ver.id}")
 					#set($codeMeta = $codeMetas.get($path))
+					#set($reportMeta = $reportMetas.get($path))
 	<tr>
 		<td style="padding-left: 2.5em; padding-right: 1em; border-right: #999999 dashed 1px;">$ver.name</td>
 		<td style="padding-left: 0.25em; padding-right: 0.25em; text-align: right;">
@@ -85,7 +86,12 @@
 			#end
 			[&nbsp;<a href="launch?path=$path">Code</a>&nbsp;]
 		</td>
-		<td style="padding-left: 0.25em; padding-right: 0.25em; text-align: right;">[&nbsp;<a href="uploadPage?path=$path">Report</a>&nbsp;]</td>
+		<td style="padding-left: 0.25em; padding-right: 0.25em; text-align: right;">
+			$reportMeta.totalUploads upload#if($reportMeta.totalUploads != 1)s#end#if($reportMeta.totalUploads > 0), #if($reportMeta.totalUploads > 1)last#{else}on#end $reportMeta.niceUploadStamp<br/>
+				Approval Pending
+			#end
+			[&nbsp;<a href="uploadPage?path=$path">Report</a>&nbsp;]
+		</td>
 		<td style="padding-left: 0.25em; padding-right: 0.25em; text-align: right;">&nbsp;</td>
 	</tr>
 				#end
