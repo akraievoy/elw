@@ -62,8 +62,10 @@
 		<td style="padding-left: 1em; padding-right: 1em;">
 			$codeMeta.totalUploads upload#if($codeMeta.totalUploads > 1)s#end#if($codeMeta.totalUploads > 0), #if($codeMeta.totalUploads > 1)last#{else}on#end $codeMeta.niceUploadStamp<br/>
 				#if($codeMeta.validatorStamp > 0)
-					<span style="color: #if($codeMeta.testsPassed>0)#00FF00#else#999999#end">$codeMeta.testsPassed</span>Pass /
-					<span style="color: #if($codeMeta.testsFailed>0)#FF0000#else#999999#end">$codeMeta.testsFailed</span>Fail
+					#set($passColor = "#if($codeMeta.testsPassed>0)#00FF00#else#999999#end")
+					#set($failColor = "#if($codeMeta.testsFailed>0)#FF0000#else#999999#end")
+					<span style="color: $passColor;">$codeMeta.testsPassed</span>Pass /
+					<span style="color: $failColor;">$codeMeta.testsFailed</span>Fail
 				#else
 					Tests Pending
 				#end
