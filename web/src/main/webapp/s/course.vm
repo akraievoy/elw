@@ -32,7 +32,7 @@
 		$ass.name
 		</td>
 		<td style="padding-left: 1em; padding-right: 1em; text-align: right; border-bottom: #CCCCCC dotted 1px; background-color: #EEEEEE;"  colspan=2>
-			Opens $enr.classes.get($ass.scoring.classFrom).niceDate, due $enr.classes.get($ass.scoring.classReportDue).niceDate
+			Opens $enr.classes.get($ass.scoring.classFrom).niceDate
 		</td>
 	</td></tr>
 				#foreach($ver in $ass.versions)#set($verI = $velocityCount)
@@ -68,7 +68,7 @@
 					Tests Pending
 				#end
 			#end
-			<br/>[&nbsp;<a href="launch?path=$path">Code</a>&nbsp;]
+			[&nbsp;<a href="launch?path=$path">Code</a>&nbsp;]
 		</td>
 		<td style="padding-left: 1em; padding-right: 1em;">[&nbsp;<a href="uploadPage?path=$path">Report</a>&nbsp;]</td>
 	</tr>
