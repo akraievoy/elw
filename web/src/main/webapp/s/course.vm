@@ -73,7 +73,7 @@
 	<tr>
 		<td style="padding-left: 2.5em; padding-right: 1em; border-right: #999999 dashed 1px;">$ver.name</td>
 		<td style="padding-left: 0.25em; padding-right: 0.25em; text-align: right;">
-			$codeMeta.totalUploads upload#if($codeMeta.totalUploads > 1)s#end#if($codeMeta.totalUploads > 0), #if($codeMeta.totalUploads > 1)last#{else}on#end $codeMeta.niceUploadStamp<br/>
+			$codeMeta.totalUploads upload#if($codeMeta.totalUploads != 1)s#end#if($codeMeta.totalUploads > 0), #if($codeMeta.totalUploads > 1)last#{else}on#end $codeMeta.niceUploadStamp<br/>
 				#if($codeMeta.validatorStamp > 0)
 					#set($passColor = "#if($codeMeta.testsPassed>0)#00FF00#else#999999#end")
 					#set($failColor = "#if($codeMeta.testsFailed>0)#FF0000#else#999999#end")
