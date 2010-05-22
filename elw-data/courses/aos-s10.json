@@ -1665,7 +1665,7 @@
 				"id":"6.lw5",
 				"shared": false,
 				"scoring": {
-					"classFrom":6,
+					"classFrom":7,
 					"classCodeDue":7,
 					"classReportDue":8,
 					"scoreBudget":10,

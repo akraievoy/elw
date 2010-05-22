@@ -50,13 +50,15 @@
 			Opens $enr.classes.get($ass.scoring.classFrom).niceDate, due $enr.classes.get($ass.scoring.classReportDue).niceDate
 		</div>
 	</td></tr>
-				#set($verIdx = $studId % $ass.versions.size())
-				#set($ver = $ass.versions.get($verIdx))
+				#if($enr.classes.get($ass.scoring.classFrom).started)
+					#set($verIdx = $studId % $ass.versions.size())
+					#set($ver = $ass.versions.get($verIdx))
 	<tr>
 		<td style="padding-left: 8em;">$ver.name</td>
 		<td style="padding-left: 1em; padding-right: 1em;">[&nbsp;<a href="launch?path=${course.id}--${bunI}--${ass.id}--${ver.id}">Code</a>&nbsp;]</td>
 		<td style="padding-left: 1em; padding-right: 1em;">[&nbsp;<a href="uploadPage?path=${course.id}--${bunI}--${ass.id}--${ver.id}">Report</a>&nbsp;]</td>
 	</tr>
+				#end
 			#end
 		#end
 	 #end

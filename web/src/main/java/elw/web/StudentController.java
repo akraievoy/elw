@@ -1,8 +1,6 @@
 package elw.web;
 
-import base.pattern.Result;
 import elw.dao.*;
-import elw.dp.mips.MipsValidator;
 import elw.miniweb.Message;
 import elw.vo.*;
 import org.akraievoy.gear.G4Parse;
@@ -167,14 +165,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 			return null;
 		}
 
-		final Enrollment[] enrollments = enrollDao.findEnrollmentsForGroupId(group.getId());
-		Enrollment enr = null;
-		for (Enrollment e : enrollments) {
-			if (e.getCourseId().equals(course.getId())) {
-				enr = e;
-				break;
-			}
-		}
+		final Enrollment enr = enrollDao.findEnrollmentForGroupAndCourse(group.getId(), course.getId());
 		if (enr == null) {
 			Message.addWarn(req, "course not enrolled");
 			resp.sendRedirect("courses");
@@ -208,7 +199,6 @@ public class StudentController extends MultiActionController implements WebSymbo
 		return new ModelAndView("s/course", model);
 	}
 
-	//	LATER check enrollment also
 	public ModelAndView do_uploadReport(final HttpServletRequest req, final HttpServletResponse resp) throws IOException, FileUploadException {
 		VersionLookup lookup = versionLookup(req, resp, true);
 		if (lookup == null) {
@@ -262,8 +252,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 			}
 
 			final InputStream itemIs = item.openStream();
-			final Group group = (Group) req.getSession(true).getAttribute(S_GROUP);
-			reportDao.createReport(lookup.createPath(group), itemIs);
+			reportDao.createReport(lookup.createPath(), itemIs);
 			fileCount++;
 		}
 
@@ -309,8 +298,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 		mapper.writeValue(verSw, lookup.getVer());
 		final Version verCopy = mapper.readValue(verSw.toString(), Version.class);
 
-		final Group group = (Group) req.getSession(true).getAttribute(S_GROUP);
-		final AssignmentPath path = lookup.createPath(group);
+		final AssignmentPath path = lookup.createPath();
 		final long lastStamp = codeDao.findLastStamp(path);
 
 		if (!lookup.getAss().isShared() || lastStamp >= 0) {
@@ -339,10 +327,9 @@ public class StudentController extends MultiActionController implements WebSymbo
 			return null;
 		}
 
-		final Group group = (Group) req.getSession(true).getAttribute(S_GROUP);
 		final BufferedReader codeReader = req.getReader();
 		try {
-			codeDao.createCode(lookup.createPath(group), codeReader);
+			codeDao.createCode(lookup.createPath(), codeReader);
 		} catch (IOException e) {
 			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 		}
@@ -429,6 +416,30 @@ public class StudentController extends MultiActionController implements WebSymbo
 		}
 
 		vl.student = (Student) req.getSession(true).getAttribute(S_STUD);
+		vl.group = (Group) req.getSession(true).getAttribute(S_GROUP);
+		vl.enr = enrollDao.findEnrollmentForGroupAndCourse(
+				vl.group.getId(),
+				vl.course.getId()
+		);
+		if (vl.enr == null) {
+			if (redirect) {
+				Message.addWarn(req, "course not enrolled");
+				resp.sendRedirect("courses");
+			} else {
+				resp.sendError(HttpServletResponse.SC_FORBIDDEN, "course not enrolled");
+			}
+			return null;
+		}
+		if (!vl.enr.getClasses()[vl.ass.getScoring().getClassFrom()].isStarted()) {
+			if (redirect) {
+				Message.addWarn(req, "task not open yet");
+				resp.sendRedirect("course?id=" + vl.course.getId());
+			} else {
+				resp.sendError(HttpServletResponse.SC_FORBIDDEN, "task not open yet");
+			}
+			return null;
+		}
+
 		final int studId = Integer.parseInt(vl.student.getId());
 		final int verIdx = IdName.indexOfId(vl.ass.getVersions(), vl.ver.getId());
 		if (!vl.ass.isShared() && (studId) % vl.ass.getVersions().length != verIdx) {
@@ -453,6 +464,8 @@ public class StudentController extends MultiActionController implements WebSymbo
 		protected Assignment ass;
 		protected Version ver;
 		protected Student student;
+		protected Group group;
+		protected Enrollment enr;
 
 		public VersionLookup() {
 		}
@@ -489,9 +502,17 @@ public class StudentController extends MultiActionController implements WebSymbo
 			return path;
 		}
 
-		protected AssignmentPath createPath(Group group) {
+		public Group getGroup() {
+			return group;
+		}
+
+		public Enrollment getEnr() {
+			return enr;
+		}
+
+		protected AssignmentPath createPath() {
 			return new AssignmentPath(
-					getCourse().getId(), group.getId(), getStudent(),
+					getCourse().getId(), getGroup().getId(), getStudent(),
 					getAssBundleIndex(), getAssId(), getVer().getId()
 			);
 		}

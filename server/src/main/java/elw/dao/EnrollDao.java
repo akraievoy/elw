@@ -108,4 +108,16 @@ public class EnrollDao {
 		}
 		return courses;
 	}
+
+	public Enrollment findEnrollmentForGroupAndCourse(String groupId, String courseId) {
+		final Enrollment[] enrollments = findEnrollmentsForGroupId(groupId);
+		Enrollment enr = null;
+		for (Enrollment e : enrollments) {
+			if (e.getCourseId().equals(courseId)) {
+				enr = e;
+				break;
+			}
+		}
+		return enr;
+	}
 }

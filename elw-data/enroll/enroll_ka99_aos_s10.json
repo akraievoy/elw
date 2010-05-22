@@ -11,7 +11,7 @@
 		{"date":"2010-04-14", "fromTime":"8:00","toTime":"8:30","onSite":[".*"]},
 		{"date":"2010-04-28", "fromTime":"8:00","toTime":"8:30","onSite":[".*"]},
 		{"date":"2010-05-12", "fromTime":"8:00","toTime":"8:30","onSite":[".*"]},
-		{"date":"2010-05-21", "fromTime":"8:00","toTime":"18:30","onSite":[".*"]},
+		{"date":"2010-05-26", "fromTime":"8:00","toTime":"18:30","onSite":[".*"]},
 		{"date":"2010-06-02", "fromTime":"8:00","toTime":"8:30","onSite":[".*"]},
 		{"date":"2010-06-09", "fromTime":"8:00","toTime":"8:30","onSite":[".*"]}
 	]
