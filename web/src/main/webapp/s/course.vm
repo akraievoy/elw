@@ -27,11 +27,13 @@
 	 #foreach($ass in $assBundle.assignments)#set($assI = $velocityCount)
 		#if($ass.id)
 			#if($ass.shared)
-	<tr><td style="padding-left: 5em; border-bottom: #CCCCCC dotted 1px; background-color: #EEEEEE;" colspan=3>
+	<tr>
+		<td style="padding-left: 5em; border-bottom: #CCCCCC dotted 1px; background-color: #EEEEEE;">
 		$ass.name
-		<div style="float: right">
+		</td>
+		<td style="padding-left: 1em; padding-right: 1em; text-align: right; border-bottom: #CCCCCC dotted 1px; background-color: #EEEEEE;"  colspan=2>
 			Opens $enr.classes.get($ass.scoring.classFrom).niceDate, due $enr.classes.get($ass.scoring.classReportDue).niceDate
-		</div>
+		</td>
 	</td></tr>
 				#foreach($ver in $ass.versions)#set($verI = $velocityCount)
 					#if($ver.id)
