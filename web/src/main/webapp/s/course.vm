@@ -55,10 +55,22 @@
 				#if($enr.classes.get($ass.scoring.classFrom).started)
 					#set($verIdx = $studId % $ass.versions.size())
 					#set($ver = $ass.versions.get($verIdx))
+					#set($path = "${course.id}--${bunI}--${ass.id}--${ver.id}")
+					#set($codeMeta = $codeMetas.get($path))
 	<tr>
 		<td style="padding-left: 8em;">$ver.name</td>
-		<td style="padding-left: 1em; padding-right: 1em;">[&nbsp;<a href="launch?path=${course.id}--${bunI}--${ass.id}--${ver.id}">Code</a>&nbsp;]</td>
-		<td style="padding-left: 1em; padding-right: 1em;">[&nbsp;<a href="uploadPage?path=${course.id}--${bunI}--${ass.id}--${ver.id}">Report</a>&nbsp;]</td>
+		<td style="padding-left: 1em; padding-right: 1em;">
+			$codeMeta.totalUploads uploads#if($codeMeta.totalUploads > 0), last $codeMeta.niceUploadStamp<br/>
+				#if($codeMeta.validatorStamp > 0)
+					<span style="color: #if($codeMeta.testsPassed>0)#00FF00#else#999999#end">$codeMeta.testsPassed</span>Pass /
+					<span style="color: #if($codeMeta.testsFailed>0)#FF0000#else#999999#end">$codeMeta.testsFailed</span>Fail
+				#else
+					Tests Pending
+				#end
+			#end
+			<br/>[&nbsp;<a href="launch?path=$path">Code</a>&nbsp;]
+		</td>
+		<td style="padding-left: 1em; padding-right: 1em;">[&nbsp;<a href="uploadPage?path=$path">Report</a>&nbsp;]</td>
 	</tr>
 				#end
 			#end

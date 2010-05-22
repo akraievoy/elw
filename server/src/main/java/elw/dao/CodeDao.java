@@ -9,10 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * Dealing with persisting, enumerating and retrieving code uploads.
@@ -30,16 +27,38 @@ public class CodeDao {
 		this.mapper = mapper;
 	}
 
-	public void createCode(AssignmentPath assignmentPath, BufferedReader codeReader) throws IOException {
+	public void createCode(AssignmentPath assignmentPath, BufferedReader codeReader, String remoteAddr) throws IOException {
 		final File assDir = assignmentPath.getCodeRoot(uploadsDir);
 
 		if (!assDir.isDirectory() && !assDir.mkdirs()) {
 			throw new IOException("failed to create dir: " + assDir.getPath());
 		}
 
-		final File targetFile = new File(assDir, String.valueOf(System.currentTimeMillis()));
-		synchronized (this) {
-			G4Io.writeToFile(codeReader, targetFile);
+		final long uploadTime = System.currentTimeMillis();
+		final File fTarget = new File(assDir, String.valueOf(uploadTime));
+		final File fTargetMeta = new File(assDir, String.valueOf(uploadTime) + META_POSTFIX);
+
+		final CodeMeta codeMeta = new CodeMeta();
+		codeMeta.setSourceAddress(remoteAddr);
+		codeMeta.setUploadStamp(uploadTime);
+
+		FileOutputStream fos = null;
+		try {
+			synchronized (this) {
+				G4Io.writeToFile(codeReader, fTarget);
+
+				fos = new FileOutputStream(fTargetMeta);
+				final OutputStreamWriter osw = new OutputStreamWriter(fos);
+				mapper.writeValue(osw, codeMeta);
+			}
+		} finally {
+			if (fos != null) {
+				try {
+					fos.close();
+				} catch (IOException e) {
+					log.info("failed on close", e);
+				}
+			}
 		}
 	}
 
@@ -75,19 +94,22 @@ public class CodeDao {
 		return stamps.toNativeArray();
 	}
 
-	public SortedMap<Long, CodeMeta> findAllMetas(AssignmentPath assignmentPath) {
+	public Map<Long, CodeMeta> findAllMetas(AssignmentPath assignmentPath) {
 		final File assDir = assignmentPath.getCodeRoot(uploadsDir);
 
-		final TreeMap<Long, CodeMeta> result = new TreeMap<Long, CodeMeta>();
 		if (!assDir.isDirectory()) {
-			return result;
+			return Collections.emptyMap();
 		}
 
 		final String[] fileNames;
 		synchronized (this) {
 			fileNames = assDir.list();
 		}
+		if (fileNames.length == 0) {
+			return Collections.emptyMap();
+		}
 
+		final TreeMap<Long, CodeMeta> result = new TreeMap<Long, CodeMeta>();
 		for (String fileName : fileNames) {
 			if (fileName.endsWith(META_POSTFIX)) {
 				continue;
@@ -122,11 +144,88 @@ public class CodeDao {
 				log.info("trace", e);
 				result.put(parsed, null);
 			} finally {
-				G4Io.silentClose(fis);
+				if (fis != null) {
+					try {
+						fis.close();
+					} catch (IOException e) {
+						log.info("failed on close", e);
+					}
+				}
 			}
 		}
 
 		return result;
+	}
+
+	public CodeMeta findMetaByStamp(AssignmentPath assignmentPath, long stamp) {
+		final File assDir = assignmentPath.getCodeRoot(uploadsDir);
+
+		if (!assDir.isDirectory()) {
+			return new CodeMeta();
+		}
+
+		final File fCode = new File(assDir, String.valueOf(stamp));
+		final File fMeta = new File(assDir, String.valueOf(stamp) + META_POSTFIX);
+		final String[] fileNames;
+		final boolean codeExists;
+		final boolean metaExists;
+		synchronized (this) {
+			fileNames = assDir.list();
+			codeExists = fCode.isFile();
+			metaExists = fMeta.isFile();
+		}
+
+		if (fileNames.length == 0) {
+			return new CodeMeta();
+		}
+
+		int totalUploads = 0;
+		for (String fileName : fileNames) {
+			if (fileName.endsWith(META_POSTFIX)) {
+				continue;
+			}
+
+			final long parsed = G4Parse.parse(fileName, -1L);
+
+			if (parsed < 0) {
+				log.warn("stamp parse error: '{}' / '{}'", assDir.getPath(), fileName);
+				continue;
+			}
+			totalUploads++;
+		}
+
+		if (!codeExists) {
+			log.warn("querying non-existent upload: '{}' / '{}'", assDir.getPath(), stamp);
+		}
+
+		final CodeMeta defaultMeta = new CodeMeta();
+		defaultMeta.setTotalUploads(totalUploads);
+		defaultMeta.setUploadStamp(stamp);
+		if (!metaExists) {
+			return defaultMeta;
+		}
+
+		FileInputStream fis = null;
+		try {
+			fis = new FileInputStream(fMeta);
+			final InputStreamReader in = new InputStreamReader(fis, "UTF-8");
+			final CodeMeta codeMeta = mapper.readValue(in, CodeMeta.class);
+			codeMeta.setTotalUploads(totalUploads);
+			return codeMeta;
+		} catch (IOException e) {
+			log.warn("failed to read meta: '{}' / '{}'", assDir.getPath(), fMeta.getName());
+			log.info("trace", e);
+		} finally {
+			if (fis != null) {
+				try {
+					fis.close();
+				} catch (IOException e) {
+					log.info("failed on close", e);
+				}
+			}
+		}
+
+		return defaultMeta;
 	}
 
 	public void updateMeta(AssignmentPath assignmentPath, long stamp, CodeMeta meta) {
@@ -137,14 +236,20 @@ public class CodeDao {
 		try {
 			synchronized (this) {
 				fos = new FileOutputStream(metaFile);
-				mapper.writeValue(new OutputStreamWriter(fos), meta);
-				fos.flush();
+				final OutputStreamWriter osw = new OutputStreamWriter(fos);
+				mapper.writeValue(osw, meta);
 			}
 		} catch (IOException e) {
 			log.warn("failed to write meta: '{}' / '{}'", assDir.getPath(), metaFile.getName());
 			log.info("trace", e);
 		} finally {
-			G4Io.silentClose(fos);
+			if (fos != null) {
+				try {
+					fos.close();
+				} catch (IOException e) {
+					log.info("failed on close", e);
+				}
+			}
 		}
 	}
 

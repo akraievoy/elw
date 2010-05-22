@@ -178,23 +178,25 @@ public class StudentController extends MultiActionController implements WebSymbo
 		model.put("course", course);
 		model.put("enr", enr);
 
-/*		final HashMap<String, Result> testResults = new HashMap<String, Result>();
-		final MipsValidator validator = new MipsValidator();
+		final HashMap<String, CodeMeta> codeMetas = new HashMap<String, CodeMeta>();
 		for (int bunI = 0, assBundlesLength = course.getAssBundles().length; bunI < assBundlesLength; bunI++) {
 			AssignmentBundle bundle = course.getAssBundles()[bunI];
 			for (Assignment ass : bundle.getAssignments()) {
 				for (Version ver : ass.getVersions()) {
-					final Result[] resRef = {new Result("unknown", false)};
-					validator.batch(resRef, ver, ver.getSolution());
-					testResults.put(
-							course.getId() + "--" + bunI + "--" + ass.getId() + "--" + ver.getId(),
-							resRef[0]
+					if (isVersionIncorrect(student, ass, ver)) {
+						continue;
+					}
+					final String path = course.getId() + "--" + bunI + "--" + ass.getId() + "--" + ver.getId();
+					final AssignmentPath assPath = new AssignmentPath(
+							course.getId(), group.getId(), student,
+							bunI, ass.getId(), ver.getId()
 					);
+					final long lastStamp = codeDao.findLastStamp(assPath);
+					codeMetas.put(path, codeDao.findMetaByStamp(assPath, lastStamp));
 				}
 			}
 		}
-		model.put("testResults", testResults);
-*/
+		model.put("codeMetas", codeMetas);
 
 		return new ModelAndView("s/course", model);
 	}
@@ -329,7 +331,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 
 		final BufferedReader codeReader = req.getReader();
 		try {
-			codeDao.createCode(lookup.createPath(), codeReader);
+			codeDao.createCode(lookup.createPath(), codeReader, req.getRemoteAddr());
 		} catch (IOException e) {
 			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 		}
@@ -440,9 +442,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 			return null;
 		}
 
-		final int studId = Integer.parseInt(vl.student.getId());
-		final int verIdx = IdName.indexOfId(vl.ass.getVersions(), vl.ver.getId());
-		if (!vl.ass.isShared() && (studId) % vl.ass.getVersions().length != verIdx) {
+		if (isVersionIncorrect(vl.student, vl.ass, vl.ver)) {
 			if (redirect) {
 				Message.addWarn(req, "variant mismatch");
 				resp.sendRedirect("course?id=" + vl.course.getId());
@@ -453,6 +453,13 @@ public class StudentController extends MultiActionController implements WebSymbo
 		}
 
 		return vl;
+	}
+
+	protected boolean isVersionIncorrect(Student student, Assignment ass, Version ver) {
+		final int studId = Integer.parseInt(student.getId());
+		final int verIdx = IdName.indexOfId(ass.getVersions(), ver.getId());
+
+		return !ass.isShared() && (studId) % ass.getVersions().length != verIdx;
 	}
 
 	static class VersionLookup {
