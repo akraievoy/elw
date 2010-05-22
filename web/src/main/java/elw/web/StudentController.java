@@ -455,7 +455,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 		return vl;
 	}
 
-	protected boolean isVersionIncorrect(Student student, Assignment ass, Version ver) {
+	public static boolean isVersionIncorrect(Student student, Assignment ass, Version ver) {
 		final int studId = Integer.parseInt(student.getId());
 		final int verIdx = IdName.indexOfId(ass.getVersions(), ver.getId());
 

@@ -508,7 +508,7 @@ public class Controller {
 					final Result[] resRef = new Result[]{new Result("status unknown", false)};
 
 					try {
-						validator.batch(resRef, selectedTask, getSource());
+						validator.batch(resRef, selectedTask, getSource(), null);
 					} finally {
 						SwingUtilities.invokeLater(new Runnable() {
 							public void run() {

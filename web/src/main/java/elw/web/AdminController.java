@@ -182,7 +182,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 				for (Assignment ass : bundle.getAssignments()) {
 					for (Version ver : ass.getVersions()) {
 						final Result[] resRef = {new Result("unknown", false)};
-						validator.batch(resRef, ver, ver.getSolution());
+						validator.batch(resRef, ver, ver.getSolution(), null);
 						testResults.put(
 								course.getId() + "--" + bunI + "--" + ass.getId() + "--" + ver.getId(),
 								resRef[0]

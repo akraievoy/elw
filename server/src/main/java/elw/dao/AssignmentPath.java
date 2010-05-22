@@ -70,4 +70,8 @@ public class AssignmentPath {
 				+ getStudent().getId() + "." + getStudent().getName() + "/"
 		);
 	}
+
+	public String toString() {
+		return getStudentRoot(new File("...")) + " / " + getAssDirName();
+	}
 }

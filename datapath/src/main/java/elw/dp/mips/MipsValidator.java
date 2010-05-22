@@ -194,7 +194,7 @@ public class MipsValidator {
 		}
 	}
 
-	public void batch(Result[] resRef, final Version task, final String[] code) {
+	public void batch(Result[] resRef, final Version task, final String[] code, final int[] passFailCounts) {
 		int failCount = 0;
 		Test[] tests = task.getTests();
 		for (int i = 0, testsLength = tests.length; i < testsLength; i++) {
@@ -204,6 +204,13 @@ public class MipsValidator {
 				run(localResRef, test, code);
 				if (!localResRef[0].isSuccess()) {
 					failCount++;
+					if (passFailCounts != null) {
+						passFailCounts[1]++;
+					}
+				} else {
+					if (passFailCounts != null) {
+						passFailCounts[0]++;
+					}
 				}
 			} catch (Throwable t) {
 				failCount++;

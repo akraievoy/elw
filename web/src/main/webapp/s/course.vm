@@ -20,37 +20,50 @@
 #end
 </div>
 <div id=main>
-	<table><tbody>
-	<tr><td style="padding-left: 2em;" colspan=3>Assignment bundles:</td></tr>
+	<table cellspacing="0"><tbody>
+	<tr><td style="padding-left: 1em;" colspan=4>Assignment bundles:</td></tr>
 	#foreach($assBundle in $course.assBundles)#set($bunI = $velocityCount - 1)
-	<tr><td style="padding-left: 3em;" colspan=3>Assignments:</td></tr>
+	<tr><td style="padding-left: 1.25em;" colspan=4>Assignments:</td></tr>
 	 #foreach($ass in $assBundle.assignments)#set($assI = $velocityCount)
 		#if($ass.id)
 			#if($ass.shared)
 	<tr>
-		<td style="padding-left: 5em; border-bottom: #CCCCCC dotted 1px; background-color: #EEEEEE;">
+		<td style="padding-left: 2em; padding-right: 1em; border-right: #999999 dashed 1px; border-bottom: #CCCCCC dotted 1px; background-color: #EEEEEE;">
 		$ass.name
 		</td>
-		<td style="padding-left: 1em; padding-right: 1em; text-align: right; border-bottom: #CCCCCC dotted 1px; background-color: #EEEEEE;"  colspan=2>
+		<td style="padding-left: 0.25em; padding-right: 0.25em; text-align: center; border-bottom: #CCCCCC dotted 1px; background-color: #EEEEEE; text-align:center;"  colspan=2>
+			#if(!$enr.classes.get($ass.scoring.classFrom).started)Opens $enr.classes.get($ass.scoring.classFrom).niceDate#end &nbsp;
+		</td>
+	  <td style="padding-left: 0.25em; padding-right: 0.25em; border-bottom: #CCCCCC dotted 1px; background-color: #EEEEEE;">&nbsp;</td>
+	</tr>
+				#if($enr.classes.get($ass.scoring.classFrom).started)
+					#foreach($ver in $ass.versions)#set($verI = $velocityCount)
+						#if($ver.id)
+	<tr>
+		<td style="padding-left: 2.5em; padding-right: 1em; border-right: #999999 dashed 1px;">$ver.name</td>
+		<td style="padding-left: 0.25em; padding-right: 0.25em; text-align: right;">[&nbsp;<a href="launch?path=${course.id}--${bunI}--${ass.id}--${ver.id}">Code</a>&nbsp;]</td>
+		<td style="padding-left: 0.25em; padding-right: 0.25em;">&nbsp;</td>
+		<td style="padding-left: 0.25em; padding-right: 0.25em;">&nbsp;</td>
+	</tr>
+						#end
+			 		#end
+				#end
+			#else
+	<tr>
+		<td style="padding-left: 2em; padding-right: 1em; border-right: #999999 dashed 1px; border-bottom: #CCCCCC dotted 1px; background-color: #EEEEEE; ">$ass.name</td>
+				#if($enr.classes.get($ass.scoring.classFrom).started)
+		<td style="padding-left: 0.25em; padding-right: 0.25em; border-bottom: #CCCCCC dotted 1px; background-color: #EEEEEE; text-align: center;">
+			Due $enr.classes.get($ass.scoring.classCodeDue).niceDate
+		</td>
+		<td style="padding-left: 0.25em; padding-right: 0.25em; border-bottom: #CCCCCC dotted 1px; background-color: #EEEEEE; text-align: center;">
+			Due $enr.classes.get($ass.scoring.classReportDue).niceDate
+		</td>
+				#else
+		<td style="padding-left: 0.25em; padding-right: 0.25em;  border-bottom: #CCCCCC dotted 1px; background-color: #EEEEEE; text-align: center;" colspan="2">
 			Opens $enr.classes.get($ass.scoring.classFrom).niceDate
 		</td>
-	</td></tr>
-				#foreach($ver in $ass.versions)#set($verI = $velocityCount)
-					#if($ver.id)
-	<tr>
-		<td style="padding-left: 8em;">$ver.name</td>
-		<td style="padding-left: 1em; padding-right: 1em;">[&nbsp;<a href="launch?path=${course.id}--${bunI}--${ass.id}--${ver.id}">Code</a>&nbsp;]</td>
-		<td style="padding-left: 1em; padding-right: 1em;"></td>
-	</tr>
-					#end
-		 		#end
-			#else
-	<tr><td style="padding-left: 5em; border-bottom: #CCCCCC dotted 1px; background-color: #EEEEEE;" colspan=3>
-		$ass.name
-		<div style="float: right">
-			$ass.scoring.scoreBudget pts.
-			Opens $enr.classes.get($ass.scoring.classFrom).niceDate, due $enr.classes.get($ass.scoring.classReportDue).niceDate
-		</div>
+				#end
+		<td style="padding-left: 0.25em; padding-right: 0.25em; border-bottom: #CCCCCC dotted 1px; background-color: #EEEEEE; text-align: right;">$ass.scoring.scoreBudget pts.</td>
 	</td></tr>
 				#if($enr.classes.get($ass.scoring.classFrom).started)
 					#set($verIdx = $studId % $ass.versions.size())
@@ -58,21 +71,22 @@
 					#set($path = "${course.id}--${bunI}--${ass.id}--${ver.id}")
 					#set($codeMeta = $codeMetas.get($path))
 	<tr>
-		<td style="padding-left: 8em;">$ver.name</td>
-		<td style="padding-left: 1em; padding-right: 1em;">
+		<td style="padding-left: 2.5em; padding-right: 1em; border-right: #999999 dashed 1px;">$ver.name</td>
+		<td style="padding-left: 0.25em; padding-right: 0.25em; text-align: right;">
 			$codeMeta.totalUploads upload#if($codeMeta.totalUploads > 1)s#end#if($codeMeta.totalUploads > 0), #if($codeMeta.totalUploads > 1)last#{else}on#end $codeMeta.niceUploadStamp<br/>
 				#if($codeMeta.validatorStamp > 0)
 					#set($passColor = "#if($codeMeta.testsPassed>0)#00FF00#else#999999#end")
 					#set($failColor = "#if($codeMeta.testsFailed>0)#FF0000#else#999999#end")
-					<span style="color: $passColor;">$codeMeta.testsPassed</span>Pass /
-					<span style="color: $failColor;">$codeMeta.testsFailed</span>Fail
+					<span style="color: $passColor;">$codeMeta.testsPassed&nbsp;Pass</span> /
+					<span style="color: $failColor;">$codeMeta.testsFailed&nbsp;Fail</span>
 				#else
 					Tests Pending
 				#end
 			#end
 			[&nbsp;<a href="launch?path=$path">Code</a>&nbsp;]
 		</td>
-		<td style="padding-left: 1em; padding-right: 1em;">[&nbsp;<a href="uploadPage?path=$path">Report</a>&nbsp;]</td>
+		<td style="padding-left: 0.25em; padding-right: 0.25em; text-align: right;">[&nbsp;<a href="uploadPage?path=$path">Report</a>&nbsp;]</td>
+		<td style="padding-left: 0.25em; padding-right: 0.25em; text-align: right;">&nbsp;</td>
 	</tr>
 				#end
 			#end

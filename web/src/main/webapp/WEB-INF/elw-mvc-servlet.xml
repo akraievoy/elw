@@ -25,6 +25,21 @@
 	<bean id="reportDao" class="elw.dao.ReportDao"/>
 	<bean id="enrollmentDao" class="elw.dao.EnrollDao"/>
 
+	<bean id="daemonThreadFactory" class="org.akraievoy.gear.G4Run$ThreadFactory">
+		<constructor-arg type="boolean" value="true"/>
+		<constructor-arg type="java.lang.String" value="ELW Daemon"/>
+	</bean>
+
+	<bean id="daemonExecutor" class="org.akraievoy.gear.G4Run" factory-method="scheduledExecutor">
+		<constructor-arg type="int" value="3"/>
+		<constructor-arg type="org.akraievoy.gear.G4Run$ThreadFactory" ref="daemonThreadFactory"/>
+	</bean>
+
+	<bean id="studentCodeValidator" class="elw.web.StudentCodeValidator">
+		<constructor-arg type="java.util.concurrent.ScheduledExecutorService" ref="daemonExecutor"/>
+		<property name="periodMillis" value="180000"/>
+	</bean>
+
 	<bean name="/a/*" class="elw.web.AdminController">
 		<property name="methodNameResolver" ref="methodNameResolver"/>
 	</bean>
