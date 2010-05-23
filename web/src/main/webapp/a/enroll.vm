@@ -9,7 +9,7 @@
 </head>
 <body style="text-align: left;">
 <div id="header">
-	<div id="nav"><a href="index">Index</a> &gt; <a href="index">Enrollments</a> &gt; <span style="font-weight: bold">Group $group.name Status</span></div>
+	<div id="nav"><a href="index">Index</a> &gt; <a href="enrolls">Enrollments</a> &gt; <span style="font-weight: bold">Group $group.name Status</span></div>
 	<div id="cred">#if($auth)[&nbsp;Admin&nbsp;]&nbsp;[&nbsp;<a href="logout">X</a>&nbsp;]#{else}[&nbsp;Anonymous&nbsp;]#end</div>
 	&nbsp;
 </div>
