@@ -39,21 +39,29 @@
 				#set($path = "${stud.id}--${course.id}--${bunI}--${ass.id}--${ver.id}")
 				#set($codeMeta = $codeMetas.get($path))
 				#set($reportMeta = $reportMetas.get($path))
-		<td style="padding-left: 0.25em; padding-right: 0.25em;">
-				$codeMeta.totalUploads #if($codeMeta.totalUploads > 0)<span title="$codeMeta.niceUploadStamp">$codeMeta.briefUploadStamp</span><br/>
+				#set($codeDue = $enr.classes.get($ass.scoring.classCodeDue).passed && ($codeMeta.totalUploads == 0 || $codeMeta.passRatio == 0))
+				#set($reportDue = $enr.classes.get($ass.scoring.reportCodeDue).passed && ($reportMeta.totalUploads == 0 ))
+		<td style="padding-left: 0.25em; padding-right: 0.25em; #if($codeDue)background-color: #FFEEEE;#end">
+				#if($codeMeta.totalUploads > 0)
+					<span title="$codeMeta.niceUploadStamp">$codeMeta.briefUploadStamp</span><br/>
 					#if($codeMeta.validatorStamp > 0)
 						#set($passColor = "#if($codeMeta.testsPassed>0)#00FF00#else#999999#end")
 						#set($failColor = "#if($codeMeta.testsFailed>0)#FF0000#else#999999#end")
-						<span style="color: $passColor;">$codeMeta.testsPassed&nbsp;P</span>/
-						<span style="color: $failColor;">$codeMeta.testsFailed&nbsp;F</span>
+						<span style="color: $passColor;">${codeMeta.testsPassed}P</span>/<span
+									style="color: $failColor;">${codeMeta.testsFailed}F</span>
 					#else
 						Pending
 					#end
+				#else
+					&nbsp;
 				#end
 		</td>
-		<td style="padding-left: 0.25em; padding-right: 0.25em; background-color: #EEEEEE;'">
-					$reportMeta.totalUploads #if($reportMeta.totalUploads > 0) <span title="$reportMeta.niceUploadStamp">$reportMeta.briefUploadStamp</span><br/>
+		<td style="padding-left: 0.25em; padding-right: 0.25em; border-left: 1px dashed #CCCCCC; #if($reportDue)background-color: #FFEEEE;#end'">
+					#if($reportMeta.totalUploads > 0)
+						<span title="$reportMeta.niceUploadStamp">$reportMeta.briefUploadStamp</span><br/>
 						Pending
+					#else
+						&nbsp;
 					#end
 		</td>
 			#end
