@@ -19,16 +19,16 @@
 </div>
 <table><tbody>
 #foreach($enr in $enrolls)
-<tr style="border-bottom: #CCCCCC dotted 1px; background-color: #EEEEEE;">
-	<td style="padding-left: 1em;">${enr.name}&nbsp;<span class="extra">(id&nbsp;:&nbsp;${enr.id})</span></td>
-	<td style="padding-left: 1em; padding-right: 1em;">$groups.get($enr.groupId).name&nbsp;<span class="extra">(id&nbsp;:&nbsp;$enr.groupId)</span></td>
-	<td style="padding-left: 1em; padding-right: 1em;">$courses.get($enr.courseId).name&nbsp;<span class="extra">(id&nbsp;:&nbsp;$enr.courseId)</span></td>
+<tr class="header">
+	<td style="padding-left: 1em; padding-right: 0.25em;"><a href="enroll?id=$enr.id">${enr.name}</a>&nbsp;<span class="extra">(id&nbsp;:&nbsp;${enr.id})</span></td>
+	<td style="padding-left: 0.25em; padding-right: 0.25em;"><a href="groups#$groups.get($enr.groupId).id">$groups.get($enr.groupId).name</a>&nbsp;<span class="extra">(id&nbsp;:&nbsp;$enr.groupId)</span></td>
+	<td style="padding-left: 0.25em; padding-right: 0.25em;"><a href="course?id=$courses.get($enr.courseId).id">$courses.get($enr.courseId).name</a>&nbsp;<span class="extra">(id&nbsp;:&nbsp;$enr.courseId)</span></td>
 </tr>
 	#foreach($cl in $enr.classes)
 	<tr >
-		<td style="padding-left: 2em;">$cl.niceDate</td>
-		<td style="padding-left: 1em; padding-right: 1em;">$cl.fromTime -- $cl.toTime</td>
-		<td style="padding-left: 1em; padding-right: 1em;">
+		<td style="padding-left: 2em; padding-right: 0.25em;">$cl.niceDate</td>
+		<td style="padding-left: 0.25em; padding-right: 0.25em;">$cl.fromTime -- $cl.toTime</td>
+		<td style="padding-left: 0.25em; padding-right: 0.25em;">
 		#if($cl.today)
 			<span style="font-weight:bold">Today#if($cl.current)&nbsp;Current#end</span>
 		#else

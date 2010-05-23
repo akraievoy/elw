@@ -21,17 +21,17 @@
 </div>
 <div id=main>
 	<table><tbody>
-	<tr><td style="padding-left: 2em;" colspan=3>Assignment bundles:</td></tr>
+	<tr><td style="padding-left: 1em;padding-right: 0.25em;" colspan=3>Assignment bundles:</td></tr>
 	#foreach($assBundle in $course.assBundles)#set($bunI = $velocityCount - 1)
-	<tr><td style="padding-left: 3em;" colspan=3>Assignments:</td></tr>
+	<tr><td style="padding-left: 1.5em;padding-right: 0.25em;" colspan=3>Assignments:</td></tr>
 	 #foreach($ass in $assBundle.assignments)#set($assI = $velocityCount)
-	<tr><td style="padding-left: 5em; border-bottom: #CCCCCC dotted 1px; background-color: #EEEEEE;" colspan=3>$ass.name&nbsp;<span style="font-size: smaller">(id:&nbsp;#if($ass.id)$ass.id#{else}null#end)</span>&nbsp;:&nbsp;</td></tr>
+	<tr class="header"><td style="padding-left: 2em; padding-right: 0.25em;" colspan=3>$ass.name&nbsp;<span style="font-size: smaller">(id:&nbsp;#if($ass.id)$ass.id#{else}null#end)</span>&nbsp;:&nbsp;</td></tr>
 		#foreach($ver in $ass.versions)#set($verI = $velocityCount)
 		#set($path="${course.id}--${bunI}--${ass.id}--${ver.id}")
 	<tr>
-		<td style="padding-left: 8em;">$ver.name&nbsp;<span style="font-size: smaller">(id:&nbsp;#if($ver.id)$ver.id#{else}null#end)</span></td>
-		<td style="padding-left: 1em; padding-right: 1em;">[&nbsp;<a href="launch?path=$path">Code</a>&nbsp;]</td>
-		<td style="padding-left: 1em; padding-right: 1em;">
+		<td style="padding-left: 3em;">$ver.name&nbsp;<span style="font-size: smaller">(id:&nbsp;#if($ver.id)$ver.id#{else}null#end)</span></td>
+		<td style="padding-left: 0.25em; padding-right: 0.25em;">[&nbsp;<a href="launch?path=$path">Code</a>&nbsp;]</td>
+		<td style="padding-left: 0.25em; padding-right: 0.25em;">
 			#if($testResults)
 			#set($res=$testResults.get($path))
 				#if($res.success)#set($resColor="#00FF00")#else#set($resColor="#FF0000")#end

@@ -7,6 +7,7 @@ import org.joda.time.format.DateTimeFormatter;
 
 public class CodeMeta {
 	private static final DateTimeFormatter FMT_DATETIME_NICE = DateTimeFormat.forPattern("EEE MMM dd HH:mm");
+	private static final DateTimeFormatter FMT_DATETIME_BRIEF = DateTimeFormat.forPattern("MMM dd");
 
 	protected int testsPassed;
 	protected int testsFailed;
@@ -84,5 +85,14 @@ public class CodeMeta {
 	@JsonIgnore
 	public String getNiceUploadStamp() {
 		return FMT_DATETIME_NICE.print(new DateTime(uploadStamp));
+	}
+	@JsonIgnore
+	public String getBriefValidatorStamp() {
+		return FMT_DATETIME_BRIEF.print(new DateTime(validatorStamp));
+	}
+
+	@JsonIgnore
+	public String getBriefUploadStamp() {
+		return FMT_DATETIME_BRIEF.print(new DateTime(uploadStamp));
 	}
 }

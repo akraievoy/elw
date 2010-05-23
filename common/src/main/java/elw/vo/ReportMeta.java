@@ -7,6 +7,7 @@ import org.joda.time.format.DateTimeFormatter;
 
 public class ReportMeta {
 	private static final DateTimeFormatter FMT_DATETIME_NICE = DateTimeFormat.forPattern("EEE MMM dd HH:mm");
+	private static final DateTimeFormatter FMT_DATETIME_BRIEF = DateTimeFormat.forPattern("MMM dd");
 
 	protected long uploadStamp;
 	protected String sourceAddress;
@@ -41,5 +42,10 @@ public class ReportMeta {
 	@JsonIgnore
 	public String getNiceUploadStamp() {
 		return FMT_DATETIME_NICE.print(new DateTime(uploadStamp));
+	}
+
+	@JsonIgnore
+	public String getBriefUploadStamp() {
+		return FMT_DATETIME_BRIEF.print(new DateTime(uploadStamp));
 	}
 }

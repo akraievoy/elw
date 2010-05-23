@@ -27,14 +27,14 @@
 	 #foreach($ass in $assBundle.assignments)#set($assI = $velocityCount)
 		#if($ass.id)
 			#if($ass.shared)
-	<tr>
-		<td style="padding-left: 2em; padding-right: 1em; border-right: #999999 dashed 1px; border-bottom: #CCCCCC dotted 1px; background-color: #EEEEEE;">
+	<tr class="header">
+		<td style="padding-left: 2em; padding-right: 1em; border-right: #999999 dashed 1px;">
 		$ass.name
 		</td>
-		<td style="padding-left: 0.25em; padding-right: 0.25em; text-align: center; border-bottom: #CCCCCC dotted 1px; background-color: #EEEEEE; text-align:center;"  colspan=2>
+		<td style="padding-left: 0.25em; padding-right: 0.25em; text-align: center; text-align:center;"  colspan=2>
 			#if(!$enr.classes.get($ass.scoring.classFrom).started)Opens $enr.classes.get($ass.scoring.classFrom).niceDate#end &nbsp;
 		</td>
-	  <td style="padding-left: 0.25em; padding-right: 0.25em; border-bottom: #CCCCCC dotted 1px; background-color: #EEEEEE;">&nbsp;</td>
+	  <td style="padding-left: 0.25em; padding-right: 0.25em; ">&nbsp;</td>
 	</tr>
 				#if($enr.classes.get($ass.scoring.classFrom).started)
 					#foreach($ver in $ass.versions)#set($verI = $velocityCount)
@@ -49,21 +49,21 @@
 			 		#end
 				#end
 			#else
-	<tr>
-		<td style="padding-left: 2em; padding-right: 1em; border-right: #999999 dashed 1px; border-bottom: #CCCCCC dotted 1px; background-color: #EEEEEE; ">$ass.name</td>
+	<tr class="header">
+		<td style="padding-left: 2em; padding-right: 1em; border-right: #999999 dashed 1px;">$ass.name</td>
 				#if($enr.classes.get($ass.scoring.classFrom).started)
-		<td style="padding-left: 0.25em; padding-right: 0.25em; border-bottom: #CCCCCC dotted 1px; background-color: #EEEEEE; text-align: center;">
+		<td style="padding-left: 0.25em; padding-right: 0.25em; text-align: center;">
 			Due $enr.classes.get($ass.scoring.classCodeDue).niceDate
 		</td>
-		<td style="padding-left: 0.25em; padding-right: 0.25em; border-bottom: #CCCCCC dotted 1px; background-color: #EEEEEE; text-align: center;">
+		<td style="padding-left: 0.25em; padding-right: 0.25em; text-align: center;">
 			Due $enr.classes.get($ass.scoring.classReportDue).niceDate
 		</td>
 				#else
-		<td style="padding-left: 0.25em; padding-right: 0.25em;  border-bottom: #CCCCCC dotted 1px; background-color: #EEEEEE; text-align: center;" colspan="2">
+		<td style="padding-left: 0.25em; padding-right: 0.25em; text-align: center;" colspan="2">
 			Opens $enr.classes.get($ass.scoring.classFrom).niceDate
 		</td>
 				#end
-		<td style="padding-left: 0.25em; padding-right: 0.25em; border-bottom: #CCCCCC dotted 1px; background-color: #EEEEEE; text-align: right;">$ass.scoring.scoreBudget pts.</td>
+		<td style="padding-left: 0.25em; padding-right: 0.25em; text-align: right;">$ass.scoring.scoreBudget pts.</td>
 	</td></tr>
 				#if($enr.classes.get($ass.scoring.classFrom).started)
 					#set($verIdx = $studId % $ass.versions.size())
@@ -74,7 +74,7 @@
 	<tr>
 		<td style="padding-left: 2.5em; padding-right: 1em; border-right: #999999 dashed 1px;">$ver.name</td>
 		<td style="padding-left: 0.25em; padding-right: 0.25em; text-align: right;">
-			$codeMeta.totalUploads upload#if($codeMeta.totalUploads != 1)s#end#if($codeMeta.totalUploads > 0), #if($codeMeta.totalUploads > 1)last#{else}on#end $codeMeta.niceUploadStamp<br/>
+			$codeMeta.totalUploads upload#if($codeMeta.totalUploads != 1)s#end#if($codeMeta.totalUploads > 0), #if($codeMeta.totalUploads > 1)last#{else}on#end <span title="$codeMeta.niceUploadStamp">$codeMeta.briefUploadStamp</span><br/>
 				#if($codeMeta.validatorStamp > 0)
 					#set($passColor = "#if($codeMeta.testsPassed>0)#00FF00#else#999999#end")
 					#set($failColor = "#if($codeMeta.testsFailed>0)#FF0000#else#999999#end")

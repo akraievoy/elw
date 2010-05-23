@@ -180,6 +180,18 @@ public class StudentController extends MultiActionController implements WebSymbo
 
 		final HashMap<String, CodeMeta> codeMetas = new HashMap<String, CodeMeta>();
 		final HashMap<String, ReportMeta> reportMetas = new HashMap<String, ReportMeta>();
+		storeMetas(codeDao, reportDao, course, group, student, codeMetas, reportMetas, "");
+		model.put("codeMetas", codeMetas);
+		model.put("reportMetas", reportMetas);
+
+		return new ModelAndView("s/course", model);
+	}
+
+	public static void storeMetas(
+			CodeDao codeDao, ReportDao reportDao,
+			Course course, Group group, Student student,
+			HashMap<String, CodeMeta> codeMetas, HashMap<String, ReportMeta> reportMetas, final String prefix
+	) {
 		for (int bunI = 0, assBundlesLength = course.getAssBundles().length; bunI < assBundlesLength; bunI++) {
 			AssignmentBundle bundle = course.getAssBundles()[bunI];
 			for (Assignment ass : bundle.getAssignments()) {
@@ -187,7 +199,10 @@ public class StudentController extends MultiActionController implements WebSymbo
 					if (isVersionIncorrect(student, ass, ver)) {
 						continue;
 					}
-					final String path = course.getId() + "--" + bunI + "--" + ass.getId() + "--" + ver.getId();
+					String path = course.getId() + "--" + bunI + "--" + ass.getId() + "--" + ver.getId();
+					if (prefix != null && prefix.length() > 0) {
+						path = prefix + "--" + path;
+					}
 					final AssignmentPath assPath = new AssignmentPath(
 							course.getId(), group.getId(), student,
 							bunI, ass.getId(), ver.getId()
@@ -199,10 +214,6 @@ public class StudentController extends MultiActionController implements WebSymbo
 				}
 			}
 		}
-		model.put("codeMetas", codeMetas);
-		model.put("reportMetas", reportMetas);
-
-		return new ModelAndView("s/course", model);
 	}
 
 	public ModelAndView do_uploadReport(final HttpServletRequest req, final HttpServletResponse resp) throws IOException, FileUploadException {

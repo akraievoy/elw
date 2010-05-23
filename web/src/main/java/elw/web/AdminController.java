@@ -1,9 +1,7 @@
 package elw.web;
 
 import base.pattern.Result;
-import elw.dao.CourseDao;
-import elw.dao.EnrollDao;
-import elw.dao.GroupDao;
+import elw.dao.*;
 import elw.dp.mips.MipsValidator;
 import elw.miniweb.Message;
 import elw.vo.*;
@@ -35,14 +33,18 @@ public class AdminController extends MultiActionController implements WebSymbols
 	protected final CourseDao courseDao;
 	protected final GroupDao groupDao;
 	protected final EnrollDao enrollDao;
+	protected final CodeDao codeDao;
+	protected final ReportDao reportDao;
 
 	protected final ObjectMapper mapper = new ObjectMapper();
 	protected final long cacheBustingToken = System.currentTimeMillis();
 
-	public AdminController(CourseDao courseDao, EnrollDao enrollDao, GroupDao groupDao) {
+	public AdminController(CourseDao courseDao, EnrollDao enrollDao, GroupDao groupDao, CodeDao codeDao, ReportDao reportDao) {
 		this.courseDao = courseDao;
 		this.enrollDao = enrollDao;
 		this.groupDao = groupDao;
+		this.codeDao = codeDao;
+		this.reportDao = reportDao;
 	}
 
 	protected HashMap<String, Object> auth(final HttpServletRequest req, final HttpServletResponse resp, final boolean redirect) throws IOException {
@@ -170,7 +172,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 
 		final Course course = courseDao.findCourse(req.getParameter("id"));
 		if (course == null) {
-			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);	//	LATER review : setStatus -> sendRedirect in most cases
 			return null;
 		}
 
@@ -231,7 +233,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 
 		final String assId = ids[2];
 		final AssignmentBundle bundle = course.getAssBundles()[assBundleIndex];
-		final Assignment ass = findIdName(bundle.getAssignments(), assId);
+		final Assignment ass = IdName.findById(bundle.getAssignments(), assId);
 		if (ass == null) {
 			log.warn("assignment not found by id {}", assId);
 			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -239,7 +241,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 		}
 
 		final String verId = ids[3];
-		final Version ver = findIdName(ass.getVersions(), verId);
+		final Version ver = IdName.findById(ass.getVersions(), verId);
 		if (ver == null) {
 			log.warn("assignment not found by id {}", verId);
 			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -280,15 +282,61 @@ public class AdminController extends MultiActionController implements WebSymbols
 		return new ModelAndView("a/enrolls", model);
 	}
 
-	protected static <E extends IdName> E findIdName(final E[] elems, String id) {
-		E found = null;
-		for (E e : elems) {
-			if (id.equals(e.getId())) {
-				found = e;
-				break;
-			}
+	public ModelAndView do_enroll(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+		final HashMap<String, Object> model = auth(req, resp, true);
+		if (model == null) {
+			return null;
 		}
 
-		return found;
+		model.put("auth", req.getSession(true).getAttribute(S_ADMIN));
+
+		final Enrollment enr = enrollDao.findEnrollment(req.getParameter("id"));
+		if (enr == null) {
+			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			return null;
+		}
+		final Course course = courseDao.findCourse(enr.getCourseId());
+		if (course == null) {
+			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			return null;
+		}
+		final Group group = groupDao.findGroup(enr.getGroupId());
+		if (group == null) {
+			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			return null;
+		}
+
+		model.put("enr", enr);
+		model.put("group", group);
+		model.put("course", course);
+
+		final HashMap<String, CodeMeta> codeMetas = new HashMap<String, CodeMeta>();
+		final HashMap<String, ReportMeta> reportMetas = new HashMap<String, ReportMeta>();
+		for (Student stud : group.getStudents()) {
+			StudentController.storeMetas(
+					codeDao, reportDao,
+					course, group, stud,
+					codeMetas, reportMetas, stud.getId()
+			);
+		}
+		model.put("codeMetas", codeMetas);
+		model.put("reportMetas", reportMetas);
+
+		return new ModelAndView("a/enroll", model);
 	}
+
+	public ModelAndView do_groups(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+		final HashMap<String, Object> model = auth(req, resp, true);
+		if (model == null) {
+			return null;
+		}
+
+		final Group[] groups = groupDao.findAllGroups();
+
+		model.put("auth", req.getSession(true).getAttribute(S_ADMIN));
+		model.put("groups", groups);
+
+		return new ModelAndView("a/groups", model);
+	}
+
 }

@@ -1,0 +1,66 @@
+#* @vtlvariable name="courses" type="elw.vo.Course[]" *#
+<html>
+<head>
+	<meta content="text/html; charset=UTF-8">
+	<title>Group $group.name Status : ELW Admin</title>
+	<link href="../css/elw.css" type="text/css" rel="stylesheet"/>
+	<script type="text/javascript" src="../js/jquery.js"></script>
+	<script type="text/javascript" src="../js/jquery.sha1.js"></script>
+</head>
+<body style="text-align: left;">
+<div id="header">
+	<div id="nav"><a href="index">Index</a> &gt; <a href="index">Enrollments</a> &gt; <span style="font-weight: bold">Group $group.name Status</span></div>
+	<div id="cred">#if($auth)[&nbsp;Admin&nbsp;]&nbsp;[&nbsp;<a href="logout">X</a>&nbsp;]#{else}[&nbsp;Anonymous&nbsp;]#end</div>
+	&nbsp;
+</div>
+<div id=messages>#foreach($m in $elw_messages)
+	<div class="$m.type">$m.message</div>
+#end
+</div>
+<table cellspacing="0"><tbody>
+<tr class="header">
+	<td style="padding-left: 1em; padding-right: 0.25em;"><a name="${group.id}"></a>${group.name}&nbsp;<span class="extra">(id&nbsp;:&nbsp;${group.id})</span></td>
+#foreach($assBundle in $course.assBundles)#set($bunI = $velocityCount - 1)
+	#foreach($ass in $assBundle.assignments)#set($assI = $velocityCount)
+		#if($ass.id && !$ass.shared)
+				<td style="padding-left: 0.25em; padding-right: 0.25em; text-align: center;" colspan="2"><span title="$ass.name">$ass.id</span></td>
+		#end
+	#end
+#end
+</tr>
+#foreach($stud in $group.students)
+	<tr >
+		<td style="padding-left: 2em; padding-right: 0.25em;">$stud.name &nbsp;<span class="extra">(id&nbsp;:&nbsp;${stud.id})</td>
+	#foreach($assBundle in $course.assBundles)#set($bunI = $velocityCount - 1)
+		#foreach($ass in $assBundle.assignments)#set($assI = $velocityCount)
+			#if($ass.id && !$ass.shared)
+				#set($verIdx = $stud.idAsInt % $ass.versions.size())
+				#set($ver = $ass.versions.get($verIdx))
+				#set($path = "${stud.id}--${course.id}--${bunI}--${ass.id}--${ver.id}")
+				#set($codeMeta = $codeMetas.get($path))
+				#set($reportMeta = $reportMetas.get($path))
+		<td style="padding-left: 0.25em; padding-right: 0.25em;">
+				$codeMeta.totalUploads #if($codeMeta.totalUploads > 0)<span title="$codeMeta.niceUploadStamp">$codeMeta.briefUploadStamp</span><br/>
+					#if($codeMeta.validatorStamp > 0)
+						#set($passColor = "#if($codeMeta.testsPassed>0)#00FF00#else#999999#end")
+						#set($failColor = "#if($codeMeta.testsFailed>0)#FF0000#else#999999#end")
+						<span style="color: $passColor;">$codeMeta.testsPassed&nbsp;P</span>/
+						<span style="color: $failColor;">$codeMeta.testsFailed&nbsp;F</span>
+					#else
+						Pending
+					#end
+				#end
+		</td>
+		<td style="padding-left: 0.25em; padding-right: 0.25em; background-color: #EEEEEE;'">
+					$reportMeta.totalUploads #if($reportMeta.totalUploads > 0) <span title="$reportMeta.niceUploadStamp">$reportMeta.briefUploadStamp</span><br/>
+						Pending
+					#end
+		</td>
+			#end
+		#end
+	#end
+	</tr>
+#end
+</tbody></table>
+</body>
+</html>

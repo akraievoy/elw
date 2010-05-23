@@ -1,5 +1,7 @@
 package elw.vo;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+
 public class IdName {
 	protected String name;
 	protected String id;
@@ -10,6 +12,11 @@ public class IdName {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	@JsonIgnore
+	public int getIdAsInt() {
+		return Integer.parseInt(id);
 	}
 
 	public String getName() {
@@ -24,7 +31,6 @@ public class IdName {
 		return name == null || name.trim().length() == 0 ? id : name;
 	}
 
-	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (!(o instanceof IdName)) return false;

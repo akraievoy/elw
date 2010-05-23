@@ -91,3 +91,8 @@ div.formButtons {
 	color: #333333;
 }
 
+.header {
+	border-bottom: #CCCCCC dotted 1px;
+	background-color: #EEEEEE;
+}
+
