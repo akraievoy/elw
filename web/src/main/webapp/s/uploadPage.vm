@@ -29,6 +29,23 @@
 			<div class="formButtons"><input type="submit" value="Upload"/></div>
 		</form>
 	</div>
+	<div style="text-align: center;">
+		<h3>Upload history</h3>
+		<table cellspacing="0" align="center"><tbody>
+			<tr>
+				<th>Date</th>
+				<th>Action</th>
+				<th>State</th>
+			</tr>
+#foreach($rep in $reports.values())
+			<tr>
+				<td><span title="$rep.niceUploadStamp">$rep.briefUploadStamp</span></td>
+				<td>[&nbsp;<a href="reportDl/$rep.fileName?path=$upPath&stamp=$rep.uploadStamp" target="_blank">Download</a>&nbsp;]</td>
+				<td>&nbsp;</td>
+			</tr>
+#end
+		</tbody></table>
+	</div>
 </div>
 </body>
 </html>

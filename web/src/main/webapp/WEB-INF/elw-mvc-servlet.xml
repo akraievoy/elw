@@ -9,13 +9,15 @@
 	   default-destroy-method="stop"
 	default-autowire="constructor">
 
-	<bean id="handlerMapping" class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping">
+	<context:annotation-config/>
+
+	<bean id="handlerMapping" class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
 		<property name="alwaysUseFullPath" value="true"/>
 	</bean>
-
-	<bean id="methodNameResolver" class="org.springframework.web.servlet.mvc.multiaction.InternalPathMethodNameResolver">
-		<property name="prefix" value="do_"/>
+	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+		<property name="alwaysUseFullPath" value="true"/>
 	</bean>
+	<context:component-scan base-package="elw.web"/>
 
 	<bean id="mapper" class="elw.dao.MapperFactory" factory-method="createMapper"/>
 
@@ -38,13 +40,6 @@
 	<bean id="studentCodeValidator" class="elw.web.StudentCodeValidator">
 		<constructor-arg type="java.util.concurrent.ScheduledExecutorService" ref="daemonExecutor"/>
 		<property name="periodMillis" value="180000"/>
-	</bean>
-
-	<bean name="/a/*" class="elw.web.AdminController">
-		<property name="methodNameResolver" ref="methodNameResolver"/>
-	</bean>
-	<bean name="/s/*" class="elw.web.StudentController">
-		<property name="methodNameResolver" ref="methodNameResolver"/>
 	</bean>
 
 	<bean id="viewResolver"

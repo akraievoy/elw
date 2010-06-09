@@ -13,6 +13,9 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 
@@ -20,10 +23,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.*;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
+@Controller
+@RequestMapping("/s/**/*")
 public class StudentController extends MultiActionController implements WebSymbols {
 	private static final Logger log = LoggerFactory.getLogger(StudentController.class);
 
@@ -46,14 +49,14 @@ public class StudentController extends MultiActionController implements WebSymbo
 		this.reportDao = reportDao;
 	}
 
-	protected HashMap<String, Object> auth(final HttpServletRequest req, final HttpServletResponse resp, final boolean redirect) throws IOException {
+	protected HashMap<String, Object> auth(final HttpServletRequest req, final HttpServletResponse resp, final String pathToRoot) throws IOException {
 		final Group group = (Group) req.getSession(true).getAttribute(S_GROUP);
 		final Student student = (Student) req.getSession(true).getAttribute(S_STUD);
 
 		if (group == null || student == null) {
-			if (redirect) {
+			if (pathToRoot != null) {
 				Message.addWarn(req, "Login required");
-				resp.sendRedirect("login");
+				resp.sendRedirect(pathToRoot + "login");
 			} else {
 				resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Login required");
 			}
@@ -70,6 +73,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 		return model;
 	}
 
+	@RequestMapping(value = "login", method = RequestMethod.GET)
 	public ModelAndView do_login(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
 		final HashMap<String, Object> model = new HashMap<String, Object>();
 
@@ -80,6 +84,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 		return new ModelAndView("s/login", model);
 	}
 
+	@RequestMapping(value = "loginPost", method = RequestMethod.POST)
 	public ModelAndView do_loginPost(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
 		final String groupName = req.getParameter("groupName");
 		final String studentName = req.getParameter("studentName");
@@ -129,14 +134,16 @@ public class StudentController extends MultiActionController implements WebSymbo
 		return null;
 	}
 
+	@RequestMapping(value = "logout", method = RequestMethod.GET)
 	public ModelAndView do_logout(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
 		req.getSession(true).invalidate();
 		resp.sendRedirect("courses");
 		return null;
 	}
 
+	@RequestMapping(value = "courses", method = RequestMethod.GET)
 	public ModelAndView do_courses(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		final HashMap<String, Object> model = auth(req, resp, true);
+		final HashMap<String, Object> model = auth(req, resp, "");
 		if (model == null) {
 			return null;
 		}
@@ -151,8 +158,9 @@ public class StudentController extends MultiActionController implements WebSymbo
 		return new ModelAndView("s/courses", model);
 	}
 
+	@RequestMapping(value = "course", method = RequestMethod.GET)
 	public ModelAndView do_course(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		final HashMap<String, Object> model = auth(req, resp, true);
+		final HashMap<String, Object> model = auth(req, resp, "");
 		if (model == null) {
 			return null;
 		}
@@ -216,8 +224,9 @@ public class StudentController extends MultiActionController implements WebSymbo
 		}
 	}
 
+	@RequestMapping(value = "uploadReport", method = RequestMethod.POST)
 	public ModelAndView do_uploadReport(final HttpServletRequest req, final HttpServletResponse resp) throws IOException, FileUploadException {
-		VersionLookup lookup = versionLookup(req, resp, true);
+		VersionLookup lookup = versionLookup(req, resp, "../");
 		if (lookup == null) {
 			return null;
 		}
@@ -284,8 +293,9 @@ public class StudentController extends MultiActionController implements WebSymbo
 		return null;
 	}
 
+	@RequestMapping(value = "uploadPage", method = RequestMethod.GET)
 	public ModelAndView do_uploadPage(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		VersionLookup lookup = versionLookup(req, resp, true);
+		VersionLookup lookup = versionLookup(req, resp, "");
 		if (lookup == null) {
 			return null;
 		}
@@ -301,12 +311,79 @@ public class StudentController extends MultiActionController implements WebSymbo
 		model.put("upPath", lookup.getPath());
 		model.put("course", lookup.getCourse());
 		model.put("uploadLimit", G4mat.formatMem(UPLOAD_LIMIT));
+		final Map<Long,ReportMeta> reports = reportDao.findAllMetas(lookup.createPath());
+
+		for (Iterator<ReportMeta> metaIt = reports.values().iterator(); metaIt.hasNext();) {
+			ReportMeta reportMeta = metaIt.next();
+			final String fileName =
+					lookup.getStudent().getName().replaceAll("\\s+", "_") + "-" +
+					lookup.getAss().getId() + "-" +
+					ReportMeta.getFileNameUploadStamp(reportMeta.getUploadStamp()) +
+					".rtf";
+
+			reportMeta.setFileName(fileName);
+		}
+
+		model.put("reports", reports);
 
 		return new ModelAndView("s/uploadPage", model);
 	}
 
+	@RequestMapping(value = "reportDl/*.*", method = RequestMethod.GET)
+	public ModelAndView do_reportDl(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+		VersionLookup lookup = versionLookup(req, resp, "");
+		if (lookup == null) {
+			return null;
+		}
+
+		if (lookup.getAss().isShared()) {
+			Message.addWarn(req, "shared assignments do not require any reports");
+			resp.sendRedirect("course?id=" + lookup.course.getId());
+			return null;
+		}
+
+		final String stampStr = req.getParameter("stamp");
+		if (stampStr == null) {
+			Message.addWarn(req, "no stamp defined");
+			resp.sendRedirect("uploadPage?path=" + req.getParameter("path"));
+			return null;
+		}	
+
+		final long stamp = G4Parse.parse(stampStr, -1L);
+		InputStream report = null;
+		try {
+			report = reportDao.findReportByStamp(lookup.createPath(), stamp);
+			if (report == null) {
+				Message.addWarn(req, "no report for stamp " + stamp);
+				resp.sendRedirect("uploadPage?path=" + req.getParameter("path"));
+				return null;
+			}
+
+			resp.setCharacterEncoding("UTF-8");
+			resp.setContentType("application/rtf");
+			resp.setHeader("Content-Disposition", "attachment;");
+
+			final byte[] buf = new byte[32768];
+			int bytesRead;
+			while ((bytesRead = report.read(buf)) >= 0) {
+				resp.getOutputStream().write(buf, 0, bytesRead);
+			}
+		} finally {
+			if (report != null) {
+				try {
+					report.close();
+				} catch (IOException e) {
+					log.warn("failed on close", e);
+				}
+			}
+		}
+
+		return null;
+	}
+
+	@RequestMapping(value = "launch", method = RequestMethod.GET)
 	public ModelAndView do_launch(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		VersionLookup lookup = versionLookup(req, resp, true);
+		VersionLookup lookup = versionLookup(req, resp, "");
 		if (lookup == null) {
 			return null;
 		}
@@ -338,8 +415,9 @@ public class StudentController extends MultiActionController implements WebSymbo
 		return new ModelAndView("s/launch", model);
 	}
 
+	@RequestMapping(value = "upload", method = RequestMethod.POST)
 	public ModelAndView do_upload(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		VersionLookup lookup = versionLookup(req, resp, false);
+		VersionLookup lookup = versionLookup(req, resp, "");
 		if (lookup == null) {
 			return null;
 		}
@@ -359,18 +437,18 @@ public class StudentController extends MultiActionController implements WebSymbo
 		return req.getRemoteAddr();
 	}
 
-	protected VersionLookup versionLookup(HttpServletRequest req, HttpServletResponse resp, final boolean redirect) throws IOException {
+	protected VersionLookup versionLookup(HttpServletRequest req, HttpServletResponse resp, final String pathToRoot) throws IOException {
 		final VersionLookup vl = new VersionLookup();
-		vl.model = auth(req, resp, redirect);
+		vl.model = auth(req, resp, pathToRoot);
 		if (vl.model == null) {
 			return null;
 		}
 
 		vl.path = req.getParameter("path");
 		if (vl.path == null) {
-			if (redirect) {
+			if (pathToRoot != null) {
 				Message.addWarn(req, "no assignment path");
-				resp.sendRedirect("courses");
+				resp.sendRedirect(pathToRoot + "courses");
 			} else {
 				resp.sendError(HttpServletResponse.SC_NOT_FOUND, "no assignment path");
 			}
@@ -379,9 +457,9 @@ public class StudentController extends MultiActionController implements WebSymbo
 
 		final String[] ids = vl.path.split("--");
 		if (ids.length != 4) {
-			if (redirect) {
+			if (pathToRoot != null) {
 				Message.addWarn(req, "malformed path:" + Arrays.toString(ids));
-				resp.sendRedirect("courses");
+				resp.sendRedirect(pathToRoot + "courses");
 			} else {
 				resp.sendError(HttpServletResponse.SC_NOT_FOUND, "malformed path:" + Arrays.toString(ids));
 			}
@@ -391,9 +469,9 @@ public class StudentController extends MultiActionController implements WebSymbo
 		final String courseId = ids[0];
 		vl.course = courseDao.findCourse(courseId);
 		if (vl.course == null) {
-			if (redirect) {
+			if (pathToRoot != null) {
 				Message.addWarn(req, "course not found by id " + courseId);
-				resp.sendRedirect("courses");
+				resp.sendRedirect(pathToRoot + "courses");
 			} else {
 				resp.sendError(HttpServletResponse.SC_NOT_FOUND, "course not found by id " + courseId);
 			}
@@ -402,9 +480,9 @@ public class StudentController extends MultiActionController implements WebSymbo
 
 		vl.assBundleIndex = G4Parse.parse(ids[1], -1);
 		if (vl.assBundleIndex < 0 || vl.course.getAssBundles().length <= vl.assBundleIndex) {
-			if (redirect) {
+			if (pathToRoot != null) {
 				Message.addWarn(req, "bundle not found by index " + vl.assBundleIndex);
-				resp.sendRedirect("course?id=" + vl.course.getId());
+				resp.sendRedirect(pathToRoot + "course?id=" + vl.course.getId());
 			} else {
 				resp.sendError(HttpServletResponse.SC_NOT_FOUND, "bundle not found by index " + vl.assBundleIndex);
 			}
@@ -415,9 +493,9 @@ public class StudentController extends MultiActionController implements WebSymbo
 		final AssignmentBundle bundle = vl.course.getAssBundles()[vl.assBundleIndex];
 		vl.ass = IdName.findById(bundle.getAssignments(), vl.assId);
 		if (vl.ass == null) {
-			if (redirect) {
+			if (pathToRoot != null) {
 				Message.addWarn(req, "assignment not found by id " + vl.assId);
-				resp.sendRedirect("course?id=" + vl.course.getId());
+				resp.sendRedirect(pathToRoot + "course?id=" + vl.course.getId());
 			} else {
 				resp.sendError(HttpServletResponse.SC_NOT_FOUND, "assignment not found by id " + vl.assId);
 			}
@@ -427,9 +505,9 @@ public class StudentController extends MultiActionController implements WebSymbo
 		final String verIdStr = ids[3];
 		vl.ver = IdName.findById(vl.ass.getVersions(), verIdStr);
 		if (vl.ver == null) {
-			if (redirect) {
+			if (pathToRoot != null) {
 				Message.addWarn(req, "version not found by id " + verIdStr);
-				resp.sendRedirect("course?id=" + vl.course.getId());
+				resp.sendRedirect(pathToRoot + "course?id=" + vl.course.getId());
 			} else {
 				resp.sendError(HttpServletResponse.SC_NOT_FOUND, "version not found by id " + verIdStr);
 			}
@@ -443,18 +521,18 @@ public class StudentController extends MultiActionController implements WebSymbo
 				vl.course.getId()
 		);
 		if (vl.enr == null) {
-			if (redirect) {
+			if (pathToRoot != null) {
 				Message.addWarn(req, "course not enrolled");
-				resp.sendRedirect("courses");
+				resp.sendRedirect(pathToRoot + "courses");
 			} else {
 				resp.sendError(HttpServletResponse.SC_FORBIDDEN, "course not enrolled");
 			}
 			return null;
 		}
 		if (!vl.enr.getClasses()[vl.ass.getScoring().getClassFrom()].isStarted()) {
-			if (redirect) {
+			if (pathToRoot != null) {
 				Message.addWarn(req, "task not open yet");
-				resp.sendRedirect("course?id=" + vl.course.getId());
+				resp.sendRedirect(pathToRoot + "course?id=" + vl.course.getId());
 			} else {
 				resp.sendError(HttpServletResponse.SC_FORBIDDEN, "task not open yet");
 			}
@@ -462,9 +540,9 @@ public class StudentController extends MultiActionController implements WebSymbo
 		}
 
 		if (isVersionIncorrect(vl.student, vl.ass, vl.ver)) {
-			if (redirect) {
+			if (pathToRoot != null) {
 				Message.addWarn(req, "variant mismatch");
-				resp.sendRedirect("course?id=" + vl.course.getId());
+				resp.sendRedirect(pathToRoot + "course?id=" + vl.course.getId());
 			} else {
 				resp.sendError(HttpServletResponse.SC_NOT_FOUND, "variant mismatch");
 			}

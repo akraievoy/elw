@@ -8,10 +8,12 @@ import org.joda.time.format.DateTimeFormatter;
 public class ReportMeta {
 	private static final DateTimeFormatter FMT_DATETIME_NICE = DateTimeFormat.forPattern("EEE MMM dd HH:mm");
 	private static final DateTimeFormatter FMT_DATETIME_BRIEF = DateTimeFormat.forPattern("MMM dd");
+	private static final DateTimeFormatter FMT_DATETIME_FNAME = DateTimeFormat.forPattern("MM_dd_HH_mm");
 
 	protected long uploadStamp;
 	protected String sourceAddress;
 	protected int totalUploads;
+	protected String fileName;
 
 	public long getUploadStamp() {
 		return uploadStamp;
@@ -47,5 +49,17 @@ public class ReportMeta {
 	@JsonIgnore
 	public String getBriefUploadStamp() {
 		return FMT_DATETIME_BRIEF.print(new DateTime(uploadStamp));
+	}
+
+	public static String getFileNameUploadStamp(final long uploadStamp) {
+		return FMT_DATETIME_FNAME.print(new DateTime(uploadStamp));
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+
+	public String getFileName() {
+		return fileName;
 	}
 }

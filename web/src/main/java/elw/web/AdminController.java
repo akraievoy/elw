@@ -9,6 +9,9 @@ import org.akraievoy.gear.G4Parse;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 
@@ -24,6 +27,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+@Controller
+@RequestMapping("/a/**/*")
 public class AdminController extends MultiActionController implements WebSymbols {
 	private static final Logger log = LoggerFactory.getLogger(AdminController.class);
 
@@ -47,14 +52,14 @@ public class AdminController extends MultiActionController implements WebSymbols
 		this.reportDao = reportDao;
 	}
 
-	protected HashMap<String, Object> auth(final HttpServletRequest req, final HttpServletResponse resp, final boolean redirect) throws IOException {
+	protected HashMap<String, Object> auth(final HttpServletRequest req, final HttpServletResponse resp, final String pathToRoot) throws IOException {
 		final HttpSession session = req.getSession(true);
 		final Boolean admin = (Boolean) session.getAttribute(S_ADMIN);
 
 		if (!Boolean.TRUE.equals(admin)) {
-			if (redirect) {
+			if (pathToRoot != null) {
 				Message.addWarn(req, "Admin authentication required");
-				resp.sendRedirect("login");
+				resp.sendRedirect(pathToRoot + "login");
 			} else {
 				resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Admin authentication required");
 			}
@@ -69,6 +74,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 		return model;
 	}
 
+	@RequestMapping(value = "login", method = RequestMethod.GET)
 	public ModelAndView do_login(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
 		final HashMap<String, Object> model = new HashMap<String, Object>();
 
@@ -79,6 +85,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 		return new ModelAndView("a/login", model);
 	}
 
+	@RequestMapping(value = "loginPost", method = RequestMethod.POST)
 	public ModelAndView do_loginPost(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
 		final String nonce = req.getParameter("nonce");
 		final String hash = req.getParameter("hash");
@@ -135,14 +142,16 @@ public class AdminController extends MultiActionController implements WebSymbols
 		}
 	}
 
+	@RequestMapping(value = "logout", method = RequestMethod.GET)
 	public ModelAndView do_logout(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
 		req.getSession(true).invalidate();
 		resp.sendRedirect("index");
 		return null;
 	}
 
+	@RequestMapping(value = "index", method = RequestMethod.GET)
 	public ModelAndView do_index(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		final HashMap<String, Object> model = auth(req, resp, true);
+		final HashMap<String, Object> model = auth(req, resp, "");
 		if (model == null) {
 			return null;
 		}
@@ -152,8 +161,9 @@ public class AdminController extends MultiActionController implements WebSymbols
 		return new ModelAndView("a/index", model);
 	}
 
+	@RequestMapping(value = "courses", method = RequestMethod.GET)
 	public ModelAndView do_courses(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		final HashMap<String, Object> model = auth(req, resp, true);
+		final HashMap<String, Object> model = auth(req, resp, "");
 		if (model == null) {
 			return null;
 		}
@@ -164,8 +174,9 @@ public class AdminController extends MultiActionController implements WebSymbols
 		return new ModelAndView("a/courses", model);
 	}
 
+	@RequestMapping(value = "course", method = RequestMethod.GET)
 	public ModelAndView do_course(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		final HashMap<String, Object> model = auth(req, resp, true);
+		final HashMap<String, Object> model = auth(req, resp, "");
 		if (model == null) {
 			return null;
 		}
@@ -201,8 +212,9 @@ public class AdminController extends MultiActionController implements WebSymbols
 		return new ModelAndView("a/course", model);
 	}
 
+	@RequestMapping(value = "launch", method = RequestMethod.GET)
 	public ModelAndView do_launch(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		final HashMap<String, Object> model = auth(req, resp, true);
+		final HashMap<String, Object> model = auth(req, resp, "");
 		if (model == null) {
 			return null;
 		}
@@ -261,8 +273,9 @@ public class AdminController extends MultiActionController implements WebSymbols
 		return new ModelAndView("a/launch", model);
 	}
 
+	@RequestMapping(value = "enrolls", method = RequestMethod.GET)
 	public ModelAndView do_enrolls(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		final HashMap<String, Object> model = auth(req, resp, true);
+		final HashMap<String, Object> model = auth(req, resp, "");
 		if (model == null) {
 			return null;
 		}
@@ -282,8 +295,9 @@ public class AdminController extends MultiActionController implements WebSymbols
 		return new ModelAndView("a/enrolls", model);
 	}
 
+	@RequestMapping(value = "enroll", method = RequestMethod.GET)
 	public ModelAndView do_enroll(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		final HashMap<String, Object> model = auth(req, resp, true);
+		final HashMap<String, Object> model = auth(req, resp, "");
 		if (model == null) {
 			return null;
 		}
@@ -325,8 +339,9 @@ public class AdminController extends MultiActionController implements WebSymbols
 		return new ModelAndView("a/enroll", model);
 	}
 
+	@RequestMapping(value = "groups", method = RequestMethod.GET)
 	public ModelAndView do_groups(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		final HashMap<String, Object> model = auth(req, resp, true);
+		final HashMap<String, Object> model = auth(req, resp, "");
 		if (model == null) {
 			return null;
 		}
