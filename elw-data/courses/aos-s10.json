@@ -2200,7 +2200,94 @@
 				]
 			}
 		],
-		"scoring":{"penaltyLate":0.1,"penaltyHold":0.1,"maxTeam":2},
+		"scoring":{
+			"criterias": [
+				{
+					"id": "code.overdue",
+					"name": "Задержка кода",
+					"ratio": "0.975",
+					"powDef": "$overdue",
+					"powMax": "90"
+				},
+				{
+					"id": "code.style",
+					"name": "Форматирование кода",
+					"ratio": "0.95",
+					"powDef": "0",
+					"powMax": "3"
+				},
+				{
+					"id": "code.reuse",
+					"name": "Групповая работа",
+					"ratio": "0.8",
+					"powDef": "0",
+					"powMax": "5"
+				},
+				{
+					"id": "code.tests",
+					"name": "Сломанные тесты",
+					"ratio": "$passratio",
+					"powDef": "1",
+					"powMax": "1"
+				},
+				{
+					"id": "code.brute",
+					"name": "Примитивный алгоритм",
+					"ratio": "0.95",
+					"powDef": "0",
+					"powMax": "3"
+				},
+				{
+					"id": "code.eff",
+					"name": "Эффективный алгоритм",
+					"ratio": "1.25",
+					"powDef": "0",
+					"powMax": "3"
+				},
+				{
+					"id": "rep.overdue",
+					"name": "Задержка отчета",
+					"ratio": "0.98",
+					"powDef": "$overdue",
+					"powMax": "90"
+				},
+				{
+					"id": "rep.style",
+					"name": "Ошибки в форматировании",
+					"ratio": "0.95",
+					"powDef": "0",
+					"powMax": "7"
+				},
+				{
+					"id": "rep.format",
+					"name": "Ошибка в оформлении",
+					"ratio": "0.9",
+					"powDef": "0",
+					"powMax": "5"
+				},
+				{
+					"id": "rep.content",
+					"name": "Структурная ишибка",
+					"ratio": "0.75",
+					"powDef": "0",
+					"powMax": "5"
+				}
+			],
+			"breakdown": {
+				"code": {
+					"weight": 0.6,
+					"auto": ["code.overdue", "code.tests"],
+					"manual": [],
+					"applied": ["code.style", "code.reuse", "code.eff", "code.brute"]
+				},
+				"report": {
+					"weight": 0.4,
+					"auto": ["rep.overdue"],
+					"manual": ["rep.style", "rep.format", "rep.content","code.style", "code.reuse", "code.eff", "code.brute"],
+					"applied": ["rep.style", "rep.format", "rep.content"]
+				}
+			}
+		},
 		"setup":{"codeMaxBytes":10240,"codeDownloadPattern":"${stud}${classFrom}${var}.txt","codeUploadRegex":".+\\.txt","reportMaxBytes":2097152,"reportUploadRegex":".+\\.rtf","codeValidatorCN":"ToBeDone","codeExportUriPattern":"/code/mips/${classFrom}","reportGenerateUriPattern":"/report/"}
 	}
 ],"resourcePath":"res/aos-s10","quizBundles":[]}

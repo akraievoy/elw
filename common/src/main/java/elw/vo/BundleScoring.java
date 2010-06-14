@@ -1,31 +1,27 @@
 package elw.vo;
 
+import java.util.*;
+
 public class BundleScoring {
-	protected double penaltyHold;
-	protected double penaltyLate;
-	protected int maxTeam;
+	protected final Map<String, TypeScoring> breakdown = new TreeMap<String, TypeScoring>();
+	protected final List<Criteria> criterias = new ArrayList<Criteria>();
 
-	public double getPenaltyLate() {
-		return penaltyLate;
+	public Map<String, TypeScoring> getBreakdown() {
+		return breakdown;
 	}
 
-	public void setPenaltyLate(double penaltyLate) {
-		this.penaltyLate = penaltyLate;
+	public void setBreakdown(Map<String, TypeScoring> breakdown) {
+		this.breakdown.clear();
+		this.breakdown.putAll(breakdown);
 	}
 
-	public double getPenaltyHold() {
-		return penaltyHold;
+	public Criteria[] getCriterias() {
+		return criterias.toArray(new Criteria[criterias.size()]);
 	}
 
-	public void setPenaltyHold(double penaltyHold) {
-		this.penaltyHold = penaltyHold;
-	}
-
-	public int getMaxTeam() {
-		return maxTeam;
-	}
-
-	public void setMaxTeam(int maxTeam) {
-		this.maxTeam = maxTeam;
+	public void setCriterias(Criteria[] criterias) {
+		this.criterias.clear();
+		this.criterias.addAll(Arrays.asList(criterias));
 	}
 }
+
