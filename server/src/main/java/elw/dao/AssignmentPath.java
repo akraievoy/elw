@@ -59,6 +59,13 @@ public class AssignmentPath {
 		);
 	}
 
+	protected File getScoreRoot(File uploadsDir) {
+		return new File(
+				getStudentRoot(uploadsDir),
+				getAssDirName() + "-scores"
+		);
+	}
+
 	protected String getAssDirName() {
 		return getAssBundleIdx() + "." + getAssId() + "." + getVerId();
 	}

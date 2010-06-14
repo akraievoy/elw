@@ -2286,7 +2286,8 @@
 					"manual": ["rep.style", "rep.format", "rep.content","code.style", "code.reuse", "code.eff", "code.brute"],
 					"applied": ["rep.style", "rep.format", "rep.content"]
 				}
-			}
+			},
+			"version": 1
 		},
 		"setup":{"codeMaxBytes":10240,"codeDownloadPattern":"${stud}${classFrom}${var}.txt","codeUploadRegex":".+\\.txt","reportMaxBytes":2097152,"reportUploadRegex":".+\\.rtf","codeValidatorCN":"ToBeDone","codeExportUriPattern":"/code/mips/${classFrom}","reportGenerateUriPattern":"/report/"}
 	}

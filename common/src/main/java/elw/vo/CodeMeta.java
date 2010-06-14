@@ -15,6 +15,7 @@ public class CodeMeta {
 	protected long uploadStamp;
 	protected String sourceAddress;
 	protected int totalUploads;
+	protected int scoringVersion;
 
 	public long getUploadStamp() {
 		return uploadStamp;
@@ -54,6 +55,14 @@ public class CodeMeta {
 
 	public void setTestsPassed(int testsPassed) {
 		this.testsPassed = testsPassed;
+	}
+
+	public int getScoringVersion() {
+		return scoringVersion;
+	}
+
+	public void setScoringVersion(int scoringVersion) {
+		this.scoringVersion = scoringVersion;
 	}
 
 	@JsonIgnore

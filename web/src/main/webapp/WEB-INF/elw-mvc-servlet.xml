@@ -26,6 +26,7 @@
 	<bean id="codeDao" class="elw.dao.CodeDao"/>
 	<bean id="reportDao" class="elw.dao.ReportDao"/>
 	<bean id="enrollmentDao" class="elw.dao.EnrollDao"/>
+	<bean id="scoreDao" class="elw.dao.ScoreDao"/>
 
 	<bean id="daemonThreadFactory" class="org.akraievoy.gear.G4Run$ThreadFactory">
 		<constructor-arg type="boolean" value="true"/>
