@@ -13,6 +13,10 @@ public class BundleScoring {
 	public void setBreakdown(Map<String, TypeScoring> breakdown) {
 		this.breakdown.clear();
 		this.breakdown.putAll(breakdown);
+
+		for (TypeScoring scoring : breakdown.values()) {
+			scoring.setBundleScoring(this);
+		}
 	}
 
 	public Criteria[] getCriterias() {
