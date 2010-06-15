@@ -7,6 +7,7 @@ public class Score {
 	protected final Map<String, Double> ratios = new TreeMap<String, Double>();
 	protected final Map<String, Integer> pows = new TreeMap<String, Integer>();
 	protected long stamp;
+	protected long codeStamp;
 
 	public long getStamp() {
 		return stamp;
@@ -14,6 +15,14 @@ public class Score {
 
 	public void setStamp(long stamp) {
 		this.stamp = stamp;
+	}
+
+	public long getCodeStamp() {
+		return codeStamp;
+	}
+
+	public void setCodeStamp(long codeStamp) {
+		this.codeStamp = codeStamp;
 	}
 
 	public Map<String, Integer> getPows() {

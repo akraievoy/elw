@@ -2267,7 +2267,7 @@
 				},
 				{
 					"id": "rep.content",
-					"name": "Структурная ишибка",
+					"name": "Структурная ошибка",
 					"ratio": "0.75",
 					"powDef": "0",
 					"powMax": "5"
@@ -2287,7 +2287,7 @@
 					"applied": ["rep.style", "rep.format", "rep.content"]
 				}
 			},
-			"version": 1
+			"version": 3
 		},
 		"setup":{"codeMaxBytes":10240,"codeDownloadPattern":"${stud}${classFrom}${var}.txt","codeUploadRegex":".+\\.txt","reportMaxBytes":2097152,"reportUploadRegex":".+\\.rtf","codeValidatorCN":"ToBeDone","codeExportUriPattern":"/code/mips/${classFrom}","reportGenerateUriPattern":"/report/"}
 	}

@@ -1,0 +1,12 @@
+{
+  "pows" : {
+    "code.overdue" : 76,
+    "code.tests" : 1
+  },
+  "ratios" : {
+    "code.overdue" : 0.975,
+    "code.tests" : 1.0
+  },
+  "stamp" : 1276591127818,
+  "codeStamp" : 1276537841038
+}

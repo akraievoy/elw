@@ -95,7 +95,8 @@ public class StudentCodeValidator extends G4Run.Task {
 									}
 								}
 
-								if (metaSafe.getScoringVersion() < bundle.getScoring().getVersion()) {
+								final boolean scoringUpdate = metaSafe.getScoringVersion() < bundle.getScoring().getVersion();
+								if (scoringUpdate) {
 									update = true;
 
 									final double overdue;
@@ -117,11 +118,13 @@ public class StudentCodeValidator extends G4Run.Task {
 									final Score score = scoreDao.findLastScore(assPath);
 									final Score newScore = score == null ? new Score() : score.copy();
 									for (Criteria c : criterias) {
+										newScore.setCodeStamp(stamp);
 										newScore.getPows().put(c.getId(), c.resolvePowDef(vars));
 										newScore.getRatios().put(c.getId(), c.resolveRatio(vars));
 									}
 									final String[] codeAutos = codeScoring.getAuto();
 									if (
+											scoringUpdate ||
 											score == null ||
 											!score.containsAll(codeAutos) ||
 											newScore.getRatio(codeAutos) > score.getRatio(codeAutos)
