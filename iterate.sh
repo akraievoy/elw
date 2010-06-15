@@ -13,6 +13,7 @@ while echo '------------->' && sleep 5; do {
     7z x -y -tzip -o$WA_DIR/elw web/target/web-1.3.war;
     rm -r /usr/share/jetty/elw-data
     mkdir -p /usr/share/jetty/elw-data;
+    7z x -y -o/usr/share/jetty elw-data.7z;
     rsync -vcr --exclude '.svn' elw-data/ /usr/share/jetty/elw-data
     chown -R jetty:adm $WA_DIR/elw;
     chown -R jetty:adm /usr/share/jetty/elw-data;

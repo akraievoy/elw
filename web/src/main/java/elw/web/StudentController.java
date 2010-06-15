@@ -215,10 +215,14 @@ public class StudentController extends MultiActionController implements WebSymbo
 							course.getId(), group.getId(), student,
 							bunI, ass.getId(), ver.getId()
 					);
-					final long lastStamp = codeDao.findLastStamp(assPath);
-					codeMetas.put(path, codeDao.findMetaByStamp(assPath, lastStamp));
-					final long lastStampReport = reportDao.findLastStamp(assPath);
-					reportMetas.put(path, reportDao.findMetaByStamp(assPath, lastStampReport));
+					if (codeMetas != null) {
+						final long lastStamp = codeDao.findLastStamp(assPath);
+						codeMetas.put(path, codeDao.findMetaByStamp(assPath, lastStamp));
+					}
+					if (reportMetas != null) {
+						final long lastStampReport = reportDao.findLastStamp(assPath);
+						reportMetas.put(path, reportDao.findMetaByStamp(assPath, lastStampReport));
+					}
 				}
 			}
 		}

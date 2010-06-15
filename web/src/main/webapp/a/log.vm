@@ -1,0 +1,46 @@
+#* @vtlvariable name="courses" type="elw.vo.Course[]" *#
+<html>
+<head>
+	<meta content="text/html; charset=UTF-8">
+	<title>Group $group.name Report Uploads : ELW Admin</title>
+	<link href="../css/elw.css" type="text/css" rel="stylesheet"/>
+	<script type="text/javascript" src="../js/jquery.js"></script>
+	<script type="text/javascript" src="../js/jquery.sha1.js"></script>
+</head>
+<body style="text-align: left;">
+<div id="header">
+	<div id="nav"><a href="index">Index</a> &gt; <a href="enrolls">Enrollments</a> &gt; <span style="font-weight: bold">$group.name Report Uploads</span></div>
+	<div id="cred">#if($auth)[&nbsp;Admin&nbsp;]&nbsp;[&nbsp;<a href="logout">X</a>&nbsp;]#{else}[&nbsp;Anonymous&nbsp;]#end</div>
+	&nbsp;
+</div>
+<div id=messages>#foreach($m in $elw_messages)
+	<div class="$m.type">$m.message</div>
+#end
+</div>
+<table cellspacing="0"><tbody>
+<tr class="header">
+	<th style="padding-left: 0.25em; padding-right: 0.25em; text-align: center;">Time Stamp</th>
+	<th style="padding-left: 0.25em; padding-right: 0.25em; text-align: center;">Student name</th>
+	<th style="padding-left: 0.25em; padding-right: 0.25em; text-align: center;">Class</th>
+	<th style="padding-left: 0.25em; padding-right: 0.25em; text-align: center;">Status</th>
+	<th style="padding-left: 0.25em; padding-right: 0.25em; text-align: center;">Actions</th>
+</tr>
+#foreach($e in $logEntries)
+	<tr >
+		<td style="padding-left: 0.25em; padding-right: 0.25em;"><span title="$e.meta.niceUploadStamp">$e.meta.briefUploadStamp</span></td>
+		<td style="padding-left: 0.25em; padding-right: 0.25em;"><span title="$e.student.id">$e.student.name</span></td>
+		<td style="padding-left: 0.25em; padding-right: 0.25em;"><span title="$e.ass.id">$e.ass.name</span></td>
+		<td style="padding-left: 0.25em; padding-right: 0.25em;">
+			Pending
+		</td>
+		<td style="padding-left: 0.25em; padding-right: 0.25em;">
+			<form action="approve" method="get" style="margin: 0;">
+				<input type="hidden" name="path" value="$e.path"/>
+				<input type="submit" value="Approve"/>
+			</form>
+		</td>
+	</tr>
+#end
+</tbody></table>
+</body>
+</html>

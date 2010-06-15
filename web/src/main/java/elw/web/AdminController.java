@@ -23,9 +23,7 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 @RequestMapping("/a/**/*")
@@ -255,7 +253,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 		final String verId = ids[3];
 		final Version ver = IdName.findById(ass.getVersions(), verId);
 		if (ver == null) {
-			log.warn("assignment not found by id {}", verId);
+			log.warn("version not found by id {}", verId);
 			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
 			return null;
 		}
@@ -337,6 +335,96 @@ public class AdminController extends MultiActionController implements WebSymbols
 		model.put("reportMetas", reportMetas);
 
 		return new ModelAndView("a/enroll", model);
+	}
+
+	@RequestMapping(value = "log", method = RequestMethod.GET)
+	public ModelAndView do_log(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+		final HashMap<String, Object> model = auth(req, resp, "");
+		if (model == null) {
+			return null;
+		}
+
+		model.put("auth", req.getSession(true).getAttribute(S_ADMIN)); //	LATER move this to auth()
+
+		final Enrollment enr = enrollDao.findEnrollment(req.getParameter("id"));
+		if (enr == null) {
+			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			return null;
+		}
+		final Course course = courseDao.findCourse(enr.getCourseId());
+		if (course == null) {
+			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			return null;
+		}
+		final Group group = groupDao.findGroup(enr.getGroupId());
+		if (group == null) {
+			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			return null;
+		}
+
+		model.put("enr", enr);
+		model.put("group", group);
+		model.put("course", course);
+
+		final HashMap<String, ReportMeta> reportMetas = new HashMap<String, ReportMeta>();
+		final List<LogEntry> logEntries = new ArrayList<LogEntry>();
+		for (Student stud : group.getStudents()) {
+			reportMetas.clear();
+			StudentController.storeMetas(codeDao, reportDao, course, group, stud, null, reportMetas, stud.getId());
+			for (String key : reportMetas.keySet()) {
+				final ReportMeta meta = reportMetas.get(key);
+				if (meta.getTotalUploads() == 0) {
+					continue;
+				}
+				
+				final String[] keyAsPath = key.split("--");
+				final int assBundleIndex = G4Parse.parse(keyAsPath[2], -1);
+				final AssignmentBundle bundle = course.getAssBundles()[assBundleIndex];
+				final Assignment ass = IdName.findById(bundle.getAssignments(), keyAsPath[3]);
+				logEntries.add(new LogEntry(stud, key, ass, meta));
+			}
+		}
+
+		Collections.sort(logEntries);
+		model.put("logEntries", logEntries);
+
+		return new ModelAndView("a/log", model);
+	}
+
+	public static class LogEntry implements Comparable<LogEntry> {
+		private final Assignment ass;
+		protected final ReportMeta meta;
+		protected final Student student;
+		protected final String path;
+
+		public LogEntry(Student student, String path, Assignment ass, ReportMeta meta) {
+			this.ass = ass;
+			this.meta = meta;
+			this.student = student;
+			this.path = path;
+		}
+
+		public int compareTo(LogEntry o) {
+			final long thisVal = meta.getUploadStamp();
+			final long anotherVal = o.meta.getUploadStamp();
+			return (thisVal < anotherVal ? -1 : (thisVal == anotherVal ? 0 : 1));
+		}
+
+		public ReportMeta getMeta() {
+			return meta;
+		}
+
+		public Student getStudent() {
+			return student;
+		}
+
+		public String getPath() {
+			return path;
+		}
+
+		public Assignment getAss() {
+			return ass;
+		}
 	}
 
 	@RequestMapping(value = "groups", method = RequestMethod.GET)
