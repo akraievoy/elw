@@ -1,0 +1,52 @@
+#* @vtlvariable name="elw_messages" type="elw.miniweb.Message[]" *#
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta content="text/html; charset=UTF-8">
+	<title>Approval</title>
+	<link href="../css/elw.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<div id="header">
+	<div id="nav">
+		<a href="index">Index</a> &gt; <a href="enrolls">Enrollments</a> &gt;
+		<a href="log?id=$enr.id">Group $group.name Reports</a> &gt;
+		<span style="font-weight: bold">Approval</span>
+	</div>
+	<div id="cred">#if($auth)[&nbsp;Admin&nbsp;]&nbsp;[&nbsp;<a href="logout">X</a>&nbsp;]#{else}[&nbsp;Anonymous&nbsp;]#end</div>
+	&nbsp;
+</div>
+<div id=messages>#foreach($m in $elw_messages)
+	<div class="$m.type">$m.message</div>
+#end
+</div>
+<div id=main>
+	<div class="formArea" style="height: 7em;">
+		<div style="padding: 0.2em; font-weight: bold; background-color: #ffee99; text-align:center;">
+			Only *.rtf uploads up to $uploadLimit, please.
+		</div>
+		<form method="POST" enctype="multipart/form-data" action="uploadReport?path=$upPath">
+			<div class="formLabel">Report file:</div>
+			<div class="formField"><input type="file" name="report"/></div>
+			<div class="formButtons"><input type="submit" value="Upload"/></div>
+		</form>
+	</div>
+	<div style="text-align: center;">
+		<h3>Upload history</h3>
+		<table cellspacing="0" align="center"><tbody>
+			<tr>
+				<th>Date</th>
+				<th>Action</th>
+				<th>State</th>
+			</tr>
+#foreach($rep in $reports.values())
+			<tr>
+				<td><span title="$rep.niceUploadStamp">$rep.briefUploadStamp</span></td>
+				<td>[&nbsp;<a href="reportDl/$rep.fileName?path=$upPath&stamp=$rep.uploadStamp" target="_blank">Download</a>&nbsp;]</td>
+				<td>&nbsp;</td>
+			</tr>
+#end
+		</tbody></table>
+	</div>
+</div>
+</body>
+</html>

@@ -9,7 +9,7 @@
 </head>
 <body style="text-align: left;">
 <div id="header">
-	<div id="nav"><a href="index">Index</a> &gt; <a href="enrolls">Enrollments</a> &gt; <span style="font-weight: bold">$group.name Report Uploads</span></div>
+	<div id="nav"><a href="index">Index</a> &gt; <a href="enrolls">Enrollments</a> &gt; <span style="font-weight: bold">Group $group.name Report</span></div>
 	<div id="cred">#if($auth)[&nbsp;Admin&nbsp;]&nbsp;[&nbsp;<a href="logout">X</a>&nbsp;]#{else}[&nbsp;Anonymous&nbsp;]#end</div>
 	&nbsp;
 </div>
@@ -35,6 +35,7 @@
 		</td>
 		<td style="padding-left: 0.25em; padding-right: 0.25em;">
 			<form action="approve" method="get" style="margin: 0;">
+				<input type="hidden" name="id" value="$enroll.id"/>
 				<input type="hidden" name="path" value="$e.path"/>
 				<input type="submit" value="Approve"/>
 			</form>

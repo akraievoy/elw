@@ -1,5 +1,6 @@
 package elw.dao;
 
+import elw.vo.Assignment;
 import elw.vo.Student;
 
 import java.io.File;

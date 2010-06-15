@@ -9,9 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.util.Collections;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * Dealing with persisting, enumerating and retrieving report uploads.
@@ -128,7 +126,9 @@ public class ReportDao {
 
 			final File metaFile = new File(assDir, fileName + META_POSTFIX);
 			if (!metaFile.isFile()) {
-				result.put(parsed, null);
+				final ReportMeta reportMeta = new ReportMeta();
+				reportMeta.setUploadStamp(parsed);
+				result.put(parsed, reportMeta);
 				continue;
 			}
 
@@ -142,7 +142,6 @@ public class ReportDao {
 			} catch (IOException e) {
 				log.warn("failed to read meta: '{}' / '{}'", assDir.getPath(), fileName);
 				log.info("trace", e);
-				result.put(parsed, null);
 			} finally {
 				if (fis != null) {
 					try {
@@ -153,6 +152,8 @@ public class ReportDao {
 				}
 			}
 		}
+
+		resolveNames(assignmentPath, result.values());
 
 		return result;
 	}
@@ -201,6 +202,8 @@ public class ReportDao {
 		final ReportMeta defaultMeta = new ReportMeta();
 		defaultMeta.setTotalUploads(totalUploads);
 		defaultMeta.setUploadStamp(stamp);
+		resolveNames(assignmentPath, Collections.singletonList(defaultMeta));
+
 		if (!metaExists) {
 			return defaultMeta;
 		}
@@ -211,6 +214,7 @@ public class ReportDao {
 			final InputStreamReader in = new InputStreamReader(fis, "UTF-8");
 			final ReportMeta reportMeta = mapper.readValue(in, ReportMeta.class);
 			reportMeta.setTotalUploads(totalUploads);
+			resolveNames(assignmentPath, Collections.singletonList(reportMeta));
 			return reportMeta;
 		} catch (IOException e) {
 			log.warn("failed to read meta: '{}' / '{}'", assDir.getPath(), fMeta.getName());
@@ -293,5 +297,18 @@ public class ReportDao {
 		}
 
 		return new FileInputStream(new File(assDir, stampFileName));
+	}
+
+	protected void resolveNames(AssignmentPath path, final Collection<ReportMeta> reportMetas) {
+		for (Iterator<ReportMeta> metaIt = reportMetas.iterator(); metaIt.hasNext();) {
+			final ReportMeta reportMeta = metaIt.next();
+			final String fileName =
+					path.getStudent().getName().replaceAll("\\s+", "_") + "--" +
+					path.getAssId() + "_" + path.getVerId() + "--" +
+					ReportMeta.getFileNameUploadStamp(reportMeta.getUploadStamp()) +
+					".rtf";
+
+			reportMeta.setFileName(fileName);
+		}
 	}
 }

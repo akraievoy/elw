@@ -8,7 +8,7 @@ import org.joda.time.format.DateTimeFormatter;
 public class ReportMeta {
 	private static final DateTimeFormatter FMT_DATETIME_NICE = DateTimeFormat.forPattern("EEE MMM dd HH:mm");
 	private static final DateTimeFormatter FMT_DATETIME_BRIEF = DateTimeFormat.forPattern("MMM dd");
-	private static final DateTimeFormatter FMT_DATETIME_FNAME = DateTimeFormat.forPattern("MM_dd_HH_mm");
+	private static final DateTimeFormatter FMT_DATETIME_FNAME = DateTimeFormat.forPattern("MMddHHmm");
 
 	protected long uploadStamp;
 	protected String sourceAddress;

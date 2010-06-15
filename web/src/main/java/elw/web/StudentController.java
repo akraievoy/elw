@@ -315,20 +315,10 @@ public class StudentController extends MultiActionController implements WebSymbo
 		model.put("upPath", lookup.getPath());
 		model.put("course", lookup.getCourse());
 		model.put("uploadLimit", G4mat.formatMem(UPLOAD_LIMIT));
-		final Map<Long,ReportMeta> reports = reportDao.findAllMetas(lookup.createPath());
 
-		for (Iterator<ReportMeta> metaIt = reports.values().iterator(); metaIt.hasNext();) {
-			ReportMeta reportMeta = metaIt.next();
-			final String fileName =
-					lookup.getStudent().getName().replaceAll("\\s+", "_") + "-" +
-					lookup.getAss().getId() + "-" +
-					ReportMeta.getFileNameUploadStamp(reportMeta.getUploadStamp()) +
-					".rtf";
-
-			reportMeta.setFileName(fileName);
-		}
-
-		model.put("reports", reports);
+		final AssignmentPath path = lookup.createPath();
+		model.put("reports", reportDao.findAllMetas(path));
+		model.put("codes", codeDao.findAllMetas(path));
 
 		return new ModelAndView("s/uploadPage", model);
 	}
@@ -380,6 +370,45 @@ public class StudentController extends MultiActionController implements WebSymbo
 					log.warn("failed on close", e);
 				}
 			}
+		}
+
+		return null;
+	}
+
+	@RequestMapping(value = "codeDl/*.*", method = RequestMethod.GET)
+	public ModelAndView do_codetDl(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+		VersionLookup lookup = versionLookup(req, resp, "");
+		if (lookup == null) {
+			return null;
+		}
+
+		if (lookup.getAss().isShared()) {
+			Message.addWarn(req, "shared assignments do not require any code");
+			resp.sendRedirect("course?id=" + lookup.course.getId());
+			return null;
+		}
+
+		final String stampStr = req.getParameter("stamp");
+		if (stampStr == null) {
+			Message.addWarn(req, "no stamp defined");
+			resp.sendRedirect("uploadPage?path=" + req.getParameter("path"));
+			return null;
+		}
+
+		final long stamp = G4Parse.parse(stampStr, -1L);
+		final String[] code = codeDao.findCodeByStamp(lookup.createPath(), stamp);
+		if (code == null) {
+			Message.addWarn(req, "no code for stamp " + stamp);
+			resp.sendRedirect("uploadPage?path=" + req.getParameter("path"));
+			return null;
+		}
+
+		resp.setCharacterEncoding("UTF-8");
+		resp.setContentType("text");
+		resp.setHeader("Content-Disposition", "attachment;");
+
+		for (String aCode : code) {
+			resp.getWriter().println(aCode);
 		}
 
 		return null;

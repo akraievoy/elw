@@ -68,6 +68,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 		final HashMap<String, Object> model = new HashMap<String, Object>();
 
 		model.put(S_MESSAGES, Message.drainMessages(req));
+		model.put("auth", req.getSession(true).getAttribute(S_ADMIN)); //	LATER move this to auth()
 
 		return model;
 	}
@@ -77,7 +78,6 @@ public class AdminController extends MultiActionController implements WebSymbols
 		final HashMap<String, Object> model = new HashMap<String, Object>();
 
 		model.put("nonce", Long.toString(System.currentTimeMillis(), 36));
-		model.put("auth", req.getSession(true).getAttribute(S_ADMIN));
 		model.put(S_MESSAGES, Message.drainMessages(req));
 
 		return new ModelAndView("a/login", model);
@@ -154,8 +154,6 @@ public class AdminController extends MultiActionController implements WebSymbols
 			return null;
 		}
 
-		model.put("auth", req.getSession(true).getAttribute(S_ADMIN));
-
 		return new ModelAndView("a/index", model);
 	}
 
@@ -166,7 +164,6 @@ public class AdminController extends MultiActionController implements WebSymbols
 			return null;
 		}
 
-		model.put("auth", req.getSession(true).getAttribute(S_ADMIN));
 		model.put("courses", courseDao.findAllCourses());
 
 		return new ModelAndView("a/courses", model);
@@ -204,7 +201,6 @@ public class AdminController extends MultiActionController implements WebSymbols
 			model.put("testResults", testResults);
 		}
 
-		model.put("auth", req.getSession(true).getAttribute(S_ADMIN));
 		model.put("course", course);
 
 		return new ModelAndView("a/course", model);
@@ -266,7 +262,6 @@ public class AdminController extends MultiActionController implements WebSymbols
 		model.put("verBean", ver);
 		model.put("cacheBustingToken", cacheBustingToken);
 		model.put("course", course);
-		model.put("auth", req.getSession(true).getAttribute(S_ADMIN));
 
 		return new ModelAndView("a/launch", model);
 	}
@@ -278,7 +273,6 @@ public class AdminController extends MultiActionController implements WebSymbols
 			return null;
 		}
 
-		model.put("auth", req.getSession(true).getAttribute(S_ADMIN));
 		final Enrollment[] enrolls = enrollDao.findAllEnrollments();
 		final Map<String, Group> groups = new HashMap<String, Group>();
 		final Map<String, Course> courses = new HashMap<String, Course>();
@@ -299,8 +293,6 @@ public class AdminController extends MultiActionController implements WebSymbols
 		if (model == null) {
 			return null;
 		}
-
-		model.put("auth", req.getSession(true).getAttribute(S_ADMIN));
 
 		final Enrollment enr = enrollDao.findEnrollment(req.getParameter("id"));
 		if (enr == null) {
@@ -344,8 +336,6 @@ public class AdminController extends MultiActionController implements WebSymbols
 			return null;
 		}
 
-		model.put("auth", req.getSession(true).getAttribute(S_ADMIN)); //	LATER move this to auth()
-
 		final Enrollment enr = enrollDao.findEnrollment(req.getParameter("id"));
 		if (enr == null) {
 			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -376,7 +366,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 				if (meta.getTotalUploads() == 0) {
 					continue;
 				}
-				
+
 				final String[] keyAsPath = key.split("--");
 				final int assBundleIndex = G4Parse.parse(keyAsPath[2], -1);
 				final AssignmentBundle bundle = course.getAssBundles()[assBundleIndex];
@@ -427,6 +417,92 @@ public class AdminController extends MultiActionController implements WebSymbols
 		}
 	}
 
+	@RequestMapping(value = "approve", method = RequestMethod.GET)
+	public ModelAndView do_approve(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+		final HashMap<String, Object> model = auth(req, resp, "");
+		if (model == null) {
+			return null;
+		}
+
+
+		final String path = req.getParameter("path");
+		if (path == null || path.trim().length() == 0) {
+			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			return null;
+		}
+		final String[] pathArr = path.split("--");
+		if (pathArr.length != 5) {
+			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			return null;
+		}
+
+		final String enrId = req.getParameter("id");
+		if (enrId == null || enrId.trim().length() == 0) {
+			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			return null;
+		}
+		final Enrollment enr = enrollDao.findEnrollment(enrId);
+		if (enr == null) {
+			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			return null;
+		}
+		final Course course = courseDao.findCourse(enr.getCourseId());
+		if (course == null) {
+			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			return null;
+		}
+		final Group group = groupDao.findGroup(enr.getGroupId());
+		if (group == null) {
+			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			return null;
+		}
+
+		model.put("enr", enr);
+		model.put("group", group);
+		model.put("course", course);
+
+		final Student student = IdName.findById(group.getStudents(), pathArr[0]);
+		if (student == null) {
+			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			return null;
+		}
+
+		final int assBundleIndex = G4Parse.parse(pathArr[2], -1);
+		if (assBundleIndex < 0 || assBundleIndex >= course.getAssBundles().length) {
+			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			return null;
+		}
+
+		final AssignmentBundle bundle = course.getAssBundles()[assBundleIndex];
+		final Assignment ass = IdName.findById(bundle.getAssignments(), pathArr[3]);
+		if (ass == null) {
+			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			return null;
+		}
+
+		Version ver = null;
+		for (Version v : ass.getVersions()) {
+			if (StudentController.isVersionIncorrect(student, ass, v)) {
+				continue;
+			}
+			ver = v;
+		}
+		if (ver == null) {
+			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			return null;
+		}
+
+		final AssignmentPath assPath = new AssignmentPath(
+				course.getId(), group.getId(), student,
+				assBundleIndex, ass.getId(), ver.getId()
+		);
+
+		model.put("reportMetas", reportDao.findAllMetas(assPath));
+		model.put("codeMetas", codeDao.findAllMetas(assPath));
+
+		return new ModelAndView("a/approve", model);
+	}
+
 	@RequestMapping(value = "groups", method = RequestMethod.GET)
 	public ModelAndView do_groups(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
 		final HashMap<String, Object> model = auth(req, resp, "");
@@ -436,7 +512,6 @@ public class AdminController extends MultiActionController implements WebSymbols
 
 		final Group[] groups = groupDao.findAllGroups();
 
-		model.put("auth", req.getSession(true).getAttribute(S_ADMIN));
 		model.put("groups", groups);
 
 		return new ModelAndView("a/groups", model);

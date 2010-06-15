@@ -1,6 +1,7 @@
 package elw.dao;
 
 import elw.vo.CodeMeta;
+import elw.vo.ReportMeta;
 import gnu.trove.TLongArrayList;
 import org.akraievoy.gear.G4Io;
 import org.akraievoy.gear.G4Parse;
@@ -94,6 +95,19 @@ public class CodeDao {
 		return stamps.toNativeArray();
 	}
 
+	protected void resolveNames(AssignmentPath path, final Collection<CodeMeta> reportMetas) {
+		for (Iterator<CodeMeta> metaIt = reportMetas.iterator(); metaIt.hasNext();) {
+			CodeMeta codeMeta = metaIt.next();
+			final String fileName =
+					path.getStudent().getName().replaceAll("\\s+", "_") + "--" +
+					path.getAssId() + "_" + path.getVerId() + "--" +
+					ReportMeta.getFileNameUploadStamp(codeMeta.getUploadStamp()) +
+					".txt";
+
+			codeMeta.setFileName(fileName);
+		}
+	}
+
 	public Map<Long, CodeMeta> findAllMetas(AssignmentPath assignmentPath) {
 		final File assDir = assignmentPath.getCodeRoot(uploadsDir);
 
@@ -142,7 +156,6 @@ public class CodeDao {
 			} catch (IOException e) {
 				log.warn("failed to read meta: '{}' / '{}'", assDir.getPath(), fileName);
 				log.info("trace", e);
-				result.put(parsed, null);
 			} finally {
 				if (fis != null) {
 					try {
@@ -153,6 +166,8 @@ public class CodeDao {
 				}
 			}
 		}
+
+		resolveNames(assignmentPath, result.values());
 
 		return result;
 	}
@@ -201,6 +216,7 @@ public class CodeDao {
 		final CodeMeta defaultMeta = new CodeMeta();
 		defaultMeta.setTotalUploads(totalUploads);
 		defaultMeta.setUploadStamp(stamp);
+		resolveNames(assignmentPath, Collections.singletonList(defaultMeta));
 		if (!metaExists) {
 			return defaultMeta;
 		}
@@ -211,6 +227,7 @@ public class CodeDao {
 			final InputStreamReader in = new InputStreamReader(fis, "UTF-8");
 			final CodeMeta codeMeta = mapper.readValue(in, CodeMeta.class);
 			codeMeta.setTotalUploads(totalUploads);
+			resolveNames(assignmentPath, Collections.singletonList(codeMeta));
 			return codeMeta;
 		} catch (IOException e) {
 			log.warn("failed to read meta: '{}' / '{}'", assDir.getPath(), fMeta.getName());

@@ -16,6 +16,7 @@ public class CodeMeta {
 	protected String sourceAddress;
 	protected int totalUploads;
 	protected int scoringVersion;
+	protected String fileName;
 
 	public long getUploadStamp() {
 		return uploadStamp;
@@ -63,6 +64,16 @@ public class CodeMeta {
 
 	public void setScoringVersion(int scoringVersion) {
 		this.scoringVersion = scoringVersion;
+	}
+
+	@JsonIgnore
+	public String getFileName() {
+		return fileName;
+	}
+
+	@JsonIgnore
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
 	}
 
 	@JsonIgnore
