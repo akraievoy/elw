@@ -8,6 +8,7 @@ import elw.vo.*;
 import elw.vo.Class;
 import org.akraievoy.gear.G4Parse;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -542,7 +543,9 @@ public class AdminController extends MultiActionController implements WebSymbols
 			Message.addWarn(req, "Unable to find any codes preceding selected report");
 		}
 		model.put("codeStamp", G4Parse.parse(req.getParameter("codeStamp"), codeStamp));
+
 		model.put("codeScores", codeScores);
+		model.put("scoring", bundle.getScoring());
 
 		return new ModelAndView("a/approve", model);
 	}
@@ -552,16 +555,16 @@ public class AdminController extends MultiActionController implements WebSymbols
 			return null;
 		}
 
+		final DateTime uploadStamp = new DateTime(meta.getUploadStamp());
 		final double overdue;
-		if (classDue.isPassed()) {
-			overdue = classDue.getDayDiff();
+		if (classDue.isPassed(uploadStamp)) {
+			overdue = classDue.getDayDiff(uploadStamp);
 		} else {
 			overdue = 0.0;
 		}
 		final Map<String, Double> vars = new TreeMap<String, Double>();
 		vars.put("$passratio", meta.getPassRatio());
 		vars.put("$overdue", overdue);
-
 
 		final Score score = new Score();
 		for (Criteria c : autos) {

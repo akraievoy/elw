@@ -28,7 +28,7 @@
 			<div class="formButtons"><input type="submit" value="Approve"/></div>
 		</form>
 	</div>
-	<div style="margin: 1em auto; width: 40em;">
+	<div style="margin: 1em auto; width: 60em;">
 		<div style="float: left;">
 			<h3>Code submissions</h3>
 			<table cellspacing="0" align="center"><tbody>
@@ -36,6 +36,7 @@
 					<th></th>
 					<th>Date</th>
 					<th>State</th>
+					<th>Score</th>
 					<th>Link</th>
 				</tr>
 #foreach($c in $codes.values())
@@ -50,6 +51,22 @@
 							<span style="color: $failColor;">$c.testsFailed&nbsp;Fail</span>
 						#else
 							Tests Pending
+						#end
+					</td>
+					<td style="padding: 0 0.25em;">
+						#set($score = $codeScores.get($c.uploadStamp))
+						#if($score)
+							$score.niceRatio : 
+							#set($terms = $score.terms)
+						  #foreach($term in $terms)
+								#if($term.positive)
+									#set($termColor = "#00FF00")
+								#else
+									#set($termColor = "#FF0000")
+								#end
+								<span style="color: $termColor;" title="$scoring.findCriteria($term.id).name ($term.pow)">$term.niceRatio</span>
+							#end
+						#else
 						#end
 					</td>
 					<td style="padding: 0 0.25em;">[&nbsp;<a href="codeDl/$c.fileName?path=$upPath&stamp=$c.uploadStamp" target="_blank">Download</a>&nbsp;]</td>

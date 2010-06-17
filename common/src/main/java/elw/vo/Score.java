@@ -1,7 +1,9 @@
 package elw.vo;
 
-import java.util.Map;
-import java.util.TreeMap;
+import org.akraievoy.gear.G4mat;
+import org.codehaus.jackson.annotate.JsonIgnore;
+
+import java.util.*;
 
 public class Score {
 	protected final Map<String, Double> ratios = new TreeMap<String, Double>();
@@ -55,6 +57,17 @@ public class Score {
 		return copy;
 	}
 
+	@JsonIgnore
+	public double getRatio() {
+		final Set<String> ratioKeys = ratios.keySet();
+		return getRatio(ratioKeys.toArray(new String[ratios.size()]));
+	}
+
+	@JsonIgnore
+	public String getNiceRatio() {
+		return G4mat.format2(getRatio());
+	}
+
 	public double getRatio(String[] ids) {
 		double res = 1.0;
 
@@ -76,5 +89,80 @@ public class Score {
 		}
 
 		return true;
+	}
+
+	@JsonIgnore
+	public Term[] getTerms() {
+		return getTerms(false);
+	}
+
+	@JsonIgnore
+	public Term[] getTerms(final boolean includeIdentity) {
+		final List<Term> terms = new ArrayList<Term>();
+
+		for (final String id : ratios.keySet()) {
+			if (!pows.containsKey(id)) {
+				continue;
+			}
+			final Integer pow = pows.get(id);
+			final Double ratio = ratios.get(id);
+			final double termRatio = Math.pow(ratio, pow);
+
+			final Term term = new Term(id, termRatio, pow);
+
+			if (term.isIdentity() && !includeIdentity) {
+				continue;
+			}
+
+			terms.add(term);
+		}
+
+		return terms.toArray(new Term[terms.size()]);
+	}
+
+	public static class Term {
+		protected final String id;
+		protected final double ratio;
+		protected final int pow;
+
+		public Term(String id, double ratio, int pow) {
+			this.id = id;
+			this.ratio = ratio;
+			this.pow = pow;
+		}
+
+		public String getId() {
+			return id;
+		}
+
+		public double getRatio() {
+			return ratio;
+		}
+
+		public int getPow() {
+			return pow;
+		}
+
+		public String getNiceRatio() {
+			if (isIdentity()) {
+				return "";
+			}
+
+			final double percentage = Math.round(ratio * 1000) / 10.0;
+
+			if (percentage < 100) {
+				return "-" + G4mat.format2(100 - percentage) + "%";
+			}
+
+			return "+" + G4mat.format2(percentage - 100) + "%";
+		}
+
+		public boolean isIdentity() {
+			return Math.abs(ratio - 1) < 1e-2;
+		}
+
+		public boolean isPositive() {
+			return ratio > 1;
+		}
 	}
 }

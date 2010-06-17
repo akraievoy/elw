@@ -23,19 +23,32 @@ public class Class {
 
 	@JsonIgnore
 	public boolean isStarted() {
-		final DateTime date = FMT_DATE.parseDateTime(getDate());
+		return isStarted(new DateTime());
+	}
+
+	public boolean isStarted(final DateTime beforeTime) {
+		final DateTime date = getDateExact();
 		final DateTime from = FMT_TIME.parseDateTime(getFromTime());
 		final DateTime fromDate = new DateTime(
 				date.getYear(), date.getMonthOfYear(), date.getDayOfMonth(),
 				from.getHourOfDay(), from.getMinuteOfHour(),
 				0, 0
 		);
-		return fromDate.isBeforeNow();
+		return fromDate.isBefore(beforeTime);
+	}
+
+	@JsonIgnore
+	public DateTime getDateExact() {
+		return FMT_DATE.parseDateTime(getDate());
 	}
 
 	@JsonIgnore
 	public boolean isPassed() {
-		final DateTime date = FMT_DATE.parseDateTime(getDate());
+		return isPassed(new DateTime());
+	}
+
+	public boolean isPassed(final DateTime beforeTime) {
+		final DateTime date = getDateExact();
 		final DateTime to = FMT_TIME.parseDateTime(getToTime());
 		final DateTime toDate = new DateTime(
 				date.getYear(), date.getMonthOfYear(), date.getDayOfMonth(),
@@ -43,12 +56,12 @@ public class Class {
 				0, 0
 		);
 
-		return toDate.isBeforeNow();
+		return toDate.isBefore(beforeTime);
 	}
 
 	@JsonIgnore
 	public boolean isToday() {
-		final DateTime date = FMT_DATE.parseDateTime(getDate());
+		final DateTime date = getDateExact();
 		final DateTime dateMidnight = new DateTime(
 				date.getYear(), date.getMonthOfYear(), date.getDayOfMonth(),
 				0, 0,
@@ -63,22 +76,26 @@ public class Class {
 
 	@JsonIgnore
 	public String getNiceDate() {
-		return FMT_DATE_NICE.print(FMT_DATE.parseDateTime(getDate()));
+		return FMT_DATE_NICE.print(getDateExact());
 	}
 
 	public int getDayDiff() {
-		final DateTime date = FMT_DATE.parseDateTime(getDate());
+		return getDayDiff(new DateTime());
+	}
+
+	public int getDayDiff(final DateTime toDate) {
+		final DateTime date = getDateExact();
 		final DateTime dateMidnight = new DateTime(
 				date.getYear(), date.getMonthOfYear(), date.getDayOfMonth(),
 				0, 0,
 				0, 0
 		);
-		if (dateMidnight.isAfterNow()) {
-			return Days.daysBetween(new DateTime(), dateMidnight).getDays() + 1;
-		} else if (dateMidnight.plusDays(1).isAfterNow()) {
+		if (dateMidnight.isAfter(toDate)) {
+			return Days.daysBetween(toDate, dateMidnight).getDays() + 1;
+		} else if (dateMidnight.plusDays(1).isAfter(toDate)) {
 			return 0;
 		} else {
-			return Days.daysBetween(dateMidnight, new DateTime()).getDays();
+			return Days.daysBetween(dateMidnight, toDate).getDays();
 		}
 	}
 

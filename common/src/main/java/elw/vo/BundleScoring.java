@@ -36,5 +36,9 @@ public class BundleScoring {
 	public void setVersion(int version) {
 		this.version = version;
 	}
+
+	public Criteria findCriteria(final String id) {
+		return IdName.findById(getCriterias(), id);
+	}
 }
 
