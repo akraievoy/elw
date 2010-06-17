@@ -91,8 +91,8 @@ public class AdminController extends MultiActionController implements WebSymbols
 		final HttpSession session = req.getSession(true);
 		if (
 				nonce == null || hash == null ||
-				nonce.trim().length() == 0 || hash.trim().length() == 0
-		) {
+						nonce.trim().length() == 0 || hash.trim().length() == 0
+				) {
 			Message.addWarn(req, "nonce/hash parameters NOT set");
 		} else {
 			long nonceStamp = Long.valueOf(nonce, 36);
@@ -424,62 +424,63 @@ public class AdminController extends MultiActionController implements WebSymbols
 			return null;
 		}
 
-
 		final String path = req.getParameter("path");
 		if (path == null || path.trim().length() == 0) {
-			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Path not set");
 			return null;
 		}
 		final String[] pathArr = path.split("--");
 		if (pathArr.length != 5) {
-			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Path syntax weirdo");
 			return null;
 		}
 
 		final String enrId = req.getParameter("id");
 		if (enrId == null || enrId.trim().length() == 0) {
-			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Enrollment ID not set");
 			return null;
 		}
 		final Enrollment enr = enrollDao.findEnrollment(enrId);
 		if (enr == null) {
-			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Enrollment " + enrId + " not found");
 			return null;
 		}
 		final Course course = courseDao.findCourse(enr.getCourseId());
 		if (course == null) {
-			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Course " + enr.getCourseId() + " not found");
 			return null;
 		}
 		final Group group = groupDao.findGroup(enr.getGroupId());
 		if (group == null) {
-			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Group " + enr.getGroupId() + " not found");
 			return null;
 		}
 
+		model.put("path", path);
+		model.put("id", enrId);
 		model.put("enr", enr);
 		model.put("group", group);
 		model.put("course", course);
 
 		final Student student = IdName.findById(group.getStudents(), pathArr[0]);
 		if (student == null) {
-			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Student " + pathArr[0] + " not found");
 			return null;
 		}
 
 		final int assBundleIndex = G4Parse.parse(pathArr[2], -1);
 		if (assBundleIndex < 0 || assBundleIndex >= course.getAssBundles().length) {
-			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Bundle " + pathArr[2] + " not found");
 			return null;
 		}
 
 		final AssignmentBundle bundle = course.getAssBundles()[assBundleIndex];
 		final Assignment ass = IdName.findById(bundle.getAssignments(), pathArr[3]);
 		if (ass == null) {
-			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Assignment " + pathArr[3] + " not found");
 			return null;
 		}
-
+		
 		Version ver = null;
 		for (Version v : ass.getVersions()) {
 			if (StudentController.isVersionIncorrect(student, ass, v)) {
@@ -488,17 +489,29 @@ public class AdminController extends MultiActionController implements WebSymbols
 			ver = v;
 		}
 		if (ver == null) {
-			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Version not found");
 			return null;
 		}
+		model.put("student", student);
+		model.put("ass", ass);
+		model.put("ver", ver);
 
 		final AssignmentPath assPath = new AssignmentPath(
 				course.getId(), group.getId(), student,
 				assBundleIndex, ass.getId(), ver.getId()
 		);
 
-		model.put("reportMetas", reportDao.findAllMetas(assPath));
-		model.put("codeMetas", codeDao.findAllMetas(assPath));
+		final Map<Long, ReportMeta> reports = reportDao.findAllMetas(assPath);
+
+		final String reportStampStr = req.getParameter("stamp");
+		long reportStamp = G4Parse.parse(reportStampStr, -1L);
+		if (reportStamp == -1) {
+			reportStamp = reports.keySet().iterator().next();
+		}
+
+		model.put("stamp", reportStamp);
+		model.put("reports", reports);
+		model.put("codes", codeDao.findAllMetas(assPath));
 
 		return new ModelAndView("a/approve", model);
 	}
