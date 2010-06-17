@@ -40,16 +40,18 @@ public class AdminController extends MultiActionController implements WebSymbols
 	protected final EnrollDao enrollDao;
 	protected final CodeDao codeDao;
 	protected final ReportDao reportDao;
+	protected final ScoreDao scoreDao;
 
 	protected final ObjectMapper mapper = new ObjectMapper();
 	protected final long cacheBustingToken = System.currentTimeMillis();
 
-	public AdminController(CourseDao courseDao, EnrollDao enrollDao, GroupDao groupDao, CodeDao codeDao, ReportDao reportDao) {
+	public AdminController(CourseDao courseDao, EnrollDao enrollDao, GroupDao groupDao, CodeDao codeDao, ReportDao reportDao, ScoreDao scoreDao) {
 		this.courseDao = courseDao;
 		this.enrollDao = enrollDao;
 		this.groupDao = groupDao;
 		this.codeDao = codeDao;
 		this.reportDao = reportDao;
+		this.scoreDao = scoreDao;
 	}
 
 	protected HashMap<String, Object> auth(final HttpServletRequest req, final HttpServletResponse resp, final String pathToRoot) throws IOException {
@@ -522,12 +524,12 @@ public class AdminController extends MultiActionController implements WebSymbols
 		double bestRatio = 0;
 		long codeStamp = 0;
 
-		final Class classDue = enr.getClasses()[ass.getScoring().getClassCodeDue()];
+		final Class classCodeDue = enr.getClasses()[ass.getScoring().getClassCodeDue()];
 		final TypeScoring codeScoring = bundle.getScoring().getBreakdown().get("code");
 		final Criteria[] codeAutos = codeScoring.resolveAuto();
 		for (Long cStamp : codes.keySet()) {
 			final CodeMeta meta = codes.get(cStamp);
-			final Score score = computeCodeScore(meta, classDue, codeAutos);
+			final Score score = computeCodeAuto(meta, classCodeDue, codeAutos);
 
 			codeScores.put(cStamp, score);
 
@@ -539,18 +541,68 @@ public class AdminController extends MultiActionController implements WebSymbols
 			}
 		}
 
-		if (codeStamp == 0){
-			Message.addWarn(req, "Unable to find any codes preceding selected report");
-		}
 		model.put("codeStamp", G4Parse.parse(req.getParameter("codeStamp"), codeStamp));
 
 		model.put("codeScores", codeScores);
 		model.put("scoring", bundle.getScoring());
 
+
+		final Score reportScore;
+		final ReportMeta reportMeta = reports.get(reportStamp);
+		final Class classReportDue = enr.getClasses()[ass.getScoring().getClassReportDue()];
+		final TypeScoring reportScoring = bundle.getScoring().getBreakdown().get("report");
+		final long scoreStamp = reportMeta.getScoreStamp();
+		if (scoreStamp == 0) {
+			final Score reportBaseScore;
+			final Score codeScore = codeScores.get(codeStamp);
+			if (codeStamp == 0 || codeScore == null){
+				Message.addWarn(req, "Unable to find any codes preceding selected report");
+				reportBaseScore = new Score();
+			} else {
+				reportBaseScore = codeScore.copy();
+			}
+			reportScore = computeReportAuto(reportMeta, classReportDue, reportScoring.resolveAuto(), reportBaseScore);
+			computeReportDefault(bundle, reportScore);
+		} else {
+			reportScore = scoreDao.findScoreByStamp(assPath, scoreStamp);
+		}
+
+		model.put("score", reportScore);
+
 		return new ModelAndView("a/approve", model);
 	}
 
-	protected static Score computeCodeScore(CodeMeta meta, Class classDue, Criteria[] autos) {
+	protected static void computeReportDefault(AssignmentBundle bundle, Score reportScore) {
+		final Criteria[] criterias = bundle.getScoring().getCriterias();
+		for (Criteria c : criterias) {
+			if (!reportScore.contains(c.getId())) {
+				reportScore.getPows().put(c.getId(), c.resolvePowDef(null));
+				reportScore.getRatios().put(c.getId(), c.resolveRatio(null));
+			}
+		}
+	}
+
+	protected static Score computeReportAuto(ReportMeta meta, Class classDue, Criteria[] autos, final Score baseScore) {
+		final DateTime uploadStamp = new DateTime(meta.getUploadStamp());
+		final double overdue;
+		if (classDue.isPassed(uploadStamp)) {
+			overdue = classDue.getDayDiff(uploadStamp);
+		} else {
+			overdue = 0.0;
+		}
+		final Map<String, Double> vars = new TreeMap<String, Double>();
+		vars.put("$overdue", overdue);
+
+		final Score score = baseScore == null ? new Score() : baseScore;
+		for (Criteria c : autos) {
+			score.getPows().put(c.getId(), c.resolvePowDef(vars));
+			score.getRatios().put(c.getId(), c.resolveRatio(vars));
+		}
+
+		return score;
+	}
+
+	protected static Score computeCodeAuto(CodeMeta meta, Class classDue, Criteria[] autos) {
 		if (meta.getValidatorStamp() <= 0) {
 			return null;
 		}

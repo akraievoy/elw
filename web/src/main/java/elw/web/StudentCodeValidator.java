@@ -4,14 +4,12 @@ import base.pattern.Result;
 import elw.dao.*;
 import elw.dp.mips.MipsValidator;
 import elw.vo.*;
-import elw.vo.Class;
 import org.akraievoy.gear.G4Run;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.concurrent.ScheduledExecutorService;
 
 public class StudentCodeValidator extends G4Run.Task {
@@ -92,44 +90,6 @@ public class StudentCodeValidator extends G4Run.Task {
 										log.warn("exception while validating {} / {}", assPath, stamp);
 									} finally {
 										metaSafe.setValidatorStamp(System.currentTimeMillis());
-									}
-								}
-
-								final boolean scoringUpdate = metaSafe.getScoringVersion() < bundle.getScoring().getVersion();
-								if (scoringUpdate) {
-									update = true;
-
-									final double overdue;
-									final Class classDue = enr.getClasses()[ass.getScoring().getClassCodeDue()];
-									if (classDue.isPassed()) {
-										overdue = classDue.getDayDiff();
-									} else {
-										overdue = 0.0;
-									}
-									final Map<String, Double> vars = new TreeMap<String, Double>();
-									vars.put("$passratio", metaSafe.getPassRatio());
-									vars.put("$overdue", overdue);
-
-									metaSafe.setScoringVersion(bundle.getScoring().getVersion());
-
-									final TypeScoring codeScoring = bundle.getScoring().getBreakdown().get("code");
-									final Criteria[] criterias = codeScoring.resolveAuto();
-
-									final Score score = scoreDao.findLastScore(assPath);
-									final Score newScore = score == null ? new Score() : score.copy();
-									for (Criteria c : criterias) {
-										newScore.setCodeStamp(stamp);
-										newScore.getPows().put(c.getId(), c.resolvePowDef(vars));
-										newScore.getRatios().put(c.getId(), c.resolveRatio(vars));
-									}
-									final String[] codeAutos = codeScoring.getAuto();
-									if (
-											scoringUpdate ||
-											score == null ||
-											!score.containsAll(codeAutos) ||
-											newScore.getRatio(codeAutos) > score.getRatio(codeAutos)
-										) {
-										scoreDao.createScore(assPath, newScore);
 									}
 								}
 

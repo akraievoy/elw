@@ -14,6 +14,7 @@ public class ReportMeta {
 	protected String sourceAddress;
 	protected int totalUploads;
 	protected String fileName;
+	protected long scoreStamp;
 
 	public long getUploadStamp() {
 		return uploadStamp;
@@ -61,5 +62,13 @@ public class ReportMeta {
 
 	public String getFileName() {
 		return fileName;
+	}
+
+	public long getScoreStamp() {
+		return scoreStamp;
+	}
+
+	public void setScoreStamp(long scoreStamp) {
+		this.scoreStamp = scoreStamp;
 	}
 }

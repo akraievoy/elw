@@ -72,7 +72,7 @@ public class Score {
 		double res = 1.0;
 
 		for (final String id : ids) {
-			if (!pows.containsKey(id) || !ratios.containsKey(id)) {
+			if (!contains(id)) {
 				continue;
 			}
 			res *= Math.pow(ratios.get(id), pows.get(id));
@@ -81,14 +81,23 @@ public class Score {
 		return res;
 	}
 
+	public boolean contains(String id) {
+		return pows.containsKey(id) && ratios.containsKey(id);
+	}
+
 	public boolean containsAll(String[] ids) {
 		for (final String id : ids) {
-			if (!pows.containsKey(id) || !ratios.containsKey(id)) {
+			if (!contains(id)) {
 				return false;
 			}
 		}
 
 		return true;
+	}
+
+	public boolean isSetTo(String id, int pow) {
+		final Integer myPow = pows.get(id);
+		return myPow != null && myPow.equals(pow);
 	}
 
 	@JsonIgnore

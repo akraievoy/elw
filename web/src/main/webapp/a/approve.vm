@@ -21,10 +21,18 @@
 </div>
 <div id=main>
 	<h3><span title="$student.id">$student.name</span> <span title="$ass.id">$ass.name</span> <span title="$ver.id">$ver.name</span></h3>
-	<div class="formArea" style="height: 7em;">
+	<div class="formArea" style="height: 22em;">
 		<form method="POST" action="approve">
-			<div class="formLabel">Criteria:</div>
-			<div class="formField"><input type="file" name="report"/></div>
+			#foreach($cri in $scoring.criterias)
+				<div class="formLabel" style="width:24em;">$cri.name:</div>
+				<div class="formField" style="width:6em;">
+					<select name="$cri.id">
+						#foreach($pow in $cri.pows)
+							<option value="$pow" #if($score.isSetTo($cri.id, $pow))selected#end>$pow</option>
+						#end
+					</select>
+				</div>
+			#end
 			<div class="formButtons"><input type="submit" value="Approve"/></div>
 		</form>
 	</div>
