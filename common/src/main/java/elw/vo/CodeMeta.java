@@ -58,10 +58,12 @@ public class CodeMeta {
 		this.testsPassed = testsPassed;
 	}
 
+	@Deprecated
 	public int getScoringVersion() {
 		return scoringVersion;
 	}
 
+	@Deprecated
 	public void setScoringVersion(int scoringVersion) {
 		this.scoringVersion = scoringVersion;
 	}

@@ -17,10 +17,12 @@ public class Score {
 		this.stamp = stamp;
 	}
 
+	@Deprecated
 	public long getCodeStamp() {
 		return codeStamp;
 	}
 
+	@Deprecated
 	public void setCodeStamp(long codeStamp) {
 		this.codeStamp = codeStamp;
 	}

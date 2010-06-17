@@ -33,14 +33,16 @@
 			<h3>Code submissions</h3>
 			<table cellspacing="0" align="center"><tbody>
 				<tr>
+					<th></th>
 					<th>Date</th>
 					<th>State</th>
 					<th>Link</th>
 				</tr>
 #foreach($c in $codes.values())
 				<tr>
-					<td><span title="$c.niceUploadStamp">$c.briefUploadStamp</span></td>
-					<td>
+					<td style="padding: 0 0.25em; text-align: center;">#if($c.uploadStamp == $codeStamp)<span style="font-weight: bold;">*</span>#else<a href="approve?path=$path&id=$id&codeStamp=$c.uploadStamp&stamp=$stamp">~</a>#end </td>
+					<td style="padding: 0 0.25em;"><span title="$c.niceUploadStamp">$c.briefUploadStamp</span></td>
+					<td style="padding: 0 0.25em;">
 						#if($c.validatorStamp > 0)
 							#set($passColor = "#if($c.testsPassed>0)#00FF00#else#999999#end")
 							#set($failColor = "#if($c.testsFailed>0)#FF0000#else#999999#end")
@@ -50,7 +52,7 @@
 							Tests Pending
 						#end
 					</td>
-					<td>[&nbsp;<a href="codeDl/$c.fileName?path=$upPath&stamp=$c.uploadStamp" target="_blank">Download</a>&nbsp;]</td>
+					<td style="padding: 0 0.25em;">[&nbsp;<a href="codeDl/$c.fileName?path=$upPath&stamp=$c.uploadStamp" target="_blank">Download</a>&nbsp;]</td>
 				</tr>
 #end
 			</tbody></table>
@@ -66,7 +68,7 @@
 				</tr>
 #foreach($rep in $reports.values())
 				<tr>
-					<td style="padding: 0 0.25em; text-align: center;">#if($rep.uploadStamp == $stamp)<span style="font-weight: bold;">*</span>#else<a href="approve?path=$path&id=$id&stamp=$rep.uploadStamp">~</a>#end </td>
+					<td style="padding: 0 0.25em; text-align: center;">#if($rep.uploadStamp == $stamp)<span style="font-weight: bold;">*</span>#else<a href="approve?path=$path&id=$id&stamp=$rep.uploadStamp&codeStamp=$codeStamp">~</a>#end </td>
 					<td style="padding: 0 0.25em;"><span title="$rep.niceUploadStamp">$rep.briefUploadStamp</span></td>
 					<td style="padding: 0 0.25em;">&nbsp;</td>
 					<td style="padding: 0 0.25em;">[&nbsp;<a href="reportDl/$rep.fileName?path=$upPath&stamp=$rep.uploadStamp" target="_blank">Download</a>&nbsp;]</td>

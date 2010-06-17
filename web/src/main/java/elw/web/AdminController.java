@@ -5,6 +5,7 @@ import elw.dao.*;
 import elw.dp.mips.MipsValidator;
 import elw.miniweb.Message;
 import elw.vo.*;
+import elw.vo.Class;
 import org.akraievoy.gear.G4Parse;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
@@ -511,9 +512,64 @@ public class AdminController extends MultiActionController implements WebSymbols
 
 		model.put("stamp", reportStamp);
 		model.put("reports", reports);
-		model.put("codes", codeDao.findAllMetas(assPath));
+
+		final Map<Long, CodeMeta> codes = codeDao.findAllMetas(assPath);
+		model.put("codes", codes);
+
+		final Map<Long, Score> codeScores = new TreeMap<Long, Score>();
+
+		double bestRatio = 0;
+		long codeStamp = 0;
+
+		final Class classDue = enr.getClasses()[ass.getScoring().getClassCodeDue()];
+		final TypeScoring codeScoring = bundle.getScoring().getBreakdown().get("code");
+		final Criteria[] codeAutos = codeScoring.resolveAuto();
+		for (Long cStamp : codes.keySet()) {
+			final CodeMeta meta = codes.get(cStamp);
+			final Score score = computeCodeScore(meta, classDue, codeAutos);
+
+			codeScores.put(cStamp, score);
+
+			//	here we select the best code scoring to base our report rating on
+			final double ratio = score.getRatio(codeScoring.getAuto());
+			if (meta.getUploadStamp() <= reportStamp && ratio > bestRatio) {
+				codeStamp = cStamp;
+				bestRatio = ratio;
+			}
+		}
+
+		if (codeStamp == 0){
+			Message.addWarn(req, "Unable to find any codes preceding selected report");
+		}
+		model.put("codeStamp", G4Parse.parse(req.getParameter("codeStamp"), codeStamp));
+		model.put("codeScores", codeScores);
 
 		return new ModelAndView("a/approve", model);
+	}
+
+	protected static Score computeCodeScore(CodeMeta meta, Class classDue, Criteria[] autos) {
+		if (meta.getValidatorStamp() <= 0) {
+			return null;
+		}
+
+		final double overdue;
+		if (classDue.isPassed()) {
+			overdue = classDue.getDayDiff();
+		} else {
+			overdue = 0.0;
+		}
+		final Map<String, Double> vars = new TreeMap<String, Double>();
+		vars.put("$passratio", meta.getPassRatio());
+		vars.put("$overdue", overdue);
+
+
+		final Score score = new Score();
+		for (Criteria c : autos) {
+			score.getPows().put(c.getId(), c.resolvePowDef(vars));
+			score.getRatios().put(c.getId(), c.resolveRatio(vars));
+		}
+
+		return score;
 	}
 
 	@RequestMapping(value = "groups", method = RequestMethod.GET)
