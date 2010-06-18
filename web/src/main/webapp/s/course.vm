@@ -11,7 +11,7 @@
 <div id="header">
 	<div id="nav"><a href="courses">My Courses</a> &gt; <span style="font-weight: bold">${elw_ctx.course.name}</span></div>
 	#elw_cred_stud($elw_ctx)
-	<div style="clear: both;">&nbsp;</div>
+	<div id="header_hr"> </div>
 </div>
 #elw_messages($elw_messages)
 <div id=main>

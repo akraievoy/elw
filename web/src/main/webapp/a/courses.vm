@@ -11,8 +11,8 @@
 <body style="text-align: left;">
 <div id="header">
 	<div id="nav"><a href="index">Index</a> &gt; <span style="font-weight: bold">Courses</span></div>
-	<div id="cred">#if($auth)[&nbsp;Admin&nbsp;]&nbsp;[&nbsp;<a href="logout">X</a>&nbsp;]#{else}[&nbsp;Anonymous&nbsp;]#end</div>
-	&nbsp;
+	#elw_cred_adm($auth)
+	<div id="header_hr"> </div>
 </div>
 #elw_messages($elw_messages)
 <table><tbody>

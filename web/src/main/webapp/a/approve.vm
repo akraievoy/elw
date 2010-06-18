@@ -14,8 +14,8 @@
 		<a href="log?id=$enr.id">Group $elw_ctx.group.name Reports</a> &gt;
 		<span style="font-weight: bold">Approval</span>
 	</div>
-	<div id="cred">#if($auth)[&nbsp;Admin&nbsp;]&nbsp;[&nbsp;<a href="logout">X</a>&nbsp;]#{else}[&nbsp;Anonymous&nbsp;]#end</div>
-	&nbsp;
+	#elw_cred_adm($auth)
+	<div id="header_hr"> </div>
 </div>
 #elw_messages($elw_messages)
 <div id=main>

@@ -9,10 +9,23 @@
 <div id="cred">
 	#if($auth)
 		[&nbsp;$elw_ctx.group.name&nbsp;$elw_ctx.student.name&nbsp;]&nbsp;
-		<form method="GET" style="display:inline; margin: 0 0.25em;" action="logout">
-			<input type="Submit" value="X" style="margin: 0;"/>
+		<form method="GET" style="display:inline; margin: 0 0.25em; padding: 0;" action="logout">
+			<input type="Submit" value="Log Out" style="margin: 0;"/>
 		</form>
 	#else
+		[&nbsp;Anonymous&nbsp;]
+	#end
+</div>
+#end
+
+#macro (elw_cred_adm $auth)
+<div id="cred">
+	#if($auth)
+		[&nbsp;Admin&nbsp;]&nbsp;
+		<form method="GET" style="display:inline; margin: 0 0.25em; padding: 0;" action="logout">
+			<input type="Submit" value="Log Out" style="margin: 0;"/>
+		</form>
+	#{else}
 		[&nbsp;Anonymous&nbsp;]
 	#end
 </div>

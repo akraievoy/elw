@@ -13,7 +13,7 @@
 <div id="header">
 	<div id="nav"><span style="font-weight: bold">Login</span></div>
 	#elw_cred_stud($elw_ctx)
-	<div style="clear: both;">&nbsp;</div>
+	<div id="header_hr"> </div>
 </div>
 #elw_messages($elw_messages)
 <div id=main>

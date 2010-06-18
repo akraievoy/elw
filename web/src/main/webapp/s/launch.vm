@@ -14,7 +14,7 @@
 		<a href="course?elw_ctx=e--${elw_ctx.enr.id}">${elw_ctx.course.name}</a> &gt;
 		<span style="font-weight: bold">$elw_ctx.ver.name - Code</span></div>
 	#elw_cred_stud($elw_ctx)
-	<div style="clear: both;">&nbsp;</div>
+	<div id="header_hr"> </div>
 </div>
 #elw_messages($elw_messages)
 <div id=main>

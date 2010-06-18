@@ -24,11 +24,24 @@ h3 {
 	font-size: 1.25em;
 }
 
+#header_hr {
+	background-color: #9999CC;
+	padding: 0;
+	margin: 1px auto;
+	width: 32em;
+	height: 1px;
+	clear: both;
+}
+
 #nav {
+	margin-top: 2px;
+	margin-left: 2px;
 	float: left;
 }
 
 #cred {
+	margin-top: 2px;
+	margin-right: 2px;
 	float: right;
 }
 

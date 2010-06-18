@@ -13,10 +13,10 @@
 		<a href="index">Index</a> &gt;
 		<a href="courses">Courses</a> &gt;
 		<a href="course?elw_ctx=c--${elw_ctx.course.id}">${elw_ctx.course.name}</a> &gt;
-		<span style="font-weight: bold">$elw_ctx.ver.name - Code</span>
+		<span style="font-weight: bold;">$elw_ctx.ver.name - Code</span>
 	</div>
-	<div id="cred">#if($auth)[&nbsp;Admin&nbsp;]&nbsp;[&nbsp;<a href="logout">X</a>&nbsp;]#{else}[&nbsp;Anonymous&nbsp;]#end</div>
-	&nbsp;
+	#elw_cred_adm($auth)
+	<div id="header_hr"> </div>
 </div>
 #elw_messages($elw_messages)
 <div id=main>
