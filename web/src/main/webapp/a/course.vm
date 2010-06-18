@@ -1,39 +1,34 @@
 #* @vtlvariable name="elw_messages" type="elw.miniweb.Message[]" *#
-#* @vtlvariable name="elw_student" type="elw.vo.Student" *#
-#* @vtlvariable name="elw_group" type="elw.vo.Group" *#
-#* @vtlvariable name="course" type="elw.vo.Course" *#
-#* @vtlvariable name="studId" type="java.lang.Integer" *#
+#* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
+#parse("t/elw.macro.vm")
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta content="text/html; charset=UTF-8">
-	<title>Course ${course.name} : ELW Admin</title>
+	<title>Course ${elw_ctx.course.name} : ELW Admin</title>
 	<link href="../css/elw.css" type="text/css" rel="stylesheet"/>
 </head>
 <body>
 <div id="header">
-	<div id="nav"><a href="index">Index</a> &gt; <a href="courses">Courses</a> &gt; <span style="font-weight: bold">${course.name}</span></div>
+	<div id="nav"><a href="index">Index</a> &gt; <a href="courses">Courses</a> &gt; <span style="font-weight: bold">${elw_ctx.course.name}</span></div>
 	<div id="cred">#if($auth)[&nbsp;Admin&nbsp;]&nbsp;[&nbsp;<a href="logout">X</a>&nbsp;]#{else}[&nbsp;Anonymous&nbsp;]#end</div>
 	&nbsp;
 </div>
-<div id=messages>#foreach($m in $elw_messages)
-	<div class="$m.type">$m.message</div>
-#end
-</div>
+#elw_messages($elw_messages)
 <div id=main>
 	<table><tbody>
 	<tr><td style="padding-left: 1em;padding-right: 0.25em;" colspan=3>Assignment bundles:</td></tr>
-	#foreach($assBundle in $course.assBundles)#set($bunI = $velocityCount - 1)
+	#foreach($assBundle in $elw_ctx.course.assBundles)#set($bunI = $velocityCount - 1)
 	<tr><td style="padding-left: 1.5em;padding-right: 0.25em;" colspan=3>Assignments:</td></tr>
 	 #foreach($ass in $assBundle.assignments)#set($assI = $velocityCount)
 	<tr class="header"><td style="padding-left: 2em; padding-right: 0.25em;" colspan=3>$ass.name&nbsp;<span style="font-size: smaller">(id:&nbsp;#if($ass.id)$ass.id#{else}null#end)</span>&nbsp;:&nbsp;</td></tr>
 		#foreach($ver in $ass.versions)#set($verI = $velocityCount)
-		#set($path="${course.id}--${bunI}--${ass.id}--${ver.id}")
+		#set($assCtx=$elw_ctx.extendBAV(${bunI}, ${ass}, ${ver}))
 	<tr>
 		<td style="padding-left: 3em;">$ver.name&nbsp;<span style="font-size: smaller">(id:&nbsp;#if($ver.id)$ver.id#{else}null#end)</span></td>
-		<td style="padding-left: 0.25em; padding-right: 0.25em;">[&nbsp;<a href="launch?path=$path">Code</a>&nbsp;]</td>
+		<td style="padding-left: 0.25em; padding-right: 0.25em;">[&nbsp;<a href="launch?elw_ctx=$assCtx">Code</a>&nbsp;]</td>
 		<td style="padding-left: 0.25em; padding-right: 0.25em;">
 			#if($testResults)
-			#set($res=$testResults.get($path))
+			#set($res=$testResults.get($assCtx.toString()))
 				#if($res.success)#set($resColor="#00FF00")#else#set($resColor="#FF0000")#end
 				<span style="color:$resColor">$res.message</span>
 			#else

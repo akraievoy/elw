@@ -40,7 +40,7 @@ public class Applet extends JApplet{
 		controller.setSelectedTask(ver);
 		controller.setUploadUrl(getCodeBase().toString() + "upload");
 		controller.setUploadHeader(getParameter("upHeader"));
-		controller.setUploadPath(getParameter("upPath"));
+		controller.setElwCtx(getParameter("elw_ctx"));
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {

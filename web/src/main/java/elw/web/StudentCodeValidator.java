@@ -57,14 +57,17 @@ public class StudentCodeValidator extends G4Run.Task {
 					final AssignmentBundle bundle = course.getAssBundles()[bunI];
 					for (Assignment ass : bundle.getAssignments()) {
 						for (Version ver : ass.getVersions()) {
-							if (StudentController.isVersionIncorrect(student, ass, ver)) {
+							if (Ctx.isVersionIncorrect(student, ass, ver)) {
 								continue;
 							}
-							final AssignmentPath assPath = new AssignmentPath(
-									course.getId(), group.getId(), student,
-									bunI, ass.getId(), ver.getId()
+							final Ctx ctx = new Ctx(
+									Ctx.STATE_EGSCBAV,
+									enr.getId(), group.getId(), student.getId(),
+									course.getId(), bunI, ass.getId(), ver.getId()
 							);
-							final Map<Long,CodeMeta> metas = codeDao.findAllMetas(assPath);
+							ctx.resolve(enrollDao, groupDao, courseDao);
+
+							final Map<Long,CodeMeta> metas = codeDao.findAllMetas(ctx);
 							final Set<Long> stamps = metas.keySet();
 							for (Long stamp : stamps) {
 								final CodeMeta meta = metas.get(stamp);
@@ -83,18 +86,18 @@ public class StudentCodeValidator extends G4Run.Task {
 									try {
 										final Result[] resRef = {new Result("unknown", false)};
 										final int[] passFailCounts = new int[2];
-										validator.batch(resRef, ver, codeDao.findCodeByStamp(assPath, stamp), passFailCounts);
+										validator.batch(resRef, ver, codeDao.findCodeByStamp(ctx, stamp), passFailCounts);
 										metaSafe.setTestsFailed(passFailCounts[1]);
 										metaSafe.setTestsPassed(passFailCounts[0]);
 									} catch (Throwable t) {
-										log.warn("exception while validating {} / {}", assPath, stamp);
+										log.warn("exception while validating {} / {}", ctx, stamp);
 									} finally {
 										metaSafe.setValidatorStamp(System.currentTimeMillis());
 									}
 								}
 
 								if (update) {
-									codeDao.updateMeta(assPath, stamp, metaSafe);
+									codeDao.updateMeta(ctx, stamp, metaSafe);
 								}
 							}
 						}

@@ -1,29 +1,29 @@
 #* @vtlvariable name="elw_messages" type="elw.miniweb.Message[]" *#
+#* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
+#* @vtlvariable name="uploadLimit" type="java.lang.String" *#
+#parse("t/elw.macro.vm")
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta content="text/html; charset=UTF-8">
-	<title>$verBean.name - Report</title>
+	<title>$elw_ctx.ver.name - Report</title>
 	<link href="../css/elw.css" type="text/css" rel="stylesheet"/>
 </head>
 <body>
 <div id="header">
 	<div id="nav">
 		<a href="courses">My Courses</a> &gt;
-		<a href="course?id=${course.id}">${course.name}</a> &gt;
-		<span style="font-weight: bold">$verBean.name - Report</span></div>
-	&nbsp;
-	<div id="cred">[&nbsp;$elw_group.name&nbsp;$elw_student.name&nbsp;]&nbsp;[&nbsp;<a href="logout">X</a>&nbsp;]</div>
+		<a href="course?id=e--${elw_ctx.enr.id}">${elw_ctx.course.name}</a> &gt;
+		<span style="font-weight: bold">$elw_ctx.ver.name - Report</span></div>
+	#elw_cred_stud($elw_ctx)
+	<div style="clear: both;">&nbsp;</div>
 </div>
-<div id=messages>#foreach($m in $elw_messages)
-	<div class="$m.type">$m.message</div>
-#end
-</div>
+#elw_messages($elw_messages)
 <div id=main>
 	<div class="formArea" style="height: 7em;">
 		<div style="padding: 0.2em; font-weight: bold; background-color: #ffee99; text-align:center;">
 			Only *.rtf uploads up to $uploadLimit, please.
 		</div>
-		<form method="POST" enctype="multipart/form-data" action="uploadReport?path=$upPath">
+		<form method="POST" enctype="multipart/form-data" action="uploadReport?elw_ctx=$elw_ctx">
 			<div class="formLabel">Report file:</div>
 			<div class="formField"><input type="file" name="report"/></div>
 			<div class="formButtons"><input type="submit" value="Upload"/></div>
@@ -51,7 +51,7 @@
 							Tests Pending
 						#end
 					</td>
-					<td style="padding: 0 0.25em;">[&nbsp;<a href="codeDl/$c.fileName?path=$upPath&stamp=$c.uploadStamp" target="_blank">Download</a>&nbsp;]</td>
+					<td style="padding: 0 0.25em;">[&nbsp;<a href="codeDl/$c.fileName?elw_ctx=$elw_ctx&stamp=$c.uploadStamp" target="_blank">Download</a>&nbsp;]</td>
 				</tr>
 #end
 			</tbody></table>
@@ -68,7 +68,7 @@
 				<tr>
 					<td style="padding: 0 0.25em;"><span title="$rep.niceUploadStamp">$rep.briefUploadStamp</span></td>
 					<td style="padding: 0 0.25em;">&nbsp;</td>
-					<td style="padding: 0 0.25em;">[&nbsp;<a href="reportDl/$rep.fileName?path=$upPath&stamp=$rep.uploadStamp" target="_blank">Download</a>&nbsp;]</td>
+					<td style="padding: 0 0.25em;">[&nbsp;<a href="reportDl/$rep.fileName?elw_ctx=$elw_ctx&stamp=$rep.uploadStamp" target="_blank">Download</a>&nbsp;]</td>
 				</tr>
 #end
 			</tbody></table>

@@ -72,7 +72,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 		final HashMap<String, Object> model = new HashMap<String, Object>();
 
 		model.put(S_MESSAGES, Message.drainMessages(req));
-		model.put("auth", req.getSession(true).getAttribute(S_ADMIN)); //	LATER move this to auth()
+		model.put("auth", req.getSession(true).getAttribute(S_ADMIN));
 
 		return model;
 	}
@@ -180,32 +180,34 @@ public class AdminController extends MultiActionController implements WebSymbols
 			return null;
 		}
 
-		final Course course = courseDao.findCourse(req.getParameter("id"));
-		if (course == null) {
-			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);	//	LATER review : setStatus -> sendRedirect in most cases
+		final Ctx ctx = Ctx.fromString(req.getParameter("elw_ctx")).resolve(enrollDao, groupDao, courseDao);
+		if (!ctx.resolved(Ctx.STATE_C)) {
+			Message.addWarn(req, "Course not found");
+			resp.sendRedirect("courses");
 			return null;
 		}
 
 		if ("true".equalsIgnoreCase(req.getParameter("test"))) {
 			final HashMap<String, Result> testResults = new HashMap<String, Result>();
 			final MipsValidator validator = new MipsValidator();
-			for (int bunI = 0, assBundlesLength = course.getAssBundles().length; bunI < assBundlesLength; bunI++) {
-				AssignmentBundle bundle = course.getAssBundles()[bunI];
+			for (int bunI = 0, assBundlesLength = ctx.getCourse().getAssBundles().length; bunI < assBundlesLength; bunI++) {
+				AssignmentBundle bundle = ctx.getCourse().getAssBundles()[bunI];
 				for (Assignment ass : bundle.getAssignments()) {
 					for (Version ver : ass.getVersions()) {
 						final Result[] resRef = {new Result("unknown", false)};
 						validator.batch(resRef, ver, ver.getSolution(), null);
 						testResults.put(
-								course.getId() + "--" + bunI + "--" + ass.getId() + "--" + ver.getId(),
+								ctx.extendBAV(bunI, ass, ver).toString(),
 								resRef[0]
 						);
 					}
 				}
 			}
+
 			model.put("testResults", testResults);
 		}
 
-		model.put("course", course);
+		model.put("elw_ctx", ctx);
 
 		return new ModelAndView("a/course", model);
 	}
@@ -217,55 +219,20 @@ public class AdminController extends MultiActionController implements WebSymbols
 			return null;
 		}
 
-		final String path = req.getParameter("path");
-		final String[] ids = path.split("--");
-		if (ids.length != 4) {
-			log.warn("malformed path {}", Arrays.toString(ids));
-
-			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-			return null;
-		}
-
-		final String courseId = ids[0];
-		final Course course = courseDao.findCourse(courseId);
-		if (course == null) {
-			log.warn("course not found by id {}", courseId);
-			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-			return null;
-		}
-
-		final int assBundleIndex = G4Parse.parse(ids[1], -1);
-		if (assBundleIndex < 0 || course.getAssBundles().length <= assBundleIndex) {
-			log.warn("bundle not found by index {}", assBundleIndex);
-			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-			return null;
-		}
-
-		final String assId = ids[2];
-		final AssignmentBundle bundle = course.getAssBundles()[assBundleIndex];
-		final Assignment ass = IdName.findById(bundle.getAssignments(), assId);
-		if (ass == null) {
-			log.warn("assignment not found by id {}", assId);
-			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-			return null;
-		}
-
-		final String verId = ids[3];
-		final Version ver = IdName.findById(ass.getVersions(), verId);
-		if (ver == null) {
-			log.warn("version not found by id {}", verId);
-			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+		final Ctx ctx = Ctx.fromString(req.getParameter(R_CTX)).resolve(enrollDao, groupDao, courseDao);
+		if (!ctx.resolved(Ctx.STATE_CBAV)) {
+			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "context path problem, please check the logs");
 			return null;
 		}
 
 		final StringWriter verSw = new StringWriter();
-		mapper.writeValue(verSw, ver);
+		mapper.writeValue(verSw, ctx.getVer());
 
+		model.put("elw_ctx", ctx);
 		//	LATER use HTTP instead of applet parameter for passing the problem/code to applet
-		model.put("ver", verSw.toString().replaceAll("&", "&amp;").replaceAll("\"", "&quot;"));
-		model.put("verBean", ver);
+		model.put("verJson", verSw.toString().replaceAll("&", "&amp;").replaceAll("\"", "&quot;"));
+		model.put("upHeader", "JSESSIONID=" + req.getSession(true).getId());
 		model.put("cacheBustingToken", cacheBustingToken);
-		model.put("course", course);
 
 		return new ModelAndView("a/launch", model);
 	}
@@ -298,35 +265,23 @@ public class AdminController extends MultiActionController implements WebSymbols
 			return null;
 		}
 
-		final Enrollment enr = enrollDao.findEnrollment(req.getParameter("id"));
-		if (enr == null) {
-			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+		final Ctx ctx = Ctx.fromString(req.getParameter("elw_ctx")).resolve(enrollDao, groupDao, courseDao);
+		if (!ctx.resolved(Ctx.STATE_ECG)) {
+			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Path problem, please check the logs");
 			return null;
 		}
-		final Course course = courseDao.findCourse(enr.getCourseId());
-		if (course == null) {
-			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-			return null;
-		}
-		final Group group = groupDao.findGroup(enr.getGroupId());
-		if (group == null) {
-			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-			return null;
-		}
-
-		model.put("enr", enr);
-		model.put("group", group);
-		model.put("course", course);
 
 		final HashMap<String, CodeMeta> codeMetas = new HashMap<String, CodeMeta>();
 		final HashMap<String, ReportMeta> reportMetas = new HashMap<String, ReportMeta>();
-		for (Student stud : group.getStudents()) {
+		for (Student stud : ctx.getGroup().getStudents()) {
 			StudentController.storeMetas(
 					codeDao, reportDao,
-					course, group, stud,
-					codeMetas, reportMetas, stud.getId()
+					ctx.extendStudent(stud),
+					codeMetas, reportMetas
 			);
 		}
+
+		model.put("elw_ctx", ctx);
 		model.put("codeMetas", codeMetas);
 		model.put("reportMetas", reportMetas);
 
@@ -340,62 +295,54 @@ public class AdminController extends MultiActionController implements WebSymbols
 			return null;
 		}
 
-		final Enrollment enr = enrollDao.findEnrollment(req.getParameter("id"));
-		if (enr == null) {
-			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-			return null;
-		}
-		final Course course = courseDao.findCourse(enr.getCourseId());
-		if (course == null) {
-			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-			return null;
-		}
-		final Group group = groupDao.findGroup(enr.getGroupId());
-		if (group == null) {
-			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+		final Ctx ctx = Ctx.fromString(req.getParameter("elw_ctx")).resolve(enrollDao, groupDao, courseDao);
+		if (!ctx.resolved(Ctx.STATE_ECG)) {
+			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Path problem, please check the logs");
 			return null;
 		}
 
-		model.put("enr", enr);
-		model.put("group", group);
-		model.put("course", course);
-
-		final HashMap<String, ReportMeta> reportMetas = new HashMap<String, ReportMeta>();
 		final List<LogEntry> logEntries = new ArrayList<LogEntry>();
-		for (Student stud : group.getStudents()) {
-			reportMetas.clear();
-			StudentController.storeMetas(codeDao, reportDao, course, group, stud, null, reportMetas, stud.getId());
-			for (String key : reportMetas.keySet()) {
-				final ReportMeta meta = reportMetas.get(key);
-				if (meta.getTotalUploads() == 0) {
-					continue;
-				}
+		for (Student stud : ctx.getGroup().getStudents()) {
+			final Ctx studCtx = ctx.extendStudent(stud);
 
-				final String[] keyAsPath = key.split("--");
-				final int assBundleIndex = G4Parse.parse(keyAsPath[2], -1);
-				final AssignmentBundle bundle = course.getAssBundles()[assBundleIndex];
-				final Assignment ass = IdName.findById(bundle.getAssignments(), keyAsPath[3]);
-				logEntries.add(new LogEntry(stud, key, ass, meta));
+			for (int bunI = 0, assBundlesLength = studCtx.getCourse().getAssBundles().length; bunI < assBundlesLength; bunI++) {
+				final AssignmentBundle bundle = studCtx.getCourse().getAssBundles()[bunI];
+				for (Assignment ass : bundle.getAssignments()) {
+					for (Version ver : ass.getVersions()) {
+						if (Ctx.isVersionIncorrect(studCtx.getStudent(), ass, ver)) {
+							continue;
+						}
+
+						final Ctx assCtx = studCtx.extendBAV(bunI, ass, ver);
+
+						final long lastStampReport = reportDao.findLastStamp(assCtx);
+						if (lastStampReport > 0) {
+							final ReportMeta lastMeta = reportDao.findMetaByStamp(assCtx, lastStampReport);
+							logEntries.add(new LogEntry(stud, assCtx, ass, lastMeta));
+						}
+					}
+				}
 			}
 		}
 
 		Collections.sort(logEntries);
+		model.put("elw_ctx", ctx);
 		model.put("logEntries", logEntries);
 
 		return new ModelAndView("a/log", model);
 	}
 
 	public static class LogEntry implements Comparable<LogEntry> {
-		private final Assignment ass;
+		protected final Assignment ass;
 		protected final ReportMeta meta;
 		protected final Student student;
-		protected final String path;
+		protected final Ctx ctx;
 
-		public LogEntry(Student student, String path, Assignment ass, ReportMeta meta) {
+		public LogEntry(Student student, Ctx ctx, Assignment ass, ReportMeta meta) {
 			this.ass = ass;
 			this.meta = meta;
 			this.student = student;
-			this.path = path;
+			this.ctx = ctx;
 		}
 
 		public int compareTo(LogEntry o) {
@@ -412,8 +359,8 @@ public class AdminController extends MultiActionController implements WebSymbols
 			return student;
 		}
 
-		public String getPath() {
-			return path;
+		public Ctx getCtx() {
+			return ctx;
 		}
 
 		public Assignment getAss() {
@@ -428,84 +375,13 @@ public class AdminController extends MultiActionController implements WebSymbols
 			return null;
 		}
 
-		final String path = req.getParameter("path");
-		if (path == null || path.trim().length() == 0) {
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Path not set");
-			return null;
-		}
-		final String[] pathArr = path.split("--");
-		if (pathArr.length != 5) {
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Path syntax weirdo");
+		final Ctx ctx = Ctx.fromString(req.getParameter("elw_ctx")).resolve(enrollDao, groupDao, courseDao);
+		if (!ctx.resolved(Ctx.STATE_EGSCBAV)) {
+			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Path problem, please check the logs");
 			return null;
 		}
 
-		final String enrId = req.getParameter("id");
-		if (enrId == null || enrId.trim().length() == 0) {
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Enrollment ID not set");
-			return null;
-		}
-		final Enrollment enr = enrollDao.findEnrollment(enrId);
-		if (enr == null) {
-			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Enrollment " + enrId + " not found");
-			return null;
-		}
-		final Course course = courseDao.findCourse(enr.getCourseId());
-		if (course == null) {
-			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Course " + enr.getCourseId() + " not found");
-			return null;
-		}
-		final Group group = groupDao.findGroup(enr.getGroupId());
-		if (group == null) {
-			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Group " + enr.getGroupId() + " not found");
-			return null;
-		}
-
-		model.put("path", path);
-		model.put("id", enrId);
-		model.put("enr", enr);
-		model.put("group", group);
-		model.put("course", course);
-
-		final Student student = IdName.findById(group.getStudents(), pathArr[0]);
-		if (student == null) {
-			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Student " + pathArr[0] + " not found");
-			return null;
-		}
-
-		final int assBundleIndex = G4Parse.parse(pathArr[2], -1);
-		if (assBundleIndex < 0 || assBundleIndex >= course.getAssBundles().length) {
-			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Bundle " + pathArr[2] + " not found");
-			return null;
-		}
-
-		final AssignmentBundle bundle = course.getAssBundles()[assBundleIndex];
-		final Assignment ass = IdName.findById(bundle.getAssignments(), pathArr[3]);
-		if (ass == null) {
-			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Assignment " + pathArr[3] + " not found");
-			return null;
-		}
-		
-		Version ver = null;
-		for (Version v : ass.getVersions()) {
-			if (StudentController.isVersionIncorrect(student, ass, v)) {
-				continue;
-			}
-			ver = v;
-		}
-		if (ver == null) {
-			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Version not found");
-			return null;
-		}
-		model.put("student", student);
-		model.put("ass", ass);
-		model.put("ver", ver);
-
-		final AssignmentPath assPath = new AssignmentPath(
-				course.getId(), group.getId(), student,
-				assBundleIndex, ass.getId(), ver.getId()
-		);
-
-		final Map<Long, ReportMeta> reports = reportDao.findAllMetas(assPath);
+		final Map<Long, ReportMeta> reports = reportDao.findAllMetas(ctx);
 
 		final String reportStampStr = req.getParameter("stamp");
 		long reportStamp = G4Parse.parse(reportStampStr, -1L);
@@ -516,7 +392,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 		model.put("stamp", reportStamp);
 		model.put("reports", reports);
 
-		final Map<Long, CodeMeta> codes = codeDao.findAllMetas(assPath);
+		final Map<Long, CodeMeta> codes = codeDao.findAllMetas(ctx);
 		model.put("codes", codes);
 
 		final Map<Long, Score> codeScores = new TreeMap<Long, Score>();
@@ -524,8 +400,8 @@ public class AdminController extends MultiActionController implements WebSymbols
 		double bestRatio = 0;
 		long codeStamp = 0;
 
-		final Class classCodeDue = enr.getClasses()[ass.getScoring().getClassCodeDue()];
-		final TypeScoring codeScoring = bundle.getScoring().getBreakdown().get("code");
+		final Class classCodeDue = ctx.getEnr().getClasses()[ctx.getAss().getScoring().getClassCodeDue()];
+		final TypeScoring codeScoring = ctx.getBundle().getScoring().getBreakdown().get("code");
 		final Criteria[] codeAutos = codeScoring.resolveAuto();
 		for (Long cStamp : codes.keySet()) {
 			final CodeMeta meta = codes.get(cStamp);
@@ -544,13 +420,11 @@ public class AdminController extends MultiActionController implements WebSymbols
 		model.put("codeStamp", G4Parse.parse(req.getParameter("codeStamp"), codeStamp));
 
 		model.put("codeScores", codeScores);
-		model.put("scoring", bundle.getScoring());
-
 
 		final Score reportScore;
 		final ReportMeta reportMeta = reports.get(reportStamp);
-		final Class classReportDue = enr.getClasses()[ass.getScoring().getClassReportDue()];
-		final TypeScoring reportScoring = bundle.getScoring().getBreakdown().get("report");
+		final Class classReportDue = ctx.getEnr().getClasses()[ctx.getAss().getScoring().getClassReportDue()];
+		final TypeScoring reportScoring = ctx.getBundle().getScoring().getBreakdown().get("report");
 		final long scoreStamp = reportMeta.getScoreStamp();
 		if (scoreStamp == 0) {
 			final Score reportBaseScore;
@@ -562,14 +436,40 @@ public class AdminController extends MultiActionController implements WebSymbols
 				reportBaseScore = codeScore.copy();
 			}
 			reportScore = computeReportAuto(reportMeta, classReportDue, reportScoring.resolveAuto(), reportBaseScore);
-			computeReportDefault(bundle, reportScore);
+			computeReportDefault(ctx.getBundle(), reportScore);
 		} else {
-			reportScore = scoreDao.findScoreByStamp(assPath, scoreStamp);
+			reportScore = scoreDao.findScoreByStamp(ctx, scoreStamp);
 		}
 
 		model.put("score", reportScore);
+		model.put("elw_ctx", ctx);
 
 		return new ModelAndView("a/approve", model);
+	}
+
+	@RequestMapping(value = "approve", method = RequestMethod.POST)
+	public ModelAndView do_approvePost(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+		final HashMap<String, Object> model = auth(req, resp, "");
+		if (model == null) {
+			return null;
+		}
+
+		final Ctx ctx = Ctx.fromString(req.getParameter("elw_ctx")).resolve(enrollDao, groupDao, courseDao);
+		if (!ctx.resolved(Ctx.STATE_EGSCBAV)) {
+			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Path problem, please check the logs");
+			return null;
+		}
+
+		Message.addWarn(req, "Not yet implemented");
+
+		resp.sendRedirect(
+				"approve?" +
+						"elw_ctx=" + ctx + "&" +
+						"stamp=" + req.getParameter("stamp") + "&" +
+						"codeStamp=" + req.getParameter("codeStamp")
+		);
+
+		return null;
 	}
 
 	protected static void computeReportDefault(AssignmentBundle bundle, Score reportScore) {

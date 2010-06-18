@@ -1,4 +1,6 @@
-#* @vtlvariable name="courses" type="elw.vo.Course[]" *#
+#* @vtlvariable name="enrolls" type="elw.vo.Enrollment[]" *#
+#* @vtlvariable name="courses" type="java.util.Map<java.lang.String,elw.vo.Course>" *#
+#parse("t/elw.macro.vm")
 <html>
 <head>
 	<meta content="text/html; charset=UTF-8">
@@ -13,23 +15,20 @@
 	<div id="cred">#if($auth)[&nbsp;Admin&nbsp;]&nbsp;[&nbsp;<a href="logout">X</a>&nbsp;]#{else}[&nbsp;Anonymous&nbsp;]#end</div>
 	&nbsp;
 </div>
-<div id=messages>#foreach($m in $elw_messages)
-	<div class="$m.type">$m.message</div>
-#end
-</div>
+#elw_messages($elw_messages)
 <table cellspacing=0 cellpadding=0><tbody>
 #foreach($enr in $enrolls)
 	<tr class="header">
-		<td style="padding-left: 1em; padding-right: 0.25em;"><a href="enroll?id=$enr.id" title="id&nbsp;:&nbsp;${enr.id}">${enr.name}</a>&nbsp;</td>
-		<td style="padding-left: 0.25em; padding-right: 0.25em;"><a href="groups#$groups.get($enr.groupId).id">$groups.get($enr.groupId).name</a>&nbsp;<span class="extra">(id&nbsp;:&nbsp;$enr.groupId)</span></td>
-		<td style="padding-left: 0.25em; padding-right: 0.25em;"><a href="course?id=$courses.get($enr.courseId).id">$courses.get($enr.courseId).name</a>&nbsp;<span class="extra">(id&nbsp;:&nbsp;$enr.courseId)</span></td>
+		<td style="padding-left: 1em; padding-right: 0.25em;"><a href="enroll?elw_ctx=e--$enr.id" title="id : ${enr.id}">${enr.name}</a></td>
+		<td style="padding-left: 0.25em; padding-right: 0.25em;"><a href="groups#$enr.groupId" title="(id : $enr.groupId)">$groups.get($enr.groupId).name</a></td>
+		<td style="padding-left: 0.25em; padding-right: 0.25em;"><a href="course?elw_ctx=c--$enr.courseId" title="(id : $enr.courseId)">$courses.get($enr.courseId).name</a></td>
 		<td style="padding-left: 0.25em; padding-right: 0.25em;">
 			<form action="enroll" method="get" style="margin: 0; display: inline;">
-				<input type="hidden" name="id" value="$enr.id"/>
+				<input type="hidden" name="elw_ctx" value="e--$enr.id"/>
 				<input type="submit" value="Summary"/>
 			</form>
 			<form action="log" method="get" style="margin: 0; display: inline;">
-				<input type="hidden" name="id" value="$enr.id"/>
+				<input type="hidden" name="elw_ctx" value="e--$enr.id"/>
 				<input type="submit" value="Log"/>
 			</form>
 		</td>

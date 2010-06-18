@@ -1,22 +1,21 @@
-#* @vtlvariable name="courses" type="elw.vo.Course[]" *#
+#* @vtlvariable name="logEntries" type="elw.web.AdminController.LogEntry[]" *#
+#* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
+#parse("t/elw.macro.vm")
 <html>
 <head>
 	<meta content="text/html; charset=UTF-8">
-	<title>Group $group.name Report Uploads : ELW Admin</title>
+	<title>Group $elw_ctx.group.name Report Uploads : ELW Admin</title>
 	<link href="../css/elw.css" type="text/css" rel="stylesheet"/>
 	<script type="text/javascript" src="../js/jquery.js"></script>
 	<script type="text/javascript" src="../js/jquery.sha1.js"></script>
 </head>
 <body style="text-align: left;">
 <div id="header">
-	<div id="nav"><a href="index">Index</a> &gt; <a href="enrolls">Enrollments</a> &gt; <span style="font-weight: bold">Group $group.name Report</span></div>
+	<div id="nav"><a href="index">Index</a> &gt; <a href="enrolls">Enrollments</a> &gt; <span style="font-weight: bold">Group $elw_ctx.group.name Report</span></div>
 	<div id="cred">#if($auth)[&nbsp;Admin&nbsp;]&nbsp;[&nbsp;<a href="logout">X</a>&nbsp;]#{else}[&nbsp;Anonymous&nbsp;]#end</div>
 	&nbsp;
 </div>
-<div id=messages>#foreach($m in $elw_messages)
-	<div class="$m.type">$m.message</div>
-#end
-</div>
+#elw_messages($elw_messages)
 <table cellspacing="0"><tbody>
 <tr class="header">
 	<th style="padding-left: 0.25em; padding-right: 0.25em; text-align: center;">Time Stamp</th>
@@ -35,8 +34,7 @@
 		</td>
 		<td style="padding-left: 0.25em; padding-right: 0.25em;">
 			<form action="approve" method="get" style="margin: 0;">
-				<input type="hidden" name="id" value="$enr.id"/>
-				<input type="hidden" name="path" value="$e.path"/>
+				<input type="hidden" name="elw_ctx" value="$e.ctx"/>
 				<input type="hidden" name="stamp" value="$e.meta.uploadStamp"/>
 				<input type="submit" value="Approve"/>
 			</form>

@@ -3,6 +3,7 @@
 #* @vtlvariable name="elw_group" type="elw.vo.Group" *#
 #* @vtlvariable name="groupName" type="java.lang.String" *#
 #* @vtlvariable name="studentName" type="java.lang.String" *#
+#parse("t/elw.macro.vm")
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta content="text/html; charset=UTF-8">
@@ -17,10 +18,7 @@
 	<div id="cred">#if($auth)[&nbsp;Admin&nbsp;]&nbsp;[&nbsp;<a href="logout">X</a>&nbsp;]#{else}[&nbsp;Anonymous&nbsp;]#end</div>
 	&nbsp;
 </div>
-<div id=messages>#foreach($m in $elw_messages)
-	<div class="$m.type">$m.message</div>
-#end
-</div>
+#elw_messages($elw_messages)
 <div id=main>
 <div class="formArea" style="height: 5em;">
 	<form method="POST" action="loginPost" id="elw_formLoginPost">

@@ -1,11 +1,10 @@
 #* @vtlvariable name="elw_messages" type="elw.miniweb.Message[]" *#
-#* @vtlvariable name="elw_student" type="elw.vo.Student" *#
-#* @vtlvariable name="elw_group" type="elw.vo.Group" *#
-#* @vtlvariable name="verBean" type="elw.vo.Version" *#
+#* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
+#parse("t/elw.macro.vm")
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta content="text/html; charset=UTF-8">
-	<title>$verBean.name - Code : ELW Admin</title>
+	<title>$elw_ctx.ver.name - Code : ELW Admin</title>
 	<link href="../css/elw.css" type="text/css" rel="stylesheet"/>
 </head>
 <body>
@@ -13,32 +12,31 @@
 	<div id="nav">
 		<a href="index">Index</a> &gt;
 		<a href="courses">Courses</a> &gt;
-		<a href="course?id=${course.id}">${course.name}</a> &gt;
-		<span style="font-weight: bold">$verBean.name - Code</span>
+		<a href="course?elw_ctx=c--${elw_ctx.course.id}">${elw_ctx.course.name}</a> &gt;
+		<span style="font-weight: bold">$elw_ctx.ver.name - Code</span>
 	</div>
 	<div id="cred">#if($auth)[&nbsp;Admin&nbsp;]&nbsp;[&nbsp;<a href="logout">X</a>&nbsp;]#{else}[&nbsp;Anonymous&nbsp;]#end</div>
 	&nbsp;
 </div>
-<div id=messages>#foreach($m in $elw_messages)
-	<div class="$m.type">$m.message</div>
-#end
-</div>
+#elw_messages($elw_messages)
 <div id=main>
 <div style="text-align:center;">	<object classid="clsid:8AD9C840-044E-11D1-B3E9-00805F499D93" width="800" height="600">
 		<param name="type" value="application/x-java-applet;version=1.5"/>
 		<param name="code" value="elw.dp.ui.Applet"/>
 	##        <param name="codebase" value = "${baseUrl}"/>
 		<param name="archive" value="../code#if($cacheBustingToken)/$cacheBustingToken#end/datapath-gui-1.3-full.jar"/>
-		<param name="ver" value="$ver"/>
+		<param name="ver" value="$verJson"/>
+		<param name="elw_ctx" value="$elw_ctx"/>
+		<param name="upHeader" value="$upHeader"/>
 		<comment>
 			<embed width="800" height="600"
 						 type="application/x-java-applet;version=1.5" pluginspage="http://java.sun.com/j2se/1.5.0/download.html"
 						 code="elw.dp.ui.Applet"
 			##                        codebase="${baseUrl}"
 						 archive="../code#if($cacheBustingToken)/$cacheBustingToken#end/datapath-gui-1.3-full.jar"
-						 ver="$ver"
+						 ver="$verJson"
 						 upHeader="$upHeader"
-						 upPath="$upPath"
+						 elw_ctx="$elw_ctx"
 				<noembed>
 					No Java Support.
 				</noembed>

@@ -1,8 +1,8 @@
 #* @vtlvariable name="elw_messages" type="elw.miniweb.Message[]" *#
-#* @vtlvariable name="elw_student" type="elw.vo.Student" *#
-#* @vtlvariable name="elw_group" type="elw.vo.Group" *#
+#* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
 #* @vtlvariable name="groupName" type="java.lang.String" *#
 #* @vtlvariable name="studentName" type="java.lang.String" *#
+#parse("t/elw.macro.vm")
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta content="text/html; charset=UTF-8">
@@ -11,15 +11,11 @@
 </head>
 <body>
 <div id="header">
-#if($elw_group)#if($elw_student)#set($auth="true") #end #end
-	<div id="nav">#if($auth)#end</div>
-	&nbsp;
-	<div id="cred">#if($auth)[&nbsp;$elw_group.name&nbsp;$elw_student.name&nbsp;]&nbsp;[&nbsp;<a href="logout">X</a>&nbsp;]#{else}[&nbsp;Anonymous&nbsp;]#end</div>
+	<div id="nav"><span style="font-weight: bold">Login</span></div>
+	#elw_cred_stud($elw_ctx)
+	<div style="clear: both;">&nbsp;</div>
 </div>
-<div id=messages>#foreach($m in $elw_messages)
-	<div class="$m.type">$m.message</div>
-#end
-</div>
+#elw_messages($elw_messages)
 <div id=main>
 	<div class="formArea" style="height: 7em;">
 		<form method="POST" action="loginPost">

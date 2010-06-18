@@ -1,7 +1,8 @@
 #* @vtlvariable name="elw_messages" type="elw.miniweb.Message[]" *#
-#* @vtlvariable name="elw_student" type="elw.vo.Student" *#
-#* @vtlvariable name="elw_group" type="elw.vo.Group" *#
-#* @vtlvariable name="courses" type="elw.vo.Course[]" *#
+#* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
+#* @vtlvariable name="enrolls" type="elw.vo.Enrollment[]" *#
+#* @vtlvariable name="courses" type="java.util.Map<java.lang.String,elw.vo.Course>" *#
+#parse("t/elw.macro.vm")
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta content="text/html; charset=UTF-8">
@@ -11,16 +12,13 @@
 <body>
 <div id="header">
 	<div id="nav"><span style="font-weight: bold">My Courses</span></div>
-	&nbsp;
-	<div id="cred">[&nbsp;$elw_group.name&nbsp;$elw_student.name&nbsp;]&nbsp;[&nbsp;<a href="logout">X</a>&nbsp;]</div>
+	#elw_cred_stud($elw_ctx)
+	<div style="clear: both;">&nbsp;</div>
 </div>
-<div id=messages>#foreach($m in $elw_messages)
-	<div class="$m.type">$m.message</div>
-#end
-</div>
+#elw_messages($elw_messages)
 <div id=main>
-	#foreach($course in $courses)
-	<a href="course?id=${course.id}">${course.name}</a>
+	#foreach($enr in $enrolls)
+	<a href="course?ctx=${enr.id}">${courses.get($enr.courseId).name}</a>
 	#end
 </div>
 </body>

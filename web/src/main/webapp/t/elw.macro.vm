@@ -1,0 +1,19 @@
+#macro(elw_messages $elw_messages)
+<div id=messages>#foreach($m in $elw_messages)
+	<div class="$m.type">$m.message</div>
+#end</div>
+#end
+
+#macro (elw_cred_stud $elw_ctx)
+#if($elw_ctx.group)#if($elw_ctx.student)#set($auth="true") #end #end
+<div id="cred">
+	#if($auth)
+		[&nbsp;$elw_ctx.group.name&nbsp;$elw_ctx.student.name&nbsp;]&nbsp;
+		<form method="GET" style="display:inline; margin: 0 0.25em;" action="logout">
+			<input type="Submit" value="X" style="margin: 0;"/>
+		</form>
+	#else
+		[&nbsp;Anonymous&nbsp;]
+	#end
+</div>
+#end

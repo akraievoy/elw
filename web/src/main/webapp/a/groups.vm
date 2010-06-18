@@ -1,4 +1,5 @@
 #* @vtlvariable name="courses" type="elw.vo.Course[]" *#
+#parse("t/elw.macro.vm")
 <html>
 <head>
 	<meta content="text/html; charset=UTF-8">
@@ -13,20 +14,17 @@
 	<div id="cred">#if($auth)[&nbsp;Admin&nbsp;]&nbsp;[&nbsp;<a href="logout">X</a>&nbsp;]#{else}[&nbsp;Anonymous&nbsp;]#end</div>
 	&nbsp;
 </div>
-<div id=messages>#foreach($m in $elw_messages)
-	<div class="$m.type">$m.message</div>
-#end
-</div>
+#elw_messages($elw_messages)
 <table cellspacing="0"><tbody>
 #foreach($group in $groups)
 <tr class="header">
-	<td style="padding-left: 1em; padding-right: 0.25em;"><a name="${group.id}"></a>${group.name}&nbsp;<span class="extra">(id&nbsp;:&nbsp;${group.id})</span></td>
+	<td style="padding-left: 1em; padding-right: 0.25em;"><a name="${group.id}"><span title="(id : ${group.id})">${group.name}</a></span></td>
 	<td style="padding-left: 0.25em; padding-right: 0.25em;"></td>
 	<td style="padding-left: 0.25em; padding-right: 0.25em;"></td>
 </tr>
 	#foreach($stud in $group.students)
 	<tr >
-		<td style="padding-left: 2em; padding-right: 0.25em;">$stud.name &nbsp;<span class="extra">(id&nbsp;:&nbsp;${stud.id})</td>
+		<td style="padding-left: 2em; padding-right: 0.25em;"><span title="(id : ${stud.id})">$stud.name</span></td>
 		<td style="padding-left: 0.25em; padding-right: 0.25em;"></td>
 		<td style="padding-left: 0.25em; padding-right: 0.25em;"></td>
 	</tr>

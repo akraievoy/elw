@@ -28,8 +28,8 @@ public class CodeDao {
 		this.mapper = mapper;
 	}
 
-	public void createCode(AssignmentPath assignmentPath, BufferedReader codeReader, String remoteAddr) throws IOException {
-		final File assDir = assignmentPath.getCodeRoot(uploadsDir);
+	public void createCode(Ctx ctx, BufferedReader codeReader, String remoteAddr) throws IOException {
+		final File assDir = ctx.getCodeRoot(uploadsDir);
 
 		if (!assDir.isDirectory() && !assDir.mkdirs()) {
 			throw new IOException("failed to create dir: " + assDir.getPath());
@@ -63,8 +63,8 @@ public class CodeDao {
 		}
 	}
 
-	public long[] findAllStamps(AssignmentPath assignmentPath) {
-		final File assDir = assignmentPath.getCodeRoot(uploadsDir);
+	public long[] findAllStamps(Ctx ctx) {
+		final File assDir = ctx.getCodeRoot(uploadsDir);
 
 		if (!assDir.isDirectory()) {
 			return new long[0];
@@ -95,12 +95,12 @@ public class CodeDao {
 		return stamps.toNativeArray();
 	}
 
-	protected void resolveNames(AssignmentPath path, final Collection<CodeMeta> reportMetas) {
+	protected void resolveNames(Ctx path, final Collection<CodeMeta> reportMetas) {
 		for (Iterator<CodeMeta> metaIt = reportMetas.iterator(); metaIt.hasNext();) {
 			CodeMeta codeMeta = metaIt.next();
 			final String fileName =
 					path.getStudent().getName().replaceAll("\\s+", "_") + "--" +
-					path.getAssId() + "_" + path.getVerId() + "--" +
+					path.getAss().getId() + "_" + path.getVer().getId() + "--" +
 					ReportMeta.getFileNameUploadStamp(codeMeta.getUploadStamp()) +
 					".txt";
 
@@ -108,8 +108,8 @@ public class CodeDao {
 		}
 	}
 
-	public Map<Long, CodeMeta> findAllMetas(AssignmentPath assignmentPath) {
-		final File assDir = assignmentPath.getCodeRoot(uploadsDir);
+	public Map<Long, CodeMeta> findAllMetas(Ctx ctx) {
+		final File assDir = ctx.getCodeRoot(uploadsDir);
 
 		if (!assDir.isDirectory()) {
 			return Collections.emptyMap();
@@ -167,13 +167,13 @@ public class CodeDao {
 			}
 		}
 
-		resolveNames(assignmentPath, result.values());
+		resolveNames(ctx, result.values());
 
 		return result;
 	}
 
-	public CodeMeta findMetaByStamp(AssignmentPath assignmentPath, long stamp) {
-		final File assDir = assignmentPath.getCodeRoot(uploadsDir);
+	public CodeMeta findMetaByStamp(Ctx ctx, long stamp) {
+		final File assDir = ctx.getCodeRoot(uploadsDir);
 
 		if (!assDir.isDirectory()) {
 			return new CodeMeta();
@@ -216,7 +216,7 @@ public class CodeDao {
 		final CodeMeta defaultMeta = new CodeMeta();
 		defaultMeta.setTotalUploads(totalUploads);
 		defaultMeta.setUploadStamp(stamp);
-		resolveNames(assignmentPath, Collections.singletonList(defaultMeta));
+		resolveNames(ctx, Collections.singletonList(defaultMeta));
 		if (!metaExists) {
 			return defaultMeta;
 		}
@@ -227,7 +227,7 @@ public class CodeDao {
 			final InputStreamReader in = new InputStreamReader(fis, "UTF-8");
 			final CodeMeta codeMeta = mapper.readValue(in, CodeMeta.class);
 			codeMeta.setTotalUploads(totalUploads);
-			resolveNames(assignmentPath, Collections.singletonList(codeMeta));
+			resolveNames(ctx, Collections.singletonList(codeMeta));
 			return codeMeta;
 		} catch (IOException e) {
 			log.warn("failed to read meta: '{}' / '{}'", assDir.getPath(), fMeta.getName());
@@ -245,8 +245,8 @@ public class CodeDao {
 		return defaultMeta;
 	}
 
-	public void updateMeta(AssignmentPath assignmentPath, long stamp, CodeMeta meta) {
-		final File assDir = assignmentPath.getCodeRoot(uploadsDir);
+	public void updateMeta(Ctx ctx, long stamp, CodeMeta meta) {
+		final File assDir = ctx.getCodeRoot(uploadsDir);
 		final File metaFile = new File(assDir, stamp + META_POSTFIX);
 
 		FileOutputStream fos = null;
@@ -270,22 +270,22 @@ public class CodeDao {
 		}
 	}
 
-	public long findLastStamp(AssignmentPath assignmentPath) {
-		final long[] stamps = findAllStamps(assignmentPath);
+	public long findLastStamp(Ctx ctx) {
+		final long[] stamps = findAllStamps(ctx);
 
 		return stamps.length > 0 ? stamps[stamps.length - 1] : -1;
 	}
 
-	public String[] findLastCode(AssignmentPath assignmentPath) throws IOException {
-		return findCodeByStamp(assignmentPath, findLastStamp(assignmentPath));
+	public String[] findLastCode(Ctx ctx) throws IOException {
+		return findCodeByStamp(ctx, findLastStamp(ctx));
 	}
 
-	public String[] findCodeByStamp(AssignmentPath assignmentPath, long stamp) throws IOException {
+	public String[] findCodeByStamp(Ctx ctx, long stamp) throws IOException {
 		if (stamp < 0) {
 			return CODE_DEFAULT;
 		}
 
-		final File assDir = assignmentPath.getCodeRoot(uploadsDir);
+		final File assDir = ctx.getCodeRoot(uploadsDir);
 
 		if (!assDir.isDirectory()) {
 			return CODE_DEFAULT;

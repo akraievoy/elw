@@ -1,26 +1,27 @@
 #* @vtlvariable name="courses" type="elw.vo.Course[]" *#
+#* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
+#* @vtlvariable name="codeMetas" type="java.util.Map<java.lang.String,elw.vo.CodeMeta>" *#
+#* @vtlvariable name="reportMetas" type="java.util.Map<java.lang.String,elw.vo.ReportMeta>" *#
+#parse("t/elw.macro.vm")
 <html>
 <head>
 	<meta content="text/html; charset=UTF-8">
-	<title>Group $group.name Status : ELW Admin</title>
+	<title>Group $elw_ctx.group.name Status : ELW Admin</title>
 	<link href="../css/elw.css" type="text/css" rel="stylesheet"/>
 	<script type="text/javascript" src="../js/jquery.js"></script>
 	<script type="text/javascript" src="../js/jquery.sha1.js"></script>
 </head>
 <body style="text-align: left;">
 <div id="header">
-	<div id="nav"><a href="index">Index</a> &gt; <a href="enrolls">Enrollments</a> &gt; <span style="font-weight: bold">Group $group.name Status</span></div>
+	<div id="nav"><a href="index">Index</a> &gt; <a href="enrolls">Enrollments</a> &gt; <span style="font-weight: bold">Group $elw_ctx.group.name Status</span></div>
 	<div id="cred">#if($auth)[&nbsp;Admin&nbsp;]&nbsp;[&nbsp;<a href="logout">X</a>&nbsp;]#{else}[&nbsp;Anonymous&nbsp;]#end</div>
 	&nbsp;
 </div>
-<div id=messages>#foreach($m in $elw_messages)
-	<div class="$m.type">$m.message</div>
-#end
-</div>
+#elw_messages($elw_messages)
 <table cellspacing="0"><tbody>
 <tr class="header">
-	<td style="padding-left: 1em; padding-right: 0.25em;"><a name="${group.id}"></a>${group.name}&nbsp;<span class="extra">(id&nbsp;:&nbsp;${group.id})</span></td>
-#foreach($assBundle in $course.assBundles)#set($bunI = $velocityCount - 1)
+	<td style="padding-left: 1em; padding-right: 0.25em;"><a name="${elw_ctx.group.id}" title="id : ${elw_ctx.group.id}">${elw_ctx.group.name}</a></td>
+#foreach($assBundle in $elw_ctx.course.assBundles)#set($bunI = $velocityCount - 1)
 	#foreach($ass in $assBundle.assignments)#set($assI = $velocityCount)
 		#if($ass.id && !$ass.shared)
 				<td style="padding-left: 0.25em; padding-right: 0.25em; text-align: center;" colspan="2"><span title="$ass.name">$ass.id</span></td>
@@ -28,19 +29,19 @@
 	#end
 #end
 </tr>
-#foreach($stud in $group.students)
+#foreach($stud in $elw_ctx.group.students)
 	<tr >
 		<td style="padding-left: 2em; padding-right: 0.25em;">$stud.name &nbsp;<span class="extra">(id&nbsp;:&nbsp;${stud.id})</td>
-	#foreach($assBundle in $course.assBundles)#set($bunI = $velocityCount - 1)
+	#foreach($assBundle in $elw_ctx.course.assBundles)#set($bunI = $velocityCount - 1)
 		#foreach($ass in $assBundle.assignments)#set($assI = $velocityCount)
 			#if($ass.id && !$ass.shared)
 				#set($verIdx = $stud.idAsInt % $ass.versions.size())
 				#set($ver = $ass.versions.get($verIdx))
-				#set($path = "${stud.id}--${course.id}--${bunI}--${ass.id}--${ver.id}")
+				#set($path = "$elw_ctx.extendStudent($stud).extendBAV(${bunI}, ${ass}, ${ver})")
 				#set($codeMeta = $codeMetas.get($path))
 				#set($reportMeta = $reportMetas.get($path))
-				#set($codeDue = $enr.classes.get($ass.scoring.classCodeDue).passed && ($codeMeta.totalUploads == 0 || $codeMeta.passRatio == 0))
-				#set($reportDue = $enr.classes.get($ass.scoring.reportCodeDue).passed && ($reportMeta.totalUploads == 0 ))
+				#set($codeDue = $elw_ctx.enr.classes.get($ass.scoring.classCodeDue).passed && ($codeMeta.totalUploads == 0 || $codeMeta.passRatio == 0))
+				#set($reportDue = $elw_ctx.enr.classes.get($ass.scoring.reportCodeDue).passed && ($reportMeta.totalUploads == 0 ))
 		<td style="padding-left: 0.25em; padding-right: 0.25em; #if($codeDue)background-color: #FFEEEE;#end">
 				#if($codeMeta.totalUploads > 0)
 					<span title="$codeMeta.niceUploadStamp">$codeMeta.briefUploadStamp</span><br/>

@@ -1,4 +1,6 @@
 #* @vtlvariable name="elw_messages" type="elw.miniweb.Message[]" *#
+#* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
+#parse("t/elw.macro.vm")
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta content="text/html; charset=UTF-8">
@@ -9,31 +11,31 @@
 <div id="header">
 	<div id="nav">
 		<a href="index">Index</a> &gt; <a href="enrolls">Enrollments</a> &gt;
-		<a href="log?id=$enr.id">Group $group.name Reports</a> &gt;
+		<a href="log?id=$enr.id">Group $elw_ctx.group.name Reports</a> &gt;
 		<span style="font-weight: bold">Approval</span>
 	</div>
 	<div id="cred">#if($auth)[&nbsp;Admin&nbsp;]&nbsp;[&nbsp;<a href="logout">X</a>&nbsp;]#{else}[&nbsp;Anonymous&nbsp;]#end</div>
 	&nbsp;
 </div>
-<div id=messages>#foreach($m in $elw_messages)
-	<div class="$m.type">$m.message</div>
-#end
-</div>
+#elw_messages($elw_messages)
 <div id=main>
-	<h3><span title="$student.id">$student.name</span> <span title="$ass.id">$ass.name</span> <span title="$ver.id">$ver.name</span></h3>
+	<h3><span title="$elw_ctx.student.id">$elw_ctx.student.name</span> <span title="$elw_ctx.ass.id">$elw_ctx.ass.name</span> <span title="$elw_ctx.ver.id">$elw_ctx.ver.name</span></h3>
 	<div class="formArea" style="height: 22em;">
 		<form method="POST" action="approve">
-			#foreach($cri in $scoring.criterias)
+			#foreach($cri in $elw_ctx.bundle.scoring.criterias)
 				<div class="formLabel" style="width:24em;">$cri.name:</div>
 				<div class="formField" style="width:6em;">
-					<select name="$cri.id">
+					<select name="cri--$cri.id">
 						#foreach($pow in $cri.pows)
 							<option value="$pow" #if($score.isSetTo($cri.id, $pow))selected#end>$pow</option>
 						#end
 					</select>
 				</div>
 			#end
-			<div class="formButtons"><input type="submit" value="Approve"/></div>
+			<input type="hidden" name="elw_ctx" value="$elw_ctx"/>
+			<input type="hidden" name="stamp" value="$stamp"/>
+			<input type="hidden" name="codeStamp" value="$codeStamp"/>
+			<div class="formButtons"><input type="submit" name="action" value="Decline"/>&nbsp;&nbsp;&nbsp;<input type="submit" name="action" value="Approve"/></div>
 		</form>
 	</div>
 	<div style="margin: 1em auto; width: 60em;">
@@ -49,7 +51,7 @@
 				</tr>
 #foreach($c in $codes.values())
 				<tr>
-					<td style="padding: 0 0.25em; text-align: center;">#if($c.uploadStamp == $codeStamp)<span style="font-weight: bold;">*</span>#else<a href="approve?path=$path&id=$id&codeStamp=$c.uploadStamp&stamp=$stamp">~</a>#end </td>
+					<td style="padding: 0 0.25em; text-align: center;">#if($c.uploadStamp == $codeStamp)<span style="font-weight: bold;">*</span>#else<a href="approve?elw_ctx=$elw_ctx&codeStamp=$c.uploadStamp&stamp=$stamp">~</a>#end </td>
 					<td style="padding: 0 0.25em;"><span title="$c.niceUploadStamp">$c.briefUploadStamp</span></td>
 					<td style="padding: 0 0.25em;">
 						#if($c.validatorStamp > 0)
@@ -77,7 +79,7 @@
 						#else
 						#end
 					</td>
-					<td style="padding: 0 0.25em;">[&nbsp;<a href="codeDl/$c.fileName?path=$upPath&stamp=$c.uploadStamp" target="_blank">Download</a>&nbsp;]</td>
+					<td style="padding: 0 0.25em;">[&nbsp;<a href="../s/codeDl/$c.fileName?elw_ctx=$elw_ctx&stamp=$c.uploadStamp" target="_blank">Download</a>&nbsp;]</td>
 				</tr>
 #end
 			</tbody></table>
@@ -93,10 +95,10 @@
 				</tr>
 #foreach($rep in $reports.values())
 				<tr>
-					<td style="padding: 0 0.25em; text-align: center;">#if($rep.uploadStamp == $stamp)<span style="font-weight: bold;">*</span>#else<a href="approve?path=$path&id=$id&stamp=$rep.uploadStamp&codeStamp=$codeStamp">~</a>#end </td>
+					<td style="padding: 0 0.25em; text-align: center;">#if($rep.uploadStamp == $stamp)<span style="font-weight: bold;">*</span>#else<a href="approve?elw_ctx=$elw_ctx&stamp=$rep.uploadStamp&codeStamp=$codeStamp">~</a>#end </td>
 					<td style="padding: 0 0.25em;"><span title="$rep.niceUploadStamp">$rep.briefUploadStamp</span></td>
 					<td style="padding: 0 0.25em;">&nbsp;</td>
-					<td style="padding: 0 0.25em;">[&nbsp;<a href="reportDl/$rep.fileName?path=$upPath&stamp=$rep.uploadStamp" target="_blank">Download</a>&nbsp;]</td>
+					<td style="padding: 0 0.25em;">[&nbsp;<a href="../s/reportDl/$rep.fileName?elw_ctx=$elw_ctx&stamp=$rep.uploadStamp" target="_blank">Download</a>&nbsp;]</td>
 				</tr>
 #end
 			</tbody></table>

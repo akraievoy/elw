@@ -44,7 +44,7 @@ public class Controller {
 	protected Version selectedTask;
 	protected String uploadUrl;
 	protected String uploadHeader;
-	protected String uploadPath;
+	protected String elwCtx;
 
 	protected final DefaultComboBoxModel testComboModel = new DefaultComboBoxModel();
 	//	app data (compile/test/run cycle)
@@ -80,8 +80,8 @@ public class Controller {
 		this.uploadHeader = uploadHeader;
 	}
 
-	public void setUploadPath(String uploadPath) {
-		this.uploadPath = uploadPath;
+	public void setElwCtx(String elwCtx) {
+		this.elwCtx = elwCtx;
 	}
 
 	public DataPathForm getView() {
@@ -212,8 +212,8 @@ public class Controller {
 			Result.failure(log, resRef, "Upload URL not set");
 			return;
 		}
-		if (uploadPath == null || uploadPath.length() == 0) {
-			Result.failure(log, resRef, "Upload Path not set");
+		if (elwCtx == null || elwCtx.length() == 0) {
+			Result.failure(log, resRef, "elw_ctx not set");
 			return;
 		}
 
@@ -224,7 +224,7 @@ public class Controller {
 		try {
 			final byte[] textBytes = sourceText.getBytes("UTF-8");
 
-			final HttpURLConnection connection = (HttpURLConnection) new URL(uploadUrl+"?path="+uploadPath).openConnection();
+			final HttpURLConnection connection = (HttpURLConnection) new URL(uploadUrl+"?elw_ctx="+ elwCtx).openConnection();
 			connection.setFixedLengthStreamingMode(textBytes.length);
 			connection.setRequestMethod("POST");
 			connection.setDoOutput(true);

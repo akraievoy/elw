@@ -25,8 +25,8 @@ public class ScoreDao {
 		this.mapper = mapper;
 	}
 
-	public void createScore(AssignmentPath assignmentPath, Score score) throws IOException {
-		final File assDir = assignmentPath.getScoreRoot(uploadsDir);
+	public void createScore(Ctx ctx, Score score) throws IOException {
+		final File assDir = ctx.getScoreRoot(uploadsDir);
 
 		if (!assDir.isDirectory() && !assDir.mkdirs()) {
 			throw new IOException("failed to create dir: " + assDir.getPath());
@@ -55,8 +55,8 @@ public class ScoreDao {
 		}
 	}
 
-	public long[] findAllStamps(AssignmentPath assignmentPath) {
-		final File assDir = assignmentPath.getScoreRoot(uploadsDir);
+	public long[] findAllStamps(Ctx ctx) {
+		final File assDir = ctx.getScoreRoot(uploadsDir);
 
 		if (!assDir.isDirectory()) {
 			return new long[0];
@@ -88,8 +88,8 @@ public class ScoreDao {
 		return stamps.toNativeArray();
 	}
 
-	public Map<Long, Score> findAllScores(AssignmentPath assignmentPath) {
-		final File assDir = assignmentPath.getScoreRoot(uploadsDir);
+	public Map<Long, Score> findAllScores(Ctx ctx) {
+		final File assDir = ctx.getScoreRoot(uploadsDir);
 
 		if (!assDir.isDirectory()) {
 			return Collections.emptyMap();
@@ -151,8 +151,8 @@ public class ScoreDao {
 		return result;
 	}
 
-	public Score findScoreByStamp(AssignmentPath assignmentPath, long stamp) {
-		final File assDir = assignmentPath.getScoreRoot(uploadsDir);
+	public Score findScoreByStamp(Ctx ctx, long stamp) {
+		final File assDir = ctx.getScoreRoot(uploadsDir);
 
 		if (!assDir.isDirectory()) {
 			return null;
@@ -192,13 +192,13 @@ public class ScoreDao {
 		return null;
 	}
 
-	public long findLastStamp(AssignmentPath assignmentPath) {
-		final long[] stamps = findAllStamps(assignmentPath);
+	public long findLastStamp(Ctx ctx) {
+		final long[] stamps = findAllStamps(ctx);
 
 		return stamps.length > 0 ? stamps[stamps.length - 1] : -1;
 	}
 
-	public Score findLastScore(AssignmentPath assignmentPath) throws IOException {
-		return findScoreByStamp(assignmentPath, findLastStamp(assignmentPath));
+	public Score findLastScore(Ctx ctx) throws IOException {
+		return findScoreByStamp(ctx, findLastStamp(ctx));
 	}
 }

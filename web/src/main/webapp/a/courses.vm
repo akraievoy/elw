@@ -1,4 +1,5 @@
 #* @vtlvariable name="courses" type="elw.vo.Course[]" *#
+#parse("t/elw.macro.vm")
 <html>
 <head>
 	<meta content="text/html; charset=UTF-8">
@@ -13,16 +14,13 @@
 	<div id="cred">#if($auth)[&nbsp;Admin&nbsp;]&nbsp;[&nbsp;<a href="logout">X</a>&nbsp;]#{else}[&nbsp;Anonymous&nbsp;]#end</div>
 	&nbsp;
 </div>
-<div id=messages>#foreach($m in $elw_messages)
-	<div class="$m.type">$m.message</div>
-#end
-</div>
+#elw_messages($elw_messages)
 <table><tbody>
 #foreach($course in $courses)
 <tr>
 	<td style="padding-left: 2em;">${course.name}</td>
-	<td style="padding-left: 1em; padding-right: 1em;">[&nbsp;<a href="course?id=${course.id}">Structure</a>&nbsp;]</td>
-	<td style="padding-left: 1em; padding-right: 1em;">[&nbsp;<a href="course?id=${course.id}&test=true">Structure + Test</a>&nbsp;]</td>
+	<td style="padding-left: 1em; padding-right: 1em;">[&nbsp;<a href="course?elw_ctx=c--${course.id}">Structure</a>&nbsp;]</td>
+	<td style="padding-left: 1em; padding-right: 1em;">[&nbsp;<a href="course?elw_ctx=c--${course.id}&test=true">Structure + Test</a>&nbsp;]</td>
 </tr>
 #end
 </tbody></table>
