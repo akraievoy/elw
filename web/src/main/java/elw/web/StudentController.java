@@ -56,7 +56,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 		//	admin impersonation
 		final Boolean admin = (Boolean) session.getAttribute(S_ADMIN);
 		if (Boolean.TRUE.equals(admin)) {
-			if (ctx.resolve(enrollDao, groupDao, courseDao).resolved(Ctx.STATE_GS)) {
+			if (!ctx.resolve(enrollDao, groupDao, courseDao).resolved(Ctx.STATE_GS)) {
 				resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "context path problem, please check the logs");
 				return null;
 			}
