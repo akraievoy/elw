@@ -123,6 +123,7 @@ public class CodeDao {
 			return Collections.emptyMap();
 		}
 
+		final int totalUploads = countTotalUploads(assDir, fileNames);
 		final TreeMap<Long, CodeMeta> result = new TreeMap<Long, CodeMeta>();
 		for (String fileName : fileNames) {
 			if (fileName.endsWith(META_POSTFIX)) {
@@ -142,7 +143,10 @@ public class CodeDao {
 
 			final File metaFile = new File(assDir, fileName + META_POSTFIX);
 			if (!metaFile.isFile()) {
-				result.put(parsed, null);
+				final CodeMeta defaultMeta = new CodeMeta();
+				defaultMeta.setTotalUploads(totalUploads);
+				defaultMeta.setUploadStamp(parsed);
+				result.put(parsed, defaultMeta);
 				continue;
 			}
 
@@ -151,7 +155,7 @@ public class CodeDao {
 				fis = new FileInputStream(metaFile);
 				final InputStreamReader in = new InputStreamReader(fis, "UTF-8");
 				final CodeMeta codeMeta = mapper.readValue(in, CodeMeta.class);
-
+				codeMeta.setTotalUploads(totalUploads);
 				result.put(parsed, codeMeta);
 			} catch (IOException e) {
 				log.warn("failed to read meta: '{}' / '{}'", assDir.getPath(), fileName);
@@ -194,20 +198,7 @@ public class CodeDao {
 			return new CodeMeta();
 		}
 
-		int totalUploads = 0;
-		for (String fileName : fileNames) {
-			if (fileName.endsWith(META_POSTFIX)) {
-				continue;
-			}
-
-			final long parsed = G4Parse.parse(fileName, -1L);
-
-			if (parsed < 0) {
-				log.warn("stamp parse error: '{}' / '{}'", assDir.getPath(), fileName);
-				continue;
-			}
-			totalUploads++;
-		}
+		final int totalUploads = countTotalUploads(assDir, fileNames);
 
 		if (!codeExists) {
 			log.warn("querying non-existent upload: '{}' / '{}'", assDir.getPath(), stamp);
@@ -243,6 +234,24 @@ public class CodeDao {
 		}
 
 		return defaultMeta;
+	}
+
+	protected int countTotalUploads(File assDir, String[] fileNames) {
+		int totalUploads = 0;
+		for (String fileName : fileNames) {
+			if (fileName.endsWith(META_POSTFIX)) {
+				continue;
+			}
+
+			final long parsed = G4Parse.parse(fileName, -1L);
+
+			if (parsed < 0) {
+				log.warn("stamp parse error: '{}' / '{}'", assDir.getPath(), fileName);
+				continue;
+			}
+			totalUploads++;
+		}
+		return totalUploads;
 	}
 
 	public void updateMeta(Ctx ctx, long stamp, CodeMeta meta) {

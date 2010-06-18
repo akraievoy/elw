@@ -107,6 +107,7 @@ public class ReportDao {
 			return Collections.emptyMap();
 		}
 
+		final int totalUploads = countTotalUploads(assDir, fileNames);
 		final TreeMap<Long, ReportMeta> result = new TreeMap<Long, ReportMeta>();
 		for (String fileName : fileNames) {
 			if (fileName.endsWith(META_POSTFIX)) {
@@ -128,6 +129,7 @@ public class ReportDao {
 			if (!metaFile.isFile()) {
 				final ReportMeta reportMeta = new ReportMeta();
 				reportMeta.setUploadStamp(parsed);
+				reportMeta.setTotalUploads(totalUploads);
 				result.put(parsed, reportMeta);
 				continue;
 			}
@@ -137,7 +139,7 @@ public class ReportDao {
 				fis = new FileInputStream(metaFile);
 				final InputStreamReader in = new InputStreamReader(fis, "UTF-8");
 				final ReportMeta reportMeta = mapper.readValue(in, ReportMeta.class);
-
+				reportMeta.setTotalUploads(totalUploads);
 				result.put(parsed, reportMeta);
 			} catch (IOException e) {
 				log.warn("failed to read meta: '{}' / '{}'", assDir.getPath(), fileName);
@@ -180,20 +182,7 @@ public class ReportDao {
 			return new ReportMeta();
 		}
 
-		int totalUploads = 0;
-		for (String fileName : fileNames) {
-			if (fileName.endsWith(META_POSTFIX)) {
-				continue;
-			}
-
-			final long parsed = G4Parse.parse(fileName, -1L);
-
-			if (parsed < 0) {
-				log.warn("stamp parse error: '{}' / '{}'", assDir.getPath(), fileName);
-				continue;
-			}
-			totalUploads++;
-		}
+		final int totalUploads = countTotalUploads(assDir, fileNames);
 
 		if (!reportExists) {
 			log.warn("querying non-existent upload: '{}' / '{}'", assDir.getPath(), stamp);
@@ -230,6 +219,24 @@ public class ReportDao {
 		}
 
 		return defaultMeta;
+	}
+
+	protected int countTotalUploads(File assDir, String[] fileNames) {
+		int totalUploads = 0;
+		for (String fileName : fileNames) {
+			if (fileName.endsWith(META_POSTFIX)) {
+				continue;
+			}
+
+			final long parsed = G4Parse.parse(fileName, -1L);
+
+			if (parsed < 0) {
+				log.warn("stamp parse error: '{}' / '{}'", assDir.getPath(), fileName);
+				continue;
+			}
+			totalUploads++;
+		}
+		return totalUploads;
 	}
 
 	public void updateMeta(Ctx ctx, long stamp, ReportMeta meta) {

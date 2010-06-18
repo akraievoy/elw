@@ -29,7 +29,7 @@
 			<div class="formButtons"><input type="submit" value="Upload"/></div>
 		</form>
 	</div>
-	<div style="margin: 1em auto; width: 40em;">
+	<div style="margin: 1em auto; width: 60em;">
 		<div style="float: left;">
 			<h3>Code submissions</h3>
 			<table cellspacing="0" align="center"><tbody>
@@ -42,14 +42,7 @@
 				<tr>
 					<td style="padding: 0 0.25em;"><span title="$c.niceUploadStamp">$c.briefUploadStamp</span></td>
 					<td style="padding: 0 0.25em;">
-						#if($c.validatorStamp > 0)
-							#set($passColor = "#if($c.testsPassed>0)#00FF00#else#999999#end")
-							#set($failColor = "#if($c.testsFailed>0)#FF0000#else#999999#end")
-							<span style="color: $passColor;">$c.testsPassed&nbsp;Pass</span> /
-							<span style="color: $failColor;">$c.testsFailed&nbsp;Fail</span>
-						#else
-							Tests Pending
-						#end
+						#elw_code_state($c, $elw_ctx.enr.classes.get($elw_ctx.ass.scoring.classCodeDue))
 					</td>
 					<td style="padding: 0 0.25em;">[&nbsp;<a href="codeDl/$c.fileName?elw_ctx=$elw_ctx&stamp=$c.uploadStamp" target="_blank">Download</a>&nbsp;]</td>
 				</tr>
@@ -57,7 +50,7 @@
 			</tbody></table>
 		</div>
 		<div style="float: right;">
-			<h3>Report Uploads</h3>
+			<h3>Report uploads</h3>
 			<table cellspacing="0" align="center"><tbody>
 				<tr>
 					<th>Date</th>
@@ -67,7 +60,9 @@
 #foreach($rep in $reports.values())
 				<tr>
 					<td style="padding: 0 0.25em;"><span title="$rep.niceUploadStamp">$rep.briefUploadStamp</span></td>
-					<td style="padding: 0 0.25em;">&nbsp;</td>
+					<td style="padding: 0 0.25em;">
+						#elw_report_state($rep, $elw_ctx.enr.classes.get($elw_ctx.ass.scoring.classReportDue))
+					</td>
 					<td style="padding: 0 0.25em;">[&nbsp;<a href="reportDl/$rep.fileName?elw_ctx=$elw_ctx&stamp=$rep.uploadStamp" target="_blank">Download</a>&nbsp;]</td>
 				</tr>
 #end
