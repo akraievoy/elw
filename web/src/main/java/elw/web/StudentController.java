@@ -34,19 +34,21 @@ public class StudentController extends MultiActionController implements WebSymbo
 	protected final GroupDao groupDao;
 	protected final EnrollDao enrollDao;
 	protected final CodeDao codeDao;
-	private final ReportDao reportDao;
+	protected final ReportDao reportDao;
+	protected final ScoreDao scoreDao;
 
 	protected final ObjectMapper mapper = new ObjectMapper();
 	protected final long cacheBustingToken = System.currentTimeMillis();
 
 	private static final int UPLOAD_LIMIT = 2 * 1024 * 1024;
 
-	public StudentController(CourseDao courseDao, GroupDao groupDao, EnrollDao enrollDao, final CodeDao codeDao, ReportDao reportDao) {
+	public StudentController(CourseDao courseDao, GroupDao groupDao, EnrollDao enrollDao, final CodeDao codeDao, ReportDao reportDao, ScoreDao scoreDao) {
 		this.courseDao = courseDao;
 		this.groupDao = groupDao;
 		this.enrollDao = enrollDao;
 		this.codeDao = codeDao;
 		this.reportDao = reportDao;
+		this.scoreDao = scoreDao;
 	}
 
 	protected HashMap<String, Object> auth(final HttpServletRequest req, final HttpServletResponse resp, final String pathToRoot) throws IOException {
@@ -215,17 +217,19 @@ public class StudentController extends MultiActionController implements WebSymbo
 
 		final HashMap<String, CodeMeta> codeMetas = new HashMap<String, CodeMeta>();
 		final HashMap<String, ReportMeta> reportMetas = new HashMap<String, ReportMeta>();
-		storeMetas(codeDao, reportDao, ctx, codeMetas, reportMetas);
+		final HashMap<String, Score> scores = new HashMap<String, Score>();
+		storeMetas(ctx, codeDao, reportDao, scoreDao, codeMetas, reportMetas, scores);
 		model.put("codeMetas", codeMetas);
 		model.put("reportMetas", reportMetas);
+		model.put("scores", scores);
 
 		return new ModelAndView("s/course", model);
 	}
 
 	public static void storeMetas(
-			CodeDao codeDao, ReportDao reportDao, Ctx ctx,
-			HashMap<String, CodeMeta> codeMetas, HashMap<String, ReportMeta> reportMetas
-	) {
+			Ctx ctx,
+			CodeDao codeDao, ReportDao reportDao, ScoreDao scoreDao,
+			Map<String, CodeMeta> codeMetas, Map<String, ReportMeta> reportMetas, Map<String, Score> scores) {
 		for (int bunI = 0, assBundlesLength = ctx.getCourse().getAssBundles().length; bunI < assBundlesLength; bunI++) {
 			AssignmentBundle bundle = ctx.getCourse().getAssBundles()[bunI];
 			for (Assignment ass : bundle.getAssignments()) {
@@ -245,6 +249,23 @@ public class StudentController extends MultiActionController implements WebSymbo
 					if (reportMetas != null) {
 						final long lastStampReport = reportDao.findLastStamp(assCtx);
 						reportMetas.put(assPath, reportDao.findMetaByStamp(assCtx, lastStampReport));
+					}
+					if (scores != null) {
+						final Score lastScore = scoreDao.findLastScore(assCtx);
+						if (lastScore == null) {
+							if (codeDao != null) {
+								final long lastReportStamp = reportDao != null ? reportDao.findLastStamp(assCtx) : Long.MAX_VALUE;
+								final HashMap<Long, Score> allCodeScores = new HashMap<Long, Score>();
+								final long bestCodeStamp = AdminController.computeCodeScores(
+										assCtx,
+										codeDao.findAllMetas(assCtx), allCodeScores,
+										lastReportStamp
+								);
+								scores.put(assPath, allCodeScores.get(bestCodeStamp));
+							}
+						} else {
+							scores.put(assPath, lastScore);
+						}
 					}
 				}
 			}
@@ -271,6 +292,12 @@ public class StudentController extends MultiActionController implements WebSymbo
 		}
 
 		final String refreshUri = "uploadPage?" + WebSymbols.R_CTX + "=" + ctx.toString();
+		if (scoreDao.findLastStamp(ctx) > 0) {
+			Message.addWarn(req, "report already approved");
+			resp.sendRedirect(refreshUri);
+			return null;
+		}
+
 		if (req.getContentLength() > UPLOAD_LIMIT) {
 			Message.addWarn(req, "apparently you're trying to upload more than " + G4mat.formatMem(UPLOAD_LIMIT));
 			resp.sendRedirect(refreshUri);
@@ -501,6 +528,11 @@ public class StudentController extends MultiActionController implements WebSymbo
 		final Ctx ctx = (Ctx) model.get(R_CTX);
 		if (!ctx.resolved(Ctx.STATE_EGSCBAV)) {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "context path problem, please check the logs");
+			return null;
+		}
+
+		if (scoreDao.findLastStamp(ctx) > 0) {
+			resp.sendError(HttpServletResponse.SC_CONFLICT, "report for given task already approved");
 			return null;
 		}
 

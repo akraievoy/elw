@@ -75,16 +75,28 @@
 				#if($elw_ctx.enr.classes.get($ass.scoring.classFrom).started)
 					#set($verIdx = $elw_ctx.student.idAsInt % $ass.versions.size())
 					#set($ver = $ass.versions.get($verIdx))
-					#set($path = $elw_ctx.extendBAV($bunI, $ass, $ver).toString())
+					#set($path = $elw_ctx.extendBAV($bunI, $ass, $ver))
 	<tr>
 		<td style="padding-left: 2.5em; padding-right: 1em; border-right: #999999 dashed 1px;">$ver.name</td>
 		<td style="padding: 0 0.25em; text-align: right;">
 			#elw_code_state($path, $codeMetas.get("$path"))
+			#if($scores.get("$path"))
+				<span style="font-size: smaller;">#elw_code_score($path, $scores.get("$path"))</span>
+			#end
 		</td>
 		<td style="padding: 0 0.25em; text-align: right;">
 			#elw_report_state($path, $reportMetas.get("$path"))
+			#if($scores.get("$path"))
+				<span style="font-size: smaller;">#elw_report_score($path, $scores.get("$path"))</span>
+			#end
 		</td>
-		<td style="padding: 0 0.25em; text-align: right;">&nbsp;</td>
+		<td style="padding: 0 0.25em; text-align: right;">
+			#if($scores.get("$path"))
+				#elw_score($path, $scores.get("$path"))
+			#else
+				&nbsp;
+			#end
+		</td>
 		<td style="padding: 0 0.25em; text-align: right;">
 			<form action="launch" method="get" style="display: inline; margin: 0;">
 				<input type="hidden" name="elw_ctx" value="$path"/>

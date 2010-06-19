@@ -96,7 +96,7 @@
 						#elw_report_state($elw_ctx, $rep)
 					</td>
 					<td style="padding: 0 0.25em;">
-						#elw_report_score($elw_ctx, $score)
+						#elw_report_score($elw_ctx, $scores.get($rep.scoreStamp))
 					</td>
 					<td style="padding: 0 0.25em;">[&nbsp;<a href="../s/reportDl/$rep.fileName?elw_ctx=$elw_ctx&stamp=$rep.uploadStamp" target="_blank">Download</a>&nbsp;]</td>
 				</tr>

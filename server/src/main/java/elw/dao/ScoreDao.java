@@ -122,7 +122,7 @@ public class ScoreDao {
 				continue;
 			}
 
-			final File scoreFile = new File(assDir, fileName + META_POSTFIX);
+			final File scoreFile = new File(assDir, fileName);
 			if (!scoreFile.isFile()) {
 				result.put(parsed, null);
 				continue;
@@ -200,7 +200,7 @@ public class ScoreDao {
 		return stamps.length > 0 ? stamps[stamps.length - 1] : -1;
 	}
 
-	public Score findLastScore(Ctx ctx) throws IOException {
+	public Score findLastScore(Ctx ctx) {
 		return findScoreByStamp(ctx, findLastStamp(ctx));
 	}
 }

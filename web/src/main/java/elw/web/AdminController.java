@@ -287,9 +287,9 @@ public class AdminController extends MultiActionController implements WebSymbols
 		final HashMap<String, ReportMeta> reportMetas = new HashMap<String, ReportMeta>();
 		for (Student stud : ctx.getGroup().getStudents()) {
 			StudentController.storeMetas(
-					codeDao, reportDao,
 					ctx.extendStudent(stud),
-					codeMetas, reportMetas
+					codeDao, reportDao, scoreDao,
+					codeMetas, reportMetas, null
 			);
 		}
 
@@ -435,13 +435,14 @@ public class AdminController extends MultiActionController implements WebSymbols
 			codeScores.put(score.getCodeStamp(), score);
 		}
 
+		model.put("scores", scoreDao.findAllScores(ctx));
 		model.put("score", reportScore);
 		model.put("elw_ctx", ctx);
 
 		return new ModelAndView("a/approve", model);
 	}
 
-	private long computeCodeScores(Ctx ctx, Map<Long, CodeMeta> codes, Map<Long, Score> codeScores, long reportStamp) {
+	public static long computeCodeScores(Ctx ctx, Map<Long, CodeMeta> codes, Map<Long, Score> codeScores, long reportStamp) {
 		double bestRatio = 0;
 		long codeStamp = 0;
 
@@ -458,6 +459,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 				bestRatio = ratio;
 			}
 		}
+
 		return codeStamp;
 	}
 

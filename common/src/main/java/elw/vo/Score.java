@@ -2,10 +2,15 @@ package elw.vo;
 
 import org.akraievoy.gear.G4mat;
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.util.*;
 
 public class Score {
+	private static final DateTimeFormatter FMT_DATETIME_NICE = DateTimeFormat.forPattern("EEE MMM dd HH:mm");
+
 	protected final Map<String, Double> ratios = new TreeMap<String, Double>();
 	protected final Map<String, Integer> pows = new TreeMap<String, Integer>();
 	protected long stamp;
@@ -65,14 +70,44 @@ public class Score {
 	}
 
 	@JsonIgnore
-	public double getRatio() {
-		final Set<String> ratioKeys = ratios.keySet();
-		return getRatio(ratioKeys.toArray(new String[ratios.size()]));
+	public String getNiceStamp() {
+		return stamp == 0 ? "Preliminary" : FMT_DATETIME_NICE.print(new DateTime(stamp));
 	}
 
 	@JsonIgnore
-	public String getNiceRatio(TypeScoring typeScoring, TaskScoring taskScoring) {
-		return G4mat.format2(taskScoring.getScoreBudget() * typeScoring.getWeight() * getRatio(typeScoring.getApplied()));
+	public String getNicePoints(TypeScoring typeScoring, TaskScoring taskScoring) {
+		return G4mat.format2(getPoints(typeScoring, taskScoring));
+	}
+
+	@JsonIgnore
+	public String getNiceTotal(BundleScoring bundleScoring, TaskScoring taskScoring) {
+		return G4mat.format2(getTotal(bundleScoring, taskScoring));
+	}
+
+	@JsonIgnore
+	public double getPoints(TypeScoring typeScoring, TaskScoring taskScoring) {
+		return taskScoring.getScoreBudget() * typeScoring.getWeight() * getRatio(typeScoring.getApplied());
+	}
+
+	@JsonIgnore
+	public double getTotal(BundleScoring bundleScoring, TaskScoring taskScoring) {
+		double result = 0.0;
+
+		for (String type : bundleScoring.breakdown.keySet()) {
+			final TypeScoring ts = bundleScoring.breakdown.get(type);
+			if ("report".equals(type) && isPreliminary()) {
+				continue;
+			}
+
+			result += getPoints(ts, taskScoring);
+		}
+
+		return result;
+	}
+
+	@JsonIgnore
+	public boolean isPreliminary() {
+		return stamp == 0 || reportStamp == 0;
 	}
 
 	public double getRatio(String[] ids) {
