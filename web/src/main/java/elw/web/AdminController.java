@@ -61,6 +61,11 @@ public class AdminController extends MultiActionController implements WebSymbols
 		if (!Boolean.TRUE.equals(admin)) {
 			if (pathToRoot != null) {
 				Message.addWarn(req, "Admin authentication required");
+				if (req.getQueryString() != null) {
+					session.setAttribute("loginTo", req.getRequestURI() + "?" + req.getQueryString());
+				} else {
+					session.setAttribute("loginTo", req.getRequestURI());
+				}
 				resp.sendRedirect(pathToRoot + "login");
 			} else {
 				resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Admin authentication required");
@@ -69,6 +74,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 			return null;
 		}
 
+		session.removeAttribute("loginTo");	//	LATER extract constant
 		final HashMap<String, Object> model = new HashMap<String, Object>();
 
 		model.put(S_MESSAGES, Message.drainMessages(req));
@@ -107,7 +113,13 @@ public class AdminController extends MultiActionController implements WebSymbols
 					session.setAttribute(S_ADMIN, Boolean.TRUE);
 					session.setMaxInactiveInterval(300);
 					Message.addInfo(req, "Admin area : logged on");
-					resp.sendRedirect("index");
+					final Object loginToAttr = session.getAttribute("loginTo");
+					if (loginToAttr instanceof String) {
+						session.removeAttribute("loginTo");
+						resp.sendRedirect((String) loginToAttr);
+					} else {
+						resp.sendRedirect("index");
+					}
 					return null;
 				} else {
 					Message.addWarn(req, "something went terribly wrong with your password, please retry authentication");
