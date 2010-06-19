@@ -34,15 +34,21 @@
 			<h3>Code submissions</h3>
 			<table cellspacing="0" align="center"><tbody>
 				<tr>
+					<th></th>
 					<th>Date</th>
 					<th>State</th>
+					<th>Score</th>
 					<th>Link</th>
 				</tr>
 #foreach($c in $codes.values())
 				<tr>
+					<td style="padding: 0 0.25em; text-align: center;">#if($c.uploadStamp == $codeStamp)<span style="font-weight: bold;">*</span>#end </td>
 					<td style="padding: 0 0.25em;"><span title="$c.niceUploadStamp">$c.briefUploadStamp</span></td>
 					<td style="padding: 0 0.25em;">
 						#elw_code_state($elw_ctx, $c)
+					</td>
+					<td style="padding: 0 0.25em;">
+						#elw_code_score($elw_ctx, $codeScores.get($c.uploadStamp))
 					</td>
 					<td style="padding: 0 0.25em;">[&nbsp;<a href="codeDl/$c.fileName?elw_ctx=$elw_ctx&stamp=$c.uploadStamp" target="_blank">Download</a>&nbsp;]</td>
 				</tr>
@@ -50,18 +56,24 @@
 			</tbody></table>
 		</div>
 		<div style="float: right;">
-			<h3>Report uploads</h3>
+			<h3>Report Uploads</h3>
 			<table cellspacing="0" align="center"><tbody>
 				<tr>
+					<th></th>
 					<th>Date</th>
 					<th>State</th>
+					<th>Score</th>
 					<th>Link</th>
 				</tr>
 #foreach($rep in $reports.values())
 				<tr>
+					<td style="padding: 0 0.25em; text-align: center;">#if($rep.uploadStamp == $stamp)<span style="font-weight: bold;">*</span>#end </td>
 					<td style="padding: 0 0.25em;"><span title="$rep.niceUploadStamp">$rep.briefUploadStamp</span></td>
 					<td style="padding: 0 0.25em;">
 						#elw_report_state($elw_ctx, $rep)
+					</td>
+					<td style="padding: 0 0.25em;">
+						#elw_report_score($elw_ctx, $scores.get($rep.scoreStamp))
 					</td>
 					<td style="padding: 0 0.25em;">[&nbsp;<a href="reportDl/$rep.fileName?elw_ctx=$elw_ctx&stamp=$rep.uploadStamp" target="_blank">Download</a>&nbsp;]</td>
 				</tr>

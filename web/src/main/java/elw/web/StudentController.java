@@ -385,8 +385,24 @@ public class StudentController extends MultiActionController implements WebSymbo
 		}
 
 		model.put("uploadLimit", G4mat.formatMem(UPLOAD_LIMIT));
-		model.put("reports", reportDao.findAllMetas(ctx));
-		model.put("codes", codeDao.findAllMetas(ctx));
+
+		final Map<Long, ReportMeta> reports = reportDao.findAllMetas(ctx);
+		final Map<Long, CodeMeta> codes = codeDao.findAllMetas(ctx);
+		final Map<Long, Score> codeScores = new TreeMap<Long, Score>();
+		AdminController.computeCodeScores(ctx, codes, codeScores, Long.MAX_VALUE);
+
+		final Score lastScore = scoreDao.findLastScore(ctx);
+		if (lastScore != null) {
+			model.put("stamp", lastScore.getReportStamp());
+			model.put("codeStamp", lastScore.getCodeStamp());
+			codeScores.put(lastScore.getCodeStamp(), lastScore);
+		}
+
+		model.put("reports", reports);
+		model.put("codes", codes);
+		model.put("codeScores", codeScores);
+		model.put("scores", scoreDao.findAllScores(ctx));
+		model.put("elw_ctx", ctx);
 
 		return new ModelAndView("s/uploadPage", model);
 	}
