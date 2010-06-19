@@ -94,4 +94,14 @@ public class TypeScoring extends IdName {
 	public Criteria[] resolveApplied() {
 		return resolve(getApplied());
 	}
+
+	public boolean isApplied(String id) {
+		for (String s : applied) {
+			if (s.equals(id)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 }

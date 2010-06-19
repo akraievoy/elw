@@ -40,5 +40,17 @@ public class BundleScoring {
 	public Criteria findCriteria(final String id) {
 		return IdName.findById(getCriterias(), id);
 	}
+
+	public boolean isAuto(final Criteria cri) {
+		for (TypeScoring ts : breakdown.values()) {
+			for (String id : ts.getAuto()) {
+				if (cri.getId().equals(id)) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
 }
 

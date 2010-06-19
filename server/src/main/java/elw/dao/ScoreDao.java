@@ -25,7 +25,7 @@ public class ScoreDao {
 		this.mapper = mapper;
 	}
 
-	public void createScore(Ctx ctx, Score score) throws IOException {
+	public long createScore(Ctx ctx, Score score) throws IOException {
 		final File assDir = ctx.getScoreRoot(uploadsDir);
 
 		if (!assDir.isDirectory() && !assDir.mkdirs()) {
@@ -53,6 +53,8 @@ public class ScoreDao {
 				}
 			}
 		}
+
+		return updateStamp;
 	}
 
 	public long[] findAllStamps(Ctx ctx) {

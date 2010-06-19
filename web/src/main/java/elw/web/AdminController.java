@@ -397,25 +397,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 
 		final Map<Long, Score> codeScores = new TreeMap<Long, Score>();
 
-		double bestRatio = 0;
-		long codeStamp = 0;
-
-		final Class classCodeDue = ctx.getEnr().getClasses()[ctx.getAss().getScoring().getClassCodeDue()];
-		final TypeScoring codeScoring = ctx.getBundle().getScoring().getBreakdown().get("code");
-		final Criteria[] codeAutos = codeScoring.resolveAuto();
-		for (Long cStamp : codes.keySet()) {
-			final CodeMeta meta = codes.get(cStamp);
-			final Score score = computeCodeAuto(meta, classCodeDue, codeAutos);
-
-			codeScores.put(cStamp, score);
-
-			//	here we select the best code scoring to base our report rating on
-			final double ratio = score.getRatio(codeScoring.getAuto());
-			if (meta.getUploadStamp() <= reportStamp && ratio > bestRatio) {
-				codeStamp = cStamp;
-				bestRatio = ratio;
-			}
-		}
+		long codeStamp = computeCodeScores(ctx, codes, codeScores, reportStamp);
 
 		model.put("codeStamp", G4Parse.parse(req.getParameter("codeStamp"), codeStamp));
 
@@ -423,10 +405,8 @@ public class AdminController extends MultiActionController implements WebSymbols
 
 		final Score reportScore;
 		final ReportMeta reportMeta = reports.get(reportStamp);
-		final Class classReportDue = ctx.getEnr().getClasses()[ctx.getAss().getScoring().getClassReportDue()];
-		final TypeScoring reportScoring = ctx.getBundle().getScoring().getBreakdown().get("report");
 		final long scoreStamp = reportMeta.getScoreStamp();
-		if (scoreStamp == 0) {
+		if (scoreStamp <= 0) {
 			final Score reportBaseScore;
 			final Score codeScore = codeScores.get(codeStamp);
 			if (codeStamp == 0 || codeScore == null){
@@ -435,16 +415,38 @@ public class AdminController extends MultiActionController implements WebSymbols
 			} else {
 				reportBaseScore = codeScore.copy();
 			}
-			reportScore = computeReportAuto(reportMeta, classReportDue, reportScoring.resolveAuto(), reportBaseScore);
-			computeReportDefault(ctx.getBundle(), reportScore);
+			reportScore = computeReportAuto(ctx, reportMeta, reportBaseScore);
+			computeReportDefault(ctx, reportScore);
 		} else {
-			reportScore = scoreDao.findScoreByStamp(ctx, scoreStamp);
+			final Score score = scoreDao.findScoreByStamp(ctx, scoreStamp);
+			reportScore = score;
+			codeScores.put(score.getCodeStamp(), score);
 		}
 
 		model.put("score", reportScore);
 		model.put("elw_ctx", ctx);
 
 		return new ModelAndView("a/approve", model);
+	}
+
+	private long computeCodeScores(Ctx ctx, Map<Long, CodeMeta> codes, Map<Long, Score> codeScores, long reportStamp) {
+		double bestRatio = 0;
+		long codeStamp = 0;
+
+		for (Long cStamp : codes.keySet()) {
+			final CodeMeta meta = codes.get(cStamp);
+			final Score score = computeCodeAuto(meta, ctx);
+
+			codeScores.put(cStamp, score);
+
+			//	here we select the best code scoring to base our report rating on
+			final double ratio = score.getRatio(ctx.getBundle().getScoring().getBreakdown().get("code").getAuto());
+			if (meta.getUploadStamp() <= reportStamp && ratio > bestRatio) {
+				codeStamp = cStamp;
+				bestRatio = ratio;
+			}
+		}
+		return codeStamp;
 	}
 
 	@RequestMapping(value = "approve", method = RequestMethod.POST)
@@ -460,20 +462,61 @@ public class AdminController extends MultiActionController implements WebSymbols
 			return null;
 		}
 
-		Message.addWarn(req, "Not yet implemented");
+		final String codeStampStr = req.getParameter("codeStamp");
+		final long codeStamp = G4Parse.parse(codeStampStr, -1L);
 
-		resp.sendRedirect(
-				"approve?" +
-						"elw_ctx=" + ctx + "&" +
-						"stamp=" + req.getParameter("stamp") + "&" +
-						"codeStamp=" + req.getParameter("codeStamp")
-		);
+		final String reportStampStr = req.getParameter("stamp");
+		final long reportStamp = G4Parse.parse(reportStampStr, -1L);
 
+		final String refreshUri = "approve?elw_ctx=" + ctx + "&stamp=" + reportStampStr + "&codeStamp=" + codeStampStr;
+		if (codeStamp <= 0 || reportStamp <= 0) {
+			Message.addWarn(req, "Missing either report or code stamp, approval NOT performed");
+			resp.sendRedirect(refreshUri);
+			return null;
+		}
+
+		final ReportMeta reportMeta = reportDao.findMetaByStamp(ctx, reportStamp);
+		final CodeMeta codeMeta = codeDao.findMetaByStamp(ctx, codeStamp);
+
+		if (reportMeta == null || codeMeta == null) {
+			Message.addWarn(req, "Missing either report or code metas, approval NOT performed");
+			resp.sendRedirect(refreshUri);
+			return null;
+		}
+
+		if ("Decline".equals(req.getParameter("action"))) {
+			reportMeta.setScoreStamp(-1);
+			reportDao.updateMeta(ctx, reportMeta.getUploadStamp(), reportMeta);
+			Message.addWarn(req, "Report declined");
+		} else {
+			final Score codeScore = computeCodeAuto(codeMeta, ctx);
+			final Score score = computeReportAuto(ctx, reportMeta, codeScore);
+			computeReportDefault(ctx, score);
+
+			score.setCodeStamp(codeStamp);
+			score.setReportStamp(reportStamp);
+
+			final Criteria[] cris = ctx.getBundle().getScoring().getCriterias();
+			for (Criteria cri : cris) {
+				final int powDef = G4Parse.parse(cri.getPowDef(), 0);
+				final String powReq = req.getParameter("cri--" + cri.getId());
+				final int pow = G4Parse.parse(powReq, powDef);
+
+				score.getPows().put(cri.getId(), pow);
+			}
+
+			final long scoreStamp = scoreDao.createScore(ctx, score);
+			reportMeta.setScoreStamp(scoreStamp);
+			reportDao.updateMeta(ctx, reportMeta.getUploadStamp(), reportMeta);
+			Message.addInfo(req, "Report approved");
+		}
+
+		resp.sendRedirect(refreshUri);
 		return null;
 	}
 
-	protected static void computeReportDefault(AssignmentBundle bundle, Score reportScore) {
-		final Criteria[] criterias = bundle.getScoring().getCriterias();
+	protected static void computeReportDefault(Ctx ctx, Score reportScore) {
+		final Criteria[] criterias = ctx.getBundle().getScoring().getCriterias();
 		for (Criteria c : criterias) {
 			if (!reportScore.contains(c.getId())) {
 				reportScore.getPows().put(c.getId(), c.resolvePowDef(null));
@@ -482,7 +525,11 @@ public class AdminController extends MultiActionController implements WebSymbols
 		}
 	}
 
-	protected static Score computeReportAuto(ReportMeta meta, Class classDue, Criteria[] autos, final Score baseScore) {
+	protected static Score computeReportAuto(Ctx ctx, ReportMeta meta, final Score baseScore) {
+		final Class classDue = ctx.getEnr().getClasses()[ctx.getAss().getScoring().getClassReportDue()];
+		final TypeScoring reportScoring = ctx.getBundle().getScoring().getBreakdown().get("report");
+		final Criteria[] autos = reportScoring.resolveAuto();
+
 		final DateTime uploadStamp = new DateTime(meta.getUploadStamp());
 		final double overdue;
 		if (classDue.isPassed(uploadStamp)) {
@@ -502,15 +549,19 @@ public class AdminController extends MultiActionController implements WebSymbols
 		return score;
 	}
 
-	protected static Score computeCodeAuto(CodeMeta meta, Class classDue, Criteria[] autos) {
+	protected static Score computeCodeAuto(CodeMeta meta, Ctx ctx) {
+		final Class classCodeDue = ctx.getEnr().getClasses()[ctx.getAss().getScoring().getClassCodeDue()];
+		final TypeScoring codeScoring = ctx.getBundle().getScoring().getBreakdown().get("code");
+		final Criteria[] autos = codeScoring.resolveAuto();
+
 		if (meta.getValidatorStamp() <= 0) {
 			return null;
 		}
 
 		final DateTime uploadStamp = new DateTime(meta.getUploadStamp());
 		final double overdue;
-		if (classDue.isPassed(uploadStamp)) {
-			overdue = classDue.getDayDiff(uploadStamp);
+		if (classCodeDue.isPassed(uploadStamp)) {
+			overdue = classCodeDue.getDayDiff(uploadStamp);
 		} else {
 			overdue = 0.0;
 		}

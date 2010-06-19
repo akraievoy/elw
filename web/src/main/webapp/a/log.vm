@@ -11,7 +11,7 @@
 </head>
 <body style="text-align: left;">
 <div id="header">
-	<div id="nav"><a href="index">Index</a> &gt; <a href="enrolls">Enrollments</a> &gt; <span style="font-weight: bold">Group $elw_ctx.group.name Report</span></div>
+	<div id="nav"><a href="index">Index</a> &gt; <a href="enrolls">Enrollments</a> &gt; <span style="font-weight: bold">Group $elw_ctx.group.name Report Uploads</span></div>
 	#elw_cred_adm($auth)
 	<div id="header_hr"> </div>
 </div>

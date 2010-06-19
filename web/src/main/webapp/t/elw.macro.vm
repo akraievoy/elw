@@ -77,8 +77,27 @@
 #macro (elw_code_score $elw_ctx, $score)
 	#if($score)
 		$score.getNiceRatio($elw_ctx.bundle.scoring.breakdown.get("code"), $elw_ctx.ass.scoring)
-		#if($score.terms.size() > 0) :
-			#set($terms = $score.terms)
+		#set($terms = $score.getTerms($elw_ctx.bundle.scoring.breakdown.get("code")))
+		#if($terms.size() > 0) :
+			#foreach($term in $terms)
+				#if($term.positive)
+					#set($termColor = "#00FF00")
+				#else
+					#set($termColor = "#FF0000")
+				#end
+					<span style="color: $termColor;" title="$elw_ctx.bundle.scoring.findCriteria($term.id).name ($term.pow)">$term.niceRatio</span>
+			#end
+		#end
+	#else
+		None
+	#end
+#end
+
+#macro (elw_report_score $elw_ctx, $score)
+	#if($score)
+		$score.getNiceRatio($elw_ctx.bundle.scoring.breakdown.get("report"), $elw_ctx.ass.scoring)
+		#set($terms = $score.getTerms($elw_ctx.bundle.scoring.breakdown.get("report")))
+		#if($terms.size() > 0) :
 			#foreach($term in $terms)
 				#if($term.positive)
 					#set($termColor = "#00FF00")

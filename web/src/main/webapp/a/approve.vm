@@ -23,14 +23,28 @@
 	<div class="formArea" style="height: 22em; width: 24em; float: left; margin: 0 2em;">
 		<form method="POST" action="approve">
 			#foreach($cri in $elw_ctx.bundle.scoring.criterias)
-				<div class="formLabel" style="width:16em;"><span title="$cri.ratio">$cri.name</span>:</div>
-				<div class="formField" style="width:6em;">
-					<select name="cri--$cri.id">
-						#foreach($pow in $cri.pows)
-							<option value="$pow" #if($score.isSetTo($cri.id, $pow))selected#end>$pow</option>
-						#end
-					</select>
-				</div>
+				#if(!$elw_ctx.bundle.scoring.isAuto($cri))
+					<div class="formLabel" style="width:16em;"><span title="$cri.ratio">$cri.name</span>:</div>
+					<div class="formField" style="width:6em;">
+						<select name="cri--$cri.id">
+							#foreach($pow in $cri.pows)
+								<option value="$pow" #if($score.isSetTo($cri.id, $pow))selected#end>$pow</option>
+							#end
+						</select>
+					</div>
+				#end
+			#end
+			#foreach($cri in $elw_ctx.bundle.scoring.criterias)
+				#if($elw_ctx.bundle.scoring.isAuto($cri))
+					<div class="formLabel" style="width:16em;"><span title="$cri.ratio" style="color:#669999;">$cri.name</span>:</div>
+					<div class="formField" style="width:6em;">
+						<select name="cri--$cri.id">
+							#foreach($pow in $cri.pows)
+								<option value="$pow" #if($score.isSetTo($cri.id, $pow))selected#end>$pow</option>
+							#end
+						</select>
+					</div>
+				#end
 			#end
 			<input type="hidden" name="elw_ctx" value="$elw_ctx"/>
 			<input type="hidden" name="stamp" value="$stamp"/>
@@ -71,6 +85,7 @@
 					<th></th>
 					<th>Date</th>
 					<th>State</th>
+					<th>Score</th>
 					<th>Link</th>
 				</tr>
 #foreach($rep in $reports.values())
@@ -79,6 +94,9 @@
 					<td style="padding: 0 0.25em;"><span title="$rep.niceUploadStamp">$rep.briefUploadStamp</span></td>
 					<td style="padding: 0 0.25em;">
 						#elw_report_state($elw_ctx, $rep)
+					</td>
+					<td style="padding: 0 0.25em;">
+						#elw_report_score($elw_ctx, $score)
 					</td>
 					<td style="padding: 0 0.25em;">[&nbsp;<a href="../s/reportDl/$rep.fileName?elw_ctx=$elw_ctx&stamp=$rep.uploadStamp" target="_blank">Download</a>&nbsp;]</td>
 				</tr>

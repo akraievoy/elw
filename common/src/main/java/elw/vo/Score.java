@@ -10,6 +10,7 @@ public class Score {
 	protected final Map<String, Integer> pows = new TreeMap<String, Integer>();
 	protected long stamp;
 	protected long codeStamp;
+	protected long reportStamp;
 
 	public long getStamp() {
 		return stamp;
@@ -19,14 +20,20 @@ public class Score {
 		this.stamp = stamp;
 	}
 
-	@Deprecated
 	public long getCodeStamp() {
 		return codeStamp;
 	}
 
-	@Deprecated
 	public void setCodeStamp(long codeStamp) {
 		this.codeStamp = codeStamp;
+	}
+
+	public long getReportStamp() {
+		return reportStamp;
+	}
+
+	public void setReportStamp(long reportStamp) {
+		this.reportStamp = reportStamp;
 	}
 
 	public Map<String, Integer> getPows() {
@@ -65,7 +72,7 @@ public class Score {
 
 	@JsonIgnore
 	public String getNiceRatio(TypeScoring typeScoring, TaskScoring taskScoring) {
-		return G4mat.format2(taskScoring.getScoreBudget() * typeScoring.getWeight() * getRatio());
+		return G4mat.format2(taskScoring.getScoreBudget() * typeScoring.getWeight() * getRatio(typeScoring.getApplied()));
 	}
 
 	public double getRatio(String[] ids) {
@@ -101,16 +108,19 @@ public class Score {
 	}
 
 	@JsonIgnore
-	public Term[] getTerms() {
-		return getTerms(false);
+	public Term[] getTerms(TypeScoring ts) {
+		return getTerms(ts, false);
 	}
 
 	@JsonIgnore
-	public Term[] getTerms(final boolean includeIdentity) {
+	public Term[] getTerms(TypeScoring ts, final boolean includeIdentity) {
 		final List<Term> terms = new ArrayList<Term>();
 
 		for (final String id : ratios.keySet()) {
 			if (!pows.containsKey(id)) {
+				continue;
+			}
+			if (!ts.isApplied(id)) {
 				continue;
 			}
 			final Integer pow = pows.get(id);
