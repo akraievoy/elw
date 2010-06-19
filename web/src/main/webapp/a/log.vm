@@ -30,7 +30,7 @@
 		<td style="padding-left: 0.25em; padding-right: 0.25em;"><span title="$e.student.id">$e.student.name</span></td>
 		<td style="padding-left: 0.25em; padding-right: 0.25em;"><span title="$e.ass.id">$e.ass.name</span></td>
 		<td style="padding-left: 0.25em; padding-right: 0.25em;">
-			Pending
+			#elw_report_state($e.ctx, $e.meta)
 		</td>
 		<td style="padding-left: 0.25em; padding-right: 0.25em;">
 			<form action="approve" method="get" style="margin: 0;">

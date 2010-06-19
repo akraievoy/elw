@@ -37,12 +37,12 @@
 			#if($ass.id && !$ass.shared)
 				#set($verIdx = $stud.idAsInt % $ass.versions.size())
 				#set($ver = $ass.versions.get($verIdx))
-				#set($path = "$elw_ctx.extendStudent($stud).extendBAV(${bunI}, ${ass}, ${ver})")
+				#set($path = $elw_ctx.extendStudent($stud).extendBAV(${bunI}, ${ass}, ${ver}))
 		<td style="padding-left: 0.25em; padding-right: 0.25em;">
-			#elw_code_state($codeMetas.get($path), $elw_ctx.enr.classes.get($ass.scoring.classCodeDue))
+			#elw_code_state($path, $codeMetas.get("$path"))
 		</td>
 		<td style="padding-left: 0.25em; padding-right: 0.25em; border-left: 1px dashed #CCCCCC;'">
-			#elw_report_state($reportMetas.get($path), $elw_ctx.enr.classes.get($ass.scoring.classReportDue))
+			#elw_report_state($path, $reportMetas.get("$path"))
 		</td>
 			#end
 		#end

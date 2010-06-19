@@ -2278,13 +2278,13 @@
 					"weight": 0.6,
 					"auto": ["code.overdue", "code.tests"],
 					"manual": [],
-					"applied": ["code.style", "code.reuse", "code.eff", "code.brute"]
+					"applied": ["code.overdue", "code.tests", "code.style", "code.reuse", "code.eff", "code.brute"]
 				},
 				"report": {
 					"weight": 0.4,
 					"auto": ["rep.overdue"],
 					"manual": ["rep.style", "rep.format", "rep.content","code.style", "code.reuse", "code.eff", "code.brute"],
-					"applied": ["rep.style", "rep.format", "rep.content"]
+					"applied": ["rep.style", "rep.format", "rep.content", "rep.overdue"]
 				}
 			},
 			"version": 3

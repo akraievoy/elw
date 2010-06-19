@@ -42,7 +42,7 @@
 				<tr>
 					<td style="padding: 0 0.25em;"><span title="$c.niceUploadStamp">$c.briefUploadStamp</span></td>
 					<td style="padding: 0 0.25em;">
-						#elw_code_state($c, $elw_ctx.enr.classes.get($elw_ctx.ass.scoring.classCodeDue))
+						#elw_code_state($elw_ctx, $c)
 					</td>
 					<td style="padding: 0 0.25em;">[&nbsp;<a href="codeDl/$c.fileName?elw_ctx=$elw_ctx&stamp=$c.uploadStamp" target="_blank">Download</a>&nbsp;]</td>
 				</tr>
@@ -61,7 +61,7 @@
 				<tr>
 					<td style="padding: 0 0.25em;"><span title="$rep.niceUploadStamp">$rep.briefUploadStamp</span></td>
 					<td style="padding: 0 0.25em;">
-						#elw_report_state($rep, $elw_ctx.enr.classes.get($elw_ctx.ass.scoring.classReportDue))
+						#elw_report_state($elw_ctx, $rep)
 					</td>
 					<td style="padding: 0 0.25em;">[&nbsp;<a href="reportDl/$rep.fileName?elw_ctx=$elw_ctx&stamp=$rep.uploadStamp" target="_blank">Download</a>&nbsp;]</td>
 				</tr>

@@ -64,8 +64,8 @@ public class Score {
 	}
 
 	@JsonIgnore
-	public String getNiceRatio() {
-		return G4mat.format2(getRatio());
+	public String getNiceRatio(TypeScoring typeScoring, TaskScoring taskScoring) {
+		return G4mat.format2(taskScoring.getScoreBudget() * typeScoring.getWeight() * getRatio());
 	}
 
 	public double getRatio(String[] ids) {

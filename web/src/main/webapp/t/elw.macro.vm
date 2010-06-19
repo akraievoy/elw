@@ -31,7 +31,8 @@
 </div>
 #end
 
-#macro (elw_code_state $meta $dueClass)
+#macro (elw_code_state $elw_ctx, $meta)
+	#set($dueClass = $elw_ctx.enr.classes.get($elw_ctx.ass.scoring.classCodeDue))
 	#set($overdue = $dueClass.passed && ($meta.totalUploads == 0 || $meta.passRatio == 0))
 	<div style="width: 100%; text-align: center; #if($overdue)background-color: #EE9999;#end">
 	#if($meta.totalUploads > 0)
@@ -51,7 +52,8 @@
 	</div>
 #end
 
-#macro (elw_report_state $meta $dueClass)
+#macro (elw_report_state $elw_ctx, $meta )
+  #set($dueClass = $elw_ctx.enr.classes.get($elw_ctx.ass.scoring.classReportDue))
 	#set($overdue = $dueClass.passed && ($meta.totalUploads == 0 || $meta.scoreStamp == -1))
 	<div style="width: 100%; text-align: center; #if($overdue)background-color: #EE9999;#end">
 	#if($meta.totalUploads > 0)
@@ -70,4 +72,23 @@
 			None
 		#end
 	</div>
+#end
+
+#macro (elw_code_score $elw_ctx, $score)
+	#if($score)
+		$score.getNiceRatio($elw_ctx.bundle.scoring.breakdown.get("code"), $elw_ctx.ass.scoring)
+		#if($score.terms.size() > 0) :
+			#set($terms = $score.terms)
+			#foreach($term in $terms)
+				#if($term.positive)
+					#set($termColor = "#00FF00")
+				#else
+					#set($termColor = "#FF0000")
+				#end
+					<span style="color: $termColor;" title="$elw_ctx.bundle.scoring.findCriteria($term.id).name ($term.pow)">$term.niceRatio</span>
+			#end
+		#end
+	#else
+		None
+	#end
 #end
