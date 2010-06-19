@@ -322,7 +322,17 @@ public class AdminController extends MultiActionController implements WebSymbols
 			return null;
 		}
 
+		final List<LogEntry> logEntries = prepareLogEntries(ctx);
+
+		model.put("elw_ctx", ctx);
+		model.put("logEntries", logEntries);
+
+		return new ModelAndView("a/log", model);
+	}
+
+	protected List<LogEntry> prepareLogEntries(Ctx ctx) {
 		final List<LogEntry> logEntries = new ArrayList<LogEntry>();
+
 		for (Student stud : ctx.getGroup().getStudents()) {
 			final Ctx studCtx = ctx.extendStudent(stud);
 
@@ -347,10 +357,8 @@ public class AdminController extends MultiActionController implements WebSymbols
 		}
 
 		Collections.sort(logEntries);
-		model.put("elw_ctx", ctx);
-		model.put("logEntries", logEntries);
 
-		return new ModelAndView("a/log", model);
+		return logEntries;
 	}
 
 	public static class LogEntry implements Comparable<LogEntry> {
@@ -534,7 +542,20 @@ public class AdminController extends MultiActionController implements WebSymbols
 			Message.addInfo(req, "Report approved");
 		}
 
-		resp.sendRedirect(refreshUri);
+		final List<LogEntry> entries = prepareLogEntries(ctx);
+		LogEntry nextEntry = null;
+		for (LogEntry entry : entries) {
+			if (entry.getMeta().getScoreStamp() == 0 && entry.getMeta().getTotalUploads() > 0) {
+				nextEntry = entry;
+				break;
+			}
+		}
+		if (nextEntry != null) {
+			final String nextUri = "approve?elw_ctx=" + nextEntry.getCtx() + "&stamp=" + nextEntry.getMeta().getUploadStamp();
+			resp.sendRedirect(nextUri);
+		} else {
+			resp.sendRedirect(refreshUri);
+		}
 		return null;
 	}
 

@@ -58,7 +58,7 @@ public class CourseDao {
 
 		for (File courseFile : courseFiles) {
 			if (courseFile.lastModified() < prevStamp) {
-				log.warn("{} not modified since last read", courseFile.getPath());
+				log.debug("{} not modified since last read", courseFile.getPath());
 				continue;
 			}
 			try {
