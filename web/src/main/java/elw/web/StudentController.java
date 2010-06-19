@@ -218,10 +218,12 @@ public class StudentController extends MultiActionController implements WebSymbo
 		final HashMap<String, CodeMeta> codeMetas = new HashMap<String, CodeMeta>();
 		final HashMap<String, ReportMeta> reportMetas = new HashMap<String, ReportMeta>();
 		final HashMap<String, Score> scores = new HashMap<String, Score>();
-		storeMetas(ctx, codeDao, reportDao, scoreDao, codeMetas, reportMetas, scores);
+		final int[] grossScore = new int[1];
+		storeMetas(ctx, codeDao, reportDao, scoreDao, codeMetas, reportMetas, scores, grossScore);
 		model.put("codeMetas", codeMetas);
 		model.put("reportMetas", reportMetas);
 		model.put("scores", scores);
+		model.put("grossScore", grossScore[0]);
 
 		return new ModelAndView("s/course", model);
 	}
@@ -229,7 +231,9 @@ public class StudentController extends MultiActionController implements WebSymbo
 	public static void storeMetas(
 			Ctx ctx,
 			CodeDao codeDao, ReportDao reportDao, ScoreDao scoreDao,
-			Map<String, CodeMeta> codeMetas, Map<String, ReportMeta> reportMetas, Map<String, Score> scores) {
+			Map<String, CodeMeta> codeMetas, Map<String, ReportMeta> reportMetas, Map<String, Score> scores, int[] grossScore) {
+		double grossScoreFuzzy = 0;
+
 		for (int bunI = 0, assBundlesLength = ctx.getCourse().getAssBundles().length; bunI < assBundlesLength; bunI++) {
 			AssignmentBundle bundle = ctx.getCourse().getAssBundles()[bunI];
 			for (Assignment ass : bundle.getAssignments()) {
@@ -252,6 +256,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 					}
 					if (scores != null) {
 						final Score lastScore = scoreDao.findLastScore(assCtx);
+						Score effectiveScore = null;
 						if (lastScore == null) {
 							if (codeDao != null) {
 								final long lastReportStamp = reportDao != null ? reportDao.findLastStamp(assCtx) : Long.MAX_VALUE;
@@ -259,17 +264,23 @@ public class StudentController extends MultiActionController implements WebSymbo
 								final long bestCodeStamp = AdminController.computeCodeScores(
 										assCtx,
 										codeDao.findAllMetas(assCtx), allCodeScores,
-										lastReportStamp
+										lastReportStamp >= 0 ? lastReportStamp : Long.MAX_VALUE
 								);
-								scores.put(assPath, allCodeScores.get(bestCodeStamp));
+								effectiveScore = allCodeScores.get(bestCodeStamp);
 							}
 						} else {
-							scores.put(assPath, lastScore);
+							effectiveScore = lastScore;
+						}
+						if (effectiveScore != null) {
+							scores.put(assPath, effectiveScore);
+							grossScoreFuzzy += effectiveScore.getTotal(bundle.getScoring(), ass.getScoring());
 						}
 					}
 				}
 			}
 		}
+
+		grossScore[0] = (int) Math.floor(grossScoreFuzzy + 0.1);
 	}
 
 	@RequestMapping(value = "uploadReport", method = RequestMethod.POST)
@@ -293,7 +304,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 
 		final String refreshUri = "uploadPage?" + WebSymbols.R_CTX + "=" + ctx.toString();
 		if (scoreDao.findLastStamp(ctx) > 0) {
-			Message.addWarn(req, "report already approved");
+			Message.addWarn(req, "report already approved, upload NOT allowed");
 			resp.sendRedirect(refreshUri);
 			return null;
 		}

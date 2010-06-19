@@ -285,17 +285,26 @@ public class AdminController extends MultiActionController implements WebSymbols
 
 		final HashMap<String, CodeMeta> codeMetas = new HashMap<String, CodeMeta>();
 		final HashMap<String, ReportMeta> reportMetas = new HashMap<String, ReportMeta>();
+		final HashMap<String, Score> scores = new HashMap<String, Score>();
+		final HashMap<String, Integer> grossScores = new HashMap<String, Integer>();
+		final int[] grossScore = new int[1];
 		for (Student stud : ctx.getGroup().getStudents()) {
+			final Ctx studCtx = ctx.extendStudent(stud);
+
 			StudentController.storeMetas(
-					ctx.extendStudent(stud),
+					studCtx,
 					codeDao, reportDao, scoreDao,
-					codeMetas, reportMetas, null
-			);
+					codeMetas, reportMetas, scores,
+					grossScore);
+
+			grossScores.put(studCtx.toString(), grossScore[0]);
 		}
 
 		model.put("elw_ctx", ctx);
 		model.put("codeMetas", codeMetas);
 		model.put("reportMetas", reportMetas);
+		model.put("scores", scores);
+		model.put("grossScores", grossScores);
 
 		return new ModelAndView("a/enroll", model);
 	}

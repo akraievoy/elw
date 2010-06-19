@@ -79,7 +79,7 @@
 		<span style="#if($score.preliminary)font-style: italic;#end">
 			<span title="$score.niceStamp">$score.getNicePoints($elw_ctx.bundle.scoring.breakdown.get("code"), $elw_ctx.ass.scoring)</span>
 			#set($terms = $score.getTerms($elw_ctx.bundle.scoring.breakdown.get("code")))
-			#if($terms.size() > 0) :
+			#if($terms.size() > 0):
 				#foreach($term in $terms)
 					#if($term.positive)
 						#set($termColor = "#00FF00")
@@ -100,7 +100,7 @@
 		<span style="#if($score.preliminary)font-style: italic;#end">
 			<span title="$score.niceStamp">$score.getNicePoints($elw_ctx.bundle.scoring.breakdown.get("report"), $elw_ctx.ass.scoring)</span>
 			#set($terms = $score.getTerms($elw_ctx.bundle.scoring.breakdown.get("report")))
-			#if($terms.size() > 0) :
+			#if($terms.size() > 0):
 				#foreach($term in $terms)
 					#if($term.positive)
 						#set($termColor = "#00FF00")

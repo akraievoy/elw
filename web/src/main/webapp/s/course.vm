@@ -23,7 +23,11 @@
 		<th>Score</th>
 		<th>Actions</th>
 	</tr>
-	<tr><td style="padding-left: 1em;" colspan=5>Assignment bundles:</td></tr>
+	<tr>
+		<td style="padding-left: 1em;" colspan=3>Assignment bundles:</td>
+		<td style="padding: 0 0.25em;">$grossScore</td>
+		<td style="padding: 0 0.25em;">&nbsp;</td>
+	</tr>
 	#foreach($assBundle in $elw_ctx.course.assBundles)#set($bunI = $velocityCount - 1)
 	<tr><td style="padding-left: 1.25em;" colspan=5>Assignments:</td></tr>
 	 #foreach($ass in $assBundle.assignments)#set($assI = $velocityCount)

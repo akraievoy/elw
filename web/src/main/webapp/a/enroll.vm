@@ -20,29 +20,34 @@
 #elw_messages($elw_messages)
 <table cellspacing="0"><tbody>
 <tr class="header">
-	<td style="padding-left: 1em; padding-right: 0.25em;"><a name="${elw_ctx.group.id}" title="id : ${elw_ctx.group.id}">${elw_ctx.group.name}</a></td>
+	<th style="padding-left: 1em; padding-right: 0.25em;"><a name="${elw_ctx.group.id}" title="id : ${elw_ctx.group.id}">${elw_ctx.group.name}</a></th>
+	<th style="padding: 0 0.25em;">Score</th>
 #foreach($assBundle in $elw_ctx.course.assBundles)#set($bunI = $velocityCount - 1)
 	#foreach($ass in $assBundle.assignments)#set($assI = $velocityCount)
 		#if($ass.id && !$ass.shared)
-				<td style="padding-left: 0.25em; padding-right: 0.25em; text-align: center;" colspan="2"><span title="$ass.name">$ass.id</span></td>
+				<th style="padding-left: 0.25em; padding-right: 0.25em; text-align: center;" colspan="2"><span title="$ass.name">$ass.id</span></th>
 		#end
 	#end
 #end
 </tr>
 #foreach($stud in $elw_ctx.group.students)
+	#set($studCtx = $elw_ctx.extendStudent($stud))
 	<tr >
-		<td style="padding-left: 2em; padding-right: 0.25em;">$stud.name &nbsp;<span class="extra">(id&nbsp;:&nbsp;${stud.id})</td>
+		<td style="padding-left: 2em; padding-right: 0.25em;"><span title="(id : ${stud.id})">$stud.name</span></td>
+		<td style="padding: 0 0.25em;">$grossScores.get("$studCtx")</td>
 	#foreach($assBundle in $elw_ctx.course.assBundles)#set($bunI = $velocityCount - 1)
 		#foreach($ass in $assBundle.assignments)#set($assI = $velocityCount)
 			#if($ass.id && !$ass.shared)
 				#set($verIdx = $stud.idAsInt % $ass.versions.size())
 				#set($ver = $ass.versions.get($verIdx))
-				#set($path = $elw_ctx.extendStudent($stud).extendBAV(${bunI}, ${ass}, ${ver}))
-		<td style="padding-left: 0.25em; padding-right: 0.25em;">
+				#set($path = $studCtx.extendBAV(${bunI}, ${ass}, ${ver}))
+		<td style="padding-left: 0.25em; padding-right: 0.25em; text-align: right;">
 			#elw_code_state($path, $codeMetas.get("$path"))
+			<span style="font-size: 0.6em;">#elw_code_score($path, $scores.get("$path"))</span>
 		</td>
-		<td style="padding-left: 0.25em; padding-right: 0.25em; border-left: 1px dashed #CCCCCC;'">
+		<td style="padding-left: 0.25em; padding-right: 0.25em; text-align: right; border-left: 1px dashed #CCCCCC;'">
 			#elw_report_state($path, $reportMetas.get("$path"))
+			<span style="font-size: 0.6em;">#elw_report_score($path, $scores.get("$path"))</span>
 		</td>
 			#end
 		#end
