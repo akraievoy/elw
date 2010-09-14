@@ -1,0 +1,20 @@
+<project default="data">
+	<target name="data">
+		<property name="elw.data" value="${user.home}/elw-data"/>
+		<delete dir="${elw.data}" failonerror="true"/>
+		<mkdir dir="${elw.data}"/>
+		<exec executable="/usr/bin/7z" failonerror="true">
+			<arg value="x"/>
+			<arg value="-y"/>
+			<arg value="-o${elw.data}"/>
+			<arg value="elw-data.7z"/>
+		</exec>
+		<exec executable="/usr/bin/rsync" failonerror="true">
+			<arg value="-vcr"/>
+			<arg value="--exclude"/>
+			<arg value="'.svn'"/>
+			<arg value="elw-data/"/>
+			<arg value="${elw.data}"/>
+		</exec>
+	</target>
+</project>
