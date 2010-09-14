@@ -18,7 +18,7 @@
 #elw_messages($elw_messages)
 <div id=main>
 	#foreach($enr in $enrolls)
-	<a href="course?ctx=${enr.id}">${courses.get($enr.courseId).name}</a>
+	<a href="course?elw_ctx=e--${enr.id}">${courses.get($enr.courseId).name}</a>
 	#end
 </div>
 </body>
