@@ -1,0 +1,118 @@
+{
+  "students" : [ {
+    "lead" : false,
+    "email" : null,
+    "name" : "Акатьєв Кирило",
+    "id" : "1"
+  }, {
+    "lead" : false,
+    "email" : null,
+    "name" : "Бистрицький Володимир",
+    "id" : "2"
+  }, {
+    "lead" : false,
+    "email" : null,
+    "name" : "Братусь Олена",
+    "id" : "3"
+  }, {
+    "lead" : false,
+    "email" : null,
+    "name" : "Веременко Марина",
+    "id" : "4"
+  }, {
+    "lead" : false,
+    "email" : null,
+    "name" : "Гнатенко Павло",
+    "id" : "5"
+  }, {
+    "lead" : false,
+    "email" : null,
+    "name" : "Головко Микола",
+    "id" : "6"
+  }, {
+    "lead" : false,
+    "email" : null,
+    "name" : "Гуляк Роман",
+    "id" : "7"
+  }, {
+    "lead" : false,
+    "email" : null,
+    "name" : "Крамаренко Олександр",
+    "id" : "8"
+  }, {
+    "lead" : false,
+    "email" : null,
+    "name" : "Кутовий Тарас",
+    "id" : "9"
+  }, {
+    "lead" : false,
+    "email" : null,
+    "name" : "Лозовий Володимир",
+    "id" : "10"
+  }, {
+    "lead" : false,
+    "email" : null,
+    "name" : "Мальчевський Юрій",
+    "id" : "11"
+  }, {
+    "lead" : false,
+    "email" : null,
+    "name" : "Михайленко Олександр",
+    "id" : "12"
+  }, {
+    "lead" : false,
+    "email" : null,
+    "name" : "Москаленко Тетяна",
+    "id" : "13"
+  }, {
+    "lead" : false,
+    "email" : null,
+    "name" : "Побережний Дмитро",
+    "id" : "14"
+  }, {
+    "lead" : false,
+    "email" : null,
+    "name" : "Ремез Орест",
+    "id" : "15"
+  }, {
+    "lead" : false,
+    "email" : null,
+    "name" : "Рисцова Катерина",
+    "id" : "16"
+  }, {
+    "lead" : false,
+    "email" : null,
+    "name" : "Снігірьова Тамара",
+    "id" : "17"
+  }, {
+    "lead" : false,
+    "email" : null,
+    "name" : "Станкевич Олена",
+    "id" : "18"
+  }, {
+    "lead" : false,
+    "email" : null,
+    "name" : "Чадюк Галина",
+    "id" : "19"
+  }, {
+    "lead" : false,
+    "email" : null,
+    "name" : "Чаповський Дмитро",
+    "id" : "20"
+  }, {
+    "lead" : false,
+    "email" : null,
+    "name" : "Чесніший Ігор",
+    "id" : "21"
+  } ],
+  "createStamp" : {
+    "time" : 1284743488461,
+    "node" : "anton"
+  },
+  "updateStamp" : {
+    "time" : 1284743488461,
+    "node" : "anton"
+  },
+  "name" : "КА-75",
+  "id" : "ka75"
+}
