@@ -3,6 +3,7 @@ package elw.dao;
 import elw.vo.Stamp;
 import elw.vo.Stamped;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.SerializationConfig;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
@@ -106,7 +107,7 @@ public abstract class Dao<Criteria extends Locator, Meta extends Stamped> {
 			log.warn("criteria not set for metaClass: {}", metaClass.getSimpleName());
 		}
 		if (mapper == null) {
-			mapper = new ObjectMapper();
+			mapper = createMapper();
 		}
 		if (node == null) {
 			node = System.getProperty("user.name");
@@ -116,6 +117,14 @@ public abstract class Dao<Criteria extends Locator, Meta extends Stamped> {
 		}
 
 		log.warn("node: '{}'; base: {}", node, base.getAbsolutePath());
+	}
+
+	protected ObjectMapper createMapper() {
+		final ObjectMapper defaultMapper = new ObjectMapper();
+
+		defaultMapper.getSerializationConfig().enable(SerializationConfig.Feature.INDENT_OUTPUT);
+
+		return defaultMapper;
 	}
 
 	public void pollInbox() {
