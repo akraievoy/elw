@@ -14,7 +14,7 @@ import java.util.*;
 /**
  * Dealing with persisting, enumerating and retrieving report uploads.
  */
-public class ReportDao {
+public class ReportDao extends Dao {
 	private static final Logger log = LoggerFactory.getLogger(ReportDao.class);
 
 	protected final ObjectMapper mapper;

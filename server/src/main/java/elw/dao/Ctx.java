@@ -6,13 +6,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.lang.Class;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class Ctx {
+public class Ctx implements Locator {
 	private static final Logger log = LoggerFactory.getLogger(Ctx.class);
 
 	public static final String STATE_NONE = "";
+	public static final String STATE_G = "g";
 	public static final String STATE_GS = "gs";
 	public static final String STATE_ECG = "ecg";
 	public static final String STATE_ECGS = "ecgs";
@@ -67,6 +69,11 @@ public class Ctx {
 		this.initState = initState;
 		this.courseId = courseId;
 		this.groupId = groupId;
+	}
+
+	@Deprecated // only for spring injections
+	public Ctx() {
+		this(STATE_NONE, null, null, null, null, -1, null, null);
 	}
 
 	public static Ctx fromString(final String path) {
@@ -604,5 +611,46 @@ public class Ctx {
 
 	public static String norm(final String state) {
 		return removeRedundant(reorder(state));
+	}
+
+	public <T extends Stamped> String[] getPath(Class<T> metaClass, T meta) {
+		if (Group.class.isAssignableFrom(metaClass)) {
+			if (meta != null) {
+				return new String[] {((Group) meta).getId()};
+			} else {
+				return new String[] {groupId};
+			}
+		}
+		return new String[0];
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		Ctx ctx = (Ctx) o;
+
+		if (bundleIdx != ctx.bundleIdx) return false;
+		if (assId != null ? !assId.equals(ctx.assId) : ctx.assId != null) return false;
+		if (courseId != null ? !courseId.equals(ctx.courseId) : ctx.courseId != null) return false;
+		if (enrId != null ? !enrId.equals(ctx.enrId) : ctx.enrId != null) return false;
+		if (groupId != null ? !groupId.equals(ctx.groupId) : ctx.groupId != null) return false;
+		if (studId != null ? !studId.equals(ctx.studId) : ctx.studId != null) return false;
+		if (verId != null ? !verId.equals(ctx.verId) : ctx.verId != null) return false;
+
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = enrId != null ? enrId.hashCode() : 0;
+		result = 31 * result + (courseId != null ? courseId.hashCode() : 0);
+		result = 31 * result + (groupId != null ? groupId.hashCode() : 0);
+		result = 31 * result + (studId != null ? studId.hashCode() : 0);
+		result = 31 * result + bundleIdx;
+		result = 31 * result + (assId != null ? assId.hashCode() : 0);
+		result = 31 * result + (verId != null ? verId.hashCode() : 0);
+		return result;
 	}
 }

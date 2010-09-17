@@ -12,7 +12,7 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.util.*;
 
-public class EnrollDao {
+public class EnrollDao extends Dao {
 	private static final Logger log = LoggerFactory.getLogger(EnrollDao.class);
 
 	protected final ObjectMapper mapper;

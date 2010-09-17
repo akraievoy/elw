@@ -15,7 +15,7 @@ import java.util.*;
 /**
  * Dealing with persisting, enumerating and retrieving code uploads.
  */
-public class CodeDao {
+public class CodeDao extends Dao {
 	private static final Logger log = LoggerFactory.getLogger(CodeDao.class);
 
 	protected static final String[] CODE_DEFAULT = new String[]{"#  your code", "#    goes here", "#      :)"};

@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-public class CourseDao {
+public class CourseDao extends Dao {
 	private static final Logger log = LoggerFactory.getLogger(CourseDao.class);
 
 	protected final ObjectMapper mapper;

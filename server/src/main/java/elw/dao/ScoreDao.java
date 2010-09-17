@@ -13,7 +13,7 @@ import java.util.*;
 /**
  * Dealing with persisting, enumerating and retrieving scoring objects.
  */
-public class ScoreDao {
+public class ScoreDao extends Dao {
 	private static final Logger log = LoggerFactory.getLogger(ScoreDao.class);
 
 	protected static final String META_POSTFIX = ".json";

@@ -21,12 +21,40 @@
 
 	<bean id="mapper" class="elw.dao.MapperFactory" factory-method="createMapper"/>
 
-	<bean id="courseDao" class="elw.dao.CourseDao"/>
-	<bean id="groupDao" class="elw.dao.GroupDao"/>
-	<bean id="codeDao" class="elw.dao.CodeDao"/>
-	<bean id="reportDao" class="elw.dao.ReportDao"/>
-	<bean id="enrollmentDao" class="elw.dao.EnrollDao"/>
-	<bean id="scoreDao" class="elw.dao.ScoreDao"/>
+	<bean id="courseDao" class="elw.dao.CourseDao">
+		<property name="metaClass" value="elw.vo.Course"/>
+	</bean>
+	<bean id="groupDao" class="elw.dao.GroupDao">
+		<property name="metaClass" value="elw.vo.Group"/>
+		<property name="criteria">
+			<bean class="elw.dao.Ctx"/>
+		</property>
+	</bean>
+	<bean id="codeDao" class="elw.dao.CodeDao">
+		<property name="metaClass" value="elw.vo.CodeMeta"/>
+	</bean>
+	<bean id="reportDao" class="elw.dao.ReportDao">
+		<property name="metaClass" value="elw.vo.ReportMeta"/>
+	</bean>
+	<bean id="enrollmentDao" class="elw.dao.EnrollDao">
+		<property name="metaClass" value="elw.vo.Enrollment"/>
+	</bean>
+	<bean id="scoreDao" class="elw.dao.ScoreDao">
+		<property name="metaClass" value="elw.vo.Score"/>
+	</bean>
+
+	<bean class="elw.dao.RunnablePollInboxes">
+		<property name="daos">
+			<list>
+				<ref bean="courseDao"/>
+				<ref bean="groupDao"/>
+				<ref bean="codeDao"/>
+				<ref bean="reportDao"/>
+				<ref bean="enrollmentDao"/>
+				<ref bean="scoreDao"/>
+			</list>
+		</property>
+	</bean>
 
 	<bean id="daemonThreadFactory" class="org.akraievoy.gear.G4Run$ThreadFactory">
 		<constructor-arg type="boolean" value="true"/>
