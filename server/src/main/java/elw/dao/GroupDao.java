@@ -15,11 +15,6 @@ import java.util.Set;
 import java.util.TreeMap;
 
 public class GroupDao extends Dao<Ctx, Group> {
-	private static final Logger log = LoggerFactory.getLogger(GroupDao.class);
-
-	public GroupDao() {
-	}
-
 	public String[] findGroupIds() {
 		final String[][] pathElems = listCriteria(criteria, null, false, true, false, null);
 
