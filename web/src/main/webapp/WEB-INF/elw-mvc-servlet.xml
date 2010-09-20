@@ -23,6 +23,9 @@
 
 	<bean id="courseDao" class="elw.dao.CourseDao">
 		<property name="metaClass" value="elw.vo.Course"/>
+		<property name="criteria">
+			<bean class="elw.dao.Ctx"/>
+		</property>
 	</bean>
 	<bean id="groupDao" class="elw.dao.GroupDao">
 		<property name="metaClass" value="elw.vo.Group"/>

@@ -621,6 +621,13 @@ public class Ctx implements Locator {
 				return new String[] {groupId};
 			}
 		}
+		if (Course.class.isAssignableFrom(metaClass)) {
+			if (meta != null) {
+				return new String[] {((Course) meta).getId()};
+			} else {
+				return new String[] {courseId};
+			}
+		}
 		return new String[0];
 	}
 

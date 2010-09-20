@@ -1,6 +1,7 @@
 package elw.dao;
 
 import elw.vo.Course;
+import elw.vo.Group;
 import org.akraievoy.gear.G;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
@@ -14,81 +15,37 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-public class CourseDao extends Dao {
+public class CourseDao extends Dao<Ctx, Course> {
 	private static final Logger log = LoggerFactory.getLogger(CourseDao.class);
 
-	protected final ObjectMapper mapper;
-	protected int cacheTime = 60000;
-
-	final Map<String, Course> courseCache = new TreeMap<String, Course>();
-
-	protected long cacheStamp = 0;
-
-	public void setCacheTime(int cacheTime) {
-		this.cacheTime = cacheTime;
-	}
-
-	public CourseDao(ObjectMapper mapper) {
-		this.mapper = mapper;
+	public CourseDao() {
 	}
 
 	public synchronized String[] findCourseIds() {
-		refreshCache();
+		final String[][] pathElems = listCriteria(criteria, null, false, true, false, null);
 
-		final Set<String> keys = courseCache.keySet();
-		return keys.toArray(new String[keys.size()]);
-	}
-
-	public void refreshCache() {
-		final long now = System.currentTimeMillis();
-		final long prevStamp = cacheStamp;
-
-		if (now - cacheStamp >= cacheTime) {
-			cacheStamp = now;
-		} else {
-			return;
-		}
-
-		final File coursesDir = new File(System.getProperty("user.home"), "elw-data/courses");
-		final File[] courseFiles = coursesDir.listFiles(new FileFilter() {
-			public boolean accept(File pathname) {
-				return pathname.isFile() && pathname.getName().endsWith(".json");
-			}
-		});
-
-		for (File courseFile : courseFiles) {
-			if (courseFile.lastModified() < prevStamp) {
-				log.debug("{} not modified since last read", courseFile.getPath());
-				continue;
-			}
-			try {
-				final Course course = mapper.readValue(courseFile, Course.class);
-				if (courseFile.getName().equals(course.getId() + ".json")) {
-					courseCache.put(course.getId(), course);
-				} else {
-					log.warn("wrong course id at file {}", courseFile.getPath());
-				}
-			} catch (IOException e) {
-				log.warn("failed to read {}: {}", courseFile.getPath(), G.report(e));
-				log.trace("trace", e);
-			}
-		}
+		return pathElems[0];
 	}
 
 	public synchronized Course findCourse(final String id) {
-		refreshCache();
-
 		if (id == null) {
 			return null;
 		}
 
-		return courseCache.get(id);
+		final Ctx groupCtx = new Ctx(Ctx.STATE_C, null, null, null, id, -1, null, null);
+		final Entry<Course> entry = findLast(groupCtx, null, null);
+
+		return entry.getMeta();
 	}
 
 	public Course[] findAllCourses() {
-		refreshCache();
+		final String[] groupIds = findCourseIds();
+		final Course[] courses = new Course[groupIds.length];
 
-		final Collection<Course> courses = courseCache.values();
-		return courses.toArray(new Course[courses.size()]);
+		for (int i = 0; i < courses.length; i++) {
+			courses[i] = findCourse(groupIds[i]);
+		}
+
+		return courses;
 	}
 }

@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Course extends IdName {
+public class Course extends IdName implements Stamped {
 	protected final List<AssignmentBundle> assBundles = new ArrayList<AssignmentBundle>();
 	protected final List<QuizBundle> quizBundles = new ArrayList<QuizBundle>();
+	protected Stamp createStamp;
+	protected Stamp updateStamp;
 
 	protected String resourcePath;
 
@@ -34,5 +36,21 @@ public class Course extends IdName {
 	public void setQuizBundles(QuizBundle[] quizBundles) {
 		this.quizBundles.clear();
 		this.quizBundles.addAll(Arrays.asList(quizBundles));
+	}
+
+	public Stamp getCreateStamp() {
+		return createStamp;
+	}
+
+	public void setCreateStamp(Stamp createStamp) {
+		this.createStamp = createStamp;
+	}
+
+	public Stamp getUpdateStamp() {
+		return updateStamp;
+	}
+
+	public void setUpdateStamp(Stamp updateStamp) {
+		this.updateStamp = updateStamp;
 	}
 }
