@@ -1,8 +1,6 @@
 package elw.dao;
 
 import elw.vo.Assignment;
-import elw.vo.AssignmentType;
-import elw.vo.Course;
 
 /**
  * Path: course.id/assType.id/ass.id
@@ -22,6 +20,7 @@ public class AssDao extends Dao<Assignment> {
 
 	public Assignment[] findAllForAssType(final String courseId, final String assTypeId) {
 		final String[] assIds = findIdsForAssType(courseId, assTypeId);
+
 		return load(courseId, assTypeId, assIds);
 	}
 
@@ -42,6 +41,6 @@ public class AssDao extends Dao<Assignment> {
 
 		final Entry<Assignment> entry = findLast(new Path(new String[] {courseId, assTypeId, assId}), null, null);
 
-		return entry.getMeta();
+		return entry != null ? entry.getMeta() : null;
 	}
 }
