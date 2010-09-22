@@ -15,7 +15,6 @@ public class Score implements Stamped {
 	protected final Map<String, Integer> pows = new TreeMap<String, Integer>();
 
 	protected Stamp createStamp;
-	protected Stamp updateStamp;
 	protected String[] path;
 
 	protected Stamp codeStamp;
@@ -27,14 +26,6 @@ public class Score implements Stamped {
 
 	public void setCreateStamp(Stamp createStamp) {
 		this.createStamp = createStamp;
-	}
-
-	public Stamp getUpdateStamp() {
-		return updateStamp;
-	}
-
-	public void setUpdateStamp(Stamp updateStamp) {
-		this.updateStamp = updateStamp;
 	}
 
 	public String[] getPath() {
@@ -83,7 +74,6 @@ public class Score implements Stamped {
 		final Score copy = new Score();
 
 		copy.setCreateStamp(createStamp);
-		copy.setUpdateStamp(updateStamp);
 		//	LATER would we copy any other stamps here?
 		copy.ratios.putAll(ratios);
 		copy.pows.putAll(pows);

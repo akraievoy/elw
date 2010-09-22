@@ -1,0 +1,159 @@
+{
+  "shared" : false,
+  "versions" : [ {
+    "solution" : [ "sw $a0, 0($a1)" ],
+    "tests" : [ {
+      "shared" : true,
+      "args" : {
+        "mem" : [ "0x100::65" ],
+        "regs" : [ "$a0:65:65", "$a1:0x100:0x100" ]
+      },
+      "name" : null,
+      "id" : null
+    }, {
+      "shared" : true,
+      "args" : {
+        "mem" : [ "0x100::9" ],
+        "regs" : [ "$a0:9:9", "$a1:0x100:0x100" ]
+      },
+      "name" : null,
+      "id" : null
+    }, {
+      "shared" : true,
+      "args" : {
+        "mem" : [ "0x100::23" ],
+        "regs" : [ "$a0:23:23", "$a1:0x100:0x100" ]
+      },
+      "name" : null,
+      "id" : null
+    } ],
+    "statementHtml" : [ "Поместить содержимое регистра $a0 в память по адресу из регистра $a1" ],
+    "name" : "Запись в память",
+    "id" : "1"
+  }, {
+    "solution" : [ "lw $a0, 0($a1)" ],
+    "tests" : [ {
+      "shared" : true,
+      "args" : {
+        "mem" : [ "0x100:10:10" ],
+        "regs" : [ "$a0::10", "$a1:0x100:0x100" ]
+      },
+      "name" : null,
+      "id" : null
+    }, {
+      "shared" : true,
+      "args" : {
+        "mem" : [ "0x100:71:71" ],
+        "regs" : [ "$a0::71", "$a1:0x100:0x100" ]
+      },
+      "name" : null,
+      "id" : null
+    }, {
+      "shared" : true,
+      "args" : {
+        "mem" : [ "0x100:22:22" ],
+        "regs" : [ "$a0::22", "$a1:0x100:0x100" ]
+      },
+      "name" : null,
+      "id" : null
+    } ],
+    "statementHtml" : [ "Поместить в регистр $a0 содержимое ячейки памяти по адресу из регистра $a1" ],
+    "name" : "Чтение из памяти",
+    "id" : "2"
+  }, {
+    "solution" : [ "xor $v0, $a0, $a1" ],
+    "tests" : [ {
+      "shared" : true,
+      "args" : {
+        "regs" : [ "$a0:11:11", "$a1:3:3", "$v0::8" ]
+      },
+      "name" : null,
+      "id" : null
+    }, {
+      "shared" : true,
+      "args" : {
+        "regs" : [ "$a0:23:23", "$a1:17:17", "$v0::6" ]
+      },
+      "name" : null,
+      "id" : null
+    }, {
+      "shared" : true,
+      "args" : {
+        "regs" : [ "$a0:14:14", "$a1:9:9", "$v0::7" ]
+      },
+      "name" : null,
+      "id" : null
+    } ],
+    "statementHtml" : [ "Выполнить \"исключающее или\" регистров $a0 и $a1, поместить результат в $vo" ],
+    "name" : "Исключающее ИЛИ",
+    "id" : "3"
+  }, {
+    "solution" : [ "mult $a0, $a1", "mflo $v0" ],
+    "tests" : [ {
+      "shared" : true,
+      "args" : {
+        "regs" : [ "$a0:13:13", "$a1:3:3", "$v0::39" ]
+      },
+      "name" : null,
+      "id" : null
+    }, {
+      "shared" : true,
+      "args" : {
+        "regs" : [ "$a0:11:11", "$a1:12:12", "$v0::132" ]
+      },
+      "name" : null,
+      "id" : null
+    }, {
+      "shared" : true,
+      "args" : {
+        "regs" : [ "$a0:25:25", "$a1:4:4", "$v0::100" ]
+      },
+      "name" : null,
+      "id" : null
+    } ],
+    "statementHtml" : [ "Умножить содержимое регистров $a0 и $a1 и поместить результат в $v0" ],
+    "name" : "Умножение",
+    "id" : "4"
+  }, {
+    "solution" : [ "div $a0, $a1", "mflo $v0" ],
+    "tests" : [ {
+      "shared" : true,
+      "args" : {
+        "regs" : [ "$a0:12:12", "$a1:3:3", "$v0::4" ]
+      },
+      "name" : null,
+      "id" : null
+    }, {
+      "shared" : true,
+      "args" : {
+        "regs" : [ "$a0:117:117", "$a1:7:7", "$v0::16" ]
+      },
+      "name" : null,
+      "id" : null
+    }, {
+      "shared" : true,
+      "args" : {
+        "regs" : [ "$a0:43:43", "$a1:4:4", "$v0::10" ]
+      },
+      "name" : null,
+      "id" : null
+    } ],
+    "statementHtml" : [ "Разделить содержимое регистра $a0 на содержимое регистра $a1 и поместить целую часть в $v0" ],
+    "name" : "Деление",
+    "id" : "5"
+  } ],
+  "scoring" : {
+    "classReportDue" : 7,
+    "classCodeDue" : 3,
+    "scoreBudget" : 2,
+    "requireClean" : false,
+    "classFrom" : 0
+  },
+  "path" : [ "aos-w10", "lr", "1c" ],
+  "createStamp" : {
+    "time" : 1285174424661,
+    "node" : "anton"
+  },
+  "name" : "Лабораторная №1(в) - Запись/чтение",
+  "id" : "1c"
+}

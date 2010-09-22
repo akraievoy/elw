@@ -8,7 +8,6 @@ public class Group extends IdName implements Stamped {
 	protected List<Student> students = new ArrayList<Student>();
 
 	protected Stamp createStamp;
-	protected Stamp updateStamp;
 
 	public Student[] getStudents() {
 		return students.toArray(new Student[students.size()]);
@@ -25,13 +24,5 @@ public class Group extends IdName implements Stamped {
 
 	public void setCreateStamp(Stamp createStamp) {
 		this.createStamp = createStamp;
-	}
-
-	public Stamp getUpdateStamp() {
-		return updateStamp;
-	}
-
-	public void setUpdateStamp(Stamp updateStamp) {
-		this.updateStamp = updateStamp;
 	}
 }

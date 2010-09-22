@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Assignment extends IdName {
+public class Assignment extends IdNameStamped {
 	protected final List<Version> versions = new ArrayList<Version>();
 	protected TaskScoring scoring = null;
 	protected boolean shared = false;

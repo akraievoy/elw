@@ -21,6 +21,9 @@
 
 	<bean id="mapper" class="elw.dao.MapperFactory" factory-method="createMapper"/>
 
+	<bean id="assDao" class="elw.dao.AssDao">
+		<property name="metaClass" value="elw.vo.Assignment"/>
+	</bean>
 	<bean id="courseDao" class="elw.dao.CourseDao">
 		<property name="metaClass" value="elw.vo.Course"/>
 	</bean>
@@ -43,6 +46,7 @@
 	<bean class="elw.dao.RunnablePollInboxes">
 		<property name="daos">
 			<list>
+				<ref bean="assDao"/>
 				<ref bean="courseDao"/>
 				<ref bean="groupDao"/>
 				<ref bean="codeDao"/>

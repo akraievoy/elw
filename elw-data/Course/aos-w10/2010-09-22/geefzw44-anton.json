@@ -1,0 +1,131 @@
+{
+  "assTypes" : [ {
+    "scoring" : {
+      "version" : 3,
+      "breakdown" : {
+        "code" : {
+          "auto" : [ "code.overdue", "code.tests" ],
+          "weight" : 0.6,
+          "applied" : [ "code.overdue", "code.tests", "code.style", "code.reuse", "code.eff", "code.brute" ],
+          "manual" : [ ],
+          "name" : null,
+          "id" : null
+        },
+        "report" : {
+          "auto" : [ "rep.overdue" ],
+          "weight" : 0.4,
+          "applied" : [ "rep.style", "rep.format", "rep.content", "rep.overdue" ],
+          "manual" : [ "rep.style", "rep.format", "rep.content", "code.style", "code.reuse", "code.eff", "code.brute" ],
+          "name" : null,
+          "id" : null
+        }
+      },
+      "criterias" : [ {
+        "ratio" : "0.975",
+        "powDef" : "$overdue",
+        "powMax" : 120,
+        "name" : "Задержка кода",
+        "id" : "code.overdue"
+      }, {
+        "ratio" : "0.95",
+        "powDef" : "0",
+        "powMax" : 3,
+        "name" : "Форматирование кода",
+        "id" : "code.style"
+      }, {
+        "ratio" : "0.8",
+        "powDef" : "0",
+        "powMax" : 5,
+        "name" : "Групповая работа",
+        "id" : "code.reuse"
+      }, {
+        "ratio" : "$passratio",
+        "powDef" : "1",
+        "powMax" : 1,
+        "name" : "Сломанные тесты",
+        "id" : "code.tests"
+      }, {
+        "ratio" : "0.95",
+        "powDef" : "0",
+        "powMax" : 3,
+        "name" : "Примитивный алгоритм",
+        "id" : "code.brute"
+      }, {
+        "ratio" : "1.25",
+        "powDef" : "0",
+        "powMax" : 3,
+        "name" : "Эффективный алгоритм",
+        "id" : "code.eff"
+      }, {
+        "ratio" : "0.98",
+        "powDef" : "$overdue",
+        "powMax" : 120,
+        "name" : "Задержка отчета",
+        "id" : "rep.overdue"
+      }, {
+        "ratio" : "0.95",
+        "powDef" : "0",
+        "powMax" : 7,
+        "name" : "Ошибки в форматировании",
+        "id" : "rep.style"
+      }, {
+        "ratio" : "0.9",
+        "powDef" : "0",
+        "powMax" : 5,
+        "name" : "Ошибка в оформлении",
+        "id" : "rep.format"
+      }, {
+        "ratio" : "0.75",
+        "powDef" : "0",
+        "powMax" : 5,
+        "name" : "Структурная ошибка",
+        "id" : "rep.content"
+      } ]
+    },
+    "fileSets" : [ ],
+    "setup" : {
+      "codeMaxBytes" : 10240,
+      "codeDownloadPattern" : "${stud}${classFrom}${var}.txt",
+      "codeUploadRegex" : ".+\\.txt",
+      "reportMaxBytes" : 2097152,
+      "reportUploadRegex" : ".+\\.rtf",
+      "codeValidatorCN" : "ToBeDone",
+      "codeExportUriPattern" : "/code/mips/${classFrom}",
+      "reportGenerateUriPattern" : "/report/"
+    },
+    "path" : null,
+    "createStamp" : null,
+    "name" : "Лабораторная Работа",
+    "id" : "lr"
+  }, {
+    "scoring" : {
+      "version" : 1,
+      "breakdown" : {
+      },
+      "criterias" : [ ]
+    },
+    "fileSets" : [ ],
+    "setup" : {
+      "codeMaxBytes" : 10240,
+      "codeDownloadPattern" : "${stud}${classFrom}${var}.txt",
+      "codeUploadRegex" : ".+\\.txt",
+      "reportMaxBytes" : 2097152,
+      "reportUploadRegex" : ".+\\.rtf",
+      "codeValidatorCN" : "ToBeDone",
+      "codeExportUriPattern" : "/code/mips/${classFrom}",
+      "reportGenerateUriPattern" : "/report/"
+    },
+    "path" : null,
+    "createStamp" : null,
+    "name" : "Компьютерный Практикум",
+    "id" : "cp"
+  } ],
+  "createStamp" : {
+    "time" : 1285174973524,
+    "node" : "anton"
+  },
+  "resourcePath" : "res/aos-s10",
+  "quizTypes" : [ ],
+  "name" : "Архитектура Вычислительных Систем",
+  "id" : "aos-w10"
+}

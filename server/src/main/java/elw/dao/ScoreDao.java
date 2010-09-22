@@ -2,7 +2,6 @@ package elw.dao;
 
 import elw.vo.Score;
 import elw.vo.Stamp;
-import org.akraievoy.gear.G4Parse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +30,7 @@ public class ScoreDao extends Dao<Score> {
 	}
 
 	public Map<Stamp, Entry<Score>> findAllScores(Ctx ctx) {
-		return findAllMetas(CodeDao.toPath(ctx), false, false);
+		return findAll(CodeDao.toPath(ctx), false, false);
 	}
 
 	public Entry<Score> findScoreByStamp(Ctx ctx, Stamp stamp) {

@@ -1,0 +1,180 @@
+{
+  "shared" : false,
+  "versions" : [ {
+    "solution" : [ "sll $v0, $a0, 1" ],
+    "tests" : [ {
+      "shared" : true,
+      "args" : {
+        "regs" : [ "$a0:65:65", "$v0::130" ]
+      },
+      "name" : null,
+      "id" : null
+    }, {
+      "shared" : true,
+      "args" : {
+        "regs" : [ "$a0:9:9", "$v0::18" ]
+      },
+      "name" : null,
+      "id" : null
+    }, {
+      "shared" : true,
+      "args" : {
+        "regs" : [ "$a0:23:23", "$v0::46" ]
+      },
+      "name" : null,
+      "id" : null
+    } ],
+    "statementHtml" : [ "Выполнить побитовый сдвиг содержимого регистра $a0 влево на 1 разряд и записать результат в $v0" ],
+    "name" : "Сдвиг влево",
+    "id" : "1"
+  }, {
+    "solution" : [ "sra $v0, $a0, 1" ],
+    "tests" : [ {
+      "shared" : true,
+      "args" : {
+        "regs" : [ "$a0:65:65", "$v0::32" ]
+      },
+      "name" : null,
+      "id" : null
+    }, {
+      "shared" : true,
+      "args" : {
+        "regs" : [ "$a0:-9:-9", "$v0::-5" ]
+      },
+      "name" : null,
+      "id" : null
+    }, {
+      "shared" : true,
+      "args" : {
+        "regs" : [ "$a0:23:23", "$v0::11" ]
+      },
+      "name" : null,
+      "id" : null
+    } ],
+    "statementHtml" : [ "Выполнить арифметический сдвиг содержимого регистра $a0 вправо на 1 разряд и записать результат в $v0" ],
+    "name" : "Арифметический сдвиг вправо",
+    "id" : "2"
+  }, {
+    "solution" : [ "andi $v0,$a0, 1" ],
+    "tests" : [ {
+      "shared" : true,
+      "args" : {
+        "regs" : [ "$a0:15:15", "$v0::1" ]
+      },
+      "name" : null,
+      "id" : null
+    }, {
+      "shared" : true,
+      "args" : {
+        "regs" : [ "$a0:-7:-7", "$v0::1" ]
+      },
+      "name" : null,
+      "id" : null
+    }, {
+      "shared" : true,
+      "args" : {
+        "regs" : [ "$a0:6:6", "$v0::0" ]
+      },
+      "name" : null,
+      "id" : null
+    } ],
+    "statementHtml" : [ "Выделить нулевой бит регистра $a0 и поместить результат в $v0" ],
+    "name" : "Младший бит",
+    "id" : "3"
+  }, {
+    "solution" : [ "xori $v0, $a0, 11" ],
+    "tests" : [ {
+      "shared" : true,
+      "args" : {
+        "regs" : [ "$a0:11:11", "$v0::0" ]
+      },
+      "name" : null,
+      "id" : null
+    }, {
+      "shared" : true,
+      "args" : {
+        "regs" : [ "$a0:23:23", "$v0::28" ]
+      },
+      "name" : null,
+      "id" : null
+    }, {
+      "shared" : true,
+      "args" : {
+        "regs" : [ "$a0:14:14", "$v0::5" ]
+      },
+      "name" : null,
+      "id" : null
+    } ],
+    "statementHtml" : [ "Выполнить исключающее «или» регистра $a0 и числа \"11\", поместить результат в $v0" ],
+    "name" : "Исключающее ИЛИ с операндом",
+    "id" : "4"
+  }, {
+    "solution" : [ "ori $v0, $a0, 20" ],
+    "tests" : [ {
+      "shared" : true,
+      "args" : {
+        "regs" : [ "$a0:17:17", "$v0::21" ]
+      },
+      "name" : null,
+      "id" : null
+    }, {
+      "shared" : true,
+      "args" : {
+        "regs" : [ "$a0:23:23", "$v0::23" ]
+      },
+      "name" : null,
+      "id" : null
+    }, {
+      "shared" : true,
+      "args" : {
+        "regs" : [ "$a0:0:0", "$v0::20" ]
+      },
+      "name" : null,
+      "id" : null
+    } ],
+    "statementHtml" : [ "Установить 3-й и 5-й биты регистра $v0 в 1, остальные биты скопировать из $a0" ],
+    "name" : "Установка битов в 1",
+    "id" : "5"
+  }, {
+    "solution" : [ "ori $v0, $a0, 34" ],
+    "tests" : [ {
+      "shared" : true,
+      "args" : {
+        "regs" : [ "$a0:25:25", "$v0::59" ]
+      },
+      "name" : null,
+      "id" : null
+    }, {
+      "shared" : true,
+      "args" : {
+        "regs" : [ "$a0:19:19", "$v0::51" ]
+      },
+      "name" : null,
+      "id" : null
+    }, {
+      "shared" : true,
+      "args" : {
+        "regs" : [ "$a0:42:42", "$v0::42" ]
+      },
+      "name" : null,
+      "id" : null
+    } ],
+    "statementHtml" : [ "Установить 2-й и 6-й биты содержимого регистра $v0 в 1, остальные биты скопировать из $a0" ],
+    "name" : "Установка битов в 0",
+    "id" : "6"
+  } ],
+  "scoring" : {
+    "classReportDue" : 7,
+    "classCodeDue" : 3,
+    "scoreBudget" : 2,
+    "requireClean" : false,
+    "classFrom" : 0
+  },
+  "path" : [ "aos-w10", "lr", "1b" ],
+  "createStamp" : {
+    "time" : 1285174426156,
+    "node" : "anton"
+  },
+  "name" : "Лабораторная №1(б) - Биты",
+  "id" : "1b"
+}

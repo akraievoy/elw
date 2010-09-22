@@ -11,7 +11,6 @@ public class ReportMeta implements Stamped {
 	private static final DateTimeFormatter FMT_DATETIME_FNAME = DateTimeFormat.forPattern("MMddHHmm");
 
 	protected Stamp createStamp;
-	protected Stamp updateStamp;
 	protected String[] path;
 	protected String sourceAddress;
 	protected int totalUploads;
@@ -26,13 +25,6 @@ public class ReportMeta implements Stamped {
 		this.createStamp = createStamp;
 	}
 
-	public Stamp getUpdateStamp() {
-		return updateStamp;
-	}
-
-	public void setUpdateStamp(Stamp updateStamp) {
-		this.updateStamp = updateStamp;
-	}
 
 	public String[] getPath() {
 		return path;

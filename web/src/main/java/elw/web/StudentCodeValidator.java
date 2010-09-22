@@ -54,17 +54,16 @@ public class StudentCodeValidator extends G4Run.Task {
 
 			final Student[] students = group.getStudents();
 			for (Student student : students) {
-				for (int bunI = 0, assBundlesLength = course.getAssBundles().length; bunI < assBundlesLength; bunI++) {
-					final AssignmentBundle bundle = course.getAssBundles()[bunI];
-					for (Assignment ass : bundle.getAssignments()) {
+				for (AssignmentType assType: course.getAssTypes()) {
+					for (Assignment ass : assType.getAssignments()) {
 						for (Version ver : ass.getVersions()) {
 							if (Ctx.isVersionIncorrect(student, ass, ver)) {
 								continue;
 							}
 							final Ctx ctx = new Ctx(
-									Ctx.STATE_EGSCBAV,
+									Ctx.STATE_EGSCTAV,
 									enr.getId(), group.getId(), student.getId(),
-									course.getId(), bunI, ass.getId(), ver.getId()
+									course.getId(), assType.getId(), ass.getId(), ver.getId()
 							);
 							ctx.resolve(enrollDao, groupDao, courseDao);
 

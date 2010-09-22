@@ -233,16 +233,15 @@ public class StudentController extends MultiActionController implements WebSymbo
 			Map<String, CodeMeta> codeMetas, Map<String, ReportMeta> reportMetas, Map<String, Score> scores, int[] grossScore) {
 		double grossScoreFuzzy = 0;
 
-		for (int bunI = 0, assBundlesLength = ctx.getCourse().getAssBundles().length; bunI < assBundlesLength; bunI++) {
-			AssignmentBundle bundle = ctx.getCourse().getAssBundles()[bunI];
-			for (Assignment ass : bundle.getAssignments()) {
+		for (AssignmentType assType: ctx.getCourse().getAssTypes()) {
+			for (Assignment ass : assType.getAssignments()) {
 				for (Version ver : ass.getVersions()) {
 					Student student = ctx.getStudent();
 					if (Ctx.isVersionIncorrect(student, ass, ver)) {
 						continue;
 					}
 
-					final Ctx assCtx = ctx.extendBAV(bunI, ass, ver);
+					final Ctx assCtx = ctx.extendTAV(assType, ass, ver);
 					final String assPath = assCtx.toString();
 
 					if (codeMetas != null) {
@@ -275,7 +274,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 						}
 						if (effectiveScore != null) {
 							scores.put(assPath, effectiveScore);
-							grossScoreFuzzy += effectiveScore.getTotal(bundle.getScoring(), ass.getScoring());
+							grossScoreFuzzy += effectiveScore.getTotal(assType.getScoring(), ass.getScoring());
 						}
 					}
 				}
@@ -293,7 +292,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 		}
 
 		final Ctx ctx = (Ctx) model.get(R_CTX);
-		if (!ctx.resolved(Ctx.STATE_EGSCBAV)) {
+		if (!ctx.resolved(Ctx.STATE_EGSCTAV)) {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "context path problem, please check the logs");
 			return null;
 		}
@@ -318,7 +317,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 		}
 
 		final DiskFileItemFactory fif = new DiskFileItemFactory();
-		fif.setRepository(new File(System.getProperty("java.io.tmpdir")));
+		fif.setRepository(new java.io.File(System.getProperty("java.io.tmpdir")));
 		fif.setSizeThreshold(2 * UPLOAD_LIMIT);
 
 		final ServletFileUpload sfu = new ServletFileUpload(fif);
@@ -375,7 +374,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 		}
 
 		final Ctx ctx = (Ctx) model.get(R_CTX);
-		if (!ctx.resolved(Ctx.STATE_EGSCBAV)) {
+		if (!ctx.resolved(Ctx.STATE_EGSCTAV)) {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "context path problem, please check the logs");
 			return null;
 		}
@@ -417,7 +416,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 		}
 
 		final Ctx ctx = (Ctx) model.get(R_CTX);
-		if (!ctx.resolved(Ctx.STATE_EGSCBAV)) {
+		if (!ctx.resolved(Ctx.STATE_EGSCTAV)) {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "context path problem, please check the logs");
 			return null;
 		}
@@ -476,7 +475,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 		}
 
 		final Ctx ctx = (Ctx) model.get(R_CTX);
-		if (!ctx.resolved(Ctx.STATE_EGSCBAV)) {
+		if (!ctx.resolved(Ctx.STATE_EGSCTAV)) {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "context path problem, please check the logs");
 			return null;
 		}
@@ -527,7 +526,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 		}
 
 		final Ctx ctx = (Ctx) model.get(R_CTX);
-		if (!ctx.resolved(Ctx.STATE_EGSCBAV)) {
+		if (!ctx.resolved(Ctx.STATE_EGSCTAV)) {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "context path problem, please check the logs");
 			return null;
 		}
@@ -566,7 +565,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 		}
 
 		final Ctx ctx = (Ctx) model.get(R_CTX);
-		if (!ctx.resolved(Ctx.STATE_EGSCBAV)) {
+		if (!ctx.resolved(Ctx.STATE_EGSCTAV)) {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "context path problem, please check the logs");
 			return null;
 		}

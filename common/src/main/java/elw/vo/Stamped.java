@@ -6,7 +6,4 @@ public interface Stamped {
 
 	void setCreateStamp(Stamp newStamp);
 
-	Stamp getUpdateStamp();
-
-	void setUpdateStamp(Stamp newStamp);
 }

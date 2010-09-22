@@ -22,7 +22,7 @@
 <tr class="header">
 	<th style="padding-left: 1em; padding-right: 0.25em;"><a name="${elw_ctx.group.id}" title="id : ${elw_ctx.group.id}">${elw_ctx.group.name}</a></th>
 	<th style="padding: 0 0.25em;">Score</th>
-#foreach($assBundle in $elw_ctx.course.assBundles)#set($bunI = $velocityCount - 1)
+#foreach($assBundle in $elw_ctx.course.assTypes)#set($bunI = $velocityCount - 1)
 	#foreach($ass in $assBundle.assignments)#set($assI = $velocityCount)
 		#if($ass.id && !$ass.shared)
 				<th style="padding-left: 0.25em; padding-right: 0.25em; text-align: center;" colspan="2"><span title="$ass.name">$ass.id</span></th>
@@ -35,7 +35,7 @@
 	<tr >
 		<td style="padding-left: 2em; padding-right: 0.25em;"><span title="(id : ${stud.id})">$stud.name</span></td>
 		<td style="padding: 0 0.25em;">$grossScores.get("$studCtx")</td>
-	#foreach($assBundle in $elw_ctx.course.assBundles)#set($bunI = $velocityCount - 1)
+	#foreach($assBundle in $elw_ctx.course.assTypes)#set($bunI = $velocityCount - 1)
 		#foreach($ass in $assBundle.assignments)#set($assI = $velocityCount)
 			#if($ass.id && !$ass.shared)
 				#set($verIdx = $stud.idAsInt % $ass.versions.size())

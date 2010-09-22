@@ -1,24 +1,17 @@
 package elw.dao;
 
+import elw.vo.Assignment;
+import elw.vo.AssignmentType;
 import elw.vo.Course;
-import elw.vo.Group;
-import org.akraievoy.gear.G;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-
 public class CourseDao extends Dao<Course> {
 	private static final Logger log = LoggerFactory.getLogger(CourseDao.class);
+	protected final AssDao assDao;
 
-	public CourseDao() {
+	public CourseDao(AssDao assDao) {
+		this.assDao = assDao;
 	}
 
 	@Override
@@ -40,7 +33,15 @@ public class CourseDao extends Dao<Course> {
 
 		final Entry<Course> entry = findLast(new Path(id), null, null);
 
-		return entry.getMeta();
+		final Course course = entry.getMeta();
+		final AssignmentType[] assTypes = course.getAssTypes();
+		for (final AssignmentType assType : assTypes) {
+			//	LATER this should be done less intrusively
+			final Assignment[] asses = assDao.findAllForAssType(course.getId(), assType.getId());
+			assType.setAssignments(asses);
+		}
+
+		return course;
 	}
 
 	public Course[] findAllCourses() {

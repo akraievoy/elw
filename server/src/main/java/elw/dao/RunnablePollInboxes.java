@@ -1,5 +1,6 @@
 package elw.dao;
 
+import org.akraievoy.gear.G;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +37,8 @@ public class RunnablePollInboxes implements Runnable {
 						if (e.getCause() instanceof InterruptedException) {
 							throw (InterruptedException) e.getCause();
 						}
-						log.info("failed to poll inbox for: {}", dao.getMetaClass().getSimpleName());
+						log.warn("failed to poll inbox for {}:", dao.getMetaClass().getSimpleName(), G.report(e));
+						log.info("failed", e);
 					}
 				}
 			}

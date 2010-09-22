@@ -1,12 +1,10 @@
 package elw.dao;
 
 import elw.vo.*;
-import org.akraievoy.gear.G4Parse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.lang.Class;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -19,18 +17,18 @@ public class Ctx {
 	public static final String STATE_ECG = "ecg";
 	public static final String STATE_ECGS = "ecgs";
 	public static final String STATE_C = "c";
-	public static final String STATE_CBAV = "cbav";
-	public static final String STATE_EGSCBAV = "egscbav";
+	public static final String STATE_CTAV = "ctav";
+	public static final String STATE_EGSCTAV = "egsctav";
 
 	public static final char ELEM_ENR = 'e';
 	public static final char ELEM_GROUP = 'g';
 	public static final char ELEM_STUD = 's';
 	public static final char ELEM_COURSE = 'c';
-	public static final char ELEM_BUNDLE = 'b';
+	public static final char ELEM_ASS_TYPE = 't';
 	public static final char ELEM_ASS = 'a';
 	public static final char ELEM_VER = 'v';
 
-	protected static final String order = "egscbav";
+	protected static final String order = "egsctav";
 	protected static final Map<Character, Integer> elemToOrder = createElemToOrderMap();
 
 	public static final String SEP = "--";
@@ -39,7 +37,7 @@ public class Ctx {
 	protected final String courseId;
 	protected final String groupId;
 	protected final String studId;
-	protected int bundleIdx;
+	protected final String assTypeId;
 	protected final String assId;
 	protected final String verId;
 	protected final String initState;
@@ -47,7 +45,7 @@ public class Ctx {
 	//	required elements resolved
 	protected Enrollment enr;
 	protected Student student;
-	protected AssignmentBundle bundle;
+	protected AssignmentType assType;
 	protected Assignment ass;
 	protected Version ver;
 	protected String resolveState;
@@ -59,37 +57,32 @@ public class Ctx {
 	public Ctx(
 			final String initState,
 			String enrId, String groupId, String studId,
-			String courseId, int bundleIdx, String assId, final String verId
+			String courseId, String assTypeId, String assId, final String verId
 	) {
 		this.assId = assId;
 		this.studId = studId;
 		this.enrId = enrId;
-		this.bundleIdx = bundleIdx;
+		this.assTypeId = assTypeId;
 		this.verId = verId;
 		this.initState = initState;
 		this.courseId = courseId;
 		this.groupId = groupId;
 	}
 
-	@Deprecated // only for spring injections
-	public Ctx() {
-		this(STATE_NONE, null, null, null, null, -1, null, null);
-	}
-
 	public static Ctx fromString(final String path) {
 		if (path == null || path.trim().length() == 0) {
-			return new Ctx(STATE_NONE, null, null, null, null, -1, null, null);
+			return new Ctx(STATE_NONE, null, null, null, null, null, null, null);
 		}
 
 		final String[] comp = path.split(SEP);
 		if (comp.length <= 1) {
-			return new Ctx(STATE_NONE, null, null, null, null, -1, null, null);
+			return new Ctx(STATE_NONE, null, null, null, null, null, null, null);
 		}
 
 		final String format = comp[0];
 		if (format.length() + 1 != comp.length) {
 			log.warn("format does not match content, NOT parsing: {}", path);
-			return new Ctx(STATE_NONE, null, null, null, null, -1, null, null);
+			return new Ctx(STATE_NONE, null, null, null, null, null, null, null);
 		}
 
 		final String initState = reorder(format);
@@ -122,14 +115,11 @@ public class Ctx {
 			studId = null;
 		}
 
-		final int bundleIdx;
-		if (format.indexOf(ELEM_BUNDLE) >= 0) {
-			bundleIdx = G4Parse.parse(comp[format.indexOf(ELEM_BUNDLE) + 1], -1);
-			if (bundleIdx < 0) {
-				log.warn("path[{}] must be an integer: {}", format.indexOf(ELEM_BUNDLE) + 1, path);
-			}
+		final String typeId;
+		if (format.indexOf(ELEM_ASS_TYPE) >= 0) {
+			typeId = comp[format.indexOf(ELEM_ASS_TYPE) + 1];
 		} else {
-			bundleIdx = -1;
+			typeId = null;
 		}
 
 		final String assId;
@@ -146,7 +136,7 @@ public class Ctx {
 			verId = null;
 		}
 
-		return new Ctx(initState, enrId, groupId, studId, courseId, bundleIdx, assId, verId);
+		return new Ctx(initState, enrId, groupId, studId, courseId, typeId, assId, verId);
 	}
 
 	public Ctx resolve(EnrollDao enrDao, GroupDao groupDao, CourseDao courseDao) {
@@ -202,17 +192,17 @@ public class Ctx {
 		}
 
 
-		if (has(resolved, ELEM_COURSE) && inited(ELEM_BUNDLE)) {
-			if (bundleIdx >= 0 && bundleIdx < course.getAssBundles().length) {
-				bundle = course.getAssBundles()[bundleIdx];
-				resolved.append(ELEM_BUNDLE);
+		if (has(resolved, ELEM_COURSE) && inited(ELEM_ASS_TYPE)) {
+			assType = IdName.findById(course.getAssTypes(), assTypeId);
+			if (assType != null) {
+				resolved.append(ELEM_ASS_TYPE);
 			} else {
-				log.warn("bundle not found: {}", bundleIdx, dump());
+				log.warn("bundle not found: {}", assTypeId, dump());
 			}
 		}
 
-		if (has(resolved, ELEM_BUNDLE) && inited(ELEM_ASS)) {
-			ass = IdName.findById(bundle.getAssignments(), assId);
+		if (has(resolved, ELEM_ASS_TYPE) && inited(ELEM_ASS)) {
+			ass = IdName.findById(assType.getAssignments(), assId);
 			if (ass != null) {
 				resolved.append(ELEM_ASS);
 			} else {
@@ -261,8 +251,8 @@ public class Ctx {
 				res.append(getStudent().getId());
 			} else if (comp == ELEM_COURSE) {
 				res.append(getCourse().getId());
-			} else if (comp == ELEM_BUNDLE) {
-				res.append(bundleIdx);
+			} else if (comp == ELEM_ASS_TYPE) {
+				res.append(getAssType().getId());
 			} else if (comp == ELEM_ASS) {
 				res.append(getAss().getId());
 			} else if (comp == ELEM_VER) {
@@ -279,7 +269,7 @@ public class Ctx {
 				"g:" + groupId + " " +
 				"s:" + studId + " " +
 				"c:" + courseId + " " +
-				"b:" + bundleIdx + " " +
+				"t:" + assTypeId + " " +
 				"a:" + assId + " " +
 				"v:" + verId;
 	}
@@ -296,8 +286,8 @@ public class Ctx {
 		return ass;
 	}
 
-	public AssignmentBundle getBundle() {
-		return bundle;
+	public AssignmentType getAssType() {
+		return assType;
 	}
 
 	public Course getCourse() {
@@ -320,8 +310,8 @@ public class Ctx {
 		return ver;
 	}
 
-	public int getBundleIdx() {
-		return bundleIdx;
+	public String getAssTypeId() {
+		return assTypeId;
 	}
 
 	public Ctx extendEnr(final Enrollment enr) {
@@ -396,21 +386,20 @@ public class Ctx {
 		return ctx;
 	}
 
-	public Ctx extendBundleIdx(final int bundleIdx) {
+	public Ctx extendAssType(final AssignmentType assType) {
 		final Ctx ctx = copy();
 
-		if (bundleIdx >= 0) {
-			if (course != null && course.getAssBundles().length > bundleIdx) {
-				ctx.bundleIdx = bundleIdx;
-				ctx.bundle = course.getAssBundles()[bundleIdx];
-				if (ctx.resolveState.indexOf(ELEM_BUNDLE) < 0) {
-					ctx.resolveState += ELEM_BUNDLE;
+		if (assType != null) {
+			if (course != null && IdName.findById(course.getAssTypes(), assType.getId()) != null) {
+				ctx.assType = assType;
+				if (ctx.resolveState.indexOf(ELEM_ASS_TYPE) < 0) {
+					ctx.resolveState += ELEM_ASS_TYPE;
 				}
 			} else {
-				log.warn("extending with wrong bundleIdx (or no course resolved)");
+				log.warn("extending with wrong assType (or no course resolved)");
 			}
 		} else {
-			log.warn("extending with negative bundleIdx");
+			log.warn("extending with no assType");
 		}
 
 		return ctx;
@@ -420,7 +409,7 @@ public class Ctx {
 		final Ctx ctx = copy();
 
 		if (ass != null) {
-			if (bundle != null && IdName.findById(bundle.getAssignments(), ass.getId()) != null) {
+			if (assType != null && IdName.findById(assType.getAssignments(), ass.getId()) != null) {
 				ctx.ass = ass;
 				if (ctx.resolveState.indexOf(ELEM_ASS) < 0) {
 					ctx.resolveState += ELEM_ASS;
@@ -454,33 +443,12 @@ public class Ctx {
 		return ctx;
 	}
 
-	public Ctx extendBAV(int bunI, Assignment ass, Version ver) {
-		return extendBundleIdx(bunI).extendAss(ass).extendVer(ver);
-	}
-
-	protected File getCodeRoot(File uploadsDir) {
-		return new File(
-				getStudentRoot(uploadsDir),
-				getAssDirName()
-		);
-	}
-
-	protected File getReportRoot(File uploadsDir) {
-		return new File(
-				getStudentRoot(uploadsDir),
-				getAssDirName() + "-doc"
-		);
-	}
-
-	protected File getScoreRoot(File uploadsDir) {
-		return new File(
-				getStudentRoot(uploadsDir),
-				getAssDirName() + "-scores"
-		);
+	public Ctx extendTAV(AssignmentType assType, Assignment ass, Version ver) {
+		return extendAssType(assType).extendAss(ass).extendVer(ver);
 	}
 
 	protected String getAssDirName() {
-		return bundleIdx + "." + getAss().getId() + "." + getVer().getId();
+		return getAssType().getId() + "." + getAss().getId() + "." + getVer().getId();
 	}
 
 	protected File getStudentRoot(File uploadsDir) {
@@ -492,14 +460,14 @@ public class Ctx {
 	}
 
 	public Ctx copy() {
-		final Ctx copy = new Ctx(initState, enrId, groupId, studId, courseId, bundleIdx, assId, verId);
+		final Ctx copy = new Ctx(initState, enrId, groupId, studId, courseId, assTypeId, assId, verId);
 
 		copy.resolveState = resolveState;
 		copy.enr = enr;
 		copy.group = group;
 		copy.student = student;
 		copy.course = course;
-		copy.bundle = bundle;
+		copy.assType = assType;
 		copy.ass = ass;
 		copy.ver = ver;
 
@@ -624,7 +592,7 @@ public class Ctx {
 
 		Ctx ctx = (Ctx) o;
 
-		if (bundleIdx != ctx.bundleIdx) return false;
+		if (assTypeId != null ? !assTypeId.equals(ctx.assTypeId) : ctx.assTypeId != null) return false;
 		if (assId != null ? !assId.equals(ctx.assId) : ctx.assId != null) return false;
 		if (courseId != null ? !courseId.equals(ctx.courseId) : ctx.courseId != null) return false;
 		if (enrId != null ? !enrId.equals(ctx.enrId) : ctx.enrId != null) return false;
@@ -641,7 +609,7 @@ public class Ctx {
 		result = 31 * result + (courseId != null ? courseId.hashCode() : 0);
 		result = 31 * result + (groupId != null ? groupId.hashCode() : 0);
 		result = 31 * result + (studId != null ? studId.hashCode() : 0);
-		result = 31 * result + bundleIdx;
+		result = 31 * result + (assTypeId != null ? assTypeId.hashCode() : 0);
 		result = 31 * result + (assId != null ? assId.hashCode() : 0);
 		result = 31 * result + (verId != null ? verId.hashCode() : 0);
 		return result;

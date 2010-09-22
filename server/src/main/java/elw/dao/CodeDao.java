@@ -3,7 +3,6 @@ package elw.dao;
 import elw.vo.CodeMeta;
 import elw.vo.ReportMeta;
 import elw.vo.Stamp;
-import org.akraievoy.gear.G4Parse;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,14 +39,14 @@ public class CodeDao extends Dao<CodeMeta> {
 	}
 
 	protected static Path toPath(Ctx ctx) {
-		if (ctx == null || !ctx.resolved(Ctx.STATE_EGSCBAV)) {
+		if (ctx == null || !ctx.resolved(Ctx.STATE_EGSCTAV)) {
 			throw new IllegalStateException("context not fully set up: " + String.valueOf(ctx));
 		}
 		final Path path = new Path(new String[]{
 				ctx.getGroup().getId(),
 				ctx.getStudent().getId(),
 				ctx.getCourse().getId(),
-				String.valueOf(ctx.getBundleIdx()),
+				String.valueOf(ctx.getAssTypeId()),
 				ctx.getAss().getId(),
 				ctx.getVer().getId(),
 		});
@@ -61,7 +60,7 @@ public class CodeDao extends Dao<CodeMeta> {
 			final String fileName =
 					path.getStudent().getName().replaceAll("\\s+", "_") + "--" +
 					path.getAss().getId() + "_" + path.getVer().getId() + "--" +
-					ReportMeta.getFileNameUploadStamp(codeMeta.getUpdateStamp().getTime()) +
+					ReportMeta.getFileNameUploadStamp(codeMeta.getCreateStamp().getTime()) +
 					".txt";
 
 			codeMeta.setFileName(fileName);
@@ -69,7 +68,7 @@ public class CodeDao extends Dao<CodeMeta> {
 	}
 
 	public Map<Stamp, Entry<CodeMeta>> findAllMetas(Ctx ctx) {
-		final SortedMap<Stamp, Entry<CodeMeta>> allMetas = findAllMetas(toPath(ctx), true, null);
+		final SortedMap<Stamp, Entry<CodeMeta>> allMetas = findAll(toPath(ctx), true, null);
 
 		resolveNames(ctx, allMetas.values());
 

@@ -2,8 +2,6 @@ package elw.dao;
 
 import elw.vo.ReportMeta;
 import elw.vo.Stamp;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
@@ -30,7 +28,7 @@ public class ReportDao extends Dao<ReportMeta> {
 	}
 
 	public SortedMap<Stamp, Entry<ReportMeta>> findAll(Ctx ctx) {
-		final SortedMap<Stamp, Entry<ReportMeta>> metas = findAllMetas(CodeDao.toPath(ctx), null, true);
+		final SortedMap<Stamp, Entry<ReportMeta>> metas = findAll(CodeDao.toPath(ctx), null, true);
 
 		resolveNames(ctx, metas.values());
 

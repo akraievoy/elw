@@ -28,7 +28,7 @@
 		<td style="padding: 0 0.25em;">$grossScore</td>
 		<td style="padding: 0 0.25em;">&nbsp;</td>
 	</tr>
-	#foreach($assBundle in $elw_ctx.course.assBundles)#set($bunI = $velocityCount - 1)
+	#foreach($assBundle in $elw_ctx.course.assTypes)#set($bunI = $velocityCount - 1)
 	<tr><td style="padding-left: 1.25em;" colspan=5>Assignments:</td></tr>
 	 #foreach($ass in $assBundle.assignments)#set($assI = $velocityCount)
 		#if($ass.id)
@@ -50,7 +50,7 @@
 		<td style="padding: 0 0.25em;" colspan="3">&nbsp;</td>
 		<td style="padding: 0 0.25em; text-align: right;">
 			<form action="launch" method="get" style="display: inline; margin: 0;">
-				<input type="hidden" name="elw_ctx" value="$elw_ctx.extendBAV($bunI, $ass, $ver)"/>
+				<input type="hidden" name="elw_ctx" value="$elw_ctx.extendTAV($bunI, $ass, $ver)"/>
 				<input type="submit" value="Code"/>
 			</form>
 		</td>

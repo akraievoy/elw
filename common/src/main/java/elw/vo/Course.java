@@ -5,10 +5,9 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Course extends IdName implements Stamped {
-	protected final List<AssignmentBundle> assBundles = new ArrayList<AssignmentBundle>();
-	protected final List<QuizBundle> quizBundles = new ArrayList<QuizBundle>();
+	protected final List<AssignmentType> assTypes = new ArrayList<AssignmentType>();
+	protected final List<QuizType> quizTypes = new ArrayList<QuizType>();
 	protected Stamp createStamp;
-	protected Stamp updateStamp;
 
 	protected String resourcePath;
 
@@ -20,22 +19,22 @@ public class Course extends IdName implements Stamped {
 		this.resourcePath = resourcePath;
 	}
 
-	public AssignmentBundle[] getAssBundles() {
-		return assBundles.toArray(new AssignmentBundle[assBundles.size()]);
+	public AssignmentType[] getAssTypes() {
+		return assTypes.toArray(new AssignmentType[assTypes.size()]);
 	}
 
-	public void setAssBundles(AssignmentBundle[] assBundles) {
-		this.assBundles.clear();
-		this.assBundles.addAll(Arrays.asList(assBundles));
+	public void setAssTypes(AssignmentType[] assTypes) {
+		this.assTypes.clear();
+		this.assTypes.addAll(Arrays.asList(assTypes));
 	}
 
-	public QuizBundle[] getQuizBundles() {
-		return quizBundles.toArray(new QuizBundle[quizBundles.size()]);
+	public QuizType[] getQuizTypes() {
+		return quizTypes.toArray(new QuizType[quizTypes.size()]);
 	}
 
-	public void setQuizBundles(QuizBundle[] quizBundles) {
-		this.quizBundles.clear();
-		this.quizBundles.addAll(Arrays.asList(quizBundles));
+	public void setQuizTypes(QuizType[] quizTypes) {
+		this.quizTypes.clear();
+		this.quizTypes.addAll(Arrays.asList(quizTypes));
 	}
 
 	public Stamp getCreateStamp() {
@@ -44,13 +43,5 @@ public class Course extends IdName implements Stamped {
 
 	public void setCreateStamp(Stamp createStamp) {
 		this.createStamp = createStamp;
-	}
-
-	public Stamp getUpdateStamp() {
-		return updateStamp;
-	}
-
-	public void setUpdateStamp(Stamp updateStamp) {
-		this.updateStamp = updateStamp;
 	}
 }

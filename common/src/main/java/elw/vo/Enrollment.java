@@ -8,7 +8,6 @@ public class Enrollment extends IdName implements Stamped{
 	protected String groupId;
 	protected String courseId;
 	protected Stamp createStamp;
-	protected Stamp updateStamp;
 
 	protected List<Class> classes = new ArrayList<Class>();
 
@@ -45,11 +44,4 @@ public class Enrollment extends IdName implements Stamped{
 		this.createStamp = createStamp;
 	}
 
-	public Stamp getUpdateStamp() {
-		return updateStamp;
-	}
-
-	public void setUpdateStamp(Stamp updateStamp) {
-		this.updateStamp = updateStamp;
-	}
 }

@@ -22,8 +22,8 @@
 	<h3><span title="$elw_ctx.student.id">$elw_ctx.student.name</span> <span title="$elw_ctx.ass.id">$elw_ctx.ass.name</span> <span title="$elw_ctx.ver.id">$elw_ctx.ver.name</span></h3>
 	<div class="formArea" style="height: 22em; width: 24em; float: left; margin: 0 2em;">
 		<form method="POST" action="approve">
-			#foreach($cri in $elw_ctx.bundle.scoring.criterias)
-				#if(!$elw_ctx.bundle.scoring.isAuto($cri))
+			#foreach($cri in $elw_ctx.assType.scoring.criterias)
+				#if(!$elw_ctx.assType.scoring.isAuto($cri))
 					<div class="formLabel" style="width:16em;"><span title="$cri.ratio">$cri.name</span>:</div>
 					<div class="formField" style="width:6em;">
 						<select name="cri--$cri.id">
@@ -34,8 +34,8 @@
 					</div>
 				#end
 			#end
-			#foreach($cri in $elw_ctx.bundle.scoring.criterias)
-				#if($elw_ctx.bundle.scoring.isAuto($cri))
+			#foreach($cri in $elw_ctx.assType.scoring.criterias)
+				#if($elw_ctx.assType.scoring.isAuto($cri))
 					<div class="formLabel" style="width:16em;"><span title="$cri.ratio" style="color:#669999;">$cri.name</span>:</div>
 					<div class="formField" style="width:6em;">
 						<select name="cri--$cri.id">

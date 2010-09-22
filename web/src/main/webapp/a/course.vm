@@ -16,13 +16,13 @@
 #elw_messages($elw_messages)
 <div id=main>
 	<table><tbody>
-	<tr><td style="padding-left: 1em;padding-right: 0.25em;" colspan=3>Assignment bundles:</td></tr>
-	#foreach($assBundle in $elw_ctx.course.assBundles)#set($bunI = $velocityCount - 1)
-	<tr><td style="padding-left: 1.5em;padding-right: 0.25em;" colspan=3>Assignments:</td></tr>
-	 #foreach($ass in $assBundle.assignments)#set($assI = $velocityCount)
-	<tr class="header"><td style="padding-left: 2em; padding-right: 0.25em;" colspan=3>$ass.name&nbsp;<span style="font-size: smaller">(id:&nbsp;#if($ass.id)$ass.id#{else}null#end)</span>&nbsp;:&nbsp;</td></tr>
-		#foreach($ver in $ass.versions)#set($verI = $velocityCount)
-		#set($assCtx=$elw_ctx.extendBAV(${bunI}, ${ass}, ${ver}))
+	<tr><td style="padding-left: 1em;padding-right: 0.25em;" colspan=3>Типы:</td></tr>
+	#foreach($assType in $elw_ctx.course.assTypes)
+	<tr><td style="padding-left: 1.5em;padding-right: 0.25em;" colspan=3>Задания для ${assType.name}</td></tr>
+	 #foreach($ass in $assType.assignments)
+	<tr class="header"><td style="padding-left: 2em; padding-right: 0.25em;" colspan=3>Варианты для $ass.name&nbsp;<span style="font-size: smaller">(id:&nbsp;#if($ass.id)$ass.id#{else}null#end)</span>&nbsp;:&nbsp;</td></tr>
+		#foreach($ver in $ass.versions)
+		#set($assCtx=$elw_ctx.extendTAV(${assType}, ${ass}, ${ver}))
 	<tr>
 		<td style="padding-left: 3em;">$ver.name&nbsp;<span style="font-size: smaller">(id:&nbsp;#if($ver.id)$ver.id#{else}null#end)</span></td>
 		<td style="padding-left: 0.25em; padding-right: 0.25em;">[&nbsp;<a href="launch?elw_ctx=$assCtx">Code</a>&nbsp;]</td>

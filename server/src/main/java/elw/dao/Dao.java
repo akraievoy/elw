@@ -2,6 +2,7 @@ package elw.dao;
 
 import elw.vo.Stamp;
 import elw.vo.Stamped;
+import org.akraievoy.gear.G;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.joda.time.format.DateTimeFormat;
@@ -286,7 +287,7 @@ public abstract class Dao<Meta extends Stamped> {
 	}
 
 
-	public SortedMap<Stamp, Entry<Meta>> findAllMetas(Path p, Boolean text, Boolean binary) {
+	public SortedMap<Stamp, Entry<Meta>> findAll(Path p, Boolean text, Boolean binary) {
 		final SortedMap<Stamp, Entry<Meta>> metas = load(p);
 
 		filter(metas, null, null, text, binary);
@@ -391,7 +392,6 @@ public abstract class Dao<Meta extends Stamped> {
 
 		boolean success = false;
 		try {
-			meta.setUpdateStamp(stamp);
 			mapper.writeValue(fileMeta, meta);
 			if (binary != null) {
 				writeBinary(binary, fileBinary);
@@ -546,7 +546,8 @@ public abstract class Dao<Meta extends Stamped> {
 						meta = mapper.readValue(fileMeta, metaClass);
 					}
 				} catch (IOException e) {
-					log.warn("failed to read meta: {}", fileMeta.getAbsolutePath());
+					log.warn("failed to read meta {}: {}", fileMeta.getAbsolutePath(), G.report(e));
+					log.info("failed", e);
 					continue;
 				}
 
@@ -619,6 +620,7 @@ public abstract class Dao<Meta extends Stamped> {
 			final boolean localGroupByDate,
 			final SortedSet<File> dirs
 	) {
+		//	TODO employ caching here too
 		final Path pEff = p == null ? pathFromMeta(meta) : p;
 		final String[] path = pEff.getPath();
 
@@ -730,8 +732,8 @@ public abstract class Dao<Meta extends Stamped> {
 		protected final File fileBinary;
 		protected final File fileText;
 		protected final long stamp;
-		protected ThreadLocal<BufferedInputStream> binary;
-		protected ThreadLocal<BufferedReader> text;
+		protected ThreadLocal<BufferedInputStream> binary = new ThreadLocal<BufferedInputStream>();
+		protected ThreadLocal<BufferedReader> text = new ThreadLocal<BufferedReader>();
 
 		public Entry(File fileMeta, File fileText, File fileBinary, Meta meta, long stamp) {
 			this.meta = meta;

@@ -28,10 +28,6 @@ public class CodeMeta implements Stamped {
 		this.createStamp = createStamp;
 	}
 
-	public Stamp getUpdateStamp() {
-		return updateStamp;
-	}
-
 	public void setUpdateStamp(Stamp updateStamp) {
 		this.updateStamp = updateStamp;
 	}

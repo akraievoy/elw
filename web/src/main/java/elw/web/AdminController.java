@@ -202,14 +202,13 @@ public class AdminController extends MultiActionController implements WebSymbols
 		if ("true".equalsIgnoreCase(req.getParameter("test"))) {
 			final HashMap<String, Result> testResults = new HashMap<String, Result>();
 			final MipsValidator validator = new MipsValidator();
-			for (int bunI = 0, assBundlesLength = ctx.getCourse().getAssBundles().length; bunI < assBundlesLength; bunI++) {
-				AssignmentBundle bundle = ctx.getCourse().getAssBundles()[bunI];
-				for (Assignment ass : bundle.getAssignments()) {
+			for (AssignmentType assType : ctx.getCourse().getAssTypes()) {
+				for (Assignment ass : assType.getAssignments()) {
 					for (Version ver : ass.getVersions()) {
 						final Result[] resRef = {new Result("unknown", false)};
 						validator.batch(resRef, ver, ver.getSolution(), null);
 						testResults.put(
-								ctx.extendBAV(bunI, ass, ver).toString(),
+								ctx.extendTAV(assType, ass, ver).toString(),
 								resRef[0]
 						);
 					}
@@ -232,7 +231,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 		}
 
 		final Ctx ctx = Ctx.fromString(req.getParameter(R_CTX)).resolve(enrollDao, groupDao, courseDao);
-		if (!ctx.resolved(Ctx.STATE_CBAV)) {
+		if (!ctx.resolved(Ctx.STATE_CTAV)) {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "context path problem, please check the logs");
 			return null;
 		}
@@ -336,15 +335,14 @@ public class AdminController extends MultiActionController implements WebSymbols
 		for (Student stud : ctx.getGroup().getStudents()) {
 			final Ctx studCtx = ctx.extendStudent(stud);
 
-			for (int bunI = 0, assBundlesLength = studCtx.getCourse().getAssBundles().length; bunI < assBundlesLength; bunI++) {
-				final AssignmentBundle bundle = studCtx.getCourse().getAssBundles()[bunI];
-				for (Assignment ass : bundle.getAssignments()) {
+			for (AssignmentType assType: studCtx.getCourse().getAssTypes()) {
+				for (Assignment ass : assType.getAssignments()) {
 					for (Version ver : ass.getVersions()) {
 						if (Ctx.isVersionIncorrect(studCtx.getStudent(), ass, ver)) {
 							continue;
 						}
 
-						final Ctx assCtx = studCtx.extendBAV(bunI, ass, ver);
+						final Ctx assCtx = studCtx.extendTAV(assType, ass, ver);
 
 						final Dao.Entry<ReportMeta> lastReport = reportDao.findLast(assCtx);
 						if (lastReport != null) {
@@ -404,7 +402,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 		}
 
 		final Ctx ctx = Ctx.fromString(req.getParameter("elw_ctx")).resolve(enrollDao, groupDao, courseDao);
-		if (!ctx.resolved(Ctx.STATE_EGSCBAV)) {
+		if (!ctx.resolved(Ctx.STATE_EGSCTAV)) {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Path problem, please check the logs");
 			return null;
 		}
@@ -470,8 +468,8 @@ public class AdminController extends MultiActionController implements WebSymbols
 			codeScores.put(cStamp, score);
 
 			//	here we select the best code scoring to base our report rating on
-			final double ratio = score.getRatio(ctx.getBundle().getScoring().getBreakdown().get("code").getAuto());
-			if ((reportStamp == null || meta.getUpdateStamp().getTime() <= reportStamp.getTime()) && ratio > bestRatio) {
+			final double ratio = score.getRatio(ctx.getAssType().getScoring().getBreakdown().get("code").getAuto());
+			if ((reportStamp == null || meta.getCreateStamp().getTime() <= reportStamp.getTime()) && ratio > bestRatio) {
 				codeStamp = cStamp;
 				bestRatio = ratio;
 			}
@@ -488,7 +486,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 		}
 
 		final Ctx ctx = Ctx.fromString(req.getParameter("elw_ctx")).resolve(enrollDao, groupDao, courseDao);
-		if (!ctx.resolved(Ctx.STATE_EGSCBAV)) {
+		if (!ctx.resolved(Ctx.STATE_EGSCTAV)) {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Path problem, please check the logs");
 			return null;
 		}
@@ -527,7 +525,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 			score.setCodeStamp(codeStamp);
 			score.setReportStamp(reportStamp);
 
-			final Criteria[] cris = ctx.getBundle().getScoring().getCriterias();
+			final Criteria[] cris = ctx.getAssType().getScoring().getCriterias();
 			for (Criteria cri : cris) {
 				final int powDef = G4Parse.parse(cri.getPowDef(), 0);
 				final String powReq = req.getParameter("cri--" + cri.getId());
@@ -560,7 +558,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 	}
 
 	protected static void computeReportDefault(Ctx ctx, Score reportScore) {
-		final Criteria[] criterias = ctx.getBundle().getScoring().getCriterias();
+		final Criteria[] criterias = ctx.getAssType().getScoring().getCriterias();
 		for (Criteria c : criterias) {
 			if (!reportScore.contains(c.getId())) {
 				reportScore.getPows().put(c.getId(), c.resolvePowDef(null));
@@ -571,7 +569,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 
 	protected static Score computeReportAuto(Ctx ctx, ReportMeta meta, final Score baseScore) {
 		final Class classDue = ctx.getEnr().getClasses()[ctx.getAss().getScoring().getClassReportDue()];
-		final TypeScoring reportScoring = ctx.getBundle().getScoring().getBreakdown().get("report");
+		final TypeScoring reportScoring = ctx.getAssType().getScoring().getBreakdown().get("report");
 		final Criteria[] autos = reportScoring.resolveAuto();
 
 		final DateTime uploadStamp = new DateTime(meta.getCreateStamp());
@@ -595,14 +593,14 @@ public class AdminController extends MultiActionController implements WebSymbols
 
 	protected static Score computeCodeAuto(CodeMeta meta, Ctx ctx) {
 		final Class classCodeDue = ctx.getEnr().getClasses()[ctx.getAss().getScoring().getClassCodeDue()];
-		final TypeScoring codeScoring = ctx.getBundle().getScoring().getBreakdown().get("code");
+		final TypeScoring codeScoring = ctx.getAssType().getScoring().getBreakdown().get("code");
 		final Criteria[] autos = codeScoring.resolveAuto();
 
 		if (meta.getValidatorStamp() <= 0) {
 			return null;
 		}
 
-		final DateTime uploadStamp = new DateTime(meta.getUpdateStamp().getTime());
+		final DateTime uploadStamp = new DateTime(meta.getCreateStamp().getTime());
 		final double overdue;
 		if (classCodeDue.isPassed(uploadStamp)) {
 			overdue = classCodeDue.getDayDiff(uploadStamp);
