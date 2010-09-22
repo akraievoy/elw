@@ -1,33 +1,34 @@
 {
-  "students" : [ {
-    "lead" : true,
-    "email" : null,
-    "name" : "Пупкін Василій",
-    "id" : "0"
-  }, {
-    "lead" : false,
-    "email" : null,
-    "name" : "Щирий Іван",
-    "id" : "1"
-  }, {
-    "lead" : false,
-    "email" : null,
-    "name" : "Просто Марія",
-    "id" : "2"
-  }, {
-    "lead" : false,
-    "email" : null,
-    "name" : "Зюзюськіна Марина",
-    "id" : "3"
-  } ],
-  "createStamp" : {
-    "time" : 1284743487576,
-    "node" : "anton"
-  },
-  "updateStamp" : {
-    "time" : 1284743487576,
-    "node" : "anton"
-  },
-  "name" : "ТЕСТЪ",
-  "id" : "ka99"
+	"id" : "ka99",
+	"name" : "ТЕСТ",
+	"students" : [
+		{
+			"lead" : true,
+			"email" : null,
+			"name" : "Пупкін Василий",
+			"id" : "0"
+		},
+		{
+			"lead" : false,
+			"email" : null,
+			"name" : "Щирый Иван",
+			"id" : "1"
+		},
+		{
+			"lead" : false,
+			"email" : null,
+			"name" : "Просто Мария",
+			"id" : "2"
+		},
+		{
+			"lead" : false,
+			"email" : null,
+			"name" : "Зюзюськина Марина",
+			"id" : "3"
+		}
+	],
+	"createStamp" : {
+		"time" : 1284743487576,
+		"node" : "anton"
+	}
 }

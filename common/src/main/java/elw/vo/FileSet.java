@@ -5,7 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public class FileSet extends IdNameStamped {
-	protected List<String> requiresApprovalOf = new ArrayList<String>();
+	protected List<String> readApprovals = new ArrayList<String>();
+	protected List<String> writeApprovals = new ArrayList<String>();
 	protected List<String> contentTypes = new ArrayList<String>();
 	protected long lengthLimit;
 	protected String nameRegex;
@@ -45,13 +46,22 @@ public class FileSet extends IdNameStamped {
 		this.nameRegex = nameRegex;
 	}
 
-	public String[] getRequiresApprovalOf() {
-		return requiresApprovalOf.toArray(new String[requiresApprovalOf.size()]);
+	public String[] getReadApprovals() {
+		return readApprovals.toArray(new String[readApprovals.size()]);
 	}
 
-	public void setRequiresApprovalOf(String[] requiresApprovalOf) {
-		this.requiresApprovalOf.clear();
-		this.requiresApprovalOf.addAll(Arrays.asList(requiresApprovalOf));
+	public void setReadApprovals(String[] readApprovals) {
+		this.readApprovals.clear();
+		this.readApprovals.addAll(Arrays.asList(readApprovals));
+	}
+
+	public String[] getWriteApprovals() {
+		return writeApprovals.toArray(new String[writeApprovals.size()]);
+	}
+
+	public void setWriteApprovals(String[] writeApprovals) {
+		this.writeApprovals.clear();
+		this.writeApprovals.addAll(Arrays.asList(writeApprovals));
 	}
 
 	public boolean isWritable() {

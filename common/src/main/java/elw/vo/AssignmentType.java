@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class AssignmentType extends IdNameStamped {
+public class AssignmentType extends IdName {
 	protected final List<Assignment> assignments = new ArrayList<Assignment>();
 	protected final List<FileSet> fileSets = new ArrayList<FileSet>();
 
