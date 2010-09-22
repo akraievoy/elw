@@ -346,10 +346,9 @@ public class AdminController extends MultiActionController implements WebSymbols
 
 						final Ctx assCtx = studCtx.extendBAV(bunI, ass, ver);
 
-						final long lastStampReport = reportDao.findLastStamp(assCtx);
-						if (lastStampReport > 0) {
-							final ReportMeta lastMeta = reportDao.findMetaByStamp(assCtx, lastStampReport);
-							logEntries.add(new LogEntry(stud, assCtx, ass, lastMeta));
+						final Dao.Entry<ReportMeta> lastReport = reportDao.findLast(assCtx);
+						if (lastReport != null) {
+							logEntries.add(new LogEntry(stud, assCtx, ass, lastReport.getMeta()));
 						}
 					}
 				}
@@ -375,8 +374,8 @@ public class AdminController extends MultiActionController implements WebSymbols
 		}
 
 		public int compareTo(LogEntry o) {
-			final long thisVal = meta.getUploadStamp();
-			final long anotherVal = o.meta.getUploadStamp();
+			final long thisVal = meta.getCreateStamp().getTime();
+			final long anotherVal = o.meta.getCreateStamp().getTime();
 			return (thisVal < anotherVal ? -1 : (thisVal == anotherVal ? 0 : 1));
 		}
 
@@ -410,35 +409,35 @@ public class AdminController extends MultiActionController implements WebSymbols
 			return null;
 		}
 
-		final Map<Long, ReportMeta> reports = reportDao.findAllMetas(ctx);
+		final Map<Stamp, Dao.Entry<ReportMeta>> reports = reportDao.findAll(ctx);
 
 		final String reportStampStr = req.getParameter("stamp");
-		long reportStamp = G4Parse.parse(reportStampStr, -1L);
-		if (reportStamp == -1) {
+		Stamp reportStamp = Stamp.parse(reportStampStr, null);
+		if (reportStamp == null) {
 			reportStamp = reports.keySet().iterator().next();
 		}
 
 		model.put("stamp", reportStamp);
 		model.put("reports", reports);
 
-		final Map<Long, CodeMeta> codes = codeDao.findAllMetas(ctx);
+		final Map<Stamp, Dao.Entry<CodeMeta>> codes = codeDao.findAllMetas(ctx);
 		model.put("codes", codes);
 
-		final Map<Long, Score> codeScores = new TreeMap<Long, Score>();
+		final Map<Stamp, Score> codeScores = new TreeMap<Stamp, Score>();
 
-		long codeStamp = computeCodeScores(ctx, codes, codeScores, reportStamp);
+		Stamp codeStamp = computeCodeScores(ctx, codes, codeScores, reportStamp);
 
-		model.put("codeStamp", G4Parse.parse(req.getParameter("codeStamp"), codeStamp));
+		model.put("codeStamp", Stamp.parse(req.getParameter("codeStamp"), codeStamp));
 
 		model.put("codeScores", codeScores);
 
 		final Score reportScore;
-		final ReportMeta reportMeta = reports.get(reportStamp);
-		final long scoreStamp = reportMeta.getScoreStamp();
-		if (scoreStamp <= 0) {
+		final ReportMeta reportMeta = reports.get(reportStamp).getMeta();
+		final Stamp scoreStamp = reportMeta.getScoreStamp();
+		if (scoreStamp == null) {
 			final Score reportBaseScore;
 			final Score codeScore = codeScores.get(codeStamp);
-			if (codeStamp == 0 || codeScore == null){
+			if (codeStamp == null || codeScore == null){
 				Message.addWarn(req, "Unable to find any codes preceding selected report");
 				reportBaseScore = new Score();
 			} else {
@@ -447,9 +446,9 @@ public class AdminController extends MultiActionController implements WebSymbols
 			reportScore = computeReportAuto(ctx, reportMeta, reportBaseScore);
 			computeReportDefault(ctx, reportScore);
 		} else {
-			final Score score = scoreDao.findScoreByStamp(ctx, scoreStamp);
-			reportScore = score;
-			codeScores.put(score.getCodeStamp(), score);
+			final Dao.Entry<Score> score = scoreDao.findScoreByStamp(ctx, scoreStamp);
+			reportScore = score.getMeta();
+			codeScores.put(score.getMeta().getCodeStamp(), score.getMeta());
 		}
 
 		model.put("scores", scoreDao.findAllScores(ctx));
@@ -459,19 +458,20 @@ public class AdminController extends MultiActionController implements WebSymbols
 		return new ModelAndView("a/approve", model);
 	}
 
-	public static long computeCodeScores(Ctx ctx, Map<Long, CodeMeta> codes, Map<Long, Score> codeScores, long reportStamp) {
+	public static Stamp computeCodeScores(Ctx ctx, Map<Stamp, Dao.Entry<CodeMeta>> codes, Map<Stamp, Score> codeScores, Stamp reportStamp) {
 		double bestRatio = 0;
-		long codeStamp = 0;
+		Stamp codeStamp = null;
 
-		for (Long cStamp : codes.keySet()) {
-			final CodeMeta meta = codes.get(cStamp);
+		for (Stamp cStamp : codes.keySet()) {
+			final Dao.Entry<CodeMeta> entry = codes.get(cStamp);
+			final CodeMeta meta = entry.getMeta();
 			final Score score = computeCodeAuto(meta, ctx);
 
 			codeScores.put(cStamp, score);
 
 			//	here we select the best code scoring to base our report rating on
 			final double ratio = score.getRatio(ctx.getBundle().getScoring().getBreakdown().get("code").getAuto());
-			if (meta.getUploadStamp() <= reportStamp && ratio > bestRatio) {
+			if ((reportStamp == null || meta.getUpdateStamp().getTime() <= reportStamp.getTime()) && ratio > bestRatio) {
 				codeStamp = cStamp;
 				bestRatio = ratio;
 			}
@@ -494,20 +494,20 @@ public class AdminController extends MultiActionController implements WebSymbols
 		}
 
 		final String codeStampStr = req.getParameter("codeStamp");
-		final long codeStamp = G4Parse.parse(codeStampStr, -1L);
+		final Stamp codeStamp = Stamp.parse(codeStampStr, null);
 
 		final String reportStampStr = req.getParameter("stamp");
-		final long reportStamp = G4Parse.parse(reportStampStr, -1L);
+		final Stamp reportStamp = Stamp.parse(reportStampStr, null);
 
 		final String refreshUri = "approve?elw_ctx=" + ctx + "&stamp=" + reportStampStr + "&codeStamp=" + codeStampStr;
-		if (codeStamp <= 0 || reportStamp <= 0) {
+		if (codeStamp == null || reportStamp == null) {
 			Message.addWarn(req, "Missing either report or code stamp, approval NOT performed");
 			resp.sendRedirect(refreshUri);
 			return null;
 		}
 
-		final ReportMeta reportMeta = reportDao.findMetaByStamp(ctx, reportStamp);
-		final CodeMeta codeMeta = codeDao.findMetaByStamp(ctx, codeStamp);
+		final ReportMeta reportMeta = reportDao.findByStamp(ctx, reportStamp).getMeta();
+		final CodeMeta codeMeta = codeDao.findMetaByStamp(ctx, codeStamp).getMeta();
 
 		if (reportMeta == null || codeMeta == null) {
 			Message.addWarn(req, "Missing either report or code metas, approval NOT performed");
@@ -516,8 +516,8 @@ public class AdminController extends MultiActionController implements WebSymbols
 		}
 
 		if ("Decline".equals(req.getParameter("action"))) {
-			reportMeta.setScoreStamp(-1);
-			reportDao.updateMeta(ctx, reportMeta.getUploadStamp(), reportMeta);
+			reportMeta.setScoreStamp(null);	//	FIXME decline stamp?!!
+			reportDao.updateMeta(ctx, reportMeta);
 			Message.addWarn(req, "Report declined");
 		} else {
 			final Score codeScore = computeCodeAuto(codeMeta, ctx);
@@ -536,22 +536,22 @@ public class AdminController extends MultiActionController implements WebSymbols
 				score.getPows().put(cri.getId(), pow);
 			}
 
-			final long scoreStamp = scoreDao.createScore(ctx, score);
+			final Stamp scoreStamp = scoreDao.createScore(ctx, score);
 			reportMeta.setScoreStamp(scoreStamp);
-			reportDao.updateMeta(ctx, reportMeta.getUploadStamp(), reportMeta);
+			reportDao.updateMeta(ctx, reportMeta);
 			Message.addInfo(req, "Report approved");
 		}
 
 		final List<LogEntry> entries = prepareLogEntries(ctx);
 		LogEntry nextEntry = null;
 		for (LogEntry entry : entries) {
-			if (entry.getMeta().getScoreStamp() == 0 && entry.getMeta().getTotalUploads() > 0) {
+			if (entry.getMeta().getScoreStamp() == null && entry.getMeta().getTotalUploads() > 0) {
 				nextEntry = entry;
 				break;
 			}
 		}
 		if (nextEntry != null) {
-			final String nextUri = "approve?elw_ctx=" + nextEntry.getCtx() + "&stamp=" + nextEntry.getMeta().getUploadStamp();
+			final String nextUri = "approve?elw_ctx=" + nextEntry.getCtx() + "&stamp=" + nextEntry.getMeta().getCreateStamp();
 			resp.sendRedirect(nextUri);
 		} else {
 			resp.sendRedirect(refreshUri);
@@ -574,7 +574,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 		final TypeScoring reportScoring = ctx.getBundle().getScoring().getBreakdown().get("report");
 		final Criteria[] autos = reportScoring.resolveAuto();
 
-		final DateTime uploadStamp = new DateTime(meta.getUploadStamp());
+		final DateTime uploadStamp = new DateTime(meta.getCreateStamp());
 		final double overdue;
 		if (classDue.isPassed(uploadStamp)) {
 			overdue = classDue.getDayDiff(uploadStamp);
@@ -602,7 +602,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 			return null;
 		}
 
-		final DateTime uploadStamp = new DateTime(meta.getUploadStamp());
+		final DateTime uploadStamp = new DateTime(meta.getUpdateStamp().getTime());
 		final double overdue;
 		if (classCodeDue.isPassed(uploadStamp)) {
 			overdue = classCodeDue.getDayDiff(uploadStamp);

@@ -79,6 +79,7 @@ public class Class {
 		return FMT_DATE_NICE.print(getDateExact());
 	}
 
+	@JsonIgnore
 	public int getDayDiff() {
 		return getDayDiff(new DateTime());
 	}

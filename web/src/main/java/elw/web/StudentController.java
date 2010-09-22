@@ -3,7 +3,6 @@ package elw.web;
 import elw.dao.*;
 import elw.miniweb.Message;
 import elw.vo.*;
-import org.akraievoy.gear.G4Parse;
 import org.akraievoy.gear.G4mat;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
@@ -247,29 +246,32 @@ public class StudentController extends MultiActionController implements WebSymbo
 					final String assPath = assCtx.toString();
 
 					if (codeMetas != null) {
-						final long lastStamp = codeDao.findLastStamp(assCtx);
-						codeMetas.put(assPath, codeDao.findMetaByStamp(assCtx, lastStamp));
+						final Dao.Entry<CodeMeta> last = codeDao.findLast(assCtx);
+						if (last != null) {
+							codeMetas.put(assPath, last.getMeta());
+						}
 					}
 					if (reportMetas != null) {
-						final long lastStampReport = reportDao.findLastStamp(assCtx);
-						reportMetas.put(assPath, reportDao.findMetaByStamp(assCtx, lastStampReport));
+						final Dao.Entry<ReportMeta> lastReport = reportDao.findLast(assCtx);
+						reportMetas.put(assPath, lastReport.getMeta());
 					}
 					if (scores != null) {
-						final Score lastScore = scoreDao.findLastScore(assCtx);
+						final Dao.Entry<Score> lastScore = scoreDao.findLastScore(assCtx);
 						Score effectiveScore = null;
 						if (lastScore == null) {
 							if (codeDao != null) {
-								final long lastReportStamp = reportDao != null ? reportDao.findLastStamp(assCtx) : Long.MAX_VALUE;
-								final HashMap<Long, Score> allCodeScores = new HashMap<Long, Score>();
-								final long bestCodeStamp = AdminController.computeCodeScores(
+								final Dao.Entry<ReportMeta> lastReport = reportDao != null ? reportDao.findLast(assCtx) : null;
+								final HashMap<Stamp, Score> allCodeScores = new HashMap<Stamp, Score>();
+								final Stamp bestCodeStamp = AdminController.computeCodeScores(
 										assCtx,
-										codeDao.findAllMetas(assCtx), allCodeScores,
-										lastReportStamp >= 0 ? lastReportStamp : Long.MAX_VALUE
+										codeDao.findAllMetas(assCtx),
+										allCodeScores,
+										lastReport.getMeta().getCreateStamp() //	TODO: this stamp or?..
 								);
 								effectiveScore = allCodeScores.get(bestCodeStamp);
 							}
 						} else {
-							effectiveScore = lastScore;
+							effectiveScore = lastScore.getMeta();
 						}
 						if (effectiveScore != null) {
 							scores.put(assPath, effectiveScore);
@@ -303,7 +305,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 		}
 
 		final String refreshUri = "uploadPage?" + WebSymbols.R_CTX + "=" + ctx.toString();
-		if (scoreDao.findLastStamp(ctx) > 0) {
+		if (scoreDao.findLastScore(ctx) != null) {
 			Message.addWarn(req, "report already approved, upload NOT allowed");
 			resp.sendRedirect(refreshUri);
 			return null;
@@ -350,7 +352,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 			}
 
 			final InputStream itemIs = item.openStream();
-			reportDao.createReport(ctx, itemIs, resolveRemoteAddress(req));
+			reportDao.createReport(ctx, new BufferedInputStream(itemIs), resolveRemoteAddress(req));
 			fileCount++;
 		}
 
@@ -386,16 +388,16 @@ public class StudentController extends MultiActionController implements WebSymbo
 
 		model.put("uploadLimit", G4mat.formatMem(UPLOAD_LIMIT));
 
-		final Map<Long, ReportMeta> reports = reportDao.findAllMetas(ctx);
-		final Map<Long, CodeMeta> codes = codeDao.findAllMetas(ctx);
-		final Map<Long, Score> codeScores = new TreeMap<Long, Score>();
-		AdminController.computeCodeScores(ctx, codes, codeScores, Long.MAX_VALUE);
+		final Map<Stamp, Dao.Entry<ReportMeta>> reports = reportDao.findAll(ctx);
+		final Map<Stamp, Dao.Entry<CodeMeta>> codes = codeDao.findAllMetas(ctx);
+		final Map<Stamp, Score> codeScores = new TreeMap<Stamp, Score>();
+		AdminController.computeCodeScores(ctx, codes, codeScores, null);
 
-		final Score lastScore = scoreDao.findLastScore(ctx);
+		final Dao.Entry<Score> lastScore = scoreDao.findLastScore(ctx);
 		if (lastScore != null) {
-			model.put("stamp", lastScore.getReportStamp());
-			model.put("codeStamp", lastScore.getCodeStamp());
-			codeScores.put(lastScore.getCodeStamp(), lastScore);
+			model.put("stamp", lastScore.getMeta().getReportStamp());
+			model.put("codeStamp", lastScore.getMeta().getCodeStamp());
+			codeScores.put(lastScore.getMeta().getCodeStamp(), lastScore.getMeta());
 		}
 
 		model.put("reports", reports);
@@ -433,10 +435,16 @@ public class StudentController extends MultiActionController implements WebSymbo
 			return null;
 		}	
 
-		final long stamp = G4Parse.parse(stampStr, -1L);
-		InputStream report = null;
+		final Stamp stamp = Stamp.parse(stampStr, null);
+		if (stamp == null) {
+			Message.addWarn(req, "stamp parse error");
+			resp.sendRedirect("uploadPage?" + WebSymbols.R_CTX + "=" + ctx.toString());
+			return null;
+		}
+
+		Dao.Entry<ReportMeta> report = null;
 		try {
-			report = reportDao.findReportByStamp(ctx, stamp);
+			report = reportDao.findByStamp(ctx, stamp);
 			if (report == null) {
 				Message.addWarn(req, "no report for stamp " + stamp);
 				resp.sendRedirect("uploadPage?" + WebSymbols.R_CTX + "=" + ctx.toString());
@@ -447,19 +455,14 @@ public class StudentController extends MultiActionController implements WebSymbo
 			resp.setContentType("application/rtf");
 			resp.setHeader("Content-Disposition", "attachment;");
 
+			final BufferedInputStream in = report.openBinaryStream();
 			final byte[] buf = new byte[32768];
 			int bytesRead;
-			while ((bytesRead = report.read(buf)) >= 0) {
+			while ((bytesRead = in.read(buf)) >= 0) {
 				resp.getOutputStream().write(buf, 0, bytesRead);
 			}
 		} finally {
-			if (report != null) {
-				try {
-					report.close();
-				} catch (IOException e) {
-					log.warn("failed on close", e);
-				}
-			}
+			report.closeStreams();
 		}
 
 		return null;
@@ -491,9 +494,9 @@ public class StudentController extends MultiActionController implements WebSymbo
 			return null;
 		}
 
-		final long stamp = G4Parse.parse(stampStr, -1L);
-		final String[] code = codeDao.findCodeByStamp(ctx, stamp);
-		if (code == null) {
+		final Stamp stamp = Stamp.parse(stampStr, null);
+		final Dao.Entry<CodeMeta> entry = codeDao.findMetaByStamp(ctx, stamp);
+		if (entry == null) {
 			Message.addWarn(req, "no code for stamp " + stamp);
 			resp.sendRedirect("uploadPage?" + WebSymbols.R_CTX + "=" + ctx.toString());
 			return null;
@@ -503,6 +506,12 @@ public class StudentController extends MultiActionController implements WebSymbo
 		resp.setContentType("text");
 		resp.setHeader("Content-Disposition", "attachment;");
 
+		final String[] code;
+		try {
+			code = entry.dumpText();
+		} finally {
+			entry.closeStreams();
+		}
 		for (String aCode : code) {
 			resp.getWriter().println(aCode);
 		}
@@ -527,10 +536,14 @@ public class StudentController extends MultiActionController implements WebSymbo
 		mapper.writeValue(verSw, ctx.getVer());
 		final Version verCopy = mapper.readValue(verSw.toString(), Version.class);
 
-		final long lastStamp = codeDao.findLastStamp(ctx);
+		final Dao.Entry<CodeMeta> last = codeDao.findLast(ctx);
 
-		if (!ctx.getAss().isShared() || lastStamp >= 0) {
-			verCopy.setSolution(codeDao.findCodeByStamp(ctx, lastStamp));
+		if (!ctx.getAss().isShared() || last != null) {
+			try {
+				verCopy.setSolution(last.dumpText());
+			} finally {
+				last.closeStreams();
+			}
 		}
 
 		final StringWriter verCopySol = new StringWriter();
@@ -558,7 +571,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 			return null;
 		}
 
-		if (scoreDao.findLastStamp(ctx) > 0) {
+		if (scoreDao.findLastScore(ctx) != null) {
 			resp.sendError(HttpServletResponse.SC_CONFLICT, "report for given task already approved");
 			return null;
 		}

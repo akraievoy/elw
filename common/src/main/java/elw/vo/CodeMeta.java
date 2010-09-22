@@ -5,24 +5,43 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-public class CodeMeta {
+public class CodeMeta implements Stamped {
 	private static final DateTimeFormatter FMT_DATETIME_NICE = DateTimeFormat.forPattern("EEE MMM dd HH:mm");
 	private static final DateTimeFormatter FMT_DATETIME_BRIEF = DateTimeFormat.forPattern("MMM dd");
+
+	protected Stamp createStamp;
+	protected Stamp updateStamp;
+
+	protected String[] path;
 
 	protected int testsPassed;
 	protected int testsFailed;
 	protected long validatorStamp;
-	protected long uploadStamp;
 	protected String sourceAddress;
-	protected int totalUploads;
 	protected String fileName;
 
-	public long getUploadStamp() {
-		return uploadStamp;
+	public Stamp getCreateStamp() {
+		return createStamp;
 	}
 
-	public void setUploadStamp(long uploadStamp) {
-		this.uploadStamp = uploadStamp;
+	public void setCreateStamp(Stamp createStamp) {
+		this.createStamp = createStamp;
+	}
+
+	public Stamp getUpdateStamp() {
+		return updateStamp;
+	}
+
+	public void setUpdateStamp(Stamp updateStamp) {
+		this.updateStamp = updateStamp;
+	}
+
+	public String[] getPath() {
+		return path;
+	}
+
+	public void setPath(String[] path) {
+		this.path = path;
 	}
 
 	public String getSourceAddress() {
@@ -79,23 +98,13 @@ public class CodeMeta {
 	}
 
 	@JsonIgnore
-	public int getTotalUploads() {
-		return totalUploads;
-	}
-
-	@JsonIgnore
-	public void setTotalUploads(int totalUploads) {
-		this.totalUploads = totalUploads;
-	}
-
-	@JsonIgnore
 	public String getNiceValidatorStamp() {
 		return FMT_DATETIME_NICE.print(new DateTime(validatorStamp));
 	}
 
 	@JsonIgnore
 	public String getNiceUploadStamp() {
-		return FMT_DATETIME_NICE.print(new DateTime(uploadStamp));
+		return FMT_DATETIME_NICE.print(new DateTime(updateStamp));
 	}
 	@JsonIgnore
 	public String getBriefValidatorStamp() {
@@ -104,6 +113,6 @@ public class CodeMeta {
 
 	@JsonIgnore
 	public String getBriefUploadStamp() {
-		return FMT_DATETIME_BRIEF.print(new DateTime(uploadStamp));
+		return FMT_DATETIME_BRIEF.print(new DateTime(updateStamp));
 	}
 }

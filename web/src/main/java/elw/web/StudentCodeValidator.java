@@ -8,6 +8,7 @@ import org.akraievoy.gear.G4Run;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
@@ -67,15 +68,16 @@ public class StudentCodeValidator extends G4Run.Task {
 							);
 							ctx.resolve(enrollDao, groupDao, courseDao);
 
-							final Map<Long,CodeMeta> metas = codeDao.findAllMetas(ctx);
-							final Set<Long> stamps = metas.keySet();
-							for (Long stamp : stamps) {
-								final CodeMeta meta = metas.get(stamp);
+							final Map<Stamp,Dao.Entry<CodeMeta>> metas = codeDao.findAllMetas(ctx);
+							final Set<Stamp> stamps = metas.keySet();
+							for (Stamp stamp : stamps) {
+								final Dao.Entry<CodeMeta> entry = metas.get(stamp);
+								final CodeMeta meta = entry.getMeta();
 								boolean update = false;
 								final CodeMeta metaSafe;
-								if (meta == null) {
+								if (meta == null) {	//	FIXME now meta should be always defined!
 									metaSafe = new CodeMeta();
-									metaSafe.setUploadStamp(stamp);
+									metaSafe.setUpdateStamp(stamp);
 									update = true;
 								} else {
 									metaSafe = meta;
@@ -86,18 +88,23 @@ public class StudentCodeValidator extends G4Run.Task {
 									try {
 										final Result[] resRef = {new Result("unknown", false)};
 										final int[] passFailCounts = new int[2];
-										validator.batch(resRef, ver, codeDao.findCodeByStamp(ctx, stamp), passFailCounts);
+										validator.batch(resRef, ver, entry.dumpText(), passFailCounts);
 										metaSafe.setTestsFailed(passFailCounts[1]);
 										metaSafe.setTestsPassed(passFailCounts[0]);
 									} catch (Throwable t) {
 										log.warn("exception while validating {} / {}", ctx, stamp);
 									} finally {
 										metaSafe.setValidatorStamp(System.currentTimeMillis());
+										entry.closeStreams();
 									}
 								}
 
 								if (update) {
-									codeDao.updateMeta(ctx, stamp, metaSafe);
+									try {
+										codeDao.updateMeta(ctx, stamp, metaSafe);
+									} catch (IOException t) {
+										log.warn("exception while storing update {} / {}", ctx, stamp);
+									}
 								}
 							}
 						}

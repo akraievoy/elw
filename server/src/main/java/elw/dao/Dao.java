@@ -13,7 +13,7 @@ import java.io.*;
 import java.util.*;
 import java.util.regex.Pattern;
 
-public abstract class Dao<Criteria extends Locator, Meta extends Stamped> {
+public abstract class Dao<Meta extends Stamped> {
 	protected static final DateTimeFormatter FMT_DATE = DateTimeFormat.forPattern("yyyy-MM-dd");
 	protected static final Pattern PATTERN_DATE = Pattern.compile("\\d\\d\\d\\d-\\d\\d-\\d\\d");
 
@@ -26,7 +26,6 @@ public abstract class Dao<Criteria extends Locator, Meta extends Stamped> {
 
 	protected ObjectMapper mapper;
 	protected Class<Meta> metaClass;
-	protected Criteria criteria;	//	default criteria for inbox poller
 	protected String node;
 	protected File base;
 	protected int createGraceTime = 30000;
@@ -41,10 +40,10 @@ public abstract class Dao<Criteria extends Locator, Meta extends Stamped> {
 	protected long createStamp = -1;
 
 	protected final Object cacheMonitor = new Object();
-	protected final Map<Criteria, Long> cacheStamps
-			= new HashMap<Criteria, Long>();
-	protected final Map<Criteria, SortedMap<Stamp, Entry<Meta>>> cache
-			= new HashMap<Criteria, SortedMap<Stamp, Entry<Meta>>>();
+	protected final Map<Path, Long> cacheStamps
+			= new HashMap<Path, Long>();
+	protected final Map<Path, SortedMap<Stamp, Entry<Meta>>> cache
+			= new HashMap<Path, SortedMap<Stamp, Entry<Meta>>>();
 
 	protected final Object fsMonitor = new Object();
 
@@ -95,16 +94,11 @@ public abstract class Dao<Criteria extends Locator, Meta extends Stamped> {
 		this.groupByDate = groupByDate;
 	}
 
-	public void setCriteria(Criteria criteria) {
-		this.criteria = criteria;
-	}
+	public abstract Path pathFromMeta(Meta meta);
 
 	public void start() {
 		if (metaClass == null) {
 			throw new IllegalStateException("metaClass not set");
-		}
-		if (criteria == null) {
-			log.warn("criteria not set for metaClass: {}", metaClass.getSimpleName());
 		}
 		if (mapper == null) {
 			mapper = createMapper();
@@ -128,9 +122,6 @@ public abstract class Dao<Criteria extends Locator, Meta extends Stamped> {
 	}
 
 	public void pollInbox() {
-		if (criteria == null) {
-			return;
-		}
 		final File inbox = new File(base, NAME_INBOX);
 		if (!inbox.isDirectory()) {
 			if (!inbox.mkdirs()) {
@@ -190,9 +181,15 @@ public abstract class Dao<Criteria extends Locator, Meta extends Stamped> {
 					grossStamp
 			);
 
+
 			try {
-				create(criteria, meta, value.openBinaryStream(), value.openTextReader());
-				log.info("created record of class {}", metaClass.getSimpleName());
+				final Path path = pathFromMeta(meta);
+				if (path == null) {
+					log.warn("NOT created record of class {}: no path provided", metaClass.getSimpleName());
+				} else {
+					create(path, meta, value.openBinaryStream(), value.openTextReader());
+					log.info("created record of class {}", metaClass.getSimpleName());
+				}
 			} catch (IOException e) {
 				log.warn("rolling back/removing inputs: {}", metaClass.getSimpleName());
 				log.warn("failed", e);
@@ -203,7 +200,7 @@ public abstract class Dao<Criteria extends Locator, Meta extends Stamped> {
 		}
 	}
 
-	public Stamp create(Criteria c, Meta meta, BufferedInputStream binary, BufferedReader text) throws IOException {
+	public Stamp create(Path p, Meta meta, BufferedInputStream binary, BufferedReader text) throws IOException {
 		final long createTime;
 		synchronized (createMonitor) {
 			createTime = createStamp = Math.max(System.currentTimeMillis(), createStamp + 1);
@@ -211,9 +208,9 @@ public abstract class Dao<Criteria extends Locator, Meta extends Stamped> {
 		final Stamp stamp = new Stamp(node, createTime);
 
 		final TreeSet<File> dirs = new TreeSet <File>();
-		listCriteria(c, meta, true, false, false, dirs);
+		listCriteria(p, meta, true, false, false, dirs);
 		if (dirs.size() != 1) {
-			throw new IllegalArgumentException("criteria '" + c + "' does not yield one data dir");
+			throw new IllegalArgumentException("criteria '" + p + "' does not yield one data dir");
 		}
 		final File dataDir;
 		if (groupByDate) {
@@ -226,20 +223,22 @@ public abstract class Dao<Criteria extends Locator, Meta extends Stamped> {
 		}
 
 		meta.setCreateStamp(stamp);
-		writeAtomically(dataDir, stamp, false, meta, binary, text);
-
-		invalidate(c, meta);
+		try {
+			writeAtomically(dataDir, stamp, false, meta, binary, text);
+		} finally {
+			invalidate(p);
+		}
 
 		return stamp;
 	}
 
-	public Stamp update(Criteria c, Meta meta, BufferedInputStream binary, BufferedReader text) throws IOException {
+	public Stamp update(Path p, Meta meta, BufferedInputStream binary, BufferedReader text) throws IOException {
 		final Stamp stamp = new Stamp(node, System.currentTimeMillis());
 
 		final TreeSet<File> dirs = new TreeSet<File>();
-		listCriteria(c, meta, true, false, false, dirs);
+		listCriteria(p, meta, true, false, false, dirs);
 		if (dirs.size() != 1) {
-			throw new IllegalArgumentException("criteria '" + c + "' does not yield one data dir");
+			throw new IllegalArgumentException("path '" + p + "' does not yield one data dir");
 		}
 		final File dataDir;
 		if (groupByDate) {
@@ -248,39 +247,75 @@ public abstract class Dao<Criteria extends Locator, Meta extends Stamped> {
 			dataDir = dirs.iterator().next();
 		}
 
-		writeAtomically(dataDir, stamp, true, meta, binary, text);
-
-		invalidate(c, meta);
+		try {
+			writeAtomically(dataDir, stamp, true, meta, binary, text);
+		} finally {
+			invalidate(p);
+		}
 
 		return stamp;
 	}
 
-	public SortedSet<Stamp> findAllStamps(Criteria c, Boolean text, Boolean binary) throws IOException {
-		final SortedMap<Stamp, Entry<Meta>> metas = load(c);
+	public SortedSet<Stamp> findAllStamps(Path p, Boolean text, Boolean binary) throws IOException {
+		final SortedMap<Stamp, Entry<Meta>> metas = load(p);
 
 		filter(metas, null, null, text, binary);
 
 		return new TreeSet<Stamp>(metas.keySet());
 	}
 
-	public SortedMap<Stamp, Entry<Meta>> findAllMetas(Criteria c, Boolean text, Boolean binary) throws IOException {
-		final SortedMap<Stamp, Entry<Meta>> metas = load(c);
+	public static long[] listTimes(final SortedSet<Stamp> stamps) {
+		final List<Long> times = new ArrayList<Long>();
+
+		Long lastTime = null;
+		for (final Stamp stamp : stamps) {
+			final long time = stamp.getTime();
+			if (lastTime == null || lastTime != time) {
+				times.add(time);
+				lastTime = time;
+			}
+		}
+
+		final long[] timesArr = new long[times.size()];
+
+		for (int i = 0; i < timesArr.length; i++) {
+			timesArr[i] = times.get(i);
+		}
+
+		return timesArr;
+	}
+
+
+	public SortedMap<Stamp, Entry<Meta>> findAllMetas(Path p, Boolean text, Boolean binary) {
+		final SortedMap<Stamp, Entry<Meta>> metas = load(p);
 
 		filter(metas, null, null, text, binary);
 
 		return metas;
 	}
 
-	public Entry<Meta> findLast(Criteria c, Boolean text, Boolean binary) {
-		final SortedMap<Stamp, Entry<Meta>> metas = load(c);
+	public Entry<Meta> findLast(Path p, Boolean text, Boolean binary) {
+		final SortedMap<Stamp, Entry<Meta>> metas = load(p);
 
 		filter(metas, null, null, text, binary);
 
-		return metas.get(metas.lastKey());
+		return metas.isEmpty() ? null : metas.get(metas.lastKey());
 	}
 
-	public Entry<Meta> findByTime(Criteria c, long time, Boolean text, Boolean binary) {
-		final SortedMap<Stamp, Entry<Meta>> metas = load(c);
+	public Entry<Meta> findByStamp(Path p, Stamp stamp, Boolean text, Boolean binary) {
+		final SortedMap<Stamp, Entry<Meta>> metas = load(p);
+
+		final Entry<Meta> found = metas.get(stamp);
+
+		if (found == null || isRemoved(stamp, found, null, null, text, binary)) {
+			return null;
+		}
+
+		return found;
+	}
+
+	public Entry<Meta> findByTime(Path p, long time, Boolean text, Boolean binary) {
+		final SortedMap<Stamp, Entry<Meta>> metas = load(p);
 
 		final Stamp infStamp = new Stamp("", time);
 		final Stamp supStamp = new Stamp("", time + 1);
@@ -292,27 +327,27 @@ public abstract class Dao<Criteria extends Locator, Meta extends Stamped> {
 	}
 
 	public int countVersions(
-			Criteria c, Long sinceTime, Long untilTime,
+			Path p, Long sinceTime, Long untilTime,
 			Boolean text, Boolean binary
 	) {
-		final SortedMap<Stamp, Entry<Meta>> metas = load(c);
-		
+		final SortedMap<Stamp, Entry<Meta>> metas = load(p);
+
 		filter(metas, sinceTime, untilTime, text, binary);
 
 		return metas.size();
 	}
 
-	public String[][] list(Criteria c) {
-		return listCriteria(c, null, false, false, groupByDate, null);
+	public String[][] list(Path p) {
+		return listCriteria(p, null, false, false, groupByDate, null);
 	}
 
-	protected SortedMap<Stamp, Entry<Meta>> load(Criteria c) {
+	protected SortedMap<Stamp, Entry<Meta>> load(Path p) {
 		final long now = System.currentTimeMillis();
 		final SortedMap<Stamp, Entry<Meta>> loaded;
 
 		synchronized (cacheMonitor) {
-			final Long cacheStamp = cacheStamps.get(c);
-			final SortedMap<Stamp, Entry<Meta>> precached = cache.get(c);
+			final Long cacheStamp = cacheStamps.get(p);
+			final SortedMap<Stamp, Entry<Meta>> precached = cache.get(p);
 			if (cacheStamp != null) {
 				if (now - cacheStamp < cacheTime) {
 					//	okay, the cache is valid
@@ -321,40 +356,25 @@ public abstract class Dao<Criteria extends Locator, Meta extends Stamped> {
 			}
 
 			final TreeSet<File> dirs = new TreeSet<File>();
-			listCriteria(c, null, false, true, groupByDate, dirs);
+			listCriteria(p, null, false, true, groupByDate, dirs);
 			loaded = listRecords(dirs, precached);
 
-			cacheStamps.put(c, now);
-			cache.put(c, loaded);
+			cacheStamps.put(p, now);
+			cache.put(p, loaded);
 		}
 
 		return loaded;
 	}
 
-	protected void invalidate(Criteria c, Meta meta) {
+	protected void invalidate(Path p) {
 		synchronized (cacheMonitor) {
-			final Set<Criteria> cSet = cache.keySet();
-			for (Iterator<Criteria> cIt = cSet.iterator(); cIt.hasNext();) {
-				final Criteria cCached = cIt.next();
-				if (intersects(cCached.getPath(metaClass, meta), c.getPath(metaClass, meta))) {
+			final Set<Path> cSet = cache.keySet();
+			for (final Path cCached : cSet) {
+				if (cCached.intersects(p)) {
 					cacheStamps.put(cCached, 0L);
 				}
 			}
 		}
-	}
-
-	protected boolean intersects(String[] pathCache, String[] pathUpdate) {
-		final int len = Math.min(pathCache.length, pathUpdate.length);
-
-		for (int i = 0; i < len; i++) {
-			final String elemCache = pathCache[i];
-			final String elemUpdate = pathUpdate[i];
-			if (elemCache != null && elemUpdate != null && !elemCache.equals(elemUpdate)) {
-				return false;
-			}
-		}
-
-		return true;
 	}
 
 	protected void writeAtomically(
@@ -446,27 +466,38 @@ public abstract class Dao<Criteria extends Locator, Meta extends Stamped> {
 		for (Iterator<Stamp> stampIt = stamps.iterator(); stampIt.hasNext();) {
 			final Stamp stamp = stampIt.next();
 
-			if (
-					(sinceTime != null && stamp.getTime() < sinceTime) ||
-					(untilTime != null && stamp.getTime() > untilTime)
-			) {
-				stampIt.remove();
-			}
-
 			final Entry<Meta> entry = metas.get(stamp);
-			if (text != null && text != (entry.getFileText() != null)) {
-				stampIt.remove();
-			}
-			if (binary != null && binary != (entry.getFileBinary() != null)) {
+			boolean removed = isRemoved(stamp, entry, sinceTime, untilTime, text, binary);
+
+			if (removed) {
 				stampIt.remove();
 			}
 		}
 	}
 
+	protected boolean isRemoved(Stamp stamp, Entry<Meta> entry, Long sinceTime, Long untilTime, Boolean text, Boolean binary) {
+		boolean removed =false;
+		if (
+				(sinceTime != null && stamp.getTime() < sinceTime) ||
+				(untilTime != null && stamp.getTime() > untilTime)
+		) {
+			removed = true;
+		}
+
+		if (text != null && text != (entry.getFileText() != null)) {
+			removed = true;
+		}
+		if (binary != null && binary != (entry.getFileBinary() != null)) {
+			removed = true;
+		}
+
+		return removed;
+	}
+
 	/**
 	 * Load all versions of all records for a given set of data dirs.
 	 *
-	 * @param dirs some set of data dirs, see {@link Dao#listCriteria(Locator, Stamped, boolean, boolean, boolean, java.util.SortedSet)}
+	 * @param dirs some set of data dirs, see {@link Dao#listCriteria(Path, elw.vo.Stamped, boolean, boolean, boolean, java.util.SortedSet)}
 	 * @param dest to dump entries into
 	 * @return dest argument, <code>null</code> in case you don't want to bother with memory allocation yourself
 	 */
@@ -572,22 +603,24 @@ public abstract class Dao<Criteria extends Locator, Meta extends Stamped> {
 	/**
 	 * Computes possible criteria positions, enumerating undefined ones via FS accesses.
 	 *
-	 * @param c				criteria to inspect
+	 * @param p				criteria to inspect
 	 * @param meta			 to compensate for partially defined criteria
 	 * @param create		   to create missing directories for any defined component
 	 * @param ignoreEmpty	  to filter out directories which do not contain any data records
 	 * @param localGroupByDate triggers grouping by date
 	 * @param dirs			 pass-in arg to return directories which contain records for this criteria	 @return all possible values for each criteria path position
+	 * @return all reachable selectors, an array for each level
 	 */
 	protected String[][] listCriteria(
-			final Criteria c,
+			final Path p,
 			final Meta meta,
 			final boolean create,
 			final boolean ignoreEmpty,
 			final boolean localGroupByDate,
 			final SortedSet<File> dirs
 	) {
-		final String[] path = c.getPath(metaClass, meta);
+		final Path pEff = p == null ? pathFromMeta(meta) : p;
+		final String[] path = pEff.getPath();
 
 		//	these grow exponentially
 		final SortedSet<File> curDirs = new TreeSet<File>();
@@ -697,8 +730,8 @@ public abstract class Dao<Criteria extends Locator, Meta extends Stamped> {
 		protected final File fileBinary;
 		protected final File fileText;
 		protected final long stamp;
-		protected BufferedInputStream binary;
-		protected BufferedReader text;
+		protected ThreadLocal<BufferedInputStream> binary;
+		protected ThreadLocal<BufferedReader> text;
 
 		public Entry(File fileMeta, File fileText, File fileBinary, Meta meta, long stamp) {
 			this.meta = meta;
@@ -732,7 +765,9 @@ public abstract class Dao<Criteria extends Locator, Meta extends Stamped> {
 			if (fileBinary == null) {
 				return null;
 			}
-			return binary = new BufferedInputStream(new FileInputStream(fileBinary));
+			final BufferedInputStream newBinary = new BufferedInputStream(new FileInputStream(fileBinary));
+			binary.set(newBinary);
+			return newBinary;
 		}
 
 		public BufferedReader openTextReader() throws IOException {
@@ -740,12 +775,33 @@ public abstract class Dao<Criteria extends Locator, Meta extends Stamped> {
 				return null;
 			}
 
-			return text = new BufferedReader(new InputStreamReader(new FileInputStream(fileText), "UTF-8"));
+			final BufferedReader newText = new BufferedReader(new InputStreamReader(new FileInputStream(fileText), "UTF-8"));
+			text.set(newText);
+			return newText;
+		}
+
+		public String[] dumpText() throws IOException {
+			final BufferedReader reader = openTextReader();
+
+			if (reader == null) {
+				return new String[0];
+			}
+
+			final List<String> lines = new ArrayList<String>();
+			String curLine;
+
+			while ((curLine = reader.readLine()) != null) {
+				lines.add(curLine);
+			}
+
+			return lines.toArray(new String[lines.size()]);
 		}
 
 		public void closeStreams() {
-			close(binary);
-			close(text);
+			close(binary.get());
+			close(text.get());
+			binary.set(null);
+			text.set(null);
 		}
 	}
 }

@@ -2,9 +2,6 @@ package elw.vo;
 
 import java.util.regex.Pattern;
 
-/**
-* LATER add javadocs for a class created by anton
-*/
 public class Stamp implements Comparable<Stamp> {
 	public static final Pattern PATTERN_STRING = Pattern.compile("\\w+-\\w+");
 
@@ -75,5 +72,13 @@ public class Stamp implements Comparable<Stamp> {
 		final String node = value.substring(dashIdx + 1);
 
 		return new Stamp(node, Long.parseLong(timeBase36, 36));
+	}
+
+	public static Stamp parse(String parameter, Stamp def) {
+		if (parameter == null || parameter.length() == 0 || parameter.indexOf("-") < 0) {
+			return def;
+		}
+
+		return fromString(parameter);
 	}
 }

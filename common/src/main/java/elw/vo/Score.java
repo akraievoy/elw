@@ -8,36 +8,56 @@ import org.joda.time.format.DateTimeFormatter;
 
 import java.util.*;
 
-public class Score {
+public class Score implements Stamped {
 	private static final DateTimeFormatter FMT_DATETIME_NICE = DateTimeFormat.forPattern("EEE MMM dd HH:mm");
 
 	protected final Map<String, Double> ratios = new TreeMap<String, Double>();
 	protected final Map<String, Integer> pows = new TreeMap<String, Integer>();
-	protected long stamp;
-	protected long codeStamp;
-	protected long reportStamp;
 
-	public long getStamp() {
-		return stamp;
+	protected Stamp createStamp;
+	protected Stamp updateStamp;
+	protected String[] path;
+
+	protected Stamp codeStamp;
+	protected Stamp reportStamp;
+
+	public Stamp getCreateStamp() {
+		return createStamp;
 	}
 
-	public void setStamp(long stamp) {
-		this.stamp = stamp;
+	public void setCreateStamp(Stamp createStamp) {
+		this.createStamp = createStamp;
 	}
 
-	public long getCodeStamp() {
+	public Stamp getUpdateStamp() {
+		return updateStamp;
+	}
+
+	public void setUpdateStamp(Stamp updateStamp) {
+		this.updateStamp = updateStamp;
+	}
+
+	public String[] getPath() {
+		return path;
+	}
+
+	public void setPath(String[] path) {
+		this.path = path;
+	}
+
+	public Stamp getCodeStamp() {
 		return codeStamp;
 	}
 
-	public void setCodeStamp(long codeStamp) {
+	public void setCodeStamp(Stamp codeStamp) {
 		this.codeStamp = codeStamp;
 	}
 
-	public long getReportStamp() {
+	public Stamp getReportStamp() {
 		return reportStamp;
 	}
 
-	public void setReportStamp(long reportStamp) {
+	public void setReportStamp(Stamp reportStamp) {
 		this.reportStamp = reportStamp;
 	}
 
@@ -62,7 +82,9 @@ public class Score {
 	public Score copy() {
 		final Score copy = new Score();
 
-		copy.setStamp(System.currentTimeMillis());
+		copy.setCreateStamp(createStamp);
+		copy.setUpdateStamp(updateStamp);
+		//	LATER would we copy any other stamps here?
 		copy.ratios.putAll(ratios);
 		copy.pows.putAll(pows);
 
@@ -71,7 +93,7 @@ public class Score {
 
 	@JsonIgnore
 	public String getNiceStamp() {
-		return stamp == 0 ? "Preliminary" : FMT_DATETIME_NICE.print(new DateTime(stamp));
+		return createStamp == null ? "Preliminary" : FMT_DATETIME_NICE.print(new DateTime(createStamp.getTime()));
 	}
 
 	@JsonIgnore
@@ -107,7 +129,7 @@ public class Score {
 
 	@JsonIgnore
 	public boolean isPreliminary() {
-		return stamp == 0 || reportStamp == 0;
+		return createStamp == null || reportStamp == null;
 	}
 
 	public double getRatio(String[] ids) {

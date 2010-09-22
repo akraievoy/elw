@@ -5,23 +5,41 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-public class ReportMeta {
+public class ReportMeta implements Stamped {
 	private static final DateTimeFormatter FMT_DATETIME_NICE = DateTimeFormat.forPattern("EEE MMM dd HH:mm");
 	private static final DateTimeFormatter FMT_DATETIME_BRIEF = DateTimeFormat.forPattern("MMM dd");
 	private static final DateTimeFormatter FMT_DATETIME_FNAME = DateTimeFormat.forPattern("MMddHHmm");
 
-	protected long uploadStamp;
+	protected Stamp createStamp;
+	protected Stamp updateStamp;
+	protected String[] path;
 	protected String sourceAddress;
 	protected int totalUploads;
 	protected String fileName;
-	protected long scoreStamp;
+	protected Stamp scoreStamp;
 
-	public long getUploadStamp() {
-		return uploadStamp;
+	public Stamp getCreateStamp() {
+		return createStamp;
 	}
 
-	public void setUploadStamp(long uploadStamp) {
-		this.uploadStamp = uploadStamp;
+	public void setCreateStamp(Stamp createStamp) {
+		this.createStamp = createStamp;
+	}
+
+	public Stamp getUpdateStamp() {
+		return updateStamp;
+	}
+
+	public void setUpdateStamp(Stamp updateStamp) {
+		this.updateStamp = updateStamp;
+	}
+
+	public String[] getPath() {
+		return path;
+	}
+
+	public void setPath(String[] path) {
+		this.path = path;
 	}
 
 	public String getSourceAddress() {
@@ -44,12 +62,12 @@ public class ReportMeta {
 
 	@JsonIgnore
 	public String getNiceUploadStamp() {
-		return FMT_DATETIME_NICE.print(new DateTime(uploadStamp));
+		return FMT_DATETIME_NICE.print(new DateTime(createStamp));
 	}
 
 	@JsonIgnore
 	public String getBriefUploadStamp() {
-		return FMT_DATETIME_BRIEF.print(new DateTime(uploadStamp));
+		return FMT_DATETIME_BRIEF.print(new DateTime(createStamp));
 	}
 
 	public static String getFileNameUploadStamp(final long uploadStamp) {
@@ -64,11 +82,11 @@ public class ReportMeta {
 		return fileName;
 	}
 
-	public long getScoreStamp() {
+	public Stamp getScoreStamp() {
 		return scoreStamp;
 	}
 
-	public void setScoreStamp(long scoreStamp) {
+	public void setScoreStamp(Stamp scoreStamp) {
 		this.scoreStamp = scoreStamp;
 	}
 }

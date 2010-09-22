@@ -15,14 +15,20 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-public class CourseDao extends Dao<Ctx, Course> {
+public class CourseDao extends Dao<Course> {
 	private static final Logger log = LoggerFactory.getLogger(CourseDao.class);
 
 	public CourseDao() {
 	}
 
+	@Override
+	public Path pathFromMeta(Course course) {
+		return new Path(course.getId());
+	}
+
 	public synchronized String[] findCourseIds() {
-		final String[][] pathElems = listCriteria(criteria, null, false, true, false, null);
+		final Path pathAll = new Path(new String[]{null});
+		final String[][] pathElems = listCriteria(pathAll, null, false, true, false, null);
 
 		return pathElems[0];
 	}
@@ -32,18 +38,21 @@ public class CourseDao extends Dao<Ctx, Course> {
 			return null;
 		}
 
-		final Ctx groupCtx = new Ctx(Ctx.STATE_C, null, null, null, id, -1, null, null);
-		final Entry<Course> entry = findLast(groupCtx, null, null);
+		final Entry<Course> entry = findLast(new Path(id), null, null);
 
 		return entry.getMeta();
 	}
 
 	public Course[] findAllCourses() {
-		final String[] groupIds = findCourseIds();
-		final Course[] courses = new Course[groupIds.length];
+		final String[] courseIds = findCourseIds();
+		return load(courseIds);
+	}
+
+	protected Course[] load(String[] courseIds) {
+		final Course[] courses = new Course[courseIds.length];
 
 		for (int i = 0; i < courses.length; i++) {
-			courses[i] = findCourse(groupIds[i]);
+			courses[i] = findCourse(courseIds[i]);
 		}
 
 		return courses;

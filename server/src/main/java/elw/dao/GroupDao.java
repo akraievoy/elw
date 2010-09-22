@@ -14,17 +14,21 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-public class GroupDao extends Dao<Ctx, Group> {
+public class GroupDao extends Dao<Group> {
+	@Override
+	public Path pathFromMeta(Group group) {
+		return new Path(group.getId());
+	}
+
 	public String[] findGroupIds() {
-		final String[][] pathElems = listCriteria(criteria, null, false, true, false, null);
+		final Path pathAll = new Path(new String[]{null});
+		final String[][] pathElems = listCriteria(pathAll, null, false, true, false, null);
 
 		return pathElems[0];
 	}
 
 	public Group findGroup(final String id) {
-		final Ctx groupCtx = new Ctx(Ctx.STATE_G, null, id, null, null, -1, null, null);
-		final Entry<Group> entry = findLast(groupCtx, null, null);
-
+		final Entry<Group> entry = findLast(new Path(id), null, null);
 		return entry.getMeta();
 	}
 

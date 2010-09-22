@@ -35,7 +35,7 @@
 		<td style="padding-left: 0.25em; padding-right: 0.25em;">
 			<form action="approve" method="get" style="margin: 0;">
 				<input type="hidden" name="elw_ctx" value="$e.ctx"/>
-				<input type="hidden" name="stamp" value="$e.meta.uploadStamp"/>
+				<input type="hidden" name="stamp" value="$e.meta.createStamp"/>
 				<input type="submit" value="Approve"/>
 			</form>
 		</td>

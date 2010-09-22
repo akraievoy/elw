@@ -2,122 +2,84 @@ package elw.dao;
 
 import elw.vo.Course;
 import elw.vo.Enrollment;
-import org.akraievoy.gear.G;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.IOException;
-import java.util.*;
-
-public class EnrollDao extends Dao {
+public class EnrollDao extends Dao<Enrollment> {
 	private static final Logger log = LoggerFactory.getLogger(EnrollDao.class);
 
-	protected final ObjectMapper mapper;
 	protected final CourseDao courseDao;
-	protected int cacheTime = 180000;
 
-	final Map<String, Enrollment> enrollCache = new TreeMap<String, Enrollment>();
-
-	protected long cacheStamp = 0;
-
-	public void setCacheTime(int cacheTime) {
-		this.cacheTime = cacheTime;
-	}
-
-	public EnrollDao(ObjectMapper mapper, CourseDao courseDao) {
-		this.mapper = mapper;
+	public EnrollDao(CourseDao courseDao) {
 		this.courseDao = courseDao;
 	}
 
-	public synchronized String[] findEnrollmentIds() {
-		refreshCache();
-
-		final Set<String> keys = enrollCache.keySet();
-		return keys.toArray(new String[keys.size()]);
+	@Override
+	public Path pathFromMeta(Enrollment e) {
+		return new Path(new String[] {e.getGroupId(), e.getCourseId(), e.getId()});
 	}
 
-	public void refreshCache() {
-		final long now = System.currentTimeMillis();
-		if (now - cacheStamp >= cacheTime) {
-			cacheStamp = now;
-		} else {
-			return;
-		}
+	public String[] findEnrollmentIds() {
+		final String[] pathAll = {null, null, null};
+		final String[][] pathElems = listCriteria(new Path(pathAll), null, false, true, false, null);
 
-		final File enrollDir = new File(System.getProperty("user.home"), "elw-data/enroll");
-		final File[] groupFiles = enrollDir.listFiles(new FileFilter() {
-			public boolean accept(File pathname) {
-				return pathname.isFile() && pathname.getName().endsWith(".json");
-			}
-		});
-
-		for (File groupFile : groupFiles) {
-			try {
-				final Enrollment enrollment = mapper.readValue(groupFile, Enrollment.class);
-				if (groupFile.getName().equals(enrollment.getId() + ".json")) {
-					enrollCache.put(enrollment.getId(), enrollment);
-				} else {
-					log.warn("wrong id at file {}", groupFile.getPath());
-				}
-			} catch (IOException e) {
-				log.warn("failed to read {}: {}", groupFile.getPath(), G.report(e));
-				log.trace("trace", e);
-			}
-		}
+		return pathElems[2];
 	}
 
 	public synchronized Enrollment findEnrollment(final String id) {
-		refreshCache();
+		if (id == null) {
+			return null;
+		}
 
-		return enrollCache.get(id);
+		final Path pathId = new Path(new String[]{null, null, id});
+		final Entry<Enrollment> entry = findLast(pathId, null, null);
+
+		return entry.getMeta();
 	}
 
 	public Enrollment[] findAllEnrollments() {
-		refreshCache();
+		final String[] enrIds = findEnrollmentIds();
 
-		final Collection<Enrollment> enrollments = enrollCache.values();
-		return enrollments.toArray(new Enrollment[enrollments.size()]);
+		return load(enrIds);
+	}
+
+	protected Enrollment[] load(String[] enrIds) {
+		final Enrollment[] enrs = new Enrollment[enrIds.length];
+
+		for (int i = 0; i < enrs.length; i++) {
+			enrs[i] = findEnrollment(enrIds[i]);
+		}
+
+		return enrs;
 	}
 
 	public Enrollment[] findEnrollmentsForGroupId(final String groupId) {
-		refreshCache();
+		final Path pathGroup = new Path(new String[]{groupId, null, null});
+		final String[][] pathElems = listCriteria(pathGroup, null, false, true, false, null);
+		final String[] enrIds = pathElems[2];
 
-		final Collection<Enrollment> allEnrollments = enrollCache.values();
-		final List<Enrollment> groupEnrollments = new ArrayList<Enrollment>();
-		for (Enrollment e : allEnrollments) {
-			if (groupId.equals(e.getGroupId())) {
-				groupEnrollments.add(e);
-			}
-		}
-
-		return groupEnrollments.toArray(new Enrollment[groupEnrollments.size()]);
+		return load(enrIds);
 	}
 
-	public List<Course> findCoursesByGroupId(String groupId) {
-		final Enrollment[] enrollments = findEnrollmentsForGroupId(groupId);
-		List<Course> courses = new ArrayList<Course>();
-		for (Enrollment e : enrollments) {
-			final Course course = courseDao.findCourse(e.getCourseId());
-			if (course == null) {
-				continue;
-			}
-			courses.add(course);
-		}
-		return courses;
+	public Course[] findCoursesByGroupId(String groupId) {
+		final Path pathGroup = new Path(new String[]{groupId, null, null});
+		final String[][] pathElems = listCriteria(pathGroup, null, false, true, false, null);
+		final String[] courseIds = pathElems[1];
+
+		return courseDao.load(courseIds);
 	}
 
 	public Enrollment findEnrollmentForGroupAndCourse(String groupId, String courseId) {
-		final Enrollment[] enrollments = findEnrollmentsForGroupId(groupId);
-		Enrollment enr = null;
-		for (Enrollment e : enrollments) {
-			if (e.getCourseId().equals(courseId)) {
-				enr = e;
-				break;
-			}
+		final Path pathGroupAndCourse = new Path(new String[]{groupId, courseId, null});
+		final String[][] pathElems = listCriteria(pathGroupAndCourse, null, false, true, false, null);
+		final String[] enrollmentIds = pathElems[2];
+
+		if (enrollmentIds.length == 0) {
+			return null;
 		}
-		return enr;
+		if (enrollmentIds.length > 1) {
+			log.warn("miltiple enrollments for group {} and course {}", groupId, courseId);
+		}
+		return load(enrollmentIds)[0];
 	}
 }

@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Enrollment extends IdName {
+public class Enrollment extends IdName implements Stamped{
 	protected String groupId;
 	protected String courseId;
+	protected Stamp createStamp;
+	protected Stamp updateStamp;
 
 	protected List<Class> classes = new ArrayList<Class>();
 
@@ -33,5 +35,21 @@ public class Enrollment extends IdName {
 	public void setClasses(Class[] classes) {
 		this.classes.clear();
 		this.classes.addAll(Arrays.asList(classes));
+	}
+
+	public Stamp getCreateStamp() {
+		return createStamp;
+	}
+
+	public void setCreateStamp(Stamp createStamp) {
+		this.createStamp = createStamp;
+	}
+
+	public Stamp getUpdateStamp() {
+		return updateStamp;
+	}
+
+	public void setUpdateStamp(Stamp updateStamp) {
+		this.updateStamp = updateStamp;
 	}
 }

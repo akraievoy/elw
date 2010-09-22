@@ -10,7 +10,7 @@ import java.lang.Class;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class Ctx implements Locator {
+public class Ctx {
 	private static final Logger log = LoggerFactory.getLogger(Ctx.class);
 
 	public static final String STATE_NONE = "";
@@ -320,6 +320,10 @@ public class Ctx implements Locator {
 		return ver;
 	}
 
+	public int getBundleIdx() {
+		return bundleIdx;
+	}
+
 	public Ctx extendEnr(final Enrollment enr) {
 		final Ctx ctx = copy();
 
@@ -611,24 +615,6 @@ public class Ctx implements Locator {
 
 	public static String norm(final String state) {
 		return removeRedundant(reorder(state));
-	}
-
-	public <T extends Stamped> String[] getPath(Class<T> metaClass, T meta) {
-		if (Group.class.isAssignableFrom(metaClass)) {
-			if (meta != null) {
-				return new String[] {((Group) meta).getId()};
-			} else {
-				return new String[] {groupId};
-			}
-		}
-		if (Course.class.isAssignableFrom(metaClass)) {
-			if (meta != null) {
-				return new String[] {((Course) meta).getId()};
-			} else {
-				return new String[] {courseId};
-			}
-		}
-		return new String[0];
 	}
 
 	@Override
