@@ -6,6 +6,8 @@
 	<meta content="text/html; charset=UTF-8">
 	<title>Course ${elw_ctx.course.name} : ELW Admin</title>
 	<link href="../css/elw.css" type="text/css" rel="stylesheet"/>
+	<script type="text/javascript" src="../js/jquery.js"></script>
+	<script type="text/javascript" src="../js/jquery.sha1.js"></script>
 </head>
 <body>
 <div id="header">
@@ -15,17 +17,35 @@
 </div>
 #elw_messages($elw_messages)
 <div id=main>
-	<table><tbody>
-	<tr><td style="padding-left: 1em;padding-right: 0.25em;" colspan=3>Типы:</td></tr>
+	<table cellspacing="0" cellpadding="0"><tbody>
+	<tr>
+		<td style="padding-left: 1em;padding-right: 0.25em; width: 40em;">Types:</td>
+		<td style="width: 8em;">&nbsp;</td>
+		<td style="width: 8em;">&nbsp;</td>
+	</tr>
 	#foreach($assType in $elw_ctx.course.assTypes)
-	<tr><td style="padding-left: 1.5em;padding-right: 0.25em;" colspan=3>Задания для ${assType.name}</td></tr>
+	<tr>
+		<td style="padding-left: 1.5em; padding-right: 0.25em;">${assType.name}</td>
+		<td style="text-align: center; border: 1px red dotted;">[&nbsp;<a href="#" class="expandTrigger" id="${assType.id}">Assignments</a>&nbsp;]</td>
+		<td>&nbsp;</td>
+	</tr>
 	 #foreach($ass in $assType.assignments)
-	<tr class="header"><td style="padding-left: 2em; padding-right: 0.25em;" colspan=3>Варианты для $ass.name&nbsp;<span style="font-size: smaller">(id:&nbsp;#if($ass.id)$ass.id#{else}null#end)</span>&nbsp;:&nbsp;</td></tr>
+	<tr class="header ${assType.id}" style="display: none;" >
+		<td style="padding-left: 2em; padding-right: 0.25em;">
+			<span title="id=#if($ass.id)$ass.id#{else}null#end">$ass.name</span>
+		</td>
+		<td style="text-align: center;border: 1px red dotted;">[&nbsp;<a href="#" class="expandTrigger" id="${assType.id}__${ass.id}">Versions</a>&nbsp;]</td>
+		<td>&nbsp;</td>
+	</tr>
 		#foreach($ver in $ass.versions)
 		#set($assCtx=$elw_ctx.extendTAV(${assType}, ${ass}, ${ver}))
-	<tr>
-		<td style="padding-left: 3em;">$ver.name&nbsp;<span style="font-size: smaller">(id:&nbsp;#if($ver.id)$ver.id#{else}null#end)</span></td>
-		<td style="padding-left: 0.25em; padding-right: 0.25em;">[&nbsp;<a href="launch?elw_ctx=$assCtx">Code</a>&nbsp;]</td>
+	<tr class="${assType.id}__${ass.id}" style="display: none;">
+		<td style="padding-left: 3em;">
+			$ver.name&nbsp;<span style="font-size: smaller">(id:&nbsp;#if($ver.id)$ver.id#{else}null#end)</span>
+		</td>
+		<td style="text-align: center; border: 1px red dotted;">
+			[&nbsp;<a href="launch?elw_ctx=$assCtx">Code</a>&nbsp;]
+		</td>
 		<td style="padding-left: 0.25em; padding-right: 0.25em;">
 			#if($testResults)
 			#set($res=$testResults.get($assCtx.toString()))
@@ -42,4 +62,14 @@
 	</tbody></table>
 </div>
 </body>
+<script type="text/javascript">
+	jQuery(document).ready(function() {
+		jQuery(".expandTrigger").toggle(function() {
+			jQuery("."+this.id).slideDown(0);
+		}, function() {
+			jQuery("."+this.id).slideUp();
+			jQuery("[class^="+this.id+"]").slideUp();
+		});
+	});
+</script>
 </html>
