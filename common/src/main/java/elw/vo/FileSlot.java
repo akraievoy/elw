@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class FileSet extends IdNameStamped {
+public class FileSlot extends IdNameStamped {
 	protected List<String> readApprovals = new ArrayList<String>();
 	protected List<String> writeApprovals = new ArrayList<String>();
 	protected List<String> contentTypes = new ArrayList<String>();

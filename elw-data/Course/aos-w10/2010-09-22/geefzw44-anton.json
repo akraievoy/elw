@@ -6,7 +6,7 @@
 		{
 			"id" : "lr",
 			"name" : "Лабораторная Работа",
-			"fileSets" : [
+			"fileSlots" : [
 				{
 					"id":"statement",
 					"name":"Условие",
@@ -161,7 +161,7 @@
 		{
 			"id" : "cp",
 			"name" : "Компьютерный Практикум",
-			"fileSets" : [
+			"fileSlots" : [
 				{
 					"id":"statement",
 					"name":"Условие",

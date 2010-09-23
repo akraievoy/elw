@@ -8,7 +8,7 @@ import java.util.List;
 
 public class AssignmentType extends IdName {
 	protected final List<Assignment> assignments = new ArrayList<Assignment>();
-	protected final List<FileSet> fileSets = new ArrayList<FileSet>();
+	protected final List<FileSlot> fileSlots = new ArrayList<FileSlot>();
 
 	protected BundleScoring scoring = null;
 	protected AssignmentSetup setup = null;
@@ -24,13 +24,13 @@ public class AssignmentType extends IdName {
 		this.assignments.addAll(Arrays.asList(assignments));
 	}
 
-	public FileSet[] getFileSets() {
-		return fileSets.toArray(new FileSet[fileSets.size()]);
+	public FileSlot[] getFileSlots() {
+		return fileSlots.toArray(new FileSlot[fileSlots.size()]);
 	}
 
-	public void setFileSets(FileSet[] fileSets) {
-		this.fileSets.clear();
-		this.fileSets.addAll(Arrays.asList(fileSets));
+	public void setFileSlots(FileSlot[] fileSlots) {
+		this.fileSlots.clear();
+		this.fileSlots.addAll(Arrays.asList(fileSlots));
 	}
 
 	public BundleScoring getScoring() {
