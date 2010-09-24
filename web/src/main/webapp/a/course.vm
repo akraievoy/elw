@@ -6,8 +6,11 @@
 	<meta content="text/html; charset=UTF-8">
 	<title>Course ${elw_ctx.course.name} : ELW Admin</title>
 	<link href="../css/elw.css" type="text/css" rel="stylesheet"/>
+	<link href="../css/jquery.jgrowl.css" type="text/css" rel="stylesheet"/>
 	<script type="text/javascript" src="../js/jquery.js"></script>
 	<script type="text/javascript" src="../js/jquery.sha1.js"></script>
+	<script type="text/javascript" src="../js/jquery.jgrowl.js"></script>
+	<script type="text/javascript" src="../js/elw.js"></script>
 </head>
 <body>
 <div id="header">
@@ -20,21 +23,47 @@
 	<table cellspacing="0" cellpadding="0"><tbody>
 	<tr>
 		<td style="padding-left: 1em;padding-right: 0.25em; width: 40em;">Types:</td>
-		<td style="width: 8em;">&nbsp;</td>
-		<td style="width: 8em;">&nbsp;</td>
+		<td style="width: 10em;">&nbsp;</td>
+		<td style="width: 6em;">&nbsp;</td>
 	</tr>
 	#foreach($assType in $elw_ctx.course.assTypes)
 	<tr>
 		<td style="padding-left: 1.5em; padding-right: 0.25em;">${assType.name}</td>
-		<td style="text-align: center; border: 1px red dotted;">[&nbsp;<a href="#" class="expandTrigger" id="${assType.id}">Assignments</a>&nbsp;]</td>
+		<td style="text-align: center;">
+			<span class="expandTrigger" id="${assType.id}">Tasks</span>&nbsp;<span class="expandTrigger" id="slots-${assType.id}">Slots</span>
+		</td>
 		<td>&nbsp;</td>
 	</tr>
+		#foreach($slot in $assType.fileSlots)
+		<tr class="slots-${assType.id}" style="display: none;">
+			<td style="padding-left: 2.5em; padding-right: 0.25em; position:relative;" >
+				<span title="id=${slot.id}">${slot.name}</span>
+			</td>
+			<td style="text-align: center;">
+				<span class="popupTrigger" id="slots-${assType.id}-${slot.id}">Details</span>
+			</td>
+			<td>
+				<div style="display:none; width: 12em;" class="slots-${assType.id}-${slot.id} popup">
+					Binary? : <span style="font-weight: bold;">#if($slot.binary)Yes#{else}No#end</span><br/>
+					Content Types : <span style="font-weight: bold;">#foreach($contentType in $slot.contentTypes) ${contentType} #end</span><br/>
+					Max Size : <span style="font-weight: bold;">${slot.lengthLimit}</span><br/>
+					Name Regex : <span style="font-weight: bold;">${slot.nameRegex}</span><br/>
+					<hr/>
+					Writable? : <span style="font-weight: bold;">#if($slot.writable)Yes#{else}No#end</span><br/>
+					Writable after : <span style="font-weight: bold;">#foreach($slotId in $slot.writeApprovals) ${slotId} #end</span><br/>
+					Readable after : <span style="font-weight: bold;">#foreach($slotId in $slot.readApprovals) ${slotId} #end</span><br/>
+				</div>
+			</td>
+		</tr>
+		#end
 	 #foreach($ass in $assType.assignments)
 	<tr class="header ${assType.id}" style="display: none;" >
 		<td style="padding-left: 2em; padding-right: 0.25em;">
 			<span title="id=#if($ass.id)$ass.id#{else}null#end">$ass.name</span>
 		</td>
-		<td style="text-align: center;border: 1px red dotted;">[&nbsp;<a href="#" class="expandTrigger" id="${assType.id}__${ass.id}">Versions</a>&nbsp;]</td>
+		<td style="text-align: center;">
+			<span class="expandTrigger" id="${assType.id}__${ass.id}">Versions</span>
+		</td>
 		<td>&nbsp;</td>
 	</tr>
 		#foreach($ver in $ass.versions)
@@ -43,7 +72,7 @@
 		<td style="padding-left: 3em;">
 			$ver.name&nbsp;<span style="font-size: smaller">(id:&nbsp;#if($ver.id)$ver.id#{else}null#end)</span>
 		</td>
-		<td style="text-align: center; border: 1px red dotted;">
+		<td style="text-align: center;">
 			[&nbsp;<a href="launch?elw_ctx=$assCtx">Code</a>&nbsp;]
 		</td>
 		<td style="padding-left: 0.25em; padding-right: 0.25em;">
@@ -62,14 +91,4 @@
 	</tbody></table>
 </div>
 </body>
-<script type="text/javascript">
-	jQuery(document).ready(function() {
-		jQuery(".expandTrigger").toggle(function() {
-			jQuery("."+this.id).slideDown(0);
-		}, function() {
-			jQuery("."+this.id).slideUp();
-			jQuery("[class^="+this.id+"]").slideUp();
-		});
-	});
-</script>
 </html>
