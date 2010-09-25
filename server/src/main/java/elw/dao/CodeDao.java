@@ -47,9 +47,8 @@ public class CodeDao extends Dao<CodeMeta> {
 				ctx.getGroup().getId(),
 				ctx.getStudent().getId(),
 				ctx.getCourse().getId(),
-				String.valueOf(ctx.getAssTypeId()),
-				ctx.getAss().getId(),
-				ctx.getVer().getId(),
+				String.valueOf(ctx.getIndex()) + "-"  + ctx.getAssTypeId() + "-" +
+						ctx.getAss().getId() + "-" +  ctx.getVer().getId()
 		});
 
 		return path;

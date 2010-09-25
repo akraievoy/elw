@@ -352,6 +352,10 @@ public class Ctx {
 		return indexEntry;
 	}
 
+	public int getIndex() {
+		return index;
+	}
+
 	public Ctx extendEnr(final Enrollment enr) {
 		final Ctx ctx = copy();
 

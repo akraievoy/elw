@@ -60,4 +60,16 @@ public class Path {
 
 		return true;
 	}
+
+	public Path set(final int index, final String value) {
+		final String[] newPath = this.path.clone();
+
+		newPath[index] = value;
+
+		return new Path(newPath);
+	}
+
+	public Path setLast(final String value) {
+		return set(this.path.length - 1, value);
+	}
 }

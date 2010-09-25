@@ -20,37 +20,25 @@
 		<tbody>
 		<tr>
 			<th>Name</th>
+			<th>State</th>
 			<th>Score</th>
-			<th>Actions</th>
 		</tr>
 			#foreach($entry in $elw_ctx.enr.index)#set($idx = $velocityCount - 1)
 				#set($ass_ctx = $elw_ctx.extendIndex($idx))
 				#set($assType = $ass_ctx.assType)
 				#set($ass = $ass_ctx.ass)
+				#set($verIdx = $elw_ctx.student.idAsInt % $ass.versions.size())
+				#set($ver = $ass.versions.get($verIdx))
+				#set($path = $elw_ctx.extendBAV($bunI, $ass, $ver))
+				#set($started = $elw_ctx.enr.classes.get($ass_ctx.indexEntry.classFrom).started)
 			<tr class="header">
-				<td style="padding-left: 2em; padding-right: 1em; border-right: #999999 dashed 1px;">$ass.name</td>
-#*
-				#if($elw_ctx.enr.classes.get($ass_ctx.indexEntry.classFrom).started)
-					<td style="padding: 0 0.25em; text-align: center;">
-						Due $elw_ctx.enr.classes.get($ass_ctx.indexEntry.classCodeDue).niceDate
-					</td>
-					<td style="padding: 0 0.25em; text-align: center;">
-						Due $elw_ctx.enr.classes.get($ass_ctx.indexEntry.classReportDue).niceDate
-					</td>
-				#else
-					<td style="padding: 0 0.25em; text-align: center;" colspan="2">
-						Opens $elw_ctx.enr.classes.get($ass_ctx.indexEntry.classFrom).niceDate
-					</td>
-				#end
-*#
-				<td style="padding: 0 0.25em; text-align: left;"></td>
-				<td style="padding: 0 0.25em; text-align: left;">$ass_ctx.indexEntry.scoreBudget pts.</td>
-
+				<td style="padding-left: 2em; padding-right: 1em; border-right: #999999 dashed 1px;">$assType.name - $ass.name</td>
+				<td style="padding: 0 0.25em; text-align: left;">
+					#if($started) Opened #else Opens #end $elw_ctx.enr.classes.get($ass_ctx.indexEntry.classFrom).niceDate
+				</td>
+				<td style="padding: 0 0.25em; text-align: right;">$ass_ctx.indexEntry.scoreBudget pts.</td>
 			</tr>
 				#if($elw_ctx.enr.classes.get($ass_ctx.indexEntry.classFrom).started)
-					#set($verIdx = $elw_ctx.student.idAsInt % $ass.versions.size())
-					#set($ver = $ass.versions.get($verIdx))
-					#set($path = $elw_ctx.extendBAV($bunI, $ass, $ver))
 				<tr>
 					<td style="padding-left: 2.5em; padding-right: 1em; border-right: #999999 dashed 1px;">$ver.name</td>
 #*

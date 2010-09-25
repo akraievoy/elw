@@ -203,40 +203,28 @@ public abstract class Dao<Meta extends Stamped> {
 	}
 
 	public Stamp create(Path p, Meta meta, BufferedInputStream binary, BufferedReader text) throws IOException {
+		final long createTime = genId();
+
+		final Stamp stamp = new Stamp(node, createTime);
+		meta.setCreateStamp(stamp);
+
+		return locateAndWrite(p, meta, binary, text, false);
+	}
+
+	protected long genId() {
 		final long createTime;
 		synchronized (createMonitor) {
 			createTime = createStamp = Math.max(System.currentTimeMillis(), createStamp + 1);
 		}
-		final Stamp stamp = new Stamp(node, createTime);
 
-		final TreeSet<File> dirs = new TreeSet <File>();
-		listCriteria(p, meta, true, false, false, dirs);
-		if (dirs.size() != 1) {
-			throw new IllegalArgumentException("criteria '" + p + "' does not yield one data dir");
-		}
-		final File dataDir;
-		if (groupByDate) {
-			dataDir = new File(dirs.iterator().next(), FMT_DATE.print(createTime));
-			if (!dataDir.mkdirs()) {
-				log.warn("failed to create data dir: {}", dataDir.getAbsolutePath());
-			}
-		} else {
-			dataDir = dirs.iterator().next();
-		}
-
-		meta.setCreateStamp(stamp);
-		try {
-			writeAtomically(dataDir, stamp, false, meta, binary, text);
-		} finally {
-			invalidate(p);
-		}
-
-		return stamp;
+		return createTime;
 	}
 
 	public Stamp update(Path p, Meta meta, BufferedInputStream binary, BufferedReader text) throws IOException {
-		final Stamp stamp = new Stamp(node, System.currentTimeMillis());
+		return locateAndWrite(p, meta, binary, text, true);
+	}
 
+	protected Stamp locateAndWrite(Path p, Meta meta, BufferedInputStream binary, BufferedReader text, boolean requireExistingMeta) throws IOException {
 		final TreeSet<File> dirs = new TreeSet<File>();
 		listCriteria(p, meta, true, false, false, dirs);
 		if (dirs.size() != 1) {
@@ -245,17 +233,20 @@ public abstract class Dao<Meta extends Stamped> {
 		final File dataDir;
 		if (groupByDate) {
 			dataDir = new File(dirs.iterator().next(), FMT_DATE.print(meta.getCreateStamp().getTime()));
+			if (!dataDir.exists() && (!requireExistingMeta && !dataDir.mkdirs())) {
+				log.warn("failed to create data dir: {}", dataDir.getAbsolutePath());
+			}
 		} else {
 			dataDir = dirs.iterator().next();
 		}
 
 		try {
-			writeAtomically(dataDir, stamp, true, meta, binary, text);
+			writeAtomically(dataDir, requireExistingMeta, meta, binary, text);
 		} finally {
 			invalidate(p);
 		}
 
-		return stamp;
+		return meta.getCreateStamp();
 	}
 
 	public SortedSet<Stamp> findAllStamps(Path p, Boolean text, Boolean binary) throws IOException {
@@ -380,30 +371,33 @@ public abstract class Dao<Meta extends Stamped> {
 	}
 
 	protected void writeAtomically(
-			File dataDir, Stamp stamp, final boolean requireExistingMeta,
+			File dataDir, final boolean requireExistingMeta,
 			Stamped meta, BufferedInputStream binary, BufferedReader text
 	) throws IOException {
-		final File fileMeta = new File(dataDir, stamp.toString() + extMeta);
-		final File fileBinary = new File(dataDir, stamp.toString() + extBinary);
-		final File fileText = new File(dataDir, stamp.toString() + extText);
+		final Stamp fileStamp = meta.getCreateStamp();
+		final File fileMeta = new File(dataDir, fileStamp.toString() + extMeta);
+		final File fileBinary = new File(dataDir, fileStamp.toString() + extBinary);
+		final File fileText = new File(dataDir, fileStamp.toString() + extText);
 
 		if (requireExistingMeta && !fileMeta.exists()) {
 			throw new IllegalStateException("file must exist: " + fileMeta.getAbsolutePath());
 		}
 
-		boolean success = false;
-		try {
-			mapper.writeValue(fileMeta, meta);
-			if (binary != null) {
-				writeBinary(binary, fileBinary);
-			}
-			if (text != null) {
-				writeText(text, fileText);
-			}
-			success = true;
-		} finally {
-			if (!success) {
-				deleteAll(fileMeta, fileBinary, fileText, "broken");
+		synchronized (fsMonitor) {
+			boolean success = false;
+			try {
+				mapper.writeValue(fileMeta, meta);
+				if (binary != null) {
+					writeBinary(binary, fileBinary);
+				}
+				if (text != null) {
+					writeText(text, fileText);
+				}
+				success = true;
+			} finally {
+				if (!success) {
+					deleteAll(fileMeta, fileBinary, fileText, "broken");
+				}
 			}
 		}
 	}
