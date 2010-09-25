@@ -1,6 +1,7 @@
 package elw.dao;
 
 import elw.vo.Assignment;
+import elw.vo.Path;
 
 /**
  * Path: course.id/assType.id/ass.id

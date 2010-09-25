@@ -1,6 +1,7 @@
 package elw.dao;
 
 import elw.vo.CodeMeta;
+import elw.vo.Path;
 import elw.vo.ReportMeta;
 import elw.vo.Stamp;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -39,7 +40,7 @@ public class CodeDao extends Dao<CodeMeta> {
 	}
 
 	protected static Path toPath(Ctx ctx) {
-		if (ctx == null || !ctx.resolved(Ctx.STATE_EGSCTAV)) {
+		if (ctx == null || !ctx.resolved(Ctx.STATE_EGSCIV)) {
 			throw new IllegalStateException("context not fully set up: " + String.valueOf(ctx));
 		}
 		final Path path = new Path(new String[]{

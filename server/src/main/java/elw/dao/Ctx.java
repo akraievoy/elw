@@ -1,6 +1,7 @@
 package elw.dao;
 
 import elw.vo.*;
+import org.akraievoy.gear.G4Parse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,10 +18,11 @@ public class Ctx {
 	public static final String STATE_ECG = "ecg";
 	public static final String STATE_ECGS = "ecgs";
 	public static final String STATE_C = "c";
-	public static final String STATE_CTAV = "ctav";
-	public static final String STATE_EGSCTAV = "egsctav";
+	public static final String STATE_CIV = "civ";
+	public static final String STATE_EGSCIV = "egsciv";
 
 	public static final char ELEM_ENR = 'e';
+	public static final char ELEM_INDEX_ENTRY = 'i';
 	public static final char ELEM_GROUP = 'g';
 	public static final char ELEM_STUD = 's';
 	public static final char ELEM_COURSE = 'c';
@@ -28,7 +30,7 @@ public class Ctx {
 	public static final char ELEM_ASS = 'a';
 	public static final char ELEM_VER = 'v';
 
-	protected static final String order = "egsctav";
+	protected static final String order = "egscitav";
 	protected static final Map<Character, Integer> elemToOrder = createElemToOrderMap();
 
 	public static final String SEP = "--";
@@ -37,6 +39,7 @@ public class Ctx {
 	protected final String courseId;
 	protected final String groupId;
 	protected final String studId;
+	protected int index;
 	protected final String assTypeId;
 	protected final String assId;
 	protected final String verId;
@@ -49,40 +52,41 @@ public class Ctx {
 	protected Assignment ass;
 	protected Version ver;
 	protected String resolveState;
-
-	//	any optional/intermediate elements
 	protected Course course;
 	protected Group group;
+	protected IndexEntry indexEntry;
 
 	public Ctx(
 			final String initState,
 			String enrId, String groupId, String studId,
-			String courseId, String assTypeId, String assId, final String verId
+			String courseId, int index, String assTypeId, String assId, String verId
 	) {
-		this.assId = assId;
-		this.studId = studId;
-		this.enrId = enrId;
-		this.assTypeId = assTypeId;
-		this.verId = verId;
 		this.initState = initState;
-		this.courseId = courseId;
+
+		this.enrId = enrId;
 		this.groupId = groupId;
+		this.studId = studId;
+		this.courseId = courseId;
+		this.index = index;
+		this.assTypeId = assTypeId;
+		this.assId = assId;
+		this.verId = verId;
 	}
 
 	public static Ctx fromString(final String path) {
 		if (path == null || path.trim().length() == 0) {
-			return new Ctx(STATE_NONE, null, null, null, null, null, null, null);
+			return new Ctx(STATE_NONE, null, null, null, null, -1, null, null, null);
 		}
 
 		final String[] comp = path.split(SEP);
 		if (comp.length <= 1) {
-			return new Ctx(STATE_NONE, null, null, null, null, null, null, null);
+			return new Ctx(STATE_NONE, null, null, null, null, -1, null, null, null);
 		}
 
 		final String format = comp[0];
 		if (format.length() + 1 != comp.length) {
 			log.warn("format does not match content, NOT parsing: {}", path);
-			return new Ctx(STATE_NONE, null, null, null, null, null, null, null);
+			return new Ctx(STATE_NONE, null, null, null, null, -1, null, null, null);
 		}
 
 		final String initState = reorder(format);
@@ -115,6 +119,16 @@ public class Ctx {
 			studId = null;
 		}
 
+		final int index;
+		if (format.indexOf(ELEM_INDEX_ENTRY) >= 0) {
+			index = G4Parse.parse(comp[format.indexOf(ELEM_INDEX_ENTRY) + 1], -1);
+			if (index < 0) {
+				log.warn("path[{}] must be an integer: {}", format.indexOf(ELEM_INDEX_ENTRY) + 1, path);
+			}
+		} else {
+			index = -1;
+		}
+
 		final String typeId;
 		if (format.indexOf(ELEM_ASS_TYPE) >= 0) {
 			typeId = comp[format.indexOf(ELEM_ASS_TYPE) + 1];
@@ -136,7 +150,7 @@ public class Ctx {
 			verId = null;
 		}
 
-		return new Ctx(initState, enrId, groupId, studId, courseId, typeId, assId, verId);
+		return new Ctx(initState, enrId, groupId, studId, courseId, index, typeId, assId, verId);
 	}
 
 	public Ctx resolve(EnrollDao enrDao, GroupDao groupDao, CourseDao courseDao) {
@@ -191,13 +205,33 @@ public class Ctx {
 			}
 		}
 
+		if (has(resolved, ELEM_ENR) && inited(ELEM_INDEX_ENTRY)) {
+			if (index >= 0 && index < enr.getIndex().size()) {
+				indexEntry = enr.getIndex().get(index);
+				resolved.append(ELEM_INDEX_ENTRY);
+				assType = IdName.findById(course.getAssTypes(), indexEntry.getPath()[0]);
+				if (assType != null) {
+					resolved.append(ELEM_ASS_TYPE);
+				} else {
+					log.warn("type not found: {}", assTypeId, dump());
+				}
+				ass = IdName.findById(assType.getAssignments(), indexEntry.getPath()[1]);
+				if (ass != null) {
+					resolved.append(ELEM_ASS);
+				} else {
+					log.warn("assignment not found: {}", dump());
+				}
+			} else {
+				log.warn("task not found by index: {}", index, dump());
+			}
+		}
 
 		if (has(resolved, ELEM_COURSE) && inited(ELEM_ASS_TYPE)) {
 			assType = IdName.findById(course.getAssTypes(), assTypeId);
 			if (assType != null) {
 				resolved.append(ELEM_ASS_TYPE);
 			} else {
-				log.warn("bundle not found: {}", assTypeId, dump());
+				log.warn("type not found: {}", assTypeId, dump());
 			}
 		}
 
@@ -314,6 +348,10 @@ public class Ctx {
 		return assTypeId;
 	}
 
+	public IndexEntry getIndexEntry() {
+		return indexEntry;
+	}
+
 	public Ctx extendEnr(final Enrollment enr) {
 		final Ctx ctx = copy();
 
@@ -386,6 +424,39 @@ public class Ctx {
 		return ctx;
 	}
 
+	public Ctx extendIndex(final int index) {
+		final Ctx ctx = copy();
+
+		if (index >= 0) {
+			if (enr != null && enr.getIndex().size() > index) {
+				ctx.index = index;
+				ctx.indexEntry = enr.getIndex().get(index);
+				if (ctx.resolveState.indexOf(ELEM_INDEX_ENTRY) < 0) {
+					ctx.resolveState += ELEM_INDEX_ENTRY;
+				}
+				ctx.assType = IdName.findById(ctx.course.getAssTypes(), ctx.indexEntry.getPath()[0]);
+				if (ctx.assType != null) {
+					ctx.resolveState += ELEM_ASS_TYPE;
+				} else {
+					log.warn("assignment type not found: {}", assTypeId, dump());
+				}
+				ctx.ass = IdName.findById(ctx.assType.getAssignments(), ctx.indexEntry.getPath()[1]);
+				if (ass != null) {
+					ctx.resolveState += ELEM_ASS;
+				} else {
+					log.warn("assignment not found: {}", dump());
+				}
+			} else {
+				log.warn("extending with wrong index (or no enr resolved)");
+			}
+		} else {
+			log.warn("extending with negative index");
+		}
+
+		return ctx;
+
+	}
+
 	public Ctx extendAssType(final AssignmentType assType) {
 		final Ctx ctx = copy();
 
@@ -415,7 +486,7 @@ public class Ctx {
 					ctx.resolveState += ELEM_ASS;
 				}
 			} else {
-				log.warn("extending with wrong assignment (or no bundle)");
+				log.warn("extending with wrong assignment (or no type)");
 			}
 		} else {
 			log.warn("extending with no assignment");
@@ -460,7 +531,7 @@ public class Ctx {
 	}
 
 	public Ctx copy() {
-		final Ctx copy = new Ctx(initState, enrId, groupId, studId, courseId, assTypeId, assId, verId);
+		final Ctx copy = new Ctx(initState, enrId, groupId, studId, courseId, -1, assTypeId, assId, verId);
 
 		copy.resolveState = resolveState;
 		copy.enr = enr;
@@ -518,7 +589,13 @@ public class Ctx {
 	}
 
 	protected static boolean isRedundant(char elemBefore, char elemAfter) {
-		return elemBefore == ELEM_ENR && (elemAfter == ELEM_COURSE || elemAfter == ELEM_GROUP);
+		if (elemBefore == ELEM_ENR) {
+			return (elemAfter == ELEM_COURSE || elemAfter == ELEM_GROUP);
+		}
+		if (elemBefore == ELEM_INDEX_ENTRY) {
+			return (elemAfter == ELEM_ASS_TYPE || elemAfter == ELEM_ASS);
+		}
+		return false;
 	}
 
 	protected static String removeRedundant(final String format) {

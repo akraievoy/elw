@@ -58,13 +58,6 @@
     "name" : "Факториал (процедуры и рекурсия)",
     "id" : "2"
   } ],
-  "scoring" : {
-    "classReportDue" : 2,
-    "classCodeDue" : 2,
-    "scoreBudget" : 0,
-    "requireClean" : false,
-    "classFrom" : 1
-  },
   "path" : [ "aos-w10", "cp", "1" ],
   "createStamp" : {
     "time" : 1285174426351,

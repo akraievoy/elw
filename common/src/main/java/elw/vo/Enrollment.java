@@ -1,15 +1,13 @@
 package elw.vo;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
-public class Enrollment extends IdName implements Stamped{
+public class Enrollment extends IdNameStamped {
 	protected String groupId;
 	protected String courseId;
-	protected Stamp createStamp;
 
 	protected List<Class> classes = new ArrayList<Class>();
+	protected List<IndexEntry> index = new ArrayList<IndexEntry>();
 
 	public String getCourseId() {
 		return courseId;
@@ -27,21 +25,19 @@ public class Enrollment extends IdName implements Stamped{
 		this.groupId = groupId;
 	}
 
-	public Class[] getClasses() {
-		return classes.toArray(new Class[classes.size()]);
+	public List<Class> getClasses() {
+		return classes;
 	}
 
-	public void setClasses(Class[] classes) {
-		this.classes.clear();
-		this.classes.addAll(Arrays.asList(classes));
+	public void setClasses(List<Class> classes) {
+		this.classes = classes;
 	}
 
-	public Stamp getCreateStamp() {
-		return createStamp;
+	public List<IndexEntry> getIndex() {
+		return index;
 	}
 
-	public void setCreateStamp(Stamp createStamp) {
-		this.createStamp = createStamp;
+	public void setIndex(List<IndexEntry> index) {
+		this.index = index;
 	}
-
 }

@@ -1,5 +1,6 @@
 package elw.dao;
 
+import elw.vo.Path;
 import elw.vo.Score;
 import elw.vo.Stamp;
 import org.slf4j.Logger;

@@ -1,6 +1,7 @@
 package elw.vo;
 
-public class TaskScoring {
+public class IndexEntry {
+	protected String[] path;
 	protected int scoreBudget;
 	protected int classFrom;
 	protected int classCodeDue;
@@ -45,5 +46,13 @@ public class TaskScoring {
 
 	public void setScoreBudget(int scoreBudget) {
 		this.scoreBudget = scoreBudget;
+	}
+
+	public String[] getPath() {
+		return path;
+	}
+
+	public void setPath(String[] path) {
+		this.path = path;
 	}
 }

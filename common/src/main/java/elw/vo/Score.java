@@ -87,22 +87,22 @@ public class Score implements Stamped {
 	}
 
 	@JsonIgnore
-	public String getNicePoints(TypeScoring typeScoring, TaskScoring taskScoring) {
-		return G4mat.format2(getPoints(typeScoring, taskScoring));
+	public String getNicePoints(TypeScoring typeScoring, IndexEntry indexEntry) {
+		return G4mat.format2(getPoints(typeScoring, indexEntry));
 	}
 
 	@JsonIgnore
-	public String getNiceTotal(BundleScoring bundleScoring, TaskScoring taskScoring) {
-		return G4mat.format2(getTotal(bundleScoring, taskScoring));
+	public String getNiceTotal(BundleScoring bundleScoring, IndexEntry indexEntry) {
+		return G4mat.format2(getTotal(bundleScoring, indexEntry));
 	}
 
 	@JsonIgnore
-	public double getPoints(TypeScoring typeScoring, TaskScoring taskScoring) {
-		return taskScoring.getScoreBudget() * typeScoring.getWeight() * getRatio(typeScoring.getApplied());
+	public double getPoints(TypeScoring typeScoring, IndexEntry indexEntry) {
+		return indexEntry.getScoreBudget() * typeScoring.getWeight() * getRatio(typeScoring.getApplied());
 	}
 
 	@JsonIgnore
-	public double getTotal(BundleScoring bundleScoring, TaskScoring taskScoring) {
+	public double getTotal(BundleScoring bundleScoring, IndexEntry indexEntry) {
 		double result = 0.0;
 
 		for (String type : bundleScoring.breakdown.keySet()) {
@@ -111,7 +111,7 @@ public class Score implements Stamped {
 				continue;
 			}
 
-			result += getPoints(ts, taskScoring);
+			result += getPoints(ts, indexEntry);
 		}
 
 		return result;

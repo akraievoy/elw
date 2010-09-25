@@ -324,13 +324,6 @@
     "name" : "Обнуление повторений",
     "id" : "10"
   } ],
-  "scoring" : {
-    "classReportDue" : 8,
-    "classCodeDue" : 7,
-    "scoreBudget" : 10,
-    "requireClean" : false,
-    "classFrom" : 7
-  },
   "path" : [ "aos-w10", "lr", "5" ],
   "createStamp" : {
     "time" : 1285174426443,

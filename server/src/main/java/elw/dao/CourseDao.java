@@ -3,6 +3,7 @@ package elw.dao;
 import elw.vo.Assignment;
 import elw.vo.AssignmentType;
 import elw.vo.Course;
+import elw.vo.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

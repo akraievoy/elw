@@ -142,13 +142,6 @@
     "name" : "Деление",
     "id" : "5"
   } ],
-  "scoring" : {
-    "classReportDue" : 7,
-    "classCodeDue" : 3,
-    "scoreBudget" : 2,
-    "requireClean" : false,
-    "classFrom" : 0
-  },
   "path" : [ "aos-w10", "lr", "1c" ],
   "createStamp" : {
     "time" : 1285174424661,

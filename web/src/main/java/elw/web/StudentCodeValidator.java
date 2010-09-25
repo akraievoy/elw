@@ -61,9 +61,9 @@ public class StudentCodeValidator extends G4Run.Task {
 								continue;
 							}
 							final Ctx ctx = new Ctx(
-									Ctx.STATE_EGSCTAV,
+									Ctx.STATE_EGSCIV,
 									enr.getId(), group.getId(), student.getId(),
-									course.getId(), assType.getId(), ass.getId(), ver.getId()
+									course.getId(), -1, assType.getId(), ass.getId(), ver.getId()
 							);
 							ctx.resolve(enrollDao, groupDao, courseDao);
 

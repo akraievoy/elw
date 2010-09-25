@@ -233,49 +233,52 @@ public class StudentController extends MultiActionController implements WebSymbo
 			Map<String, CodeMeta> codeMetas, Map<String, ReportMeta> reportMetas, Map<String, Score> scores, int[] grossScore) {
 		double grossScoreFuzzy = 0;
 
-		for (AssignmentType assType: ctx.getCourse().getAssTypes()) {
-			for (Assignment ass : assType.getAssignments()) {
-				for (Version ver : ass.getVersions()) {
-					Student student = ctx.getStudent();
-					if (Ctx.isVersionIncorrect(student, ass, ver)) {
-						continue;
-					}
+		for (int index = 0; index < ctx.getEnr().getIndex().size(); index++) {
+			final Ctx ctxIdx = ctx.extendIndex(index);
+			final AssignmentType assType = ctxIdx.getAssType();
+			final Assignment ass = ctxIdx.getAss();
+			for (Version ver : ass.getVersions()) {
+				Student student = ctxIdx.getStudent();
+				if (Ctx.isVersionIncorrect(student, ass, ver)) {
+					continue;
+				}
 
-					final Ctx assCtx = ctx.extendTAV(assType, ass, ver);
-					final String assPath = assCtx.toString();
+				final Ctx ctxAss = ctxIdx.extendTAV(assType, ass, ver);
+				final String assPath = ctxAss.toString();
 
-					if (codeMetas != null) {
-						final Dao.Entry<CodeMeta> last = codeDao.findLast(assCtx);
-						if (last != null) {
-							codeMetas.put(assPath, last.getMeta());
-						}
+				if (codeMetas != null) {
+					final Dao.Entry<CodeMeta> last = codeDao.findLast(ctxAss);
+					if (last != null) {
+						codeMetas.put(assPath, last.getMeta());
 					}
-					if (reportMetas != null) {
-						final Dao.Entry<ReportMeta> lastReport = reportDao.findLast(assCtx);
+				}
+				if (reportMetas != null) {
+					final Dao.Entry<ReportMeta> lastReport = reportDao.findLast(ctxAss);
+					if (lastReport != null) {
 						reportMetas.put(assPath, lastReport.getMeta());
 					}
-					if (scores != null) {
-						final Dao.Entry<Score> lastScore = scoreDao.findLastScore(assCtx);
-						Score effectiveScore = null;
-						if (lastScore == null) {
-							if (codeDao != null) {
-								final Dao.Entry<ReportMeta> lastReport = reportDao != null ? reportDao.findLast(assCtx) : null;
-								final HashMap<Stamp, Score> allCodeScores = new HashMap<Stamp, Score>();
-								final Stamp bestCodeStamp = AdminController.computeCodeScores(
-										assCtx,
-										codeDao.findAllMetas(assCtx),
-										allCodeScores,
-										lastReport.getMeta().getCreateStamp() //	TODO: this stamp or?..
-								);
-								effectiveScore = allCodeScores.get(bestCodeStamp);
-							}
-						} else {
-							effectiveScore = lastScore.getMeta();
+				}
+				if (scores != null) {
+					final Dao.Entry<Score> lastScore = scoreDao.findLastScore(ctxAss);
+					Score effectiveScore = null;
+					if (lastScore == null) {
+						if (codeDao != null) {
+							final Dao.Entry<ReportMeta> lastReport = reportDao != null ? reportDao.findLast(ctxAss) : null;
+							final HashMap<Stamp, Score> allCodeScores = new HashMap<Stamp, Score>();
+							final Stamp bestCodeStamp = AdminController.computeCodeScores(
+									ctxAss,
+									codeDao.findAllMetas(ctxAss),
+									allCodeScores,
+									lastReport != null ? lastReport.getMeta().getCreateStamp() : null
+							);
+							effectiveScore = allCodeScores.get(bestCodeStamp);
 						}
-						if (effectiveScore != null) {
-							scores.put(assPath, effectiveScore);
-							grossScoreFuzzy += effectiveScore.getTotal(assType.getScoring(), ass.getScoring());
-						}
+					} else {
+						effectiveScore = lastScore.getMeta();
+					}
+					if (effectiveScore != null) {
+						scores.put(assPath, effectiveScore);
+						grossScoreFuzzy += effectiveScore.getTotal(assType.getScoring(), ctxAss.getIndexEntry());
 					}
 				}
 			}
@@ -292,7 +295,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 		}
 
 		final Ctx ctx = (Ctx) model.get(R_CTX);
-		if (!ctx.resolved(Ctx.STATE_EGSCTAV)) {
+		if (!ctx.resolved(Ctx.STATE_EGSCIV)) {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "context path problem, please check the logs");
 			return null;
 		}
@@ -374,7 +377,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 		}
 
 		final Ctx ctx = (Ctx) model.get(R_CTX);
-		if (!ctx.resolved(Ctx.STATE_EGSCTAV)) {
+		if (!ctx.resolved(Ctx.STATE_EGSCIV)) {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "context path problem, please check the logs");
 			return null;
 		}
@@ -416,7 +419,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 		}
 
 		final Ctx ctx = (Ctx) model.get(R_CTX);
-		if (!ctx.resolved(Ctx.STATE_EGSCTAV)) {
+		if (!ctx.resolved(Ctx.STATE_EGSCIV)) {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "context path problem, please check the logs");
 			return null;
 		}
@@ -475,7 +478,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 		}
 
 		final Ctx ctx = (Ctx) model.get(R_CTX);
-		if (!ctx.resolved(Ctx.STATE_EGSCTAV)) {
+		if (!ctx.resolved(Ctx.STATE_EGSCIV)) {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "context path problem, please check the logs");
 			return null;
 		}
@@ -526,7 +529,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 		}
 
 		final Ctx ctx = (Ctx) model.get(R_CTX);
-		if (!ctx.resolved(Ctx.STATE_EGSCTAV)) {
+		if (!ctx.resolved(Ctx.STATE_EGSCIV)) {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "context path problem, please check the logs");
 			return null;
 		}
@@ -565,7 +568,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 		}
 
 		final Ctx ctx = (Ctx) model.get(R_CTX);
-		if (!ctx.resolved(Ctx.STATE_EGSCTAV)) {
+		if (!ctx.resolved(Ctx.STATE_EGSCIV)) {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "context path problem, please check the logs");
 			return null;
 		}

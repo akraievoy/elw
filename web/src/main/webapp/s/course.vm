@@ -9,115 +9,91 @@
 </head>
 <body>
 <div id="header">
-	<div id="nav"><a href="courses">My Courses</a> &gt; <span style="font-weight: bold">${elw_ctx.course.name}</span></div>
+	<div id="nav"><a href="courses">My Courses</a> &gt; <span style="font-weight: bold">${elw_ctx.course.name}</span>
+	</div>
 	#elw_cred_stud($elw_ctx)
-	<div id="header_hr"> </div>
+	<div id="header_hr"></div>
 </div>
-#elw_messages($elw_messages)
+	#elw_messages($elw_messages)
 <div id=main>
-	<table cellspacing="0"><tbody>
-	<tr>
-		<th>Name</th>
-		<th>Code</th>
-		<th>Report</th>
-		<th>Score</th>
-		<th>Actions</th>
-	</tr>
-	<tr>
-		<td style="padding-left: 1em;" colspan=3>Assignment bundles:</td>
-		<td style="padding: 0 0.25em;">$grossScore</td>
-		<td style="padding: 0 0.25em;">&nbsp;</td>
-	</tr>
-	#foreach($assBundle in $elw_ctx.course.assTypes)#set($bunI = $velocityCount - 1)
-	<tr><td style="padding-left: 1.25em;" colspan=5>Assignments:</td></tr>
-	 #foreach($ass in $assBundle.assignments)#set($assI = $velocityCount)
-		#if($ass.id)
-			#if($ass.shared)
-	<tr class="header">
-		<td style="padding-left: 2em; padding-right: 1em; border-right: #999999 dashed 1px;">
-		$ass.name
-		</td>
-		<td style="padding: 0 0.25em; text-align: center; text-align:center;"  colspan=2>
-			#if(!$elw_ctx.enr.classes.get($ass.scoring.classFrom).started)Opens $elw_ctx.enr.classes.get($ass.scoring.classFrom).niceDate#end &nbsp;
-		</td>
-	  <td style="padding: 0 0.25em;" colspan=2>&nbsp;</td>
-	</tr>
-				#if($elw_ctx.enr.classes.get($ass.scoring.classFrom).started)
-					#foreach($ver in $ass.versions)#set($verI = $velocityCount)
-						#if($ver.id)
-	<tr>
-		<td style="padding-left: 2.5em; padding-right: 1em; border-right: #999999 dashed 1px;">$ver.name</td>
-		<td style="padding: 0 0.25em;" colspan="3">&nbsp;</td>
-		<td style="padding: 0 0.25em; text-align: right;">
-			<form action="launch" method="get" style="display: inline; margin: 0;">
-				<input type="hidden" name="elw_ctx" value="$elw_ctx.extendTAV($bunI, $ass, $ver)"/>
-				<input type="submit" value="Code"/>
-			</form>
-		</td>
-	</tr>
-						#end
-			 		#end
-				#end
-			#else
-	<tr class="header">
-		<td style="padding-left: 2em; padding-right: 1em; border-right: #999999 dashed 1px;">$ass.name</td>
-				#if($elw_ctx.enr.classes.get($ass.scoring.classFrom).started)
-		<td style="padding: 0 0.25em; text-align: center;">
-			Due $elw_ctx.enr.classes.get($ass.scoring.classCodeDue).niceDate
-		</td>
-		<td style="padding: 0 0.25em; text-align: center;">
-			Due $elw_ctx.enr.classes.get($ass.scoring.classReportDue).niceDate
-		</td>
+	<table cellspacing="0">
+		<tbody>
+		<tr>
+			<th>Name</th>
+			<th>Score</th>
+			<th>Actions</th>
+		</tr>
+			#foreach($entry in $elw_ctx.enr.index)#set($idx = $velocityCount - 1)
+				#set($ass_ctx = $elw_ctx.extendIndex($idx))
+				#set($assType = $ass_ctx.assType)
+				#set($ass = $ass_ctx.ass)
+			<tr class="header">
+				<td style="padding-left: 2em; padding-right: 1em; border-right: #999999 dashed 1px;">$ass.name</td>
+#*
+				#if($elw_ctx.enr.classes.get($ass_ctx.indexEntry.classFrom).started)
+					<td style="padding: 0 0.25em; text-align: center;">
+						Due $elw_ctx.enr.classes.get($ass_ctx.indexEntry.classCodeDue).niceDate
+					</td>
+					<td style="padding: 0 0.25em; text-align: center;">
+						Due $elw_ctx.enr.classes.get($ass_ctx.indexEntry.classReportDue).niceDate
+					</td>
 				#else
-		<td style="padding: 0 0.25em; text-align: center;" colspan="2">
-			Opens $elw_ctx.enr.classes.get($ass.scoring.classFrom).niceDate
-		</td>
+					<td style="padding: 0 0.25em; text-align: center;" colspan="2">
+						Opens $elw_ctx.enr.classes.get($ass_ctx.indexEntry.classFrom).niceDate
+					</td>
 				#end
-		<td style="padding: 0 0.25em; text-align: left;" colspan="2">$ass.scoring.scoreBudget pts.</td>
+*#
+				<td style="padding: 0 0.25em; text-align: left;"></td>
+				<td style="padding: 0 0.25em; text-align: left;">$ass_ctx.indexEntry.scoreBudget pts.</td>
 
-	</tr>
-				#if($elw_ctx.enr.classes.get($ass.scoring.classFrom).started)
+			</tr>
+				#if($elw_ctx.enr.classes.get($ass_ctx.indexEntry.classFrom).started)
 					#set($verIdx = $elw_ctx.student.idAsInt % $ass.versions.size())
 					#set($ver = $ass.versions.get($verIdx))
 					#set($path = $elw_ctx.extendBAV($bunI, $ass, $ver))
-	<tr>
-		<td style="padding-left: 2.5em; padding-right: 1em; border-right: #999999 dashed 1px;">$ver.name</td>
-		<td style="padding: 0 0.25em; text-align: right;">
-			#elw_code_state($path, $codeMetas.get("$path"))
-			#if($scores.get("$path"))
-				<span style="font-size: smaller;">#elw_code_score($path, $scores.get("$path"))</span>
-			#end
-		</td>
-		<td style="padding: 0 0.25em; text-align: right;">
-			#elw_report_state($path, $reportMetas.get("$path"))
-			#if($scores.get("$path"))
-				<span style="font-size: smaller;">#elw_report_score($path, $scores.get("$path"))</span>
-			#end
-		</td>
-		<td style="padding: 0 0.25em; text-align: right;">
-			#if($scores.get("$path"))
-				#elw_score($path, $scores.get("$path"))
-			#else
-				&nbsp;
-			#end
-		</td>
-		<td style="padding: 0 0.25em; text-align: right;">
-			<form action="launch" method="get" style="display: inline; margin: 0;">
-				<input type="hidden" name="elw_ctx" value="$path"/>
-				<input type="submit" value="Code"/>
-			</form>
-			<form action="uploadPage" method="get" style="display: inline; margin: 0;">
-				<input type="hidden" name="elw_ctx" value="$path"/>
-				<input type="submit" value="Report"/>
-			</form>
-		</td>
-	</tr>
+				<tr>
+					<td style="padding-left: 2.5em; padding-right: 1em; border-right: #999999 dashed 1px;">$ver.name</td>
+#*
+					<td style="padding: 0 0.25em; text-align: right;">
+						#elw_code_state($path, $codeMetas.get("$path"))
+						#if($scores.get("$path"))
+							<span style="font-size: smaller;">#elw_code_score($path, $scores.get("$path"))</span>
+						#end
+					</td>
+					<td style="padding: 0 0.25em; text-align: right;">
+						#elw_report_state($path, $reportMetas.get("$path"))
+						#if($scores.get("$path"))
+							<span style="font-size: smaller;">#elw_report_score($path, $scores.get("$path"))</span>
+						#end
+					</td>
+*#
+					<td style="padding: 0 0.25em; text-align: right;">
+						#if($scores.get("$path"))
+							#elw_score($path, $scores.get("$path"))
+						#else
+							&nbsp;
+						#end
+					</td>
+					<td style="padding: 0 0.25em; text-align: right;">
+						<form action="launch" method="get" style="display: inline; margin: 0;">
+							<input type="hidden" name="elw_ctx" value="$path"/>
+							<input type="submit" value="Code"/>
+						</form>
+						<form action="uploadPage" method="get" style="display: inline; margin: 0;">
+							<input type="hidden" name="elw_ctx" value="$path"/>
+							<input type="submit" value="Report"/>
+						</form>
+					</td>
+				</tr>
 				#end
 			#end
-		#end
-	 #end
-	#end
-	</tbody></table>
+		<tr>
+			<td style="padding-left: 1em;" colspan=3>Total Score:</td>
+			<td style="padding: 0 0.25em;">$grossScore</td>
+			<td style="padding: 0 0.25em;">&nbsp;</td>
+		</tr>
+		</tbody>
+	</table>
 </div>
 </body>
 </html>

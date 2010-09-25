@@ -163,13 +163,6 @@
     "name" : "Логическое И",
     "id" : "6"
   } ],
-  "scoring" : {
-    "classReportDue" : 7,
-    "classCodeDue" : 3,
-    "scoreBudget" : 2,
-    "requireClean" : false,
-    "classFrom" : 0
-  },
   "path" : [ "aos-w10", "lr", "1a" ],
   "createStamp" : {
     "time" : 1285174426048,

@@ -1,5 +1,6 @@
 package elw.dao;
 
+import elw.vo.Path;
 import elw.vo.Stamp;
 import elw.vo.Stamped;
 import org.akraievoy.gear.G;

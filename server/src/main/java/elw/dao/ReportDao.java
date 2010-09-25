@@ -1,5 +1,6 @@
 package elw.dao;
 
+import elw.vo.Path;
 import elw.vo.ReportMeta;
 import elw.vo.Stamp;
 

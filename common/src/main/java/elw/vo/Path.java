@@ -1,6 +1,4 @@
-package elw.dao;
-
-import elw.vo.Stamped;
+package elw.vo;
 
 import java.util.Arrays;
 
@@ -49,7 +47,7 @@ public class Path {
 		return "{" + Arrays.deepToString(path) + "}";
 	}
 
-	protected boolean intersects(final Path that) {
+	public boolean intersects(final Path that) {
 		final int len = Math.min(this.path.length, that.path.length);
 
 		for (int i = 0; i < len; i++) {

@@ -433,13 +433,6 @@
     "name" : "Объединение массивов",
     "id" : "12"
   } ],
-  "scoring" : {
-    "classReportDue" : 7,
-    "classCodeDue" : 6,
-    "scoreBudget" : 8,
-    "requireClean" : false,
-    "classFrom" : 6
-  },
   "path" : [ "aos-w10", "lr", "3" ],
   "createStamp" : {
     "time" : 1285174426264,

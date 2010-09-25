@@ -331,13 +331,6 @@
     "name" : "Установка битов и проверка на равенство",
     "id" : "12"
   } ],
-  "scoring" : {
-    "classReportDue" : 7,
-    "classCodeDue" : 3,
-    "scoreBudget" : 7,
-    "requireClean" : false,
-    "classFrom" : 3
-  },
   "path" : [ "aos-w10", "lr", "2" ],
   "createStamp" : {
     "time" : 1285174425940,

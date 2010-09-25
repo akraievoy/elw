@@ -231,7 +231,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 		}
 
 		final Ctx ctx = Ctx.fromString(req.getParameter(R_CTX)).resolve(enrollDao, groupDao, courseDao);
-		if (!ctx.resolved(Ctx.STATE_CTAV)) {
+		if (!ctx.resolved(Ctx.STATE_CIV)) {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "context path problem, please check the logs");
 			return null;
 		}
@@ -402,7 +402,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 		}
 
 		final Ctx ctx = Ctx.fromString(req.getParameter("elw_ctx")).resolve(enrollDao, groupDao, courseDao);
-		if (!ctx.resolved(Ctx.STATE_EGSCTAV)) {
+		if (!ctx.resolved(Ctx.STATE_EGSCIV)) {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Path problem, please check the logs");
 			return null;
 		}
@@ -486,7 +486,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 		}
 
 		final Ctx ctx = Ctx.fromString(req.getParameter("elw_ctx")).resolve(enrollDao, groupDao, courseDao);
-		if (!ctx.resolved(Ctx.STATE_EGSCTAV)) {
+		if (!ctx.resolved(Ctx.STATE_EGSCIV)) {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Path problem, please check the logs");
 			return null;
 		}
@@ -568,7 +568,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 	}
 
 	protected static Score computeReportAuto(Ctx ctx, ReportMeta meta, final Score baseScore) {
-		final Class classDue = ctx.getEnr().getClasses()[ctx.getAss().getScoring().getClassReportDue()];
+		final Class classDue = ctx.getEnr().getClasses().get(ctx.getIndexEntry().getClassReportDue());
 		final TypeScoring reportScoring = ctx.getAssType().getScoring().getBreakdown().get("report");
 		final Criteria[] autos = reportScoring.resolveAuto();
 
@@ -592,7 +592,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 	}
 
 	protected static Score computeCodeAuto(CodeMeta meta, Ctx ctx) {
-		final Class classCodeDue = ctx.getEnr().getClasses()[ctx.getAss().getScoring().getClassCodeDue()];
+		final Class classCodeDue = ctx.getEnr().getClasses().get(ctx.getIndexEntry().getClassCodeDue());
 		final TypeScoring codeScoring = ctx.getAssType().getScoring().getBreakdown().get("code");
 		final Criteria[] autos = codeScoring.resolveAuto();
 
