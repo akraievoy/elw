@@ -6,6 +6,11 @@
 	<meta content="text/html; charset=UTF-8">
 	<title>Course ${elw_ctx.course.name} Structure</title>
 	<link href="../css/elw.css" type="text/css" rel="stylesheet"/>
+	<link href="../css/jquery.jgrowl.css" type="text/css" rel="stylesheet"/>
+	<script type="text/javascript" src="../js/jquery.js"></script>
+	<script type="text/javascript" src="../js/jquery.sha1.js"></script>
+	<script type="text/javascript" src="../js/jquery.jgrowl.js"></script>
+	<script type="text/javascript" src="../js/elw.js"></script>
 </head>
 <body>
 <div id="header">
@@ -23,7 +28,8 @@
 			<th>State</th>
 			<th>Score</th>
 		</tr>
-			#foreach($entry in $elw_ctx.enr.index)#set($idx = $velocityCount - 1)
+			#foreach($entry in $elw_ctx.enr.index)
+				#set($idx = $velocityCount - 1)
 				#set($ass_ctx = $elw_ctx.extendIndex($idx))
 				#set($assType = $ass_ctx.assType)
 				#set($ass = $ass_ctx.ass)
@@ -32,37 +38,46 @@
 				#set($path = $elw_ctx.extendBAV($bunI, $ass, $ver))
 				#set($started = $elw_ctx.enr.classes.get($ass_ctx.indexEntry.classFrom).started)
 			<tr class="header">
-				<td style="padding-left: 2em; padding-right: 1em; border-right: #999999 dashed 1px;">$assType.name - $ass.name</td>
-				<td style="padding: 0 0.25em; text-align: left;">
-					#if($started) Opened #else Opens #end $elw_ctx.enr.classes.get($ass_ctx.indexEntry.classFrom).niceDate
+				<td style="padding-left: 2em; padding-right: 1em; border-right: #999999 dashed 1px;">$assType.name
+					- $ass.name</td>
+				<td style="padding: 0 0.25em; text-align: center;">
+					#if($started)
+						<a class="expandTrigger" id="index-$idx">Opened $elw_ctx.enr.classes.get($ass_ctx.indexEntry.classFrom).niceDate</a>
+					#else
+						Opens $elw_ctx.enr.classes.get($ass_ctx.indexEntry.classFrom).niceDate
+					#end
 				</td>
-				<td style="padding: 0 0.25em; text-align: right;">$ass_ctx.indexEntry.scoreBudget pts.</td>
+				<td style="padding: 0 0.25em; text-align: right;">
+					#if($scores.get("$path"))
+						#elw_score($path, $scores.get("$path")) of
+					#else
+						&nbsp;
+					#end
+					$ass_ctx.indexEntry.scoreBudget
+				</td>
 			</tr>
 				#if($elw_ctx.enr.classes.get($ass_ctx.indexEntry.classFrom).started)
-				<tr>
+				<tr class="index-$idx" style="display:none;">
 					<td style="padding-left: 2.5em; padding-right: 1em; border-right: #999999 dashed 1px;">$ver.name</td>
-#*
-					<td style="padding: 0 0.25em; text-align: right;">
-						#elw_code_state($path, $codeMetas.get("$path"))
-						#if($scores.get("$path"))
-							<span style="font-size: smaller;">#elw_code_score($path, $scores.get("$path"))</span>
-						#end
+				#*
+							<td style="padding: 0 0.25em; text-align: right;">
+								#elw_code_state($path, $codeMetas.get("$path"))
+								#if($scores.get("$path"))
+									<span style="font-size: smaller;">#elw_code_score($path, $scores.get("$path"))</span>
+								#end
+							</td>
+							<td style="padding: 0 0.25em; text-align: right;">
+								#elw_report_state($path, $reportMetas.get("$path"))
+								#if($scores.get("$path"))
+									<span style="font-size: smaller;">#elw_report_score($path, $scores.get("$path"))</span>
+								#end
+							</td>
+		*#
+					<td style="padding: 0 0.25em; text-align: center;">
+
 					</td>
 					<td style="padding: 0 0.25em; text-align: right;">
-						#elw_report_state($path, $reportMetas.get("$path"))
-						#if($scores.get("$path"))
-							<span style="font-size: smaller;">#elw_report_score($path, $scores.get("$path"))</span>
-						#end
-					</td>
-*#
-					<td style="padding: 0 0.25em; text-align: right;">
-						#if($scores.get("$path"))
-							#elw_score($path, $scores.get("$path"))
-						#else
-							&nbsp;
-						#end
-					</td>
-					<td style="padding: 0 0.25em; text-align: right;">
+					#*
 						<form action="launch" method="get" style="display: inline; margin: 0;">
 							<input type="hidden" name="elw_ctx" value="$path"/>
 							<input type="submit" value="Code"/>
@@ -71,14 +86,94 @@
 							<input type="hidden" name="elw_ctx" value="$path"/>
 							<input type="submit" value="Report"/>
 						</form>
+*#
 					</td>
 				</tr>
+				<tr class="index-$idx" style="display:none;">
+					<td style="padding-left: 2.5em; padding-right: 1em; border-right: #999999 dashed 1px;">
+						File Types: #foreach($slot in $assType.fileSlots)
+							<a class="expandTrigger" id="index-${idx}--slot-${slot.id}">$slot.name</a>
+						#end
+					</td>
+					<td style="padding: 0 0.25em; text-align: center;">
+					</td>
+					<td style="padding: 0 0.25em; text-align: right;">
+					</td>
+				</tr>
+					#foreach($slot in $assType.fileSlots)
+					<tr class="index-${idx}--slot-${slot.id}" style="display:none;">
+						<td style="padding-left: 3em; padding-right: 1em;">
+							<span style="font-weight: bold;" title="${slot.id}">${slot.name}</span>&nbsp;
+							#if($slot.writable)
+								Writable? : <span style="font-weight: bold;">Yes</span>
+								#if($slot.writeApprovals.size() > 0)
+									Writable after : <span style="font-weight: bold;">#foreach($slotId in $slot.writeApprovals) ${assType.findSlotById($slotId).name} #end</span>
+							  #end
+							#else
+								Writable? : <span style="font-weight: bold;">No</span>
+							#end
+							#if($slot.readApprovals.size() > 0)
+								Readable after : <span style="font-weight: bold;">#foreach($slotId in $slot.readApprovals) ${assType.findSlotById($slotId).name} #end</span>
+							#end
+						</td>
+						<td style="padding: 0 0.25em; text-align: center;">
+							<a class="expandTrigger" id="index-${idx}--slot-${slot.id}--files">Files</a>
+							<a class="popupTrigger" id="index-${idx}--slotinfo-${slot.id}">Details</a>
+						</td>
+						<td style="padding: 0 0.25em; text-align: right; position: relative;">
+							<div style="display: none;" class="popup index-${idx}--slotinfo-${slot.id}">
+								Content Types : <span style="font-weight: bold;">#foreach($contentType in $slot.contentTypes) ${contentType} #end</span><br/>
+								Max Size : <span style="font-weight: bold;">${slot.lengthLimit}</span><br/>
+								Name Regex : <span style="font-weight: bold;">${slot.nameRegex}</span><br/>
+							</div>
+						</td>
+					</tr>
+						#foreach($file in $assType.getFiles($slot.id))
+							<tr class="index-${idx}--slot-${slot.id}--files" style="display:none;">
+								<td style="padding-left: 4em; padding-right: 1em; border-right: #999999 dashed 1px;">
+									<span style="font-weight: bold;" title="${file.id}">${file.name} (t)</span>
+								</td>
+								<td style="padding: 0 0.25em; text-align: center;">
+
+								</td>
+								<td style="padding: 0 0.25em; text-align: right;">
+
+								</td>
+							</tr>
+						#end
+						#foreach($file in $ass.getFiles($slot.id))
+							<tr class="index-${idx}--slot-${slot.id}--files" style="display:none;">
+								<td style="padding-left: 4em; padding-right: 1em; border-right: #999999 dashed 1px;">
+									<span style="font-weight: bold;" title="${file.id}">${file.name} (a)</span>
+								</td>
+								<td style="padding: 0 0.25em; text-align: center;">
+
+								</td>
+								<td style="padding: 0 0.25em; text-align: right;">
+
+								</td>
+							</tr>
+						#end
+						#foreach($file in $ver.getFiles($slot.id))
+							<tr class="index-${idx}--slot-${slot.id}--files" style="display:none;">
+								<td style="padding-left: 4em; padding-right: 1em; border-right: #999999 dashed 1px;">
+									<span style="font-weight: bold;" title="${file.id}">${file.name} (v)</span>
+								</td>
+								<td style="padding: 0 0.25em; text-align: center;">
+
+								</td>
+								<td style="padding: 0 0.25em; text-align: right;">
+
+								</td>
+							</tr>
+						#end
+					#end
 				#end
 			#end
 		<tr>
-			<td style="padding-left: 1em;" colspan=3>Total Score:</td>
-			<td style="padding: 0 0.25em;">$grossScore</td>
-			<td style="padding: 0 0.25em;">&nbsp;</td>
+			<td style="padding-left: 1em;">&nbsp;</td>
+			<td style="padding: 0 0.25em;">Total Score:</td>
+			<td style="padding: 0 0.25em; text-align: right;">$grossScore</td>
 		</tr>
 		</tbody>
 	</table>

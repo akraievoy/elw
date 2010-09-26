@@ -34,17 +34,32 @@ public class FileDao extends Dao<FileMeta> {
 		return findLast(pathForCourse(ctx, null).setLast(fileId), null, null);
 	}
 
-	public Entry<FileMeta>[] findFilesForAssignment(final Ctx ctx, final String slotId) {
+
+	public Entry<FileMeta>[] findFilesForAssType(final Ctx ctx, final String slotId) {
+		return findFiles(pathForAssType(ctx, slotId, null));
+	}
+
+	public Stamp createFileForAssType(
+			Ctx ctx, String slotId, FileMeta meta, BufferedInputStream binary, BufferedReader text
+	) throws IOException {
+		return create(pathForAssType(ctx, slotId, meta), meta, binary, text);
+	}
+
+	public Entry<FileMeta> findFileForAssType(Ctx ctx, final String slotId, final String fileId) {
+		return findLast(pathForAssType(ctx, slotId, null).setLast(fileId), null, null);
+	}
+
+	public Entry<FileMeta>[] findFilesForAss(final Ctx ctx, final String slotId) {
 		return findFiles(pathForAss(ctx, slotId, null));
 	}
 
-	public Stamp createFileForAssignment(
+	public Stamp createFileForAss(
 			Ctx ctx, String slotId, FileMeta meta, BufferedInputStream binary, BufferedReader text
 	) throws IOException {
 		return create(pathForAss(ctx, slotId, meta), meta, binary, text);
 	}
 
-	public Entry<FileMeta> findFileForAssignment(Ctx ctx, final String slotId, final String fileId) {
+	public Entry<FileMeta> findFileForAss(Ctx ctx, final String slotId, final String fileId) {
 		return findLast(pathForAss(ctx, slotId, null).setLast(fileId), null, null);
 	}
 
@@ -81,6 +96,18 @@ public class FileDao extends Dao<FileMeta> {
 		final String[] pathStr = {
 				ctx.getCourse().getId(),
 				"global",
+				idForMeta(meta)
+		};
+
+		return new Path(pathStr);
+	}
+
+	protected Path pathForAssType(Ctx ctx, String slotId, FileMeta meta) {
+		final String[] pathStr = {
+				ctx.getCourse().getId(),
+				"assType",
+				ctx.getAssType().getId(),
+				slotId,
 				idForMeta(meta)
 		};
 

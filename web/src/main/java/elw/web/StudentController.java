@@ -247,23 +247,23 @@ public class StudentController extends MultiActionController implements WebSymbo
 				final String assPath = ctxAss.toString();
 
 				if (codeMetas != null) {
-					final Dao.Entry<CodeMeta> last = codeDao.findLast(ctxAss);
+					final Entry<CodeMeta> last = codeDao.findLast(ctxAss);
 					if (last != null) {
 						codeMetas.put(assPath, last.getMeta());
 					}
 				}
 				if (reportMetas != null) {
-					final Dao.Entry<ReportMeta> lastReport = reportDao.findLast(ctxAss);
+					final Entry<ReportMeta> lastReport = reportDao.findLast(ctxAss);
 					if (lastReport != null) {
 						reportMetas.put(assPath, lastReport.getMeta());
 					}
 				}
 				if (scores != null) {
-					final Dao.Entry<Score> lastScore = scoreDao.findLastScore(ctxAss);
+					final Entry<Score> lastScore = scoreDao.findLastScore(ctxAss);
 					Score effectiveScore = null;
 					if (lastScore == null) {
 						if (codeDao != null) {
-							final Dao.Entry<ReportMeta> lastReport = reportDao != null ? reportDao.findLast(ctxAss) : null;
+							final Entry<ReportMeta> lastReport = reportDao != null ? reportDao.findLast(ctxAss) : null;
 							final HashMap<Stamp, Score> allCodeScores = new HashMap<Stamp, Score>();
 							final Stamp bestCodeStamp = AdminController.computeCodeScores(
 									ctxAss,
@@ -390,12 +390,12 @@ public class StudentController extends MultiActionController implements WebSymbo
 
 		model.put("uploadLimit", G4mat.formatMem(UPLOAD_LIMIT));
 
-		final Map<Stamp, Dao.Entry<ReportMeta>> reports = reportDao.findAll(ctx);
-		final Map<Stamp, Dao.Entry<CodeMeta>> codes = codeDao.findAllMetas(ctx);
+		final Map<Stamp, Entry<ReportMeta>> reports = reportDao.findAll(ctx);
+		final Map<Stamp, Entry<CodeMeta>> codes = codeDao.findAllMetas(ctx);
 		final Map<Stamp, Score> codeScores = new TreeMap<Stamp, Score>();
 		AdminController.computeCodeScores(ctx, codes, codeScores, null);
 
-		final Dao.Entry<Score> lastScore = scoreDao.findLastScore(ctx);
+		final Entry<Score> lastScore = scoreDao.findLastScore(ctx);
 		if (lastScore != null) {
 			model.put("stamp", lastScore.getMeta().getReportStamp());
 			model.put("codeStamp", lastScore.getMeta().getCodeStamp());
@@ -444,7 +444,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 			return null;
 		}
 
-		Dao.Entry<ReportMeta> report = null;
+		Entry<ReportMeta> report = null;
 		try {
 			report = reportDao.findByStamp(ctx, stamp);
 			if (report == null) {
@@ -497,7 +497,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 		}
 
 		final Stamp stamp = Stamp.parse(stampStr, null);
-		final Dao.Entry<CodeMeta> entry = codeDao.findMetaByStamp(ctx, stamp);
+		final Entry<CodeMeta> entry = codeDao.findMetaByStamp(ctx, stamp);
 		if (entry == null) {
 			Message.addWarn(req, "no code for stamp " + stamp);
 			resp.sendRedirect("uploadPage?" + WebSymbols.R_CTX + "=" + ctx.toString());
@@ -538,7 +538,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 		mapper.writeValue(verSw, ctx.getVer());
 		final Version verCopy = mapper.readValue(verSw.toString(), Version.class);
 
-		final Dao.Entry<CodeMeta> last = codeDao.findLast(ctx);
+		final Entry<CodeMeta> last = codeDao.findLast(ctx);
 
 		if (!ctx.getAss().isShared() || last != null) {
 			try {

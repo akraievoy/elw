@@ -109,11 +109,6 @@ div.formButtons {
 	background-color: #EEEEEE;
 }
 
-.expandTrigger:hover {
-	background-color: #99FF99;
-	border: thin #66CC66 solid;
-}
-
 .expandTrigger {
 	background-color: #CCFFCC;
 	border: thin #99CC99 dotted;
@@ -121,9 +116,9 @@ div.formButtons {
 	margin: 0 2px;
 }
 
-.popupTrigger:hover {
-	background-color: #9999FF;
-	border: thin #6666CC solid;
+a.expandTrigger:hover {
+	background-color: #99FF99;
+	border: thin #66CC66 solid;
 }
 
 .popupTrigger {
@@ -131,6 +126,11 @@ div.formButtons {
 	border: thin #9999CC dotted;
 	padding: 0 4px;
 	margin: 0 2px;
+}
+
+a.popupTrigger:hover {
+	background-color: #9999FF;
+	border: thin #6666CC solid;
 }
 
 .popup {

@@ -1,18 +1,17 @@
 package elw.dao;
 
-import elw.vo.Assignment;
-import elw.vo.AssignmentType;
-import elw.vo.Course;
-import elw.vo.Path;
+import elw.vo.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class CourseDao extends Dao<Course> {
 	private static final Logger log = LoggerFactory.getLogger(CourseDao.class);
 	protected final AssDao assDao;
+	protected final FileDao fileDao;
 
-	public CourseDao(AssDao assDao) {
+	public CourseDao(final AssDao assDao, final FileDao fileDao) {
 		this.assDao = assDao;
+		this.fileDao = fileDao;
 	}
 
 	@Override
@@ -35,11 +34,20 @@ public class CourseDao extends Dao<Course> {
 		final Entry<Course> entry = findLast(new Path(id), null, null);
 
 		final Course course = entry.getMeta();
+		course.setFiles(fileDao.findFilesForCourse(Ctx.forCourse(course)));
+
 		final AssignmentType[] assTypes = course.getAssTypes();
 		for (final AssignmentType assType : assTypes) {
 			//	LATER this should be done less intrusively
-			final Assignment[] asses = assDao.findAllForAssType(course.getId(), assType.getId());
-			assType.setAssignments(asses);
+			assType.setAssignments(assDao.findAllForAssType(course, assType));
+
+			final FileSlot[] slots = assType.getFileSlots();
+			for (FileSlot slot : slots) {
+				assType.setFiles(
+						slot.getId(),
+						fileDao.findFilesForAssType(Ctx.forAssType(course, assType), slot.getId())
+				);
+			}
 		}
 
 		return course;

@@ -344,7 +344,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 
 						final Ctx assCtx = studCtx.extendTAV(assType, ass, ver);
 
-						final Dao.Entry<ReportMeta> lastReport = reportDao.findLast(assCtx);
+						final Entry<ReportMeta> lastReport = reportDao.findLast(assCtx);
 						if (lastReport != null) {
 							logEntries.add(new LogEntry(stud, assCtx, ass, lastReport.getMeta()));
 						}
@@ -407,7 +407,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 			return null;
 		}
 
-		final Map<Stamp, Dao.Entry<ReportMeta>> reports = reportDao.findAll(ctx);
+		final Map<Stamp, Entry<ReportMeta>> reports = reportDao.findAll(ctx);
 
 		final String reportStampStr = req.getParameter("stamp");
 		Stamp reportStamp = Stamp.parse(reportStampStr, null);
@@ -418,7 +418,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 		model.put("stamp", reportStamp);
 		model.put("reports", reports);
 
-		final Map<Stamp, Dao.Entry<CodeMeta>> codes = codeDao.findAllMetas(ctx);
+		final Map<Stamp, Entry<CodeMeta>> codes = codeDao.findAllMetas(ctx);
 		model.put("codes", codes);
 
 		final Map<Stamp, Score> codeScores = new TreeMap<Stamp, Score>();
@@ -444,7 +444,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 			reportScore = computeReportAuto(ctx, reportMeta, reportBaseScore);
 			computeReportDefault(ctx, reportScore);
 		} else {
-			final Dao.Entry<Score> score = scoreDao.findScoreByStamp(ctx, scoreStamp);
+			final Entry<Score> score = scoreDao.findScoreByStamp(ctx, scoreStamp);
 			reportScore = score.getMeta();
 			codeScores.put(score.getMeta().getCodeStamp(), score.getMeta());
 		}
@@ -456,12 +456,12 @@ public class AdminController extends MultiActionController implements WebSymbols
 		return new ModelAndView("a/approve", model);
 	}
 
-	public static Stamp computeCodeScores(Ctx ctx, Map<Stamp, Dao.Entry<CodeMeta>> codes, Map<Stamp, Score> codeScores, Stamp reportStamp) {
+	public static Stamp computeCodeScores(Ctx ctx, Map<Stamp, Entry<CodeMeta>> codes, Map<Stamp, Score> codeScores, Stamp reportStamp) {
 		double bestRatio = 0;
 		Stamp codeStamp = null;
 
 		for (Stamp cStamp : codes.keySet()) {
-			final Dao.Entry<CodeMeta> entry = codes.get(cStamp);
+			final Entry<CodeMeta> entry = codes.get(cStamp);
 			final CodeMeta meta = entry.getMeta();
 			final Score score = computeCodeAuto(meta, ctx);
 

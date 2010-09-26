@@ -1,5 +1,6 @@
 package elw.dao;
 
+import elw.vo.Entry;
 import elw.vo.Group;
 import elw.vo.Path;
 

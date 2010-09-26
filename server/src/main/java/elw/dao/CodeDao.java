@@ -1,9 +1,6 @@
 package elw.dao;
 
-import elw.vo.CodeMeta;
-import elw.vo.Path;
-import elw.vo.ReportMeta;
-import elw.vo.Stamp;
+import elw.vo.*;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

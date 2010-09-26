@@ -62,6 +62,7 @@ public class Ctx {
 			String courseId, int index, String assTypeId, String assId, String verId
 	) {
 		this.initState = initState;
+		this.resolveState = "";
 
 		this.enrId = enrId;
 		this.groupId = groupId;
@@ -73,20 +74,24 @@ public class Ctx {
 		this.verId = verId;
 	}
 
+	protected Ctx() {
+		this(STATE_NONE, null, null, null, null, -1, null, null, null);
+	}
+
 	public static Ctx fromString(final String path) {
 		if (path == null || path.trim().length() == 0) {
-			return new Ctx(STATE_NONE, null, null, null, null, -1, null, null, null);
+			return new Ctx();
 		}
 
 		final String[] comp = path.split(SEP);
 		if (comp.length <= 1) {
-			return new Ctx(STATE_NONE, null, null, null, null, -1, null, null, null);
+			return new Ctx();
 		}
 
 		final String format = comp[0];
 		if (format.length() + 1 != comp.length) {
 			log.warn("format does not match content, NOT parsing: {}", path);
-			return new Ctx(STATE_NONE, null, null, null, null, -1, null, null, null);
+			return new Ctx();
 		}
 
 		final String initState = reorder(format);
@@ -151,6 +156,36 @@ public class Ctx {
 		}
 
 		return new Ctx(initState, enrId, groupId, studId, courseId, index, typeId, assId, verId);
+	}
+
+	public static Ctx forCourse(final Course course) {
+		if (course == null) {
+			throw new IllegalArgumentException("please provide the course for context");
+		}
+		return new Ctx().extendCourse(course);
+	}
+
+	public static Ctx forAssType(final Course course, final AssignmentType assType) {
+		if (course == null) {
+			throw new IllegalArgumentException("please provide course for context");
+		}
+		if (assType == null) {
+			throw new IllegalArgumentException("please provide assType for context");
+		}
+		return new Ctx().extendCourse(course).extendAssType(assType);
+	}
+
+	public static Ctx forAss(Course course, AssignmentType assType, Assignment ass) {
+		if (course == null) {
+			throw new IllegalArgumentException("please provide course for context");
+		}
+		if (assType == null) {
+			throw new IllegalArgumentException("please provide assType for context");
+		}
+		if (ass == null) {
+			throw new IllegalArgumentException("please provide ass for context");
+		}
+		return new Ctx().extendCourse(course).extendAssType(assType).extendAss(ass);
 	}
 
 	public Ctx resolve(EnrollDao enrDao, GroupDao groupDao, CourseDao courseDao) {
@@ -484,13 +519,9 @@ public class Ctx {
 		final Ctx ctx = copy();
 
 		if (ass != null) {
-			if (assType != null && IdName.findById(assType.getAssignments(), ass.getId()) != null) {
-				ctx.ass = ass;
-				if (ctx.resolveState.indexOf(ELEM_ASS) < 0) {
-					ctx.resolveState += ELEM_ASS;
-				}
-			} else {
-				log.warn("extending with wrong assignment (or no type)");
+			ctx.ass = ass;
+			if (ctx.resolveState.indexOf(ELEM_ASS) < 0) {
+				ctx.resolveState += ELEM_ASS;
 			}
 		} else {
 			log.warn("extending with no assignment");

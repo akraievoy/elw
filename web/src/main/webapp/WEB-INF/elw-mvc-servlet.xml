@@ -21,6 +21,9 @@
 
 	<bean id="mapper" class="elw.dao.MapperFactory" factory-method="createMapper"/>
 
+	<bean id="fileDao" class="elw.dao.FileDao">
+		<property name="metaClass" value="elw.vo.FileMeta"/>
+	</bean>
 	<bean id="assDao" class="elw.dao.AssDao">
 		<property name="metaClass" value="elw.vo.Assignment"/>
 	</bean>

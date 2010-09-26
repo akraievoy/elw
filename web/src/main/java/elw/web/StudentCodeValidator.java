@@ -67,10 +67,10 @@ public class StudentCodeValidator extends G4Run.Task {
 							);
 							ctx.resolve(enrollDao, groupDao, courseDao);
 
-							final Map<Stamp,Dao.Entry<CodeMeta>> metas = codeDao.findAllMetas(ctx);
+							final Map<Stamp, Entry<CodeMeta>> metas = codeDao.findAllMetas(ctx);
 							final Set<Stamp> stamps = metas.keySet();
 							for (Stamp stamp : stamps) {
-								final Dao.Entry<CodeMeta> entry = metas.get(stamp);
+								final Entry<CodeMeta> entry = metas.get(stamp);
 								final CodeMeta meta = entry.getMeta();
 								boolean update = false;
 								final CodeMeta metaSafe;

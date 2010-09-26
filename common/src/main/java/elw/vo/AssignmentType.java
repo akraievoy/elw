@@ -2,13 +2,12 @@ package elw.vo;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class AssignmentType extends IdName {
 	protected final List<Assignment> assignments = new ArrayList<Assignment>();
 	protected final List<FileSlot> fileSlots = new ArrayList<FileSlot>();
+	protected Map<String, List<Entry<FileMeta>>> files = new TreeMap<String, List<Entry<FileMeta>>>();
 
 	protected BundleScoring scoring = null;
 	protected AssignmentSetup setup = null;
@@ -31,6 +30,32 @@ public class AssignmentType extends IdName {
 	public void setFileSlots(FileSlot[] fileSlots) {
 		this.fileSlots.clear();
 		this.fileSlots.addAll(Arrays.asList(fileSlots));
+	}
+
+	public FileSlot findSlotById(final String id) {
+		return IdName.findById(fileSlots, id);
+	}
+
+	@SuppressWarnings({"unchecked"})
+	@JsonIgnore
+	public Entry<FileMeta>[] getFiles(final String slotId) {
+		final List<Entry<FileMeta>> filesForSlot = files.get(slotId);
+		if (filesForSlot == null) {
+			return new Entry[0];
+		}
+		return filesForSlot.toArray(new Entry[filesForSlot.size()]);
+	}
+
+	@JsonIgnore
+	public void setFiles(final String slotId, Entry<FileMeta>[] files) {
+		final List<Entry<FileMeta>> filesForSlot = this.files.get(slotId);
+		if (filesForSlot == null) {
+			this.files.put(slotId, new ArrayList<Entry<FileMeta>>(Arrays.asList(files)));
+			return;
+		}
+
+		filesForSlot.clear();
+		filesForSlot.addAll(Arrays.asList(files));
 	}
 
 	public BundleScoring getScoring() {

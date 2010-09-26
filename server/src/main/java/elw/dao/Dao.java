@@ -1,5 +1,6 @@
 package elw.dao;
 
+import elw.vo.Entry;
 import elw.vo.Path;
 import elw.vo.Stamp;
 import elw.vo.Stamped;
@@ -431,8 +432,8 @@ public abstract class Dao<Meta extends Stamped> {
 			}
 			out.flush();
 		} finally {
-			close(in);
-			close(out);
+			Entry.close(in);
+			Entry.close(out);
 		}
 	}
 
@@ -451,8 +452,8 @@ public abstract class Dao<Meta extends Stamped> {
 			}
 			out.flush();
 		} finally {
-			close(in);
-			close(out);
+			Entry.close(in);
+			Entry.close(out);
 		}
 	}
 
@@ -709,96 +710,5 @@ public abstract class Dao<Meta extends Stamped> {
 		}
 
 		return pathElems;
-	}
-
-	protected static void close(final Closeable closeable) {
-		if (closeable != null) {
-			try {
-				closeable.close();
-			} catch (IOException e) {
-				log.info("failed on close", e);
-			}
-		}
-	}
-
-	public static class Entry<Meta> {
-		protected final Meta meta;
-		protected final File fileMeta;
-		protected final File fileBinary;
-		protected final File fileText;
-		protected final long stamp;
-		protected ThreadLocal<BufferedInputStream> binary = new ThreadLocal<BufferedInputStream>();
-		protected ThreadLocal<BufferedReader> text = new ThreadLocal<BufferedReader>();
-
-		public Entry(File fileMeta, File fileText, File fileBinary, Meta meta, long stamp) {
-			this.meta = meta;
-			this.fileMeta = fileMeta;
-			this.fileText = fileText;
-			this.fileBinary = fileBinary;
-			this.stamp = stamp;
-		}
-
-		public File getFileMeta() {
-			return fileMeta;
-		}
-
-		public File getFileBinary() {
-			return fileBinary;
-		}
-
-		public File getFileText() {
-			return fileText;
-		}
-
-		public Meta getMeta() {
-			return meta;
-		}
-
-		public long getStamp() {
-			return stamp;
-		}
-
-		public BufferedInputStream openBinaryStream() throws IOException {
-			if (fileBinary == null) {
-				return null;
-			}
-			final BufferedInputStream newBinary = new BufferedInputStream(new FileInputStream(fileBinary));
-			binary.set(newBinary);
-			return newBinary;
-		}
-
-		public BufferedReader openTextReader() throws IOException {
-			if (fileText == null) {
-				return null;
-			}
-
-			final BufferedReader newText = new BufferedReader(new InputStreamReader(new FileInputStream(fileText), "UTF-8"));
-			text.set(newText);
-			return newText;
-		}
-
-		public String[] dumpText() throws IOException {
-			final BufferedReader reader = openTextReader();
-
-			if (reader == null) {
-				return new String[0];
-			}
-
-			final List<String> lines = new ArrayList<String>();
-			String curLine;
-
-			while ((curLine = reader.readLine()) != null) {
-				lines.add(curLine);
-			}
-
-			return lines.toArray(new String[lines.size()]);
-		}
-
-		public void closeStreams() {
-			close(binary.get());
-			close(text.get());
-			binary.set(null);
-			text.set(null);
-		}
 	}
 }

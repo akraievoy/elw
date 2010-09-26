@@ -2,6 +2,8 @@ package elw.vo;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 
+import java.util.List;
+
 public class IdName {
 	protected String name;
 	protected String id;
@@ -51,6 +53,18 @@ public class IdName {
 	}
 
 	public static <E extends IdName> E findById(final E[] elems, String id) {
+		E found = null;
+		for (E e : elems) {
+			if (id.equals(e.getId())) {
+				found = e;
+				break;
+			}
+		}
+
+		return found;
+	}
+
+	public static <E extends IdName> E findById(final List<E> elems, String id) {
 		E found = null;
 		for (E e : elems) {
 			if (id.equals(e.getId())) {

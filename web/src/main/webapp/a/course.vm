@@ -50,8 +50,12 @@
 					Name Regex : <span style="font-weight: bold;">${slot.nameRegex}</span><br/>
 					<hr/>
 					Writable? : <span style="font-weight: bold;">#if($slot.writable)Yes#{else}No#end</span><br/>
-					Writable after : <span style="font-weight: bold;">#foreach($slotId in $slot.writeApprovals) ${slotId} #end</span><br/>
-					Readable after : <span style="font-weight: bold;">#foreach($slotId in $slot.readApprovals) ${slotId} #end</span><br/>
+					#if($slot.writeApprovals.size() > 0)
+					Writable after : <span style="font-weight: bold;">#foreach($slotId in $slot.writeApprovals) $assType.findSlotById($slotId).name #end</span><br/>
+					#end
+					#if($slot.readApprovals.size() > 0)
+					Readable after : <span style="font-weight: bold;">#foreach($slotId in $slot.readApprovals) $assType.findSlotById($slotId).name #end</span><br/>
+					#end
 				</div>
 			</td>
 		</tr>
