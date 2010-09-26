@@ -92,7 +92,8 @@
 				<tr class="index-$idx" style="display:none;">
 					<td style="padding-left: 2.5em; padding-right: 1em; border-right: #999999 dashed 1px;">
 						File Types: #foreach($slot in $assType.fileSlots)
-							<a class="expandTrigger" id="index-${idx}--slot-${slot.id}">$slot.name</a>
+							<a class="expandTrigger" id="index-${idx}--slot-${slot.id}">$slot.name:&nbsp;
+								<span style="font-weight: bold;">$ver.countFiles($assType, $ass, $slot.id)</span></a>
 						#end
 					</td>
 					<td style="padding: 0 0.25em; text-align: center;">
@@ -116,7 +117,8 @@
 							#end
 						</td>
 						<td style="padding: 0 0.25em; text-align: center;">
-							<a class="expandTrigger" id="index-${idx}--slot-${slot.id}--files">Files</a>
+							<a class="expandTrigger" id="index-${idx}--slot-${slot.id}--files">Files:&nbsp;<span
+											style="font-weight: bold;">$ver.countFiles($assType, $ass, $slot.id)</span></a>
 							<a class="popupTrigger" id="index-${idx}--slotinfo-${slot.id}">Details</a>
 						</td>
 						<td style="padding: 0 0.25em; text-align: right; position: relative;">

@@ -300,12 +300,6 @@ public class StudentController extends MultiActionController implements WebSymbo
 			return null;
 		}
 
-		if (ctx.getAss().isShared()) {
-			Message.addWarn(req, "shared assignment do not require any reports");
-			resp.sendRedirect("course?" + WebSymbols.R_CTX + "=e--" + ctx.getEnr().getId());
-			return null;
-		}
-
 		final String refreshUri = "uploadPage?" + WebSymbols.R_CTX + "=" + ctx.toString();
 		if (scoreDao.findLastScore(ctx) != null) {
 			Message.addWarn(req, "report already approved, upload NOT allowed");
@@ -382,12 +376,6 @@ public class StudentController extends MultiActionController implements WebSymbo
 			return null;
 		}
 
-		if (ctx.getAss().isShared()) {
-			Message.addWarn(req, "shared assignments do not require any reports");
-			resp.sendRedirect("course?" + WebSymbols.R_CTX + "=e--" + ctx.getEnr().getId());
-			return null;
-		}
-
 		model.put("uploadLimit", G4mat.formatMem(UPLOAD_LIMIT));
 
 		final Map<Stamp, Entry<ReportMeta>> reports = reportDao.findAll(ctx);
@@ -421,12 +409,6 @@ public class StudentController extends MultiActionController implements WebSymbo
 		final Ctx ctx = (Ctx) model.get(R_CTX);
 		if (!ctx.resolved(Ctx.STATE_EGSCIV)) {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "context path problem, please check the logs");
-			return null;
-		}
-
-		if (ctx.getAss().isShared()) {
-			Message.addWarn(req, "shared assignments do not require any reports");
-			resp.sendRedirect("course?" + WebSymbols.R_CTX + "=e--" + ctx.getEnr().getId());
 			return null;
 		}
 
@@ -483,12 +465,6 @@ public class StudentController extends MultiActionController implements WebSymbo
 			return null;
 		}
 
-		if (ctx.getAss().isShared()) {
-			Message.addWarn(req, "shared assignments do not require any code");
-			resp.sendRedirect("course?" + WebSymbols.R_CTX + "=e--" + ctx.getEnr().getId());
-			return null;
-		}
-
 		final String stampStr = req.getParameter("stamp");
 		if (stampStr == null) {
 			Message.addWarn(req, "no stamp defined");
@@ -540,7 +516,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 
 		final Entry<CodeMeta> last = codeDao.findLast(ctx);
 
-		if (!ctx.getAss().isShared() || last != null) {
+		if (last != null) {
 			try {
 				verCopy.setSolution(last.dumpText());
 			} finally {

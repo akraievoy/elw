@@ -24,7 +24,7 @@
 	<th style="padding: 0 0.25em;">Score</th>
 #foreach($assBundle in $elw_ctx.course.assTypes)#set($bunI = $velocityCount - 1)
 	#foreach($ass in $assBundle.assignments)#set($assI = $velocityCount)
-		#if($ass.id && !$ass.shared)
+		#if($ass.id)
 				<th style="padding-left: 0.25em; padding-right: 0.25em; text-align: center;" colspan="2"><span title="$ass.name">$ass.id</span></th>
 		#end
 	#end
@@ -37,7 +37,7 @@
 		<td style="padding: 0 0.25em;">$grossScores.get("$studCtx")</td>
 	#foreach($assBundle in $elw_ctx.course.assTypes)#set($bunI = $velocityCount - 1)
 		#foreach($ass in $assBundle.assignments)#set($assI = $velocityCount)
-			#if($ass.id && !$ass.shared)
+			#if($ass.id)
 				#set($verIdx = $stud.idAsInt % $ass.versions.size())
 				#set($ver = $ass.versions.get($verIdx))
 				#set($path = $studCtx.extendBAV(${bunI}, ${ass}, ${ver}))

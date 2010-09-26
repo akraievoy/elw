@@ -80,4 +80,12 @@ public class Version extends IdName {
 		filesForSlot.clear();
 		filesForSlot.addAll(Arrays.asList(studFiles));
 	}
+
+	public int countFiles(final AssignmentType assType, final Assignment ass, final String slotId) {
+		return
+				assType.getFiles(slotId).length +
+				ass.getFiles(slotId).length +
+				getStudFiles(slotId).length +
+				getFiles(slotId).length;
+	}
 }

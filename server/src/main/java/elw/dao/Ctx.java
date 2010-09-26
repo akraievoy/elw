@@ -296,7 +296,7 @@ public class Ctx {
 		final int studId = Integer.parseInt(student.getId());
 		final int verIdx = IdName.indexOfId(ass.getVersions(), ver.getId());
 
-		return !ass.isShared() && (studId) % ass.getVersions().length != verIdx;
+		return (studId) % ass.getVersions().length != verIdx;
 	}
 
 	public String toString() {
