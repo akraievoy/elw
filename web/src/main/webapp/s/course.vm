@@ -1,6 +1,5 @@
 #* @vtlvariable name="elw_messages" type="elw.miniweb.Message[]" *#
 #* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
-#parse("t/elw.macro.vm")
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta content="text/html; charset=UTF-8">
@@ -30,35 +29,33 @@
 		</tr>
 			#foreach($entry in $elw_ctx.enr.index)
 				#set($idx = $velocityCount - 1)
-				#set($ass_ctx = $elw_ctx.extendIndex($idx))
-				#set($assType = $ass_ctx.assType)
-				#set($ass = $ass_ctx.ass)
-				#set($verIdx = $elw_ctx.student.idAsInt % $ass.versions.size())
-				#set($ver = $ass.versions.get($verIdx))
-				#set($path = $elw_ctx.extendBAV($bunI, $ass, $ver))
-				#set($started = $elw_ctx.enr.classes.get($ass_ctx.indexEntry.classFrom).started)
+				#set($elw_ctx_ass = $elw_ctx.extendIndex($idx))
+				#set($verIdx = $elw_ctx.student.idAsInt % $elw_ctx_ass.ass.versions.size())
+				#set($elw_ctx_ver = $elw_ctx_ass.extendVer($elw_ctx_ass.ass.versions.get($verIdx)))
+				#set($started = $elw_ctx.enr.classes.get($elw_ctx_ass.indexEntry.classFrom).started)
 			<tr class="header">
-				<td style="padding-left: 2em; padding-right: 1em; border-right: #999999 dashed 1px;">$assType.name
-					- $ass.name</td>
+				<td style="padding-left: 2em; padding-right: 1em; border-right: #999999 dashed 1px;">$elw_ctx_ass.assType.name
+					- $elw_ctx_ass.ass.name</td>
 				<td style="padding: 0 0.25em; text-align: center;">
 					#if($started)
-						<a class="expandTrigger" id="index-$idx">Opened $elw_ctx.enr.classes.get($ass_ctx.indexEntry.classFrom).niceDate</a>
+						<a class="expandTrigger"
+							 id="index-$idx">Opened $elw_ctx.enr.classes.get($elw_ctx_ass.indexEntry.classFrom).niceDate</a>
 					#else
-						Opens $elw_ctx.enr.classes.get($ass_ctx.indexEntry.classFrom).niceDate
+						Opens $elw_ctx.enr.classes.get($elw_ctx_ass.indexEntry.classFrom).niceDate
 					#end
 				</td>
 				<td style="padding: 0 0.25em; text-align: right;">
-					#if($scores.get("$path"))
-						#elw_score($path, $scores.get("$path")) of
+					#if($scores.get("$elw_ctx_ver"))
+						#elw_score($elw_ctx_ver, $scores.get("$elw_ctx_ver")) of
 					#else
 						&nbsp;
 					#end
-					$ass_ctx.indexEntry.scoreBudget
+					$elw_ctx_ass.indexEntry.scoreBudget
 				</td>
 			</tr>
-				#if($elw_ctx.enr.classes.get($ass_ctx.indexEntry.classFrom).started)
+				#if($elw_ctx.enr.classes.get($elw_ctx_ass.indexEntry.classFrom).started)
 				<tr class="index-$idx" style="display:none;">
-					<td style="padding-left: 2.5em; padding-right: 1em; border-right: #999999 dashed 1px;">$ver.name</td>
+					<td style="padding-left: 2.5em; padding-right: 1em; border-right: #999999 dashed 1px;">$elw_ctx_ver.ver.name</td>
 				#*
 							<td style="padding: 0 0.25em; text-align: right;">
 								#elw_code_state($path, $codeMetas.get("$path"))
@@ -91,96 +88,54 @@
 				</tr>
 				<tr class="index-$idx" style="display:none;">
 					<td style="padding-left: 2.5em; padding-right: 1em; border-right: #999999 dashed 1px;">
-						File Types: #foreach($slot in $assType.fileSlots)
-							<a class="expandTrigger" id="index-${idx}--slot-${slot.id}">$slot.name:&nbsp;
-								<span style="font-weight: bold;">$ver.countFiles($assType, $ass, $slot.id)</span></a>
+						#foreach($slot in $elw_ctx_ass.assType.fileSlots)
+							$slot.name:&nbsp;<span style="font-weight: bold;">$elw_ctx_ver.ver.countFiles($elw_ctx_ass.assType, $elw_ctx_ass.ass, $slot.id)</span>
 						#end
 					</td>
 					<td style="padding: 0 0.25em; text-align: center;">
+						#foreach($slot in $elw_ctx_ass.assType.fileSlots)
+							<a class="expandTrigger" id="index-${idx}--slot-${slot.id}" title="$slot.name">$slot.name.charAt(0):<span
+											style="font-weight: bold;">$elw_ctx_ver.ver.countFiles($elw_ctx_ass.assType, $elw_ctx_ass.ass, $slot.id)</span></a>
+						#end
 					</td>
 					<td style="padding: 0 0.25em; text-align: right;">
 					</td>
 				</tr>
-					#foreach($slot in $assType.fileSlots)
+					#foreach($slot in $elw_ctx_ass.assType.fileSlots)
 					<tr class="index-${idx}--slot-${slot.id}" style="display:none;">
 						<td style="padding-left: 3em; padding-right: 1em; border-right: #999999 dashed 1px;">
 							<span style="font-weight: bold;" title="${slot.id}">${slot.name}</span>&nbsp;
 							#if($slot.writable)
 								#if($slot.writeApprovals.size() > 0)
-									Writable after : <span style="font-weight: bold;">#foreach($slotId in $slot.writeApprovals) ${assType.findSlotById($slotId).name} #end</span>
-							  #end
+									Writable after : <span
+												style="font-weight: bold;">#foreach($slotId in $slot.writeApprovals) ${elw_ctx_ass.assType.findSlotById($slotId).name} #end</span>
+								#end
 							#else
 								<span style="font-weight: bold;">Read-only</span>
 							#end
 							#if($slot.readApprovals.size() > 0)
-								Readable after : <span style="font-weight: bold;">#foreach($slotId in $slot.readApprovals) ${assType.findSlotById($slotId).name} #end</span>
+								Readable after : <span
+											style="font-weight: bold;">#foreach($slotId in $slot.readApprovals) ${elw_ctx_ass.assType.findSlotById($slotId).name} #end</span>
 							#end
 						</td>
 						<td style="padding: 0 0.25em; text-align: center;">
 							<a class="expandTrigger" id="index-${idx}--slot-${slot.id}--files">Files:&nbsp;<span
-											style="font-weight: bold;">$ver.countFiles($assType, $ass, $slot.id)</span></a>
+											style="font-weight: bold;">$elw_ctx_ver.ver.countFiles($elw_ctx_ass.assType, $elw_ctx_ass.ass, $slot.id)</span></a>
 							<a class="popupTrigger" id="index-${idx}--slotinfo-${slot.id}">Details</a>
 						</td>
 						<td style="padding: 0 0.25em; text-align: right; position: relative;">
 							<div style="display: none;" class="popup index-${idx}--slotinfo-${slot.id}">
-								Content Types : <span style="font-weight: bold;">#foreach($contentType in $slot.contentTypes) ${contentType} #end</span><br/>
+								Content Types : <span
+											style="font-weight: bold;">#foreach($contentType in $slot.contentTypes) ${contentType} #end</span><br/>
 								Max Size : <span style="font-weight: bold;">${slot.lengthLimit}</span><br/>
 								Name Regex : <span style="font-weight: bold;">${slot.nameRegex}</span><br/>
 							</div>
 						</td>
 					</tr>
-						#foreach($file in $assType.getFiles($slot.id))
-							<tr class="index-${idx}--slot-${slot.id}--files" style="display:none;">
-								<td style="padding-left: 4em; padding-right: 1em; border-right: #999999 dashed 1px;">
-									<span style="font-weight: bold;" title="${file.meta.id}">${file.meta.name}</span> (v)
-								</td>
-								<td style="padding: 0 0.25em; text-align: center;">
-
-								</td>
-								<td style="padding: 0 0.25em; text-align: right;">
-
-								</td>
-							</tr>
-						#end
-						#foreach($file in $ass.getFiles($slot.id))
-							<tr class="index-${idx}--slot-${slot.id}--files" style="display:none;">
-								<td style="padding-left: 4em; padding-right: 1em; border-right: #999999 dashed 1px;">
-									<span style="font-weight: bold;" title="${file.meta.id}">${file.meta.name}</span> (a)
-								</td>
-								<td style="padding: 0 0.25em; text-align: center;">
-
-								</td>
-								<td style="padding: 0 0.25em; text-align: right;">
-
-								</td>
-							</tr>
-						#end
-						#foreach($file in $ver.getFiles($slot.id))
-							<tr class="index-${idx}--slot-${slot.id}--files" style="display:none;">
-								<td style="padding-left: 4em; padding-right: 1em; border-right: #999999 dashed 1px;">
-									<span style="font-weight: bold;" title="${file.meta.id}">${file.meta.name}</span> (v)
-								</td>
-								<td style="padding: 0 0.25em; text-align: center;">
-
-								</td>
-								<td style="padding: 0 0.25em; text-align: right;">
-
-								</td>
-							</tr>
-						#end
-						#foreach($file in $ver.getStudFiles($slot.id))
-							<tr class="index-${idx}--slot-${slot.id}--files" style="display:none;">
-								<td style="padding-left: 4em; padding-right: 1em; border-right: #999999 dashed 1px;">
-									<span style="font-weight: bold;" title="${file.meta.id}">${file.meta.name}</span> (s)
-								</td>
-								<td style="padding: 0 0.25em; text-align: center;">
-
-								</td>
-								<td style="padding: 0 0.25em; text-align: right;">
-
-								</td>
-							</tr>
-						#end
+						#elw_file_row($elw_ctx_ver, $slot, $elw_ctx_ver.assType.getFiles($slot.id), "type")
+						#elw_file_row($elw_ctx_ver, $slot, $elw_ctx_ver.ass.getFiles($slot.id), "ass")
+						#elw_file_row($elw_ctx_ver, $slot, $elw_ctx_ver.ver.getFiles($slot.id), "ver")
+						#elw_file_row($elw_ctx_ver, $slot, $elw_ctx_ver.ver.getStudFiles($slot.id), "stud")
 					#end
 				#end
 			#end

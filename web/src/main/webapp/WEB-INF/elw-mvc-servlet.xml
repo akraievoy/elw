@@ -88,6 +88,9 @@
 			<map>
 				<entry key="input.encoding" value="UTF-8"/>
 				<entry key="output.encoding" value="UTF-8"/>
+				<entry key="velocimacro.library" value="t/elw.vm"/>
+				<entry key="velocimacro.library.autoreload" value="true"/>
+				<entry key="file.resource.loader.cache" value="false"/>
 			</map>
 		</property>
 	</bean>

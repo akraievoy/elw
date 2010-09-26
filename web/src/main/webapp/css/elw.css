@@ -112,8 +112,8 @@ div.formButtons {
 .expandTrigger {
 	background-color: #CCFFCC;
 	border: thin #99CC99 dotted;
-	padding: 0 4px;
-	margin: 0 2px;
+	padding: 0 2px;
+	margin: 0 1px;
 }
 
 a.expandTrigger:hover {
@@ -124,8 +124,8 @@ a.expandTrigger:hover {
 .popupTrigger {
 	background-color: #CCCCFF;
 	border: thin #9999CC dotted;
-	padding: 0 4px;
-	margin: 0 2px;
+	padding: 0 2px;
+	margin: 0 1px;
 }
 
 a.popupTrigger:hover {

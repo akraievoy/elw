@@ -1,6 +1,5 @@
 #* @vtlvariable name="logEntries" type="elw.web.AdminController.LogEntry[]" *#
 #* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
-#parse("t/elw.macro.vm")
 <html>
 <head>
 	<meta content="text/html; charset=UTF-8">

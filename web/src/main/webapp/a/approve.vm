@@ -1,6 +1,5 @@
 #* @vtlvariable name="elw_messages" type="elw.miniweb.Message[]" *#
 #* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
-#parse("t/elw.macro.vm")
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta content="text/html; charset=UTF-8">

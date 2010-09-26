@@ -1,5 +1,6 @@
 package elw.vo;
 
+import org.akraievoy.gear.G4Str;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,20 +67,28 @@ public class Entry<Meta> {
 	}
 
 	public String[] dumpText() throws IOException {
-		final BufferedReader reader = openTextReader();
+		try {
+			final BufferedReader reader = openTextReader();
 
-		if (reader == null) {
-			return new String[0];
+			if (reader == null) {
+				return new String[0];
+			}
+
+			final List<String> lines = new ArrayList<String>();
+			String curLine;
+
+			while ((curLine = reader.readLine()) != null) {
+				lines.add(curLine);
+			}
+
+			return lines.toArray(new String[lines.size()]);
+		} finally {
+			closeStreams();
 		}
+	}
 
-		final List<String> lines = new ArrayList<String>();
-		String curLine;
-
-		while ((curLine = reader.readLine()) != null) {
-			lines.add(curLine);
-		}
-
-		return lines.toArray(new String[lines.size()]);
+	public String getText() throws IOException {
+		return G4Str.join(dumpText(), "<br/>\n");
 	}
 
 	public void closeStreams() {

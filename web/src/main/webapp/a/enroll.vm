@@ -2,7 +2,6 @@
 #* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
 #* @vtlvariable name="codeMetas" type="java.util.Map<java.lang.String,elw.vo.CodeMeta>" *#
 #* @vtlvariable name="reportMetas" type="java.util.Map<java.lang.String,elw.vo.ReportMeta>" *#
-#parse("t/elw.macro.vm")
 <html>
 <head>
 	<meta content="text/html; charset=UTF-8">

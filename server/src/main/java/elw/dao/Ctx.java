@@ -320,6 +320,8 @@ public class Ctx {
 				res.append(getStudent().getId());
 			} else if (comp == ELEM_COURSE) {
 				res.append(getCourse().getId());
+			} else if (comp == ELEM_INDEX_ENTRY) {
+				res.append(getIndex());
 			} else if (comp == ELEM_ASS_TYPE) {
 				res.append(getAssType().getId());
 			} else if (comp == ELEM_ASS) {
@@ -573,6 +575,7 @@ public class Ctx {
 		copy.group = group;
 		copy.student = student;
 		copy.course = course;
+		copy.index = index;
 		copy.assType = assType;
 		copy.ass = ass;
 		copy.ver = ver;

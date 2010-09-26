@@ -1,5 +1,4 @@
 #* @vtlvariable name="courses" type="elw.vo.Course[]" *#
-#parse("t/elw.macro.vm")
 <html>
 <head>
 	<meta content="text/html; charset=UTF-8">

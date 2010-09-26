@@ -2,7 +2,6 @@
 #* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
 #* @vtlvariable name="groupName" type="java.lang.String" *#
 #* @vtlvariable name="studentName" type="java.lang.String" *#
-#parse("t/elw.macro.vm")
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta content="text/html; charset=UTF-8">

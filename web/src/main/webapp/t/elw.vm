@@ -125,3 +125,27 @@
 		None
 	#end
 #end
+
+#macro (elw_file_row $p_path $p_slot $p_files $p_scope)
+	#foreach($file in $p_files)
+		<tr class="index-${p_path.index}--slot-${p_slot.id}--files" style="display:none;">
+			<td style="padding-left: 4em; padding-right: 1em; border-right: #999999 dashed 1px;">
+				<span style="font-weight: bold;" title="${file.meta.id} @ $p_scope">${file.meta.name}</span>
+			</td>
+			<td style="padding: 0 0.25em; text-align: center;">
+				#if(!${p_slot.binary})
+					<a class="popupTrigger"
+						 id="index-${p_path.index}--slotinfo-${p_slot.id}--${p_scope}-${file.meta.id}">Content</a>
+				#end
+			</td>
+			<td style="padding: 0 0.25em; text-align: right;">
+				#if(!${p_slot.binary})
+					<div style="display: none; text-align: left;"
+							 class="popup index-${p_path.index}--slotinfo-${p_slot.id}--${p_scope}-${file.meta.id}">
+						${file.text}
+					</div>
+				#end
+			</td>
+		</tr>
+	#end
+#end

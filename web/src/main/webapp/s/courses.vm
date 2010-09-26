@@ -2,7 +2,6 @@
 #* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
 #* @vtlvariable name="enrolls" type="elw.vo.Enrollment[]" *#
 #* @vtlvariable name="courses" type="java.util.Map<java.lang.String,elw.vo.Course>" *#
-#parse("t/elw.macro.vm")
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta content="text/html; charset=UTF-8">
