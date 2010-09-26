@@ -480,7 +480,7 @@ public class Ctx {
 					log.warn("assignment type not found: {}", assTypeId, dump());
 				}
 				ctx.ass = IdName.findById(ctx.assType.getAssignments(), ctx.indexEntry.getPath()[1]);
-				if (ass != null) {
+				if (ctx.ass != null) {
 					ctx.resolveState += ELEM_ASS;
 				} else {
 					log.warn("assignment not found: {}", dump());

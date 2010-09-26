@@ -1,0 +1,5 @@
+#REGISTERS
+$a0:9:9
+$a1:0x100:0x100
+#MEMORY
+0x100::9

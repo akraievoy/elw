@@ -1,11 +1,21 @@
 package elw.vo;
 
 public class FileMeta extends IdNameStamped {
-	protected long length;
 	protected String contentType;
-	protected String fileSetId;
+	protected String nameNorm;
 	protected String sourceAddress;
 	protected String author;
+
+	public FileMeta() {
+	}
+
+	public FileMeta(String name, String nameNorm, String contentType, String author, String sourceAddress) {
+		this.name = name;
+		this.nameNorm = nameNorm;
+		this.author = author;
+		this.contentType = contentType;
+		this.sourceAddress = sourceAddress;
+	}
 
 	public String getContentType() {
 		return contentType;
@@ -15,20 +25,12 @@ public class FileMeta extends IdNameStamped {
 		this.contentType = contentType;
 	}
 
-	public String getFileSetId() {
-		return fileSetId;
+	public String getNameNorm() {
+		return nameNorm;
 	}
 
-	public void setFileSetId(String fileSetId) {
-		this.fileSetId = fileSetId;
-	}
-
-	public long getLength() {
-		return length;
-	}
-
-	public void setLength(long length) {
-		this.length = length;
+	public void setNameNorm(String nameNorm) {
+		this.nameNorm = nameNorm;
 	}
 
 	public String getSourceAddress() {

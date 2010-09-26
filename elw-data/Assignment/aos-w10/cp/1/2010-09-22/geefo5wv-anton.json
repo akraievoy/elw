@@ -1,60 +1,8 @@
 {
-  "shared" : true,
   "versions" : [ {
-    "solution" : [ "add\t$t4, $zero, $a0", "add\t$t5, $zero, $a1", "lw\t$t0, 0($t4)", "lw\t$t1, 0($t4)", "", "iLoop:", "addi\t$t5, $t5, -1", "beq\t$t5, $zero, end", "addi\t$t4, $t4, 4", "lw\t$t3, 0($t4)", "sub\t$t2, $t3, $t0", "bgtz\t$t2, ch_max", "sub\t$t2, $t1, $t3", "bgtz\t$t2, ch_min", "j\tiLoop ", "", "ch_max:", "lw\t$t0, 0($t4)", "j\tiLoop", "", "ch_min:", "lw\t$t1, 0($t4)", "j\tiLoop ", "", "end:", "sub\t$v0, $t0, $t1" ],
-    "tests" : [ {
-      "shared" : true,
-      "args" : {
-        "mem" : [ "0x100:1:1", "0x104:2:2", "0x108:3:3", "0x10C:8:8", "0x110:5:5" ],
-        "regs" : [ "$a0:0x100:0x100", "$a1:5:5", "$v0::7" ]
-      },
-      "name" : null,
-      "id" : null
-    }, {
-      "shared" : true,
-      "args" : {
-        "mem" : [ "0x100:-1:-1", "0x104:2:2", "0x108:3:3", "0x10C:8:8", "0x110:5:5", "0x114:5:5" ],
-        "regs" : [ "$a0:0x100:0x100", "$a1:6:6", "$v0::9" ]
-      },
-      "name" : null,
-      "id" : null
-    }, {
-      "shared" : true,
-      "args" : {
-        "mem" : [ "0x100:8:8", "0x104:0:0", "0x108:14:14", "0x10C:7:7", "0x110:10:10", "0x114:13:13" ],
-        "regs" : [ "$a0:0x100:0x100", "$a1:6:6", "$v0::14" ]
-      },
-      "name" : null,
-      "id" : null
-    } ],
-    "statementHtml" : [ "Задан целочисленный массив. Найти разность его максимального и минимального элементов.", "Массив задается начальным адресом в $a0 и размером в $a1. Результат ожидается в $v0." ],
     "name" : "Разница экстремумов (итерации и массивы)",
     "id" : "1"
   }, {
-    "solution" : [ "#\t$a0 - n", "#\t$v0 - n!", "", "fact:", "addi\t$sp, $sp, -8", "sw\t$a0, 4($sp)", "sw\t$ra, 0($sp)", "addi\t$t7, $a0, -1", "blez\t$t7, finish", "addi\t$a0, $a0, -1", "jal\tfact", "", "addi\t$a0, $a0, 1", "mult\t$a0, $v0", "mflo\t$v0", "lw\t$ra, 0($sp)", "lw\t$a0, 4($sp)", "addi\t$sp, $sp, 8", "jr\t$ra", "", "finish:", "addi\t$v0, $0, 1", "addi\t$sp, $sp, 8", "jr\t$ra" ],
-    "tests" : [ {
-      "shared" : true,
-      "args" : {
-        "regs" : [ "$a0:1:1", "$v0::1" ]
-      },
-      "name" : null,
-      "id" : null
-    }, {
-      "shared" : true,
-      "args" : {
-        "regs" : [ "$a0:5:5", "$v0::120" ]
-      },
-      "name" : null,
-      "id" : null
-    }, {
-      "shared" : true,
-      "args" : {
-        "regs" : [ "$a0:9:9", "$v0::362880" ]
-      },
-      "name" : null,
-      "id" : null
-    } ],
-    "statementHtml" : [ "Дано натуральное число n, в регистре $a0. Вычислить факториал данного числа и поместить результат в $v0." ],
     "name" : "Факториал (процедуры и рекурсия)",
     "id" : "2"
   } ],

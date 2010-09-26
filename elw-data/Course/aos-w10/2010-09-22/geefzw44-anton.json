@@ -33,7 +33,7 @@
 					"id":"test",
 					"name":"Тест",
 					"lengthLimit": "10240",
-					"nameRegex": ".+\\.(mips|txt)",
+					"nameRegex": ".+\\.txt",
 					"contentTypes": ["text/plain"],
 					"binary":false,
 					"writable":true,

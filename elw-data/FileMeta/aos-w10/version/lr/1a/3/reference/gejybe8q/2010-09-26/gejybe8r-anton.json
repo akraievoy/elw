@@ -1,0 +1,13 @@
+{
+  "contentType" : "text/plain",
+  "nameNorm" : "reference.mips",
+  "sourceAddress" : "lynx",
+  "author" : "akraievoy",
+  "path" : [ "aos-w10", "version", "lr", "1a", "3", "reference", "gejybe8q" ],
+  "createStamp" : {
+    "time" : 1285508074203,
+    "node" : "anton"
+  },
+  "name" : "reference.mips",
+  "id" : "gejybe8q"
+}

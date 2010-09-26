@@ -1,0 +1,13 @@
+{
+  "contentType" : "text/plain",
+  "nameNorm" : "test-2.txt",
+  "sourceAddress" : "lynx",
+  "author" : "akraievoy",
+  "path" : [ "aos-w10", "version", "lr", "2", "2", "test", "gejybcve" ],
+  "createStamp" : {
+    "time" : 1285508072427,
+    "node" : "anton"
+  },
+  "name" : "test-2.txt",
+  "id" : "gejybcve"
+}

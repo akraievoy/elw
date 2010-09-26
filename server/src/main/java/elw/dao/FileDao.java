@@ -27,7 +27,7 @@ public class FileDao extends Dao<FileMeta> {
 	public Stamp createFileForCourse(
 			Ctx ctx, FileMeta meta, BufferedInputStream binary, BufferedReader text
 	) throws IOException {
-		return create(pathForCourse(ctx, meta), meta, binary, text);
+		return setPathAndCreate(pathForCourse(ctx, meta), meta, binary, text);
 	}
 
 	public Entry<FileMeta> findFileForCourse(Ctx ctx, final String fileId) {
@@ -42,7 +42,7 @@ public class FileDao extends Dao<FileMeta> {
 	public Stamp createFileForAssType(
 			Ctx ctx, String slotId, FileMeta meta, BufferedInputStream binary, BufferedReader text
 	) throws IOException {
-		return create(pathForAssType(ctx, slotId, meta), meta, binary, text);
+		return setPathAndCreate(pathForAssType(ctx, slotId, meta), meta, binary, text);
 	}
 
 	public Entry<FileMeta> findFileForAssType(Ctx ctx, final String slotId, final String fileId) {
@@ -56,7 +56,7 @@ public class FileDao extends Dao<FileMeta> {
 	public Stamp createFileForAss(
 			Ctx ctx, String slotId, FileMeta meta, BufferedInputStream binary, BufferedReader text
 	) throws IOException {
-		return create(pathForAss(ctx, slotId, meta), meta, binary, text);
+		return setPathAndCreate(pathForAss(ctx, slotId, meta), meta, binary, text);
 	}
 
 	public Entry<FileMeta> findFileForAss(Ctx ctx, final String slotId, final String fileId) {
@@ -70,7 +70,7 @@ public class FileDao extends Dao<FileMeta> {
 	public Stamp createFileForVersion(
 			Ctx ctx, String slotId, FileMeta meta, BufferedInputStream binary, BufferedReader text
 	) throws IOException {
-		return create(pathForVer(ctx, slotId, meta), meta, binary, text);
+		return setPathAndCreate(pathForVer(ctx, slotId, meta), meta, binary, text);
 	}
 
 	public Entry<FileMeta> findFileForVersion(Ctx ctx, final String slotId, final String fileId) {
@@ -85,11 +85,16 @@ public class FileDao extends Dao<FileMeta> {
 	public Stamp createFileForStudent(
 			Ctx ctx, String slotId, FileMeta meta, BufferedInputStream binary, BufferedReader text
 	) throws IOException {
-		return create(pathForStud(ctx, slotId, meta), meta, binary, text);
+		return setPathAndCreate(pathForStud(ctx, slotId, meta), meta, binary, text);
 	}
 
 	public Entry<FileMeta> findFileForStudent(Ctx ctx, final String slotId, final String fileId) {
 		return findLast(pathForStud(ctx, slotId, null).setLast(fileId), null, null);
+	}
+
+	protected Stamp setPathAndCreate(final Path path, FileMeta meta, BufferedInputStream binary, BufferedReader text) throws IOException {
+		meta.setPath(path.getPath());
+		return create(path, meta, binary, text);
 	}
 
 	protected Path pathForCourse(Ctx ctx, FileMeta meta) {
@@ -164,7 +169,11 @@ public class FileDao extends Dao<FileMeta> {
 			return meta.getId();
 		}
 
-		return Long.toString(genId(), 36);
+		final String id = Long.toString(genId(), 36);
+
+		meta.setId(id);
+
+		return id;
 	}
 
 	protected Entry<FileMeta>[] findFiles(final Path path) {

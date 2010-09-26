@@ -1,0 +1,4 @@
+#REGISTERS
+$a0:65:65
+$v0::11
+#MEMORY

@@ -102,15 +102,14 @@
 				</tr>
 					#foreach($slot in $assType.fileSlots)
 					<tr class="index-${idx}--slot-${slot.id}" style="display:none;">
-						<td style="padding-left: 3em; padding-right: 1em;">
+						<td style="padding-left: 3em; padding-right: 1em; border-right: #999999 dashed 1px;">
 							<span style="font-weight: bold;" title="${slot.id}">${slot.name}</span>&nbsp;
 							#if($slot.writable)
-								Writable? : <span style="font-weight: bold;">Yes</span>
 								#if($slot.writeApprovals.size() > 0)
 									Writable after : <span style="font-weight: bold;">#foreach($slotId in $slot.writeApprovals) ${assType.findSlotById($slotId).name} #end</span>
 							  #end
 							#else
-								Writable? : <span style="font-weight: bold;">No</span>
+								<span style="font-weight: bold;">Read-only</span>
 							#end
 							#if($slot.readApprovals.size() > 0)
 								Readable after : <span style="font-weight: bold;">#foreach($slotId in $slot.readApprovals) ${assType.findSlotById($slotId).name} #end</span>
@@ -131,7 +130,7 @@
 						#foreach($file in $assType.getFiles($slot.id))
 							<tr class="index-${idx}--slot-${slot.id}--files" style="display:none;">
 								<td style="padding-left: 4em; padding-right: 1em; border-right: #999999 dashed 1px;">
-									<span style="font-weight: bold;" title="${file.id}">${file.name} (t)</span>
+									<span style="font-weight: bold;" title="${file.meta.id}">${file.meta.name}</span> (v)
 								</td>
 								<td style="padding: 0 0.25em; text-align: center;">
 
@@ -144,7 +143,7 @@
 						#foreach($file in $ass.getFiles($slot.id))
 							<tr class="index-${idx}--slot-${slot.id}--files" style="display:none;">
 								<td style="padding-left: 4em; padding-right: 1em; border-right: #999999 dashed 1px;">
-									<span style="font-weight: bold;" title="${file.id}">${file.name} (a)</span>
+									<span style="font-weight: bold;" title="${file.meta.id}">${file.meta.name}</span> (a)
 								</td>
 								<td style="padding: 0 0.25em; text-align: center;">
 
@@ -157,7 +156,20 @@
 						#foreach($file in $ver.getFiles($slot.id))
 							<tr class="index-${idx}--slot-${slot.id}--files" style="display:none;">
 								<td style="padding-left: 4em; padding-right: 1em; border-right: #999999 dashed 1px;">
-									<span style="font-weight: bold;" title="${file.id}">${file.name} (v)</span>
+									<span style="font-weight: bold;" title="${file.meta.id}">${file.meta.name}</span> (v)
+								</td>
+								<td style="padding: 0 0.25em; text-align: center;">
+
+								</td>
+								<td style="padding: 0 0.25em; text-align: right;">
+
+								</td>
+							</tr>
+						#end
+						#foreach($file in $ver.getStudFiles($slot.id))
+							<tr class="index-${idx}--slot-${slot.id}--files" style="display:none;">
+								<td style="padding-left: 4em; padding-right: 1em; border-right: #999999 dashed 1px;">
+									<span style="font-weight: bold;" title="${file.meta.id}">${file.meta.name}</span> (s)
 								</td>
 								<td style="padding: 0 0.25em; text-align: center;">
 

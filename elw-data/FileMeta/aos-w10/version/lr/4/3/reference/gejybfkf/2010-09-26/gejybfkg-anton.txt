@@ -1,0 +1,12 @@
+add $v0, $v0, $zero
+add $t0, $a0, $zero
+
+more:
+beq $t0, $zero, done
+andi $t1, $t0, 1
+sll $v0, $v0, 1
+add $v0, $v0, $t1
+srl $t0, $t0, 1
+j more
+
+done:
