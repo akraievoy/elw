@@ -88,4 +88,66 @@ public class Version extends IdName {
 				getStudFiles(slotId).length +
 				getFiles(slotId).length;
 	}
+
+	public boolean checkRead(final AssignmentType assType, final Assignment ass, final String slotId) {
+		final FileSlot fileSlot = assType.findSlotById(slotId);
+
+		final String[] readApprovals = fileSlot.getReadApprovals();
+		for (String slotIdRA : readApprovals) {
+			if (!isApprovedAny(slotIdRA)) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	public boolean isApprovedAny(String slotId) {
+		final Entry<FileMeta>[] files = getStudFiles(slotId);
+		boolean approved = false;
+		for (Entry<FileMeta> f : files) {
+			if (f.getMeta().getScore() != null && f.getMeta().getScore().isApproved()) {
+				approved = true;
+			}
+		}
+		return approved;
+	}
+
+	public boolean isDeclinedLast(String slotId) {
+		final Entry<FileMeta>[] files = getStudFiles(slotId);
+
+		if (files.length == 0) {
+			return false;
+		}
+
+		final Entry<FileMeta> f = files[files.length - 1];
+		return f.getMeta().getScore() != null && !f.getMeta().getScore().isApproved();
+	}
+
+	public boolean isPendingLast(String slotId) {
+		final Entry<FileMeta>[] files = getStudFiles(slotId);
+
+		if (files.length == 0) {
+			return false;
+		}
+
+		final Entry<FileMeta> f = files[files.length - 1];
+		return f.getMeta().getScore() == null;
+	}
+
+	public boolean checkWrite(final AssignmentType assType, final Assignment ass, final String slotId) {
+		final FileSlot fileSlot = assType.findSlotById(slotId);
+		if (!fileSlot.isWritable()) {
+			return false;
+		}
+
+		final String[] writeApprovals = fileSlot.getWriteApprovals();
+		for (String slotIdWA : writeApprovals) {
+			if (!isApprovedAny(slotIdWA)) {
+				return false;
+			}
+		}
+
+		return true;
+	}
 }

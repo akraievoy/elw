@@ -259,7 +259,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 					}
 				}
 				if (scores != null) {
-					final Entry<Score> lastScore = scoreDao.findLastScore(ctxAss);
+					final Entry<Score> lastScore = scoreDao.findLastScore(ctxAss, "FIXME:slotId", "FIXME:fileId");
 					Score effectiveScore = null;
 					if (lastScore == null) {
 						if (codeDao != null) {
@@ -301,7 +301,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 		}
 
 		final String refreshUri = "uploadPage?" + WebSymbols.R_CTX + "=" + ctx.toString();
-		if (scoreDao.findLastScore(ctx) != null) {
+		if (scoreDao.findLastScore(ctx, "FIXME:slotId", "FIXME:fileId") != null) {
 			Message.addWarn(req, "report already approved, upload NOT allowed");
 			resp.sendRedirect(refreshUri);
 			return null;
@@ -383,7 +383,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 		final Map<Stamp, Score> codeScores = new TreeMap<Stamp, Score>();
 		AdminController.computeCodeScores(ctx, codes, codeScores, null);
 
-		final Entry<Score> lastScore = scoreDao.findLastScore(ctx);
+		final Entry<Score> lastScore = scoreDao.findLastScore(ctx, "FIXME:slotId", "FIXME:fileId");
 		if (lastScore != null) {
 			model.put("stamp", lastScore.getMeta().getReportStamp());
 			model.put("codeStamp", lastScore.getMeta().getCodeStamp());
@@ -393,7 +393,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 		model.put("reports", reports);
 		model.put("codes", codes);
 		model.put("codeScores", codeScores);
-		model.put("scores", scoreDao.findAllScores(ctx));
+		model.put("scores", scoreDao.findAllScores(ctx, "FIXME:slotId", "FIXME:fileId"));
 		model.put("elw_ctx", ctx);
 
 		return new ModelAndView("s/uploadPage", model);
@@ -549,7 +549,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 			return null;
 		}
 
-		if (scoreDao.findLastScore(ctx) != null) {
+		if (scoreDao.findLastScore(ctx, "FIXME:slotId", "FIXME:fileId") != null) {
 			resp.sendError(HttpServletResponse.SC_CONFLICT, "report for given task already approved");
 			return null;
 		}

@@ -12,7 +12,10 @@ import java.lang.reflect.Array;
 public class FileDao extends Dao<FileMeta> {
 	private static final Logger log = LoggerFactory.getLogger(FileDao.class);
 
-	public FileDao() {
+	protected final ScoreDao scoreDao;
+
+	public FileDao(final ScoreDao scoreDao) {
+		this.scoreDao = scoreDao;
 	}
 
 	@Override
@@ -79,7 +82,13 @@ public class FileDao extends Dao<FileMeta> {
 
 
 	public Entry<FileMeta>[] findFilesForStudent(final Ctx ctx, final String slotId) {
-		return findFiles(pathForStud(ctx, slotId, null));
+		final Entry<FileMeta>[] files = findFiles(pathForStud(ctx, slotId, null));
+
+		for (Entry<FileMeta> file : files) {
+			loadScore(ctx, slotId, file.getMeta().getId(), file);
+		}
+
+		return files;
 	}
 
 	public Stamp createFileForStudent(
@@ -89,7 +98,18 @@ public class FileDao extends Dao<FileMeta> {
 	}
 
 	public Entry<FileMeta> findFileForStudent(Ctx ctx, final String slotId, final String fileId) {
-		return findLast(pathForStud(ctx, slotId, null).setLast(fileId), null, null);
+		final Entry<FileMeta> entry = findLast(pathForStud(ctx, slotId, null).setLast(fileId), null, null);
+
+		loadScore(ctx, slotId, fileId, entry);
+
+		return entry;
+	}
+
+	protected void loadScore(Ctx ctx, String slotId, String fileId, Entry<FileMeta> entry) {
+		final Entry<Score> score = scoreDao.findLastScore(ctx, slotId, fileId);
+		if (score != null) {
+			entry.getMeta().setScore(score.getMeta());
+		}
 	}
 
 	protected Stamp setPathAndCreate(final Path path, FileMeta meta, BufferedInputStream binary, BufferedReader text) throws IOException {
@@ -189,6 +209,8 @@ public class FileDao extends Dao<FileMeta> {
 		for (int i = 0; i < files.length; i++) {
 			files[i] = findLast(path.setLast(fileIds[i]), null, null);
 		}
+
+		sortByCreateStamp(files);
 
 		return files;
 	}

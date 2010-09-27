@@ -444,12 +444,12 @@ public class AdminController extends MultiActionController implements WebSymbols
 			reportScore = computeReportAuto(ctx, reportMeta, reportBaseScore);
 			computeReportDefault(ctx, reportScore);
 		} else {
-			final Entry<Score> score = scoreDao.findScoreByStamp(ctx, scoreStamp);
+			final Entry<Score> score = scoreDao.findScoreByStamp(ctx, scoreStamp, "FIXME:slotId", "FIXME:fileId");
 			reportScore = score.getMeta();
 			codeScores.put(score.getMeta().getCodeStamp(), score.getMeta());
 		}
 
-		model.put("scores", scoreDao.findAllScores(ctx));
+		model.put("scores", scoreDao.findAllScores(ctx, "FIXME:slotId", "FIXME:fileId"));
 		model.put("score", reportScore);
 		model.put("elw_ctx", ctx);
 
@@ -534,7 +534,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 				score.getPows().put(cri.getId(), pow);
 			}
 
-			final Stamp scoreStamp = scoreDao.createScore(ctx, score);
+			final Stamp scoreStamp = scoreDao.createScore(ctx, "FIXME:slotId", "FIXME:fileId", score);
 			reportMeta.setScoreStamp(scoreStamp);
 			reportDao.updateMeta(ctx, reportMeta);
 			Message.addInfo(req, "Report approved");

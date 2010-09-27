@@ -1,10 +1,14 @@
 package elw.vo;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+
 public class FileMeta extends IdNameStamped {
 	protected String contentType;
 	protected String nameNorm;
+	protected String comment;
 	protected String sourceAddress;
 	protected String author;
+	protected Score score;
 
 	public FileMeta() {
 	}
@@ -47,5 +51,23 @@ public class FileMeta extends IdNameStamped {
 
 	public void setAuthor(String author) {
 		this.author = author;
+	}
+
+	public String getComment() {
+		return comment;
+	}
+
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
+
+	@JsonIgnore
+	public Score getScore() {
+		return score;
+	}
+
+	@JsonIgnore
+	public void setScore(Score score) {
+		this.score = score;
 	}
 }

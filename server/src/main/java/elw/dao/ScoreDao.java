@@ -20,26 +20,45 @@ public class ScoreDao extends Dao<Score> {
 	}
 
 	@Override
-	public Path pathFromMeta(Score stamped) {
-		return new Path(stamped.getPath());
+	public Path pathFromMeta(Score score) {
+		return new Path(score.getPath());
 	}
 
-	public Stamp createScore(Ctx ctx, Score score) throws IOException {
-		final Path path = CodeDao.toPath(ctx);
+	public Stamp createScore(Ctx ctx, final String slotId, final String fileId, Score score) throws IOException {
+		final Path path = toPath(ctx, slotId, fileId);
 		score.setPath(path.getPath());
-
 		return create(path, score, null, null);
 	}
 
-	public Map<Stamp, Entry<Score>> findAllScores(Ctx ctx) {
-		return findAll(CodeDao.toPath(ctx), false, false);
+	public Map<Stamp, Entry<Score>> findAllScores(Ctx ctx, final String slotId, final String fileId) {
+		return findAll(toPath(ctx, slotId, fileId), false, false);
 	}
 
-	public Entry<Score> findScoreByStamp(Ctx ctx, Stamp stamp) {
-		return findByStamp(CodeDao.toPath(ctx), stamp, false, false);
+	public Entry<Score> findScoreByStamp(Ctx ctx, Stamp stamp, final String slotId, final String fileId) {
+		return findByStamp(toPath(ctx, slotId, fileId), stamp, false, false);
 	}
 
-	public Entry<Score> findLastScore(Ctx ctx) {
-		return findLast(CodeDao.toPath(ctx), false, false);
+	public Entry<Score> findLastScore(Ctx ctx, final String slotId, final String fileId) {
+		return findLast(toPath(ctx, slotId, fileId), false, false);
+	}
+
+	protected Path toPath(Ctx ctx, final String slotId, final String fileId) {
+		if (ctx == null || !ctx.resolved(Ctx.STATE_EGSCIV)) {
+			throw new IllegalStateException("context not fully set up: " + String.valueOf(ctx));
+		}
+
+		final Path path = new Path(new String[]{
+				ctx.getGroup().getId(),
+				ctx.getStudent().getId(),
+				ctx.getCourse().getId(),
+				String.valueOf(ctx.getIndex()) + "-" +
+				ctx.getAssTypeId() + "-" +
+				ctx.getAss().getId() + "-" +
+				ctx.getVer().getId(),
+				slotId,
+				fileId
+		});
+
+		return path;
 	}
 }

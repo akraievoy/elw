@@ -20,6 +20,25 @@ public class Score implements Stamped {
 	protected Stamp codeStamp;
 	protected Stamp reportStamp;
 
+	protected boolean approved;
+	protected String comment;
+
+	public boolean isApproved() {
+		return approved;
+	}
+
+	public void setApproved(boolean approved) {
+		this.approved = approved;
+	}
+
+	public String getComment() {
+		return comment;
+	}
+
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
+
 	public Stamp getCreateStamp() {
 		return createStamp;
 	}
