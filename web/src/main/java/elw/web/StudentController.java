@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -35,19 +36,25 @@ public class StudentController extends MultiActionController implements WebSymbo
 	protected final CodeDao codeDao;
 	protected final ReportDao reportDao;
 	protected final ScoreDao scoreDao;
+	protected final FileDao fileDao;
 
 	protected final ObjectMapper mapper = new ObjectMapper();
 	protected final long cacheBustingToken = System.currentTimeMillis();
 
 	private static final int UPLOAD_LIMIT = 2 * 1024 * 1024;
 
-	public StudentController(CourseDao courseDao, GroupDao groupDao, EnrollDao enrollDao, final CodeDao codeDao, ReportDao reportDao, ScoreDao scoreDao) {
+	public StudentController(
+			CourseDao courseDao, GroupDao groupDao, EnrollDao enrollDao,
+			CodeDao codeDao, ReportDao reportDao, ScoreDao scoreDao,
+			FileDao fileDao
+	) {
 		this.courseDao = courseDao;
 		this.groupDao = groupDao;
 		this.enrollDao = enrollDao;
 		this.codeDao = codeDao;
 		this.reportDao = reportDao;
 		this.scoreDao = scoreDao;
+		this.fileDao = fileDao;
 	}
 
 	protected HashMap<String, Object> auth(final HttpServletRequest req, final HttpServletResponse resp, final String pathToRoot) throws IOException {
@@ -417,7 +424,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 			Message.addWarn(req, "no stamp defined");
 			resp.sendRedirect("uploadPage?" + WebSymbols.R_CTX + "=" + ctx.toString());
 			return null;
-		}	
+		}
 
 		final Stamp stamp = Stamp.parse(stampStr, null);
 		if (stamp == null) {
@@ -452,8 +459,8 @@ public class StudentController extends MultiActionController implements WebSymbo
 		return null;
 	}
 
-	@RequestMapping(value = "codeDl/*.*", method = RequestMethod.GET)
-	public ModelAndView do_codeDl(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+	@RequestMapping(value = "dl/*.*", method = RequestMethod.GET)
+	public ModelAndView do_dl(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
 		final HashMap<String, Object> model = auth(req, resp, "../");
 		if (model == null) {
 			return null;
@@ -465,33 +472,74 @@ public class StudentController extends MultiActionController implements WebSymbo
 			return null;
 		}
 
-		final String stampStr = req.getParameter("stamp");
-		if (stampStr == null) {
-			Message.addWarn(req, "no stamp defined");
-			resp.sendRedirect("uploadPage?" + WebSymbols.R_CTX + "=" + ctx.toString());
+		final String scope = req.getParameter("s");
+		if (scope == null || scope.trim().length() == 0) {
+			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "no scope (s) defined");
 			return null;
 		}
 
-		final Stamp stamp = Stamp.parse(stampStr, null);
-		final Entry<CodeMeta> entry = codeDao.findMetaByStamp(ctx, stamp);
+		final String slotId = req.getParameter("sId");
+		if (!FileDao.SCOPE_COURSE.equals(scope) && (slotId == null || slotId.trim().length() == 0)) {
+			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "no slotId (sId) defined");
+			return null;
+		}
+
+		final String fileId = req.getParameter("fId");
+		if (fileId == null || fileId.trim().length() == 0) {
+			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "no fileId (fId) defined");
+			return null;
+		}
+
+		final Entry<FileMeta> entry = fileDao.findFileFor(scope, ctx, slotId, fileId);
 		if (entry == null) {
-			Message.addWarn(req, "no code for stamp " + stamp);
-			resp.sendRedirect("uploadPage?" + WebSymbols.R_CTX + "=" + ctx.toString());
+			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "no file found");
 			return null;
 		}
 
-		resp.setCharacterEncoding("UTF-8");
-		resp.setContentType("text");
-		resp.setHeader("Content-Disposition", "attachment;");
+		if (slotId != null && !ctx.getVer().checkRead(ctx.getAssType(), ctx.getAss(), slotId)) {
+			resp.sendError(HttpServletResponse.SC_FORBIDDEN, "not readable yet");
+			return null;
+		}
 
-		final String[] code;
+		boolean binary;
+		if (slotId != null) {
+			binary = ctx.getAssType().findSlotById(slotId).isBinary();
+		} else {
+			binary = entry.getFileBinary() != null;
+		}
+
 		try {
-			code = entry.dumpText();
+			if (binary) {
+				resp.setContentType(entry.getMeta().getContentType());
+				resp.setContentLength((int) (binary ? entry.getFileBinary() : entry.getFileText()).length());
+				resp.setHeader("Content-Disposition", "attachment;");
+
+				final BufferedInputStream bis = entry.openBinaryStream();
+				final ServletOutputStream os = resp.getOutputStream();
+
+				final byte[] buf = new byte[32768];
+				int numRead;
+				while ((numRead = bis.read(buf, 0, buf.length)) > 0) {
+					os.write(buf, 0, numRead);
+				}
+			} else {
+				resp.setCharacterEncoding("UTF-8");
+				resp.setContentType(entry.getMeta().getContentType()+ "; charset=UTF-8");
+				resp.setContentLength((int) (binary ? entry.getFileBinary() : entry.getFileText()).length());
+				resp.setHeader("Content-Disposition", "attachment;");
+
+				//	copy the data with the original line breaks (we've set the content-length header)
+				final BufferedReader reader = entry.openTextReader();
+				final PrintWriter writer = resp.getWriter();
+
+				final char[] buf = new char[16384];
+				int numRead;
+				while ((numRead = reader.read(buf, 0, buf.length)) > 0) {
+					writer.write(buf, 0, numRead);
+				}
+			}
 		} finally {
 			entry.closeStreams();
-		}
-		for (String aCode : code) {
-			resp.getWriter().println(aCode);
 		}
 
 		return null;

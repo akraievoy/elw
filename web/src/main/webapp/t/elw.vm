@@ -130,7 +130,13 @@
 	#foreach($file in $p_files)
 		<tr class="index-${p_path.index}--slot-${p_slot.id}--files" style="display:none;">
 			<td style="padding-left: 4em; padding-right: 1em; border-right: #999999 dashed 1px;">
-				<span style="font-weight: bold;" title="${file.meta.id} @ $p_scope">${file.meta.name}</span>
+				#if($p_path.ver.checkRead($p_path.assType, $p_path.ass, $p_slot.id))
+					<a style="font-weight: bold;" title="${file.meta.id} @ $p_scope"
+						 href="dl/${file.meta.name}?elw_ctx=$p_path&s=$p_scope&sId=$p_slot.id&fId=$file.meta.id"
+									>${file.meta.name}</a>
+				#else
+					<span style="font-weight: bold;" title="${file.meta.id} @ $p_scope">${file.meta.name}</span>
+				#end
 			</td>
 			<td style="padding: 0 0.25em; text-align: center;">
 				#if(!$p_slot.binary && $p_path.ver.checkRead($p_path.assType, $p_path.ass, $p_slot.id))

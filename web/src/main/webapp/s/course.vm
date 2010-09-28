@@ -132,10 +132,10 @@
 							</div>
 						</td>
 					</tr>
-						#elw_file_row($elw_ctx_ver, $slot, $elw_ctx_ver.assType.getFiles($slot.id), "type")
-						#elw_file_row($elw_ctx_ver, $slot, $elw_ctx_ver.ass.getFiles($slot.id), "ass")
-						#elw_file_row($elw_ctx_ver, $slot, $elw_ctx_ver.ver.getFiles($slot.id), "ver")
-						#elw_file_row($elw_ctx_ver, $slot, $elw_ctx_ver.ver.getStudFiles($slot.id), "stud")
+						#elw_file_row($elw_ctx_ver, $slot, $elw_ctx_ver.assType.getFiles($slot.id), "t")
+						#elw_file_row($elw_ctx_ver, $slot, $elw_ctx_ver.ass.getFiles($slot.id), "a")
+						#elw_file_row($elw_ctx_ver, $slot, $elw_ctx_ver.ver.getFiles($slot.id), "v")
+						#elw_file_row($elw_ctx_ver, $slot, $elw_ctx_ver.ver.getStudFiles($slot.id), "s")
 					#end
 				#end
 			#end

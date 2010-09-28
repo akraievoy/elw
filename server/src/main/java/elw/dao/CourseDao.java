@@ -34,7 +34,7 @@ public class CourseDao extends Dao<Course> {
 		final Entry<Course> entry = findLast(new Path(id), null, null);
 
 		final Course course = entry.getMeta();
-		course.setFiles(fileDao.findFilesForCourse(Ctx.forCourse(course)));
+		course.setFiles(fileDao.findFilesFor(FileDao.SCOPE_COURSE, Ctx.forCourse(course), null));
 
 		final AssignmentType[] assTypes = course.getAssTypes();
 		for (final AssignmentType assType : assTypes) {
@@ -45,7 +45,7 @@ public class CourseDao extends Dao<Course> {
 			for (FileSlot slot : slots) {
 				assType.setFiles(
 						slot.getId(),
-						fileDao.findFilesForAssType(Ctx.forAssType(course, assType), slot.getId())
+						fileDao.findFilesFor(FileDao.SCOPE_ASS_TYPE, Ctx.forAssType(course, assType), slot.getId())
 				);
 			}
 		}

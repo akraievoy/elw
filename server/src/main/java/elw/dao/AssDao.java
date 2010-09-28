@@ -61,12 +61,12 @@ public class AssDao extends Dao<Assignment> {
 		for (FileSlot slot : slots) {
 			ass.setFiles(
 					slot.getId(),
-					fileDao.findFilesForAss(ctxAss, slot.getId())
+					fileDao.findFilesFor(FileDao.SCOPE_ASS, ctxAss, slot.getId())
 			);
 			for (Version ver : vers) {
 				ver.setFiles(
 						slot.getId(),
-						fileDao.findFilesForVersion(ctxAss.extendVer(ver), slot.getId())
+						fileDao.findFilesFor(FileDao.SCOPE_VER, ctxAss.extendVer(ver), slot.getId())
 				);
 			}
 		}
