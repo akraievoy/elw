@@ -6,7 +6,7 @@
 	<title>Course ${elw_ctx.course.name} : ELW Admin</title>
 	<link href="../css/elw.css" type="text/css" rel="stylesheet"/>
 	<link href="../css/jquery.jgrowl.css" type="text/css" rel="stylesheet"/>
-	<script type="text/javascript" src="../js/jquery.js"></script>
+	<script type="text/javascript" src="../js/jquery-1.4.2.js"></script>
 	<script type="text/javascript" src="../js/jquery.sha1.js"></script>
 	<script type="text/javascript" src="../js/jquery.jgrowl.js"></script>
 	<script type="text/javascript" src="../js/elw.js"></script>

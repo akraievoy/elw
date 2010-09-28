@@ -3,6 +3,7 @@ package elw.web;
 import elw.dao.*;
 import elw.miniweb.Message;
 import elw.vo.*;
+import org.akraievoy.gear.G4Str;
 import org.akraievoy.gear.G4mat;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
@@ -24,6 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.util.*;
+import java.util.regex.Pattern;
 
 @Controller
 @RequestMapping("/s/**/*")
@@ -41,7 +43,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 	protected final ObjectMapper mapper = new ObjectMapper();
 	protected final long cacheBustingToken = System.currentTimeMillis();
 
-	private static final int UPLOAD_LIMIT = 2 * 1024 * 1024;
+	protected final DiskFileItemFactory fileItemFactory;
 
 	public StudentController(
 			CourseDao courseDao, GroupDao groupDao, EnrollDao enrollDao,
@@ -55,11 +57,15 @@ public class StudentController extends MultiActionController implements WebSymbo
 		this.reportDao = reportDao;
 		this.scoreDao = scoreDao;
 		this.fileDao = fileDao;
+
+		fileItemFactory = new DiskFileItemFactory();
+		fileItemFactory.setRepository(new java.io.File(System.getProperty("java.io.tmpdir")));
+		fileItemFactory.setSizeThreshold(2 * 1024 * 1024);
 	}
 
 	protected HashMap<String, Object> auth(final HttpServletRequest req, final HttpServletResponse resp, final String pathToRoot) throws IOException {
 		final HttpSession session = req.getSession(true);
-		Ctx ctx = Ctx.fromString(req.getParameter(	R_CTX));
+		Ctx ctx = Ctx.fromString(req.getParameter(R_CTX));
 
 		//	admin impersonation
 		final Boolean admin = (Boolean) session.getAttribute(S_ADMIN);
@@ -224,8 +230,11 @@ public class StudentController extends MultiActionController implements WebSymbo
 		final HashMap<String, CodeMeta> codeMetas = new HashMap<String, CodeMeta>();
 		final HashMap<String, ReportMeta> reportMetas = new HashMap<String, ReportMeta>();
 		final HashMap<String, Score> scores = new HashMap<String, Score>();
+		final TreeMap<String, Map<String, List<Entry<FileMeta>>>> fileMetas =
+				new TreeMap<String, Map<String, List<Entry<FileMeta>>>>();
 		final int[] grossScore = new int[1];
-		storeMetas(ctx, codeDao, reportDao, scoreDao, codeMetas, reportMetas, scores, grossScore);
+		storeMetas(ctx, codeDao, reportDao, scoreDao, fileDao, fileMetas, codeMetas, reportMetas, scores, grossScore);
+		model.put("fileMetas", fileMetas);
 		model.put("codeMetas", codeMetas);
 		model.put("reportMetas", reportMetas);
 		model.put("scores", scores);
@@ -235,9 +244,13 @@ public class StudentController extends MultiActionController implements WebSymbo
 	}
 
 	public static void storeMetas(
-			Ctx ctx,
-			CodeDao codeDao, ReportDao reportDao, ScoreDao scoreDao,
-			Map<String, CodeMeta> codeMetas, Map<String, ReportMeta> reportMetas, Map<String, Score> scores, int[] grossScore) {
+			Ctx ctx, CodeDao codeDao, ReportDao reportDao, ScoreDao scoreDao, FileDao fileDao,
+			Map<String, Map<String, List<Entry<FileMeta>>>> fileMetas,
+			Map<String, CodeMeta> codeMetas,
+			Map<String, ReportMeta> reportMetas,
+			Map<String, Score> scores,
+			int[] grossScore
+	) {
 		double grossScoreFuzzy = 0;
 
 		for (int index = 0; index < ctx.getEnr().getIndex().size(); index++) {
@@ -252,6 +265,11 @@ public class StudentController extends MultiActionController implements WebSymbo
 
 				final Ctx ctxAss = ctxIdx.extendTAV(assType, ass, ver);
 				final String assPath = ctxAss.toString();
+
+				if (fileMetas != null) {
+					final TreeMap<String, List<Entry<FileMeta>>> slotIdToFiles = loadFilesStud(fileDao, ctxAss);
+					fileMetas.put(ctxAss.toString(), slotIdToFiles);
+				}
 
 				if (codeMetas != null) {
 					final Entry<CodeMeta> last = codeDao.findLast(ctxAss);
@@ -294,8 +312,19 @@ public class StudentController extends MultiActionController implements WebSymbo
 		grossScore[0] = (int) Math.floor(grossScoreFuzzy + 0.1);
 	}
 
-	@RequestMapping(value = "uploadReport", method = RequestMethod.POST)
-	public ModelAndView do_uploadReport(final HttpServletRequest req, final HttpServletResponse resp) throws IOException, FileUploadException {
+	private static TreeMap<String, List<Entry<FileMeta>>> loadFilesStud(FileDao fileDao, Ctx ctxAss) {
+		final TreeMap<String, List<Entry<FileMeta>>> slotIdToFiles =
+				new TreeMap<String, List<Entry<FileMeta>>>();
+		for (FileSlot slot : ctxAss.getAssType().getFileSlots()) {
+			final Entry<FileMeta>[] filesStud =
+					fileDao.findFilesFor(FileDao.SCOPE_STUD, ctxAss, slot.getId());
+			slotIdToFiles.put(slot.getId(), Arrays.asList(filesStud));
+		}
+		return slotIdToFiles;
+	}
+
+	@RequestMapping(value = "ul", method = RequestMethod.POST)
+	public ModelAndView do_ul(final HttpServletRequest req, final HttpServletResponse resp) throws IOException, FileUploadException {
 		final HashMap<String, Object> model = auth(req, resp, "");
 		if (model == null) {
 			return null;
@@ -307,31 +336,46 @@ public class StudentController extends MultiActionController implements WebSymbo
 			return null;
 		}
 
-		final String refreshUri = "uploadPage?" + WebSymbols.R_CTX + "=" + ctx.toString();
-		if (scoreDao.findLastScore(ctx, "FIXME:slotId", "FIXME:fileId") != null) {
-			Message.addWarn(req, "report already approved, upload NOT allowed");
+		final String refreshUri = "course?" + WebSymbols.R_CTX + "=" + Ctx.forEnr(ctx.getEnr()).toString();
+		final String slotId = req.getParameter("sId");
+		if (slotId == null || slotId.trim().length() == 0) {
+			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "no slotId (sId) defined");
+			return null;
+		}
+
+		final FileSlot slot = ctx.getAssType().findSlotById(slotId);
+		if (slot == null) {
+			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "slot '" + slotId + "' not found");
+			return null;
+		}
+
+		if (req.getContentLength() == -1) {
+			Message.addWarn(req, "upload size not reported");
 			resp.sendRedirect(refreshUri);
 			return null;
 		}
 
-		if (req.getContentLength() > UPLOAD_LIMIT) {
-			Message.addWarn(req, "apparently you're trying to upload more than " + G4mat.formatMem(UPLOAD_LIMIT));
+		if (req.getContentLength() > slot.getLengthLimit()) {
+			Message.addWarn(req, "upload exceeds " + G4mat.formatMem(slot.getLengthLimit()));
 			resp.sendRedirect(refreshUri);
 			return null;
 		}
 
-		final DiskFileItemFactory fif = new DiskFileItemFactory();
-		fif.setRepository(new java.io.File(System.getProperty("java.io.tmpdir")));
-		fif.setSizeThreshold(2 * UPLOAD_LIMIT);
+		if (!ctx.getVer().checkWrite(ctx.getAssType(), ctx.getAss(), slotId, loadFilesStud(fileDao, ctx))) {
+			Message.addWarn(req, "not writable yet");
+			resp.sendRedirect(refreshUri);
+			return null;
+		}
 
-		final ServletFileUpload sfu = new ServletFileUpload(fif);
-
+		final boolean binary = slot.isBinary();
+		final ServletFileUpload sfu = new ServletFileUpload(fileItemFactory);
 		final FileItemIterator fii = sfu.getItemIterator(req);
 		int fileCount = 0;
 		while (fii.hasNext()) {
 			final FileItemStream item = fii.next();
 			if (item.isFormField()) {
-					continue;
+				//	TODO store the active expand triggers...
+				continue;
 			}
 
 			if (fileCount > 0) {
@@ -341,21 +385,33 @@ public class StudentController extends MultiActionController implements WebSymbo
 			}
 
 			final String fileName = item.getName();
-			if (!fileName.endsWith(".rtf")) {
-				Message.addWarn(req, "is that an .rtf file or what?");
+			if (!Pattern.compile(slot.getNameRegex()).matcher(fileName).matches()) {
+				Message.addWarn(req, "check the file name: regex check failed");
 				resp.sendRedirect(refreshUri);
 				return null;
 			}
 
 			final String contentType = item.getContentType();
-			if (!"application/rtf".equalsIgnoreCase(contentType) && !"application/msword".equalsIgnoreCase(contentType)) {
-				Message.addWarn(req, "contentType is '" + contentType + "', which is not what is expected for an .rtf file");
+			if (G4Str.indexOf(contentType, slot.getContentTypes()) < 0) {
+				Message.addWarn(req, "contentType '" + contentType + "': not allowed");
 				resp.sendRedirect(refreshUri);
 				return null;
 			}
 
-			final InputStream itemIs = item.openStream();
-			reportDao.createReport(ctx, new BufferedInputStream(itemIs), resolveRemoteAddress(req));
+			fileDao.createFileFor(
+					FileDao.SCOPE_STUD,
+					ctx,
+					slot.getId(),
+					new FileMeta(
+							fileName,
+							fileName,
+							contentType,
+							ctx.getStudent().getName(),
+							resolveRemoteAddress(req)
+					), 
+					binary ? new BufferedInputStream(item.openStream()) : null,
+					binary ? null : new BufferedReader(new InputStreamReader(item.openStream(), "UTF-8"))
+			);
 			fileCount++;
 		}
 
@@ -365,95 +421,6 @@ public class StudentController extends MultiActionController implements WebSymbo
 		} else {
 			Message.addWarn(req, "Something went terribly wrong");
 			resp.sendRedirect(refreshUri);
-		}
-
-		return null;
-	}
-
-	@RequestMapping(value = "uploadPage", method = RequestMethod.GET)
-	public ModelAndView do_uploadPage(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		final HashMap<String, Object> model = auth(req, resp, "");
-		if (model == null) {
-			return null;
-		}
-
-		final Ctx ctx = (Ctx) model.get(R_CTX);
-		if (!ctx.resolved(Ctx.STATE_EGSCIV)) {
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "context path problem, please check the logs");
-			return null;
-		}
-
-		model.put("uploadLimit", G4mat.formatMem(UPLOAD_LIMIT));
-
-		final Map<Stamp, Entry<ReportMeta>> reports = reportDao.findAll(ctx);
-		final Map<Stamp, Entry<CodeMeta>> codes = codeDao.findAllMetas(ctx);
-		final Map<Stamp, Score> codeScores = new TreeMap<Stamp, Score>();
-		AdminController.computeCodeScores(ctx, codes, codeScores, null);
-
-		final Entry<Score> lastScore = scoreDao.findLastScore(ctx, "FIXME:slotId", "FIXME:fileId");
-		if (lastScore != null) {
-			model.put("stamp", lastScore.getMeta().getReportStamp());
-			model.put("codeStamp", lastScore.getMeta().getCodeStamp());
-			codeScores.put(lastScore.getMeta().getCodeStamp(), lastScore.getMeta());
-		}
-
-		model.put("reports", reports);
-		model.put("codes", codes);
-		model.put("codeScores", codeScores);
-		model.put("scores", scoreDao.findAllScores(ctx, "FIXME:slotId", "FIXME:fileId"));
-		model.put("elw_ctx", ctx);
-
-		return new ModelAndView("s/uploadPage", model);
-	}
-
-	@RequestMapping(value = "reportDl/*.*", method = RequestMethod.GET)
-	public ModelAndView do_reportDl(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		final HashMap<String, Object> model = auth(req, resp, "../");
-		if (model == null) {
-			return null;
-		}
-
-		final Ctx ctx = (Ctx) model.get(R_CTX);
-		if (!ctx.resolved(Ctx.STATE_EGSCIV)) {
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "context path problem, please check the logs");
-			return null;
-		}
-
-		final String stampStr = req.getParameter("stamp");
-		if (stampStr == null) {
-			Message.addWarn(req, "no stamp defined");
-			resp.sendRedirect("uploadPage?" + WebSymbols.R_CTX + "=" + ctx.toString());
-			return null;
-		}
-
-		final Stamp stamp = Stamp.parse(stampStr, null);
-		if (stamp == null) {
-			Message.addWarn(req, "stamp parse error");
-			resp.sendRedirect("uploadPage?" + WebSymbols.R_CTX + "=" + ctx.toString());
-			return null;
-		}
-
-		Entry<ReportMeta> report = null;
-		try {
-			report = reportDao.findByStamp(ctx, stamp);
-			if (report == null) {
-				Message.addWarn(req, "no report for stamp " + stamp);
-				resp.sendRedirect("uploadPage?" + WebSymbols.R_CTX + "=" + ctx.toString());
-				return null;
-			}
-
-			resp.setCharacterEncoding("UTF-8");
-			resp.setContentType("application/rtf");
-			resp.setHeader("Content-Disposition", "attachment;");
-
-			final BufferedInputStream in = report.openBinaryStream();
-			final byte[] buf = new byte[32768];
-			int bytesRead;
-			while ((bytesRead = in.read(buf)) >= 0) {
-				resp.getOutputStream().write(buf, 0, bytesRead);
-			}
-		} finally {
-			report.closeStreams();
 		}
 
 		return null;
@@ -496,7 +463,8 @@ public class StudentController extends MultiActionController implements WebSymbo
 			return null;
 		}
 
-		if (slotId != null && !ctx.getVer().checkRead(ctx.getAssType(), ctx.getAss(), slotId)) {
+		final TreeMap<String, List<Entry<FileMeta>>> filesStud = loadFilesStud(fileDao, ctx);
+		if (slotId != null && !ctx.getVer().checkRead(ctx.getAssType(), ctx.getAss(), slotId, filesStud)) {
 			resp.sendError(HttpServletResponse.SC_FORBIDDEN, "not readable yet");
 			return null;
 		}

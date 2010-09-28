@@ -10,7 +10,6 @@ public class Version extends IdName {
 	protected final ArrayList<Test> tests = new ArrayList<Test>();
 
 	protected Map<String, List<Entry<FileMeta>>> files = new TreeMap<String, List<Entry<FileMeta>>>();
-	protected Map<String, List<Entry<FileMeta>>> studFiles = new TreeMap<String, List<Entry<FileMeta>>>();
 
 	public Test[] getTests() {
 		return tests.toArray(new Test[tests.size()]);
@@ -59,42 +58,26 @@ public class Version extends IdName {
 		filesForSlot.addAll(Arrays.asList(files));
 	}
 
-	@SuppressWarnings({"unchecked"})
-	@JsonIgnore
-	public Entry<FileMeta>[] getStudFiles(final String slotId) {
-		final List<Entry<FileMeta>> filesForSlot = studFiles.get(slotId);
-		if (filesForSlot == null) {
-			return new Entry[0];
-		}
-		return filesForSlot.toArray(new Entry[filesForSlot.size()]);
-	}
-
-	@JsonIgnore
-	public void setStudFiles(final String slotId, Entry<FileMeta>[] studFiles) {
-		final List<Entry<FileMeta>> filesForSlot = this.files.get(slotId);
-		if (filesForSlot == null) {
-			this.studFiles.put(slotId, new ArrayList<Entry<FileMeta>>(Arrays.asList(studFiles)));
-			return;
-		}
-
-		filesForSlot.clear();
-		filesForSlot.addAll(Arrays.asList(studFiles));
-	}
-
-	public int countFiles(final AssignmentType assType, final Assignment ass, final String slotId) {
+	public int countFiles(
+			final AssignmentType assType, final Assignment ass, final String slotId,
+			final Map<String, List<Entry<FileMeta>>> filesStud
+	) {
 		return
 				assType.getFiles(slotId).length +
 				ass.getFiles(slotId).length +
-				getStudFiles(slotId).length +
-				getFiles(slotId).length;
+				getFiles(slotId).length + 
+				filesStud.get(slotId).size();
 	}
 
-	public boolean checkRead(final AssignmentType assType, final Assignment ass, final String slotId) {
+	public boolean checkRead(
+			final AssignmentType assType, final Assignment ass, final String slotId,
+			final Map<String, List<Entry<FileMeta>>> filesStud
+	) {
 		final FileSlot fileSlot = assType.findSlotById(slotId);
 
 		final String[] readApprovals = fileSlot.getReadApprovals();
 		for (String slotIdRA : readApprovals) {
-			if (!isApprovedAny(slotIdRA)) {
+			if (!isApprovedAny(slotIdRA, filesStud)) {
 				return false;
 			}
 		}
@@ -102,8 +85,16 @@ public class Version extends IdName {
 		return true;
 	}
 
-	public boolean isApprovedAny(String slotId) {
-		final Entry<FileMeta>[] files = getStudFiles(slotId);
+	public boolean isApprovedAny(
+			final String slotId,
+			final Map<String, List<Entry<FileMeta>>> filesStud
+	) {
+		final List<Entry<FileMeta>> files = filesStud.get(slotId);
+
+		if (files == null || files.isEmpty()) {
+			return false;
+		}
+
 		boolean approved = false;
 		for (Entry<FileMeta> f : files) {
 			if (f.getMeta().getScore() != null && f.getMeta().getScore().isApproved()) {
@@ -113,29 +104,38 @@ public class Version extends IdName {
 		return approved;
 	}
 
-	public boolean isDeclinedLast(String slotId) {
-		final Entry<FileMeta>[] files = getStudFiles(slotId);
+	public boolean isDeclinedLast(
+			String slotId,
+			final Map<String, List<Entry<FileMeta>>> filesStud
+	) {
+		final List<Entry<FileMeta>> files = filesStud.get(slotId);
 
-		if (files.length == 0) {
+		if (files == null || files.size() == 0) {
 			return false;
 		}
 
-		final Entry<FileMeta> f = files[files.length - 1];
+		final Entry<FileMeta> f = files.get(files.size() - 1);
 		return f.getMeta().getScore() != null && !f.getMeta().getScore().isApproved();
 	}
 
-	public boolean isPendingLast(String slotId) {
-		final Entry<FileMeta>[] files = getStudFiles(slotId);
+	public boolean isPendingLast(
+			String slotId,
+			final Map<String, List<Entry<FileMeta>>> filesStud
+	) {
+		final List<Entry<FileMeta>> files = filesStud.get(slotId);
 
-		if (files.length == 0) {
+		if (files == null || files.isEmpty()) {
 			return false;
 		}
 
-		final Entry<FileMeta> f = files[files.length - 1];
+		final Entry<FileMeta> f = files.get(files.size() - 1);
 		return f.getMeta().getScore() == null;
 	}
 
-	public boolean checkWrite(final AssignmentType assType, final Assignment ass, final String slotId) {
+	public boolean checkWrite(
+			final AssignmentType assType, final Assignment ass, final String slotId,
+			final Map<String, List<Entry<FileMeta>>> filesStud
+	) {
 		final FileSlot fileSlot = assType.findSlotById(slotId);
 		if (!fileSlot.isWritable()) {
 			return false;
@@ -143,7 +143,7 @@ public class Version extends IdName {
 
 		final String[] writeApprovals = fileSlot.getWriteApprovals();
 		for (String slotIdWA : writeApprovals) {
-			if (!isApprovedAny(slotIdWA)) {
+			if (!isApprovedAny(slotIdWA, filesStud)) {
 				return false;
 			}
 		}

@@ -2,7 +2,8 @@ package elw.vo;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 
-public class FileMeta extends IdNameStamped {
+public class
+		FileMeta extends IdNameStamped {
 	protected String contentType;
 	protected String nameNorm;
 	protected String comment;

@@ -1,3 +1,12 @@
+#macro(elw_imports $p_relPath)
+	<link href="${p_relPath}css/elw.css" type="text/css" rel="stylesheet"/>
+	<link href="${p_relPath}css/jquery.jgrowl.css" type="text/css" rel="stylesheet"/>
+	<script type="text/javascript" src="${p_relPath}js/jquery-1.4.2.js"></script>
+	<script type="text/javascript" src="${p_relPath}js/jquery.sha1.js"></script>
+	<script type="text/javascript" src="${p_relPath}js/jquery.jgrowl.js"></script>
+	<script type="text/javascript" src="${p_relPath}js/elw.js"></script>
+#end
+
 #macro(elw_messages $elw_messages)
 <div id=messages>#foreach($m in $elw_messages)
 	<div class="$m.type">$m.message</div>
@@ -130,7 +139,7 @@
 	#foreach($file in $p_files)
 		<tr class="index-${p_path.index}--slot-${p_slot.id}--files" style="display:none;">
 			<td style="padding-left: 4em; padding-right: 1em; border-right: #999999 dashed 1px;">
-				#if($p_path.ver.checkRead($p_path.assType, $p_path.ass, $p_slot.id))
+				#if($p_path.ver.checkRead($p_path.assType, $p_path.ass, $p_slot.id, $filesStud))
 					<a style="font-weight: bold;" title="${file.meta.id} @ $p_scope"
 						 href="dl/${file.meta.name}?elw_ctx=$p_path&s=$p_scope&sId=$p_slot.id&fId=$file.meta.id"
 									>${file.meta.name}</a>
@@ -139,13 +148,13 @@
 				#end
 			</td>
 			<td style="padding: 0 0.25em; text-align: center;">
-				#if(!$p_slot.binary && $p_path.ver.checkRead($p_path.assType, $p_path.ass, $p_slot.id))
+				#if(!$p_slot.binary && $p_path.ver.checkRead($p_path.assType, $p_path.ass, $p_slot.id, $filesStud))
 					<a class="popupTrigger"
 						 id="index-${p_path.index}--slotinfo-${p_slot.id}--${p_scope}-${file.meta.id}">Content</a>
 				#end
 			</td>
 			<td style="padding: 0 0.25em; text-align: right;">
-				#if(!$p_slot.binary && $p_path.ver.checkRead($p_path.assType, $p_path.ass, $p_slot.id))
+				#if(!$p_slot.binary && $p_path.ver.checkRead($p_path.assType, $p_path.ass, $p_slot.id, $filesStud))
 					<div style="display: none; text-align: left;"
 							 class="popup index-${p_path.index}--slotinfo-${p_slot.id}--${p_scope}-${file.meta.id}">
 						${file.text}

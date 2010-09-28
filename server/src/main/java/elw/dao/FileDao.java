@@ -114,7 +114,7 @@ public class FileDao extends Dao<FileMeta> {
 					ctx.getGroup().getId(),
 					ctx.getStudent().getId(),
 					ctx.getCourse().getId(),
-					String.valueOf(ctx.getIndex()) + "-" + ctx.getAssTypeId() + "-" +
+					String.valueOf(ctx.getIndex()) + "-" + ctx.getAssType().getId() + "-" +
 							ctx.getAss().getId() + "-" + ctx.getVer().getId(),
 					slotId,
 					idForMeta(meta)

@@ -42,7 +42,7 @@ public class AssDao extends Dao<Assignment> {
 		return assignments;
 	}
 
-	public Assignment findAssignment(final Course course, final AssignmentType assType, final String assId) {
+	protected Assignment findAssignment(final Course course, final AssignmentType assType, final String assId) {
 		if (assId == null) {
 			return null;
 		}
@@ -64,9 +64,10 @@ public class AssDao extends Dao<Assignment> {
 					fileDao.findFilesFor(FileDao.SCOPE_ASS, ctxAss, slot.getId())
 			);
 			for (Version ver : vers) {
+				final Ctx ctxVer = ctxAss.extendVer(ver);
 				ver.setFiles(
 						slot.getId(),
-						fileDao.findFilesFor(FileDao.SCOPE_VER, ctxAss.extendVer(ver), slot.getId())
+						fileDao.findFilesFor(FileDao.SCOPE_VER, ctxVer, slot.getId())
 				);
 			}
 		}

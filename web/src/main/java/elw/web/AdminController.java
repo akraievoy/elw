@@ -41,17 +41,19 @@ public class AdminController extends MultiActionController implements WebSymbols
 	protected final CodeDao codeDao;
 	protected final ReportDao reportDao;
 	protected final ScoreDao scoreDao;
+	protected final FileDao fileDao;
 
 	protected final ObjectMapper mapper = new ObjectMapper();
 	protected final long cacheBustingToken = System.currentTimeMillis();
 
-	public AdminController(CourseDao courseDao, EnrollDao enrollDao, GroupDao groupDao, CodeDao codeDao, ReportDao reportDao, ScoreDao scoreDao) {
+	public AdminController(CourseDao courseDao, EnrollDao enrollDao, GroupDao groupDao, CodeDao codeDao, ReportDao reportDao, ScoreDao scoreDao, FileDao fileDao) {
 		this.courseDao = courseDao;
 		this.enrollDao = enrollDao;
 		this.groupDao = groupDao;
 		this.codeDao = codeDao;
 		this.reportDao = reportDao;
 		this.scoreDao = scoreDao;
+		this.fileDao = fileDao;
 	}
 
 	protected HashMap<String, Object> auth(final HttpServletRequest req, final HttpServletResponse resp, final String pathToRoot) throws IOException {
@@ -282,6 +284,9 @@ public class AdminController extends MultiActionController implements WebSymbols
 			return null;
 		}
 
+		//	TODO: check that studentId is not deleted from the context as redundant element
+		final TreeMap<String, Map<String, List<Entry<FileMeta>>>> fileMetas =
+				new TreeMap<String, Map<String, List<Entry<FileMeta>>>>();
 		final HashMap<String, CodeMeta> codeMetas = new HashMap<String, CodeMeta>();
 		final HashMap<String, ReportMeta> reportMetas = new HashMap<String, ReportMeta>();
 		final HashMap<String, Score> scores = new HashMap<String, Score>();
@@ -292,14 +297,15 @@ public class AdminController extends MultiActionController implements WebSymbols
 
 			StudentController.storeMetas(
 					studCtx,
-					codeDao, reportDao, scoreDao,
-					codeMetas, reportMetas, scores,
+					codeDao, reportDao, scoreDao, fileDao,
+					fileMetas, codeMetas, reportMetas, scores,
 					grossScore);
 
 			grossScores.put(studCtx.toString(), grossScore[0]);
 		}
 
 		model.put("elw_ctx", ctx);
+		model.put("fileMetas", fileMetas);
 		model.put("codeMetas", codeMetas);
 		model.put("reportMetas", reportMetas);
 		model.put("scores", scores);

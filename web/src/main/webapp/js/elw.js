@@ -8,12 +8,21 @@ function elw_mouseHovered(elemId) {
 	elw_enterTimes[elemId] = null;
 
 	if (elw_visible[elemId] === undefined || !elw_visible[elemId]) {
+		jQuery("#" + elemId).addClass("expanded");
 		jQuery("." + elemId).slideDown(0);
 		elw_visible[elemId] = true;
 	} else {
 		jQuery("." + elemId).slideUp(0);
-		jQuery("[class^=" + elemId + "]").slideUp(0);
+		jQuery("#" + elemId).removeClass("expanded");
 		elw_visible[elemId] = false;
+		//	process dependent triggers, if any
+		for (var visElemId in elw_visible) {
+			if (visElemId.indexOf(elemId) == 0 && elw_visible[visElemId]) {
+				jQuery("." + visElemId).slideUp(0);
+				jQuery("#" + visElemId).removeClass("expanded");
+				elw_visible[visElemId] = false;
+			}
+		}
 	}
 }
 

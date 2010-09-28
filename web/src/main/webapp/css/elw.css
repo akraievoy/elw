@@ -110,27 +110,32 @@ div.formButtons {
 }
 
 .expandTrigger {
-	background-color: #CCFFCC;
-	border: thin #99CC99 dotted;
+	background-color: #99FF99;
+	border: 1px #66CC66 solid;
 	padding: 0 2px;
 	margin: 0 1px;
 }
 
+.expandTrigger.expanded {
+	background-color: #CCFFCC;
+	border: 1px #99CC99 dotted;
+}
+
 a.expandTrigger:hover {
-	background-color: #99FF99;
-	border: thin #66CC66 solid;
+	background-color: #66CC66;
+	border: 1px #339933 solid;
 }
 
 .popupTrigger {
 	background-color: #CCCCFF;
-	border: thin #9999CC dotted;
+	border: 1px #9999CC dotted;
 	padding: 0 2px;
 	margin: 0 1px;
 }
 
 a.popupTrigger:hover {
 	background-color: #9999FF;
-	border: thin #6666CC solid;
+	border: 1px #6666CC solid;
 }
 
 .popup {

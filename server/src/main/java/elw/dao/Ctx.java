@@ -165,6 +165,13 @@ public class Ctx {
 		return new Ctx().extendCourse(course);
 	}
 
+	public static Ctx forEnr(final Enrollment enr) {
+		if (enr == null) {
+			throw new IllegalArgumentException("please provide the enr for context");
+		}
+		return new Ctx().extendEnr(enr);
+	}
+
 	public static Ctx forAssType(final Course course, final AssignmentType assType) {
 		if (course == null) {
 			throw new IllegalArgumentException("please provide course for context");
