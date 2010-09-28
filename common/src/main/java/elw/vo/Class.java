@@ -27,19 +27,34 @@ public class Class {
 	}
 
 	public boolean isStarted(final DateTime beforeTime) {
-		final DateTime date = getDateExact();
-		final DateTime from = FMT_TIME.parseDateTime(getFromTime());
-		final DateTime fromDate = new DateTime(
-				date.getYear(), date.getMonthOfYear(), date.getDayOfMonth(),
-				from.getHourOfDay(), from.getMinuteOfHour(),
-				0, 0
-		);
-		return fromDate.isBefore(beforeTime);
+		final DateTime fromDateTime = getFromDateTime();
+		return fromDateTime.isBefore(beforeTime);
 	}
 
 	@JsonIgnore
-	public DateTime getDateExact() {
-		return FMT_DATE.parseDateTime(getDate());
+	public DateTime getFromDateTime() {
+		final DateTime fromDate = FMT_DATE.parseDateTime(getDate());
+		final DateTime fromTime = FMT_TIME.parseDateTime(getFromTime());
+		final DateTime dateExact = new DateTime(
+				fromDate.getYear(), fromDate.getMonthOfYear(), fromDate.getDayOfMonth(),
+				fromTime.getHourOfDay(), fromTime.getMinuteOfHour(),
+				0, 0
+		);
+
+		return dateExact;
+	}
+
+	@JsonIgnore
+	public DateTime getToDateTime() {
+		final DateTime fromDate = FMT_DATE.parseDateTime(getDate());
+		final DateTime toTime = FMT_TIME.parseDateTime(getToTime());
+		final DateTime dateExact = new DateTime(
+				fromDate.getYear(), fromDate.getMonthOfYear(), fromDate.getDayOfMonth(),
+				toTime.getHourOfDay(), toTime.getMinuteOfHour(),
+				0, 0
+		);
+
+		return dateExact;
 	}
 
 	@JsonIgnore
@@ -48,26 +63,15 @@ public class Class {
 	}
 
 	public boolean isPassed(final DateTime beforeTime) {
-		final DateTime date = getDateExact();
-		final DateTime to = FMT_TIME.parseDateTime(getToTime());
-		final DateTime toDate = new DateTime(
-				date.getYear(), date.getMonthOfYear(), date.getDayOfMonth(),
-				to.getHourOfDay(), to.getMinuteOfHour(),
-				0, 0
-		);
+		final DateTime toDateTime = getToDateTime();
 
-		return toDate.isBefore(beforeTime);
+		return toDateTime.isBefore(beforeTime);
 	}
 
 	@JsonIgnore
 	public boolean isToday() {
-		final DateTime date = getDateExact();
-		final DateTime dateMidnight = new DateTime(
-				date.getYear(), date.getMonthOfYear(), date.getDayOfMonth(),
-				0, 0,
-				0, 0
-		);
-		return dateMidnight.isBeforeNow() && dateMidnight.plusDays(1).isAfterNow();
+		final DateTime fromDateTime = getFromDateTime();
+		return fromDateTime.isBeforeNow() && fromDateTime.plusDays(1).isAfterNow();
 	}
 
 	public String getDate() {
@@ -76,7 +80,7 @@ public class Class {
 
 	@JsonIgnore
 	public String getNiceDate() {
-		return FMT_DATE_NICE.print(getDateExact());
+		return FMT_DATE_NICE.print(getFromDateTime());
 	}
 
 	@JsonIgnore
@@ -85,7 +89,7 @@ public class Class {
 	}
 
 	public int getDayDiff(final DateTime toDate) {
-		final DateTime date = getDateExact();
+		final DateTime date = getFromDateTime();
 		final DateTime dateMidnight = new DateTime(
 				date.getYear(), date.getMonthOfYear(), date.getDayOfMonth(),
 				0, 0,

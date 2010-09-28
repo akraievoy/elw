@@ -1,5 +1,6 @@
 #* @vtlvariable name="elw_messages" type="elw.miniweb.Message[]" *#
 #* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
+#* @vtlvariable name="format" type="elw.web.FormatTool" *#
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta content="text/html; charset=UTF-8">
@@ -30,14 +31,14 @@
 				#set($started = $elw_ctx.enr.classes.get($elw_ctx_ass.indexEntry.classFrom).started)
 				#set($filesStud = $fileMetas.get("$elw_ctx_ver.toString()"))
 			<tr class="header">
-				<td style="padding-left: 2em; padding-right: 1em; border-right: #999999 dashed 1px;">$elw_ctx_ass.assType.name
-					- $elw_ctx_ass.ass.name</td>
+				<td style="padding-left: 2em; padding-right: 1em; border-right: #999999 dashed 1px;">
+					<span style="font-weight: bold;">$elw_ctx_ass.ass.name</span> $elw_ctx_ass.assType.name</td>
 				<td style="padding: 0 0.25em; text-align: center;">
 					#if($started)
 						<a class="expandTrigger"
-							 id="index-$idx">Opened $elw_ctx.enr.classes.get($elw_ctx_ass.indexEntry.classFrom).niceDate</a>
+							 id="index-$idx">Opened $format.format($elw_ctx.enr.classes.get($elw_ctx_ass.indexEntry.classFrom).fromDateTime.millis)</a>
 					#else
-						Opens $elw_ctx.enr.classes.get($elw_ctx_ass.indexEntry.classFrom).niceDate
+						Opens $format.format($elw_ctx.enr.classes.get($elw_ctx_ass.indexEntry.classFrom).fromDateTime.millis)
 					#end
 				</td>
 				<td style="padding: 0 0.25em; text-align: right;">

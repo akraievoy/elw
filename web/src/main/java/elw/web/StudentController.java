@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
+import org.springframework.web.servlet.support.RequestContextUtils;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -75,10 +76,9 @@ public class StudentController extends MultiActionController implements WebSymbo
 				return null;
 			}
 
-			final HashMap<String, Object> model = new HashMap<String, Object>();
+			final HashMap<String, Object> model = prepareDefaultModel(req);
 
 			model.put(R_CTX, ctx);
-			model.put(S_MESSAGES, Message.drainMessages(req));
 
 			return model;
 		}
@@ -106,10 +106,8 @@ public class StudentController extends MultiActionController implements WebSymbo
 				return null;
 			}
 
-			final HashMap<String, Object> model = new HashMap<String, Object>();
-
+			final HashMap<String, Object> model = prepareDefaultModel(req);
 			model.put(R_CTX, ctx);
-			model.put(S_MESSAGES, Message.drainMessages(req));
 
 			return model;
 		}
@@ -124,13 +122,21 @@ public class StudentController extends MultiActionController implements WebSymbo
 		return null;
 	}
 
+	protected HashMap<String, Object> prepareDefaultModel(HttpServletRequest req) {
+		final HashMap<String, Object> model = new HashMap<String, Object>();
+
+		model.put(S_MESSAGES, Message.drainMessages(req));
+		model.put("format", FormatTool.forLocale(RequestContextUtils.getLocale(req)));
+
+		return model;
+	}
+
 	@RequestMapping(value = "login", method = RequestMethod.GET)
 	public ModelAndView do_login(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		final HashMap<String, Object> model = new HashMap<String, Object>();
+		final HashMap<String, Object> model = prepareDefaultModel(req);
 
 		model.put("groupName", req.getSession(true).getAttribute("groupName"));
 		model.put("studentName", req.getSession(true).getAttribute("studentName"));
-		model.put(S_MESSAGES, Message.drainMessages(req));
 
 		return new ModelAndView("s/login", model);
 	}

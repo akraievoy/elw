@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
+import org.springframework.web.servlet.support.RequestContextUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -77,20 +78,26 @@ public class AdminController extends MultiActionController implements WebSymbols
 		}
 
 		session.removeAttribute("loginTo");	//	LATER extract constant
+		final HashMap<String, Object> model = prepareDefaultModel(req);
+		model.put("auth", req.getSession(true).getAttribute(S_ADMIN));
+
+		return model;
+	}
+
+	protected HashMap<String, Object> prepareDefaultModel(HttpServletRequest req) {
 		final HashMap<String, Object> model = new HashMap<String, Object>();
 
 		model.put(S_MESSAGES, Message.drainMessages(req));
-		model.put("auth", req.getSession(true).getAttribute(S_ADMIN));
+		model.put("format", FormatTool.forLocale(RequestContextUtils.getLocale(req)));
 
 		return model;
 	}
 
 	@RequestMapping(value = "login", method = RequestMethod.GET)
 	public ModelAndView do_login(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		final HashMap<String, Object> model = new HashMap<String, Object>();
+		final HashMap<String, Object> model = prepareDefaultModel(req);
 
 		model.put("nonce", Long.toString(System.currentTimeMillis(), 36));
-		model.put(S_MESSAGES, Message.drainMessages(req));
 
 		return new ModelAndView("a/login", model);
 	}
