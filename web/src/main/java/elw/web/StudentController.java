@@ -2,6 +2,7 @@ package elw.web;
 
 import elw.dao.*;
 import elw.miniweb.Message;
+import elw.miniweb.ViewJackson;
 import elw.vo.*;
 import org.akraievoy.gear.G4Io;
 import org.akraievoy.gear.G4Str;
@@ -443,6 +444,18 @@ public class StudentController extends MultiActionController implements WebSymbo
 		}
 
 		return null;
+	}
+
+	@RequestMapping(value = "updateExpandTriggers", method = RequestMethod.POST)
+	public ModelAndView do_updateExpandTriggers(
+			final HttpServletRequest req, final HttpServletResponse resp
+	) throws IOException {
+		req.getSession().setAttribute(
+				"course.expandTriggers",
+				G4Io.dumpToString(req.getInputStream(), "UTF-8")
+		);
+
+		return new ModelAndView(ViewJackson.success("success"));
 	}
 
 	@RequestMapping(value = "dl/*.*", method = RequestMethod.GET)

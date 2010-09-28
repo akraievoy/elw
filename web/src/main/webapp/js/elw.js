@@ -1,5 +1,6 @@
 var elw_enterTimes = {};
 var elw_visible = {};
+var elw_ajaxStamp = 0;
 
 function elw_expand(elemId) {
 	jQuery("#" + elemId).addClass("expanded");
@@ -28,7 +29,44 @@ function elw_mouseHovered(elemId) {
 			}
 		}
 	}
+
+	elw_ajaxStamp++;
+	setTimeout("elw_ajaxStart(" + elw_ajaxStamp + ")", 10000);
 }
+
+function elw_expandedTriggers() {
+	var visElemIds = [];
+	for (var visElemId in elw_visible) {
+		if (elw_visible[visElemId]) {
+			visElemIds.push(visElemId);
+		}
+	}
+	return visElemIds;
+}
+
+function elw_ajaxStart(myAjaxStamp) {
+	if (elw_ajaxStamp > myAjaxStamp) {
+		return;
+	}
+
+	jQuery.ajax({
+		"type": "POST",
+		"url": "updateExpandTriggers",
+		"data": jQuery.toJSON(elw_expandedTriggers()),
+		"success": function(resp) {
+			if (resp == null || !resp.success) {
+				jQuery.jGrowl("Failed to save view state", {"header":"Warning", "life": 10000});
+			} else {
+				jQuery.jGrowl("View state saved", {"header":"Info", "life": 3000});
+			}
+		},
+		"error": function() {
+			jQuery.jGrowl("Failed to save view state", {"header":"Warning", "life": 10000});
+		},
+		"dataType": 'json'
+	});
+}
+
 
 jQuery(document).ready(function() {
 	jQuery(".expandTrigger").mouseenter(function() {
@@ -46,14 +84,7 @@ jQuery(document).ready(function() {
 		jQuery("[class^=" + this.id + "]").slideUp(0);
 	});
 	jQuery("form[method=POST]").submit(function() {
-		var visElemIds = [];
-		for (var visElemId in elw_visible) {
-			if (elw_visible[visElemId]) {
-				visElemIds.push(visElemId);
-			}
-		}
-
-		alert(jQuery.toJSON(visElemIds));
+		var visElemIds = elw_expandedTriggers();
 		jQuery(this).children("input[type=hidden][name=expandTriggers]").val(jQuery.toJSON(visElemIds));
 	});
 });

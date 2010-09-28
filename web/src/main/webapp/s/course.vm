@@ -136,11 +136,13 @@
 	</table>
 </div>
 </body>
-<script type="text/javascript">
-	jQuery(document).ready(function() {
-		jQuery($expandTriggers).each(function(index){
-			elw_expand(this);
-		});
-	});
-</script>
+	#if($expandTriggers) 
+		<script type="text/javascript">
+			jQuery(document).ready(function() {
+					jQuery($expandTriggers).each(function(index) {
+						elw_expand(this);
+					});
+			});
+		</script>
+	#end
 </html>
