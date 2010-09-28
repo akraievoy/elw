@@ -4,10 +4,10 @@
 <head>
 	<meta content="text/html; charset=UTF-8">
 	<title>$elw_ctx.ver.name - Code : ELW Admin</title>
-	<link href="../css/elw.css" type="text/css" rel="stylesheet"/>
+	#elw_imports("../")
 </head>
 <body>
-<div id="header">
+<div id="elw_header">
 	<div id="nav">
 		<a href="index">Index</a> &gt;
 		<a href="courses">Courses</a> &gt;

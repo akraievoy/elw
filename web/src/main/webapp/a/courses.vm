@@ -3,12 +3,10 @@
 <head>
 	<meta content="text/html; charset=UTF-8">
 	<title>Course List : ELW Admin</title>
-	<link href="../css/elw.css" type="text/css" rel="stylesheet"/>
-	<script type="text/javascript" src="../js/jquery-1.4.2.js"></script>
-	<script type="text/javascript" src="../js/jquery.sha1.js"></script>
+	#elw_imports("../")
 </head>
 <body style="text-align: left;">
-<div id="header">
+<div id="elw_header">
 	<div id="nav"><a href="index">Index</a> &gt; <span style="font-weight: bold">Courses</span></div>
 	#elw_cred_adm($auth)
 	<div id="header_hr"> </div>

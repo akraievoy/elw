@@ -7,12 +7,11 @@
 <head>
 	<meta content="text/html; charset=UTF-8">
 	<title>Login : ELW Admin</title>
-	<link href="../css/elw.css" type="text/css" rel="stylesheet"/>
-	<script type="text/javascript" src="../js/jquery-1.4.2.js"></script>
+	#elw_imports("../")
 	<script type="text/javascript" src="../js/jquery.sha1.js"></script>
 </head>
 <body>
-<div id="header">
+<div id="elw_header">
 	<div id="nav"><span style="font-weight: bold">Login</span></div>
 	#elw_cred_adm($auth)
 	<div id="header_hr"> </div>

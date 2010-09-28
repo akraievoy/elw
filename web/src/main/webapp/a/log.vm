@@ -4,19 +4,17 @@
 <head>
 	<meta content="text/html; charset=UTF-8">
 	<title>Group $elw_ctx.group.name Report Uploads : ELW Admin</title>
-	<link href="../css/elw.css" type="text/css" rel="stylesheet"/>
-	<script type="text/javascript" src="../js/jquery-1.4.2.js"></script>
-	<script type="text/javascript" src="../js/jquery.sha1.js"></script>
+	#elw_imports("../")
 </head>
 <body style="text-align: left;">
-<div id="header">
+<div id="elw_header">
 	<div id="nav"><a href="index">Index</a> &gt; <a href="enrolls">Enrollments</a> &gt; <span style="font-weight: bold">Group $elw_ctx.group.name Report Uploads</span></div>
 	#elw_cred_adm($auth)
 	<div id="header_hr"> </div>
 </div>
 #elw_messages($elw_messages)
 <table cellspacing="0"><tbody>
-<tr class="header">
+<tr class="elw_header_row">
 	<th style="padding-left: 0.25em; padding-right: 0.25em; text-align: center;">Time Stamp</th>
 	<th style="padding-left: 0.25em; padding-right: 0.25em; text-align: center;">Student name</th>
 	<th style="padding-left: 0.25em; padding-right: 0.25em; text-align: center;">Class</th>

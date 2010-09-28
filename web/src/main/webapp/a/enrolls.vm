@@ -4,12 +4,10 @@
 <head>
 	<meta content="text/html; charset=UTF-8">
 	<title>Enrollments List : ELW Admin</title>
-	<link href="../css/elw.css" type="text/css" rel="stylesheet"/>
-	<script type="text/javascript" src="../js/jquery-1.4.2.js"></script>
-	<script type="text/javascript" src="../js/jquery.sha1.js"></script>
+	#elw_imports("../")
 </head>
 <body style="text-align: left;">
-<div id="header">
+<div id="elw_header">
 	<div id="nav"><a href="index">Index</a> &gt; <span style="font-weight: bold">Enrollments</span></div>
 	#elw_cred_adm($auth)
 	<div id="header_hr"> </div>
@@ -17,7 +15,7 @@
 #elw_messages($elw_messages)
 <table cellspacing=0 cellpadding=0><tbody>
 #foreach($enr in $enrolls)
-	<tr class="header">
+	<tr class="elw_header_row">
 		<td style="padding-left: 1em; padding-right: 0.25em;"><a href="enroll?elw_ctx=e--$enr.id" title="id : ${enr.id}">${enr.name}</a></td>
 		<td style="padding-left: 0.25em; padding-right: 0.25em;"><a href="groups#$enr.groupId" title="(id : $enr.groupId)">$groups.get($enr.groupId).name</a></td>
 		<td style="padding-left: 0.25em; padding-right: 0.25em;"><a href="course?elw_ctx=c--$enr.courseId" title="(id : $enr.courseId)">$courses.get($enr.courseId).name</a></td>

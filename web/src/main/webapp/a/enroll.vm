@@ -6,19 +6,17 @@
 <head>
 	<meta content="text/html; charset=UTF-8">
 	<title>Group $elw_ctx.group.name Status : ELW Admin</title>
-	<link href="../css/elw.css" type="text/css" rel="stylesheet"/>
-	<script type="text/javascript" src="../js/jquery-1.4.2.js"></script>
-	<script type="text/javascript" src="../js/jquery.sha1.js"></script>
+	#elw_imports("../")
 </head>
 <body style="text-align: left;">
-<div id="header">
+<div id="elw_header">
 	<div id="nav"><a href="index">Index</a> &gt; <a href="enrolls">Enrollments</a> &gt; <span style="font-weight: bold">Group $elw_ctx.group.name Status</span></div>
 	#elw_cred_adm($auth)
 	<div id="header_hr"> </div>
 </div>
 #elw_messages($elw_messages)
 <table cellspacing="0"><tbody>
-<tr class="header">
+<tr class="elw_header_row">
 	<th style="padding-left: 1em; padding-right: 0.25em;"><a name="${elw_ctx.group.id}" title="id : ${elw_ctx.group.id}">${elw_ctx.group.name}</a></th>
 	<th style="padding: 0 0.25em;">Score</th>
 #foreach($assBundle in $elw_ctx.course.assTypes)#set($bunI = $velocityCount - 1)

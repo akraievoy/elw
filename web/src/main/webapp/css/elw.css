@@ -17,7 +17,7 @@ h3 {
 	font-weight: normal;
 }
 
-#header {
+#elw_header {
 	background-color: #ccccff;
 	border-bottom: #6666ff 1px dashed;
 	text-align: center;
@@ -104,7 +104,7 @@ div.formButtons {
 	color: #333333;
 }
 
-.header {
+.elw_header_row {
 	border-bottom: #CCCCCC dotted 1px;
 	background-color: #EEEEEE;
 }

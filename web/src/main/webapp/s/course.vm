@@ -8,7 +8,7 @@
 	#elw_imports("../")
 </head>
 <body>
-<div id="header">
+<div id="elw_header">
 	<div id="nav"><a href="courses">My Courses</a> &gt; <span style="font-weight: bold">${elw_ctx.course.name}</span>
 	</div>
 	#elw_cred_stud($elw_ctx)
@@ -30,7 +30,7 @@
 				#set($elw_ctx_ver = $elw_ctx_ass.extendVer($elw_ctx_ass.ass.versions.get($verIdx)))
 				#set($started = $elw_ctx.enr.classes.get($elw_ctx_ass.indexEntry.classFrom).started)
 				#set($filesStud = $fileMetas.get("$elw_ctx_ver.toString()"))
-			<tr class="header">
+			<tr class="elw_header_row">
 				<td style="padding-left: 2em; padding-right: 1em; border-right: #999999 dashed 1px;">
 					<span style="font-weight: bold;">$elw_ctx_ass.ass.name</span> $elw_ctx_ass.assType.name</td>
 				<td style="padding: 0 0.25em; text-align: center;">

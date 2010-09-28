@@ -4,10 +4,10 @@
 <head>
 	<meta content="text/html; charset=UTF-8">
 	<title>$elw_ctx.ver.name - Code</title>
-	<link href="../css/elw.css" type="text/css" rel="stylesheet"/>
+	#elw_imports("../")
 </head>
 <body>
-<div id="header">
+<div id="elw_header">
 	<div id="nav">
 		<a href="courses">My Courses</a> &gt;
 		<a href="course?elw_ctx=e--${elw_ctx.enr.id}">${elw_ctx.course.name}</a> &gt;

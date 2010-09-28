@@ -4,15 +4,10 @@
 <head>
 	<meta content="text/html; charset=UTF-8">
 	<title>Course ${elw_ctx.course.name} : ELW Admin</title>
-	<link href="../css/elw.css" type="text/css" rel="stylesheet"/>
-	<link href="../css/jquery.jgrowl.css" type="text/css" rel="stylesheet"/>
-	<script type="text/javascript" src="../js/jquery-1.4.2.js"></script>
-	<script type="text/javascript" src="../js/jquery.sha1.js"></script>
-	<script type="text/javascript" src="../js/jquery.jgrowl.js"></script>
-	<script type="text/javascript" src="../js/elw.js"></script>
+	#elw_imports("../")
 </head>
 <body>
-<div id="header">
+<div id="elw_header">
 	<div id="nav"><a href="index">Index</a> &gt; <a href="courses">Courses</a> &gt; <span style="font-weight: bold">${elw_ctx.course.name}</span></div>
 	#elw_cred_adm($auth)
 	<div id="header_hr"> </div>
@@ -60,7 +55,7 @@
 		</tr>
 		#end
 	 #foreach($ass in $assType.assignments)
-	<tr class="header ${assType.id}" style="display: none;" >
+	<tr class="elw_header_row ${assType.id}" style="display: none;" >
 		<td style="padding-left: 2em; padding-right: 0.25em;">
 			<span title="id=#if($ass.id)$ass.id#{else}null#end">$ass.name</span>
 		</td>

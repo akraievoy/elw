@@ -6,10 +6,11 @@
 <head>
 	<meta content="text/html; charset=UTF-8">
 	<title>Login</title>
-	<link href="../css/elw.css" type="text/css" rel="stylesheet"/>
+	#elw_imports("../")
+	<script type="text/javascript" src="../js/jquery.sha1.js"></script>
 </head>
 <body>
-<div id="header">
+<div id="elw_header">
 	<div id="nav"><span style="font-weight: bold">Login</span></div>
 	#elw_cred_stud($elw_ctx)
 	<div id="header_hr"> </div>

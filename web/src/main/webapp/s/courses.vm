@@ -6,10 +6,10 @@
 <head>
 	<meta content="text/html; charset=UTF-8">
 	<title>My Courses</title>
-	<link href="../css/elw.css" type="text/css" rel="stylesheet"/>
+	#elw_imports("../")
 </head>
 <body>
-<div id="header">
+<div id="elw_header">
 	<div id="nav"><span style="font-weight: bold">My Courses</span></div>
 	#elw_cred_stud($elw_ctx)
 	<div id="header_hr"> </div>
