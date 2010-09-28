@@ -2,7 +2,7 @@
 	<link href="${p_relPath}css/elw.css" type="text/css" rel="stylesheet"/>
 	<link href="${p_relPath}css/jquery.jgrowl.css" type="text/css" rel="stylesheet"/>
 	<script type="text/javascript" src="${p_relPath}js/jquery-1.4.2.js"></script>
-	<script type="text/javascript" src="${p_relPath}js/jquery.sha1.js"></script>
+	<script type="text/javascript" src="${p_relPath}js/jquery.codecs.js"></script>
 	<script type="text/javascript" src="${p_relPath}js/jquery.jgrowl.js"></script>
 	<script type="text/javascript" src="${p_relPath}js/elw.js"></script>
 #end

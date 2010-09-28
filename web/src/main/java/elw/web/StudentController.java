@@ -246,6 +246,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 		model.put("reportMetas", reportMetas);
 		model.put("scores", scores);
 		model.put("grossScore", grossScore[0]);
+		model.put("expandTriggers", req.getSession().getAttribute("course.expandTriggers"));
 
 		return new ModelAndView("s/course", model);
 	}
@@ -385,7 +386,9 @@ public class StudentController extends MultiActionController implements WebSymbo
 				if ("comment".equals(item.getFieldName())) {
 					comment = G4Io.dumpToString(item.openStream());
 				}
-				//	TODO store the active expand triggers...
+				if ("expandTriggers".equals(item.getFieldName())) {
+					req.getSession().setAttribute("course.expandTriggers", G4Io.dumpToString(item.openStream()));
+				}
 				continue;
 			}
 
@@ -566,35 +569,6 @@ public class StudentController extends MultiActionController implements WebSymbo
 		model.put("cacheBustingToken", cacheBustingToken);
 
 		return new ModelAndView("s/launch", model);
-	}
-
-	@RequestMapping(value = "upload", method = RequestMethod.POST)
-	public ModelAndView do_upload(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		final HashMap<String, Object> model = auth(req, resp, null);
-		if (model == null) {
-			return null;
-		}
-
-		final Ctx ctx = (Ctx) model.get(R_CTX);
-		if (!ctx.resolved(Ctx.STATE_EGSCIV)) {
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "context path problem, please check the logs");
-			return null;
-		}
-
-		if (scoreDao.findLastScore(ctx, "FIXME:slotId", "FIXME:fileId") != null) {
-			resp.sendError(HttpServletResponse.SC_CONFLICT, "report for given task already approved");
-			return null;
-		}
-
-		final BufferedReader codeReader = req.getReader();
-		try {
-			codeDao.createCode(ctx, codeReader, resolveRemoteAddress(req));
-		} catch (IOException e) {
-			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
-		}
-
-		resp.setStatus(HttpServletResponse.SC_OK);
-		return null;
 	}
 
 	protected static String resolveRemoteAddress(HttpServletRequest req) {

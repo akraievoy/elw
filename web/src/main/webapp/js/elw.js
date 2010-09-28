@@ -1,6 +1,12 @@
 var elw_enterTimes = {};
 var elw_visible = {};
 
+function elw_expand(elemId) {
+	jQuery("#" + elemId).addClass("expanded");
+	jQuery("." + elemId).slideDown(0);
+	elw_visible[elemId] = true;
+}
+
 function elw_mouseHovered(elemId) {
 	if (elw_enterTimes[elemId] === undefined || elw_enterTimes[elemId] == null) {
 		return;
@@ -8,9 +14,7 @@ function elw_mouseHovered(elemId) {
 	elw_enterTimes[elemId] = null;
 
 	if (elw_visible[elemId] === undefined || !elw_visible[elemId]) {
-		jQuery("#" + elemId).addClass("expanded");
-		jQuery("." + elemId).slideDown(0);
-		elw_visible[elemId] = true;
+		elw_expand(elemId);
 	} else {
 		jQuery("." + elemId).slideUp(0);
 		jQuery("#" + elemId).removeClass("expanded");
@@ -40,5 +44,16 @@ jQuery(document).ready(function() {
 	jQuery(".popupTrigger").mouseleave(function() {
 		jQuery("." + this.id).slideUp(0);
 		jQuery("[class^=" + this.id + "]").slideUp(0);
+	});
+	jQuery("form[method=POST]").submit(function() {
+		var visElemIds = [];
+		for (var visElemId in elw_visible) {
+			if (elw_visible[visElemId]) {
+				visElemIds.push(visElemId);
+			}
+		}
+
+		alert(jQuery.toJSON(visElemIds));
+		jQuery(this).children("input[type=hidden][name=expandTriggers]").val(jQuery.toJSON(visElemIds));
 	});
 });
