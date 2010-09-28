@@ -15,10 +15,10 @@
 				jQuery.jGrowl("$m.message", {"header":"Error", "sticky": true});
 			#end
 			#if($m.type == "warn")
-				jQuery.jGrowl("$m.message", {"header":"Warning", "life": 10000, "sticky": true});
+				jQuery.jGrowl("$m.message", {"header":"Warning", "life": 10000});
 			#end
 			#if($m.type == "info")
-				jQuery.jGrowl("$m.message", {"header":"Info", "sticky": true});
+				jQuery.jGrowl("$m.message", {"header":"Info"});
 			#end
 		#end
 	});
