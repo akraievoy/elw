@@ -112,7 +112,7 @@
 								<td style="padding-left: 4em; padding-right: 1em; border-right: #999999 dashed 1px;">
 									<form method="POST" enctype="multipart/form-data" 
 												action="ul?elw_ctx=$elw_ctx_ver&sId=$slot.id" style="display: inline;">
-										File: <input type="file" name="file"/> <input type="submit" value="Upload"/>
+										<input type="text" name="comment" value="" title="Add a note"/> <input type="file" name="file" title="Select a file..."/> <input type="submit" value="Upload"/>
 										<input type="hidden" name="expandTriggers" value="[]"/>
 									</form>
 								</td>

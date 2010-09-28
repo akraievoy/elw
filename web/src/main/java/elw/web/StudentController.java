@@ -3,6 +3,7 @@ package elw.web;
 import elw.dao.*;
 import elw.miniweb.Message;
 import elw.vo.*;
+import org.akraievoy.gear.G4Io;
 import org.akraievoy.gear.G4Str;
 import org.akraievoy.gear.G4mat;
 import org.apache.commons.fileupload.FileItemIterator;
@@ -377,9 +378,13 @@ public class StudentController extends MultiActionController implements WebSymbo
 		final ServletFileUpload sfu = new ServletFileUpload(fileItemFactory);
 		final FileItemIterator fii = sfu.getItemIterator(req);
 		int fileCount = 0;
+		String comment = null;
 		while (fii.hasNext()) {
 			final FileItemStream item = fii.next();
 			if (item.isFormField()) {
+				if ("comment".equals(item.getFieldName())) {
+					comment = G4Io.dumpToString(item.openStream());
+				}
 				//	TODO store the active expand triggers...
 				continue;
 			}
@@ -404,17 +409,22 @@ public class StudentController extends MultiActionController implements WebSymbo
 				return null;
 			}
 
+			final FileMeta fileMeta = new FileMeta(
+					fileName,
+					fileName,
+					contentType,
+					ctx.getStudent().getName(),
+					resolveRemoteAddress(req)
+			);
+			if (comment != null) {
+				fileMeta.setComment(comment);
+			}
+
 			fileDao.createFileFor(
 					FileDao.SCOPE_STUD,
 					ctx,
 					slot.getId(),
-					new FileMeta(
-							fileName,
-							fileName,
-							contentType,
-							ctx.getStudent().getName(),
-							resolveRemoteAddress(req)
-					), 
+					fileMeta,
 					binary ? new BufferedInputStream(item.openStream()) : null,
 					binary ? null : new BufferedReader(new InputStreamReader(item.openStream(), "UTF-8"))
 			);

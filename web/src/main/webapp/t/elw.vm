@@ -146,11 +146,16 @@
 				#else
 					<span style="font-weight: bold;" title="${file.meta.id} @ $p_scope">${file.meta.name}</span>
 				#end
+				$format.format($file.meta.createStamp.time) $file.meta.author $file.meta.sourceAddress
 			</td>
 			<td style="padding: 0 0.25em; text-align: center;">
 				#if(!$p_slot.binary && $p_path.ver.checkRead($p_path.assType, $p_path.ass, $p_slot.id, $filesStud))
 					<a class="popupTrigger"
 						 id="index-${p_path.index}--slotinfo-${p_slot.id}--${p_scope}-${file.meta.id}">Content</a>
+				#end
+				#if($file.meta.comment && $file.meta.comment.length() > 0)
+					<a class="popupTrigger"
+						 id="index-${p_path.index}--slotinfo-${p_slot.id}--${p_scope}-${file.meta.id}--comm">Note</a>
 				#end
 			</td>
 			<td style="padding: 0 0.25em; text-align: right;">
@@ -158,6 +163,12 @@
 					<div style="display: none; text-align: left;"
 							 class="popup index-${p_path.index}--slotinfo-${p_slot.id}--${p_scope}-${file.meta.id}">
 						${file.text}
+					</div>
+				#end
+				#if($file.meta.comment && $file.meta.comment.length() > 0)
+					<div style="display: none; text-align: left;"
+							 class="popup index-${p_path.index}--slotinfo-${p_slot.id}--${p_scope}-${file.meta.id}--comm">
+						$file.meta.comment
 					</div>
 				#end
 			</td>
