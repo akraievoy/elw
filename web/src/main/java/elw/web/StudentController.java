@@ -598,6 +598,13 @@ public class StudentController extends MultiActionController implements WebSymbo
 	}
 
 	protected static String resolveRemoteAddress(HttpServletRequest req) {
-		return req.getRemoteAddr();
+		final String remoteAddr = req.getRemoteAddr();
+
+		final String xff = req.getHeader("X-Forwarded-For");
+		if (xff != null && xff.trim().length() > 0) {
+			return xff.replaceAll("\\s+", "").split(",")[0];
+		}
+
+		return remoteAddr;
 	}
 }
