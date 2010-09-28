@@ -8,6 +8,7 @@ public class FileSlot extends IdNameStamped {
 	protected List<String> readApprovals = new ArrayList<String>();
 	protected List<String> writeApprovals = new ArrayList<String>();
 	protected List<String> contentTypes = new ArrayList<String>();
+	protected String shortName;
 	protected long lengthLimit;
 	protected String nameRegex;
 	protected boolean binary;
@@ -62,6 +63,14 @@ public class FileSlot extends IdNameStamped {
 	public void setWriteApprovals(String[] writeApprovals) {
 		this.writeApprovals.clear();
 		this.writeApprovals.addAll(Arrays.asList(writeApprovals));
+	}
+
+	public String getShortName() {
+		return shortName;
+	}
+
+	public void setShortName(String shortName) {
+		this.shortName = shortName;
 	}
 
 	public boolean isWritable() {

@@ -581,7 +581,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 	}
 
 	protected static Score computeReportAuto(Ctx ctx, ReportMeta meta, final Score baseScore) {
-		final Class classDue = ctx.getEnr().getClasses().get(ctx.getIndexEntry().getClassReportDue());
+		final Class classDue = ctx.getEnr().getClasses().get(ctx.getIndexEntry().getClassDue().get("report"));
 		final TypeScoring reportScoring = ctx.getAssType().getScoring().getBreakdown().get("report");
 		final Criteria[] autos = reportScoring.resolveAuto();
 
@@ -605,7 +605,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 	}
 
 	protected static Score computeCodeAuto(CodeMeta meta, Ctx ctx) {
-		final Class classCodeDue = ctx.getEnr().getClasses().get(ctx.getIndexEntry().getClassCodeDue());
+		final Class classCodeDue = ctx.getEnr().getClasses().get(ctx.getIndexEntry().getClassDue().get("code"));
 		final TypeScoring codeScoring = ctx.getAssType().getScoring().getBreakdown().get("code");
 		final Criteria[] autos = codeScoring.resolveAuto();
 

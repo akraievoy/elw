@@ -5,25 +5,25 @@
 	"groupId" : "ka99",
 	"classes" : [
 		{
-			"date" : "2010-09-17",
+			"date" : "2010-09-12",
 			"fromTime" : "8:00",
 			"onSite" : [ ".*" ],
 			"toTime" : "8:30"
 		},
 		{
-			"date" : "2010-10-03",
+			"date" : "2010-09-19",
 			"fromTime" : "8:00",
 			"onSite" : [ ".*" ],
 			"toTime" : "8:30"
 		},
 		{
-			"date" : "2010-10-17",
+			"date" : "2010-09-26",
 			"fromTime" : "8:00",
 			"onSite" : [ ".*" ],
 			"toTime" : "8:30"
 		},
 		{
-			"date" : "2010-10-31",
+			"date" : "2010-09-27",
 			"fromTime" : "8:00",
 			"onSite" : [ ".*" ],
 			"toTime" : "8:30"
@@ -68,67 +68,58 @@
 	"index": [
 		{
 			"path": ["lr", "1a"],
-			"classReportDue" : 7,
-			"classCodeDue" : 3,
+			"classDue" : {"report": 2, "code": 1},
 			"scoreBudget" : 2,
 			"requireClean" : false,
 			"classFrom" : 0
 		},
 		{
 			"path": ["lr", "1b"],
-			"classReportDue" : 7,
-			"classCodeDue" : 3,
+			"classDue" : {"report": 3, "code": 2},
 			"scoreBudget" : 2,
 			"requireClean" : false,
 			"classFrom" : 0
 		},
 		{
 			"path": ["lr", "1c"],
-			"classReportDue" : 7,
-			"classCodeDue" : 3,
+			"classDue" : {"report": 4, "code": 3},
 			"scoreBudget" : 2,
 			"requireClean" : false,
 			"classFrom" : 0
 		},
 		{
+			"path": ["cp", "1"],
+			"scoreBudget" : 0,
+			"requireClean" : false,
+			"classFrom" : 1
+		},
+		{
 			"path": ["lr", "2"],
-			"classReportDue" : 7,
-			"classCodeDue" : 3,
+			"classDue" : {"report": 7, "code": 3},
 			"scoreBudget" : 7,
 			"requireClean" : false,
 			"classFrom" : 3
 		},
 		{
 			"path": ["lr", "3"],
-			"classReportDue" : 7,
-			"classCodeDue" : 6,
+			"classDue" : {"report": 7, "code": 6},
 			"scoreBudget" : 8,
 			"requireClean" : false,
 			"classFrom" : 6
 		},
 		{
 			"path": ["lr", "4"],
-			"classReportDue" : 8,
-			"classCodeDue" : 7,
+			"classDue" : {"report": 8, "code": 7},
 			"scoreBudget" : 9,
 			"requireClean" : false,
 			"classFrom" : 6
 		},
 		{
 			"path": ["lr", "5"],
-			"classReportDue" : 8,
-			"classCodeDue" : 7,
+			"classDue" : {"report": 8, "code": 7},
 			"scoreBudget" : 10,
 			"requireClean" : false,
 			"classFrom" : 7
-		},
-		{
-			"path": ["cp", "1"],
-			"classReportDue" : 2,
-			"classCodeDue" : 2,
-			"scoreBudget" : 0,
-			"requireClean" : false,
-			"classFrom" : 1
 		}
 	],
 	"createStamp" : {

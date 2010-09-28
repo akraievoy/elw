@@ -10,6 +10,7 @@
 				{
 					"id":"statement",
 					"name":"Условие",
+					"shortName":"У",
 					"lengthLimit": "10240",
 					"nameRegex": ".+\\.(html|txt)",
 					"contentTypes": ["text/html","text/plain"],
@@ -21,6 +22,7 @@
 				{
 					"id":"code",
 					"name":"Решение",
+					"shortName":"Р",
 					"lengthLimit": "10240",
 					"nameRegex": ".+\\.(mips|txt)",
 					"contentTypes": ["text/plain"],
@@ -32,6 +34,7 @@
 				{
 					"id":"test",
 					"name":"Тест",
+					"shortName":"T",
 					"lengthLimit": "10240",
 					"nameRegex": ".+\\.txt",
 					"contentTypes": ["text/plain"],
@@ -43,6 +46,7 @@
 				{
 					"id":"report",
 					"name":"Отчет",
+					"shortName":"О",
 					"lengthLimit": "2097152",
 					"nameRegex": ".+\\.(rtf)",
 					"contentTypes": ["application/rtf", "application/msword"],
@@ -54,6 +58,7 @@
 				{
 					"id":"reference",
 					"name":"Эталон",
+					"shortName":"Э",
 					"lengthLimit": "10240",
 					"nameRegex": ".+\\.(mips|txt)",
 					"contentTypes": ["text/plain"],
@@ -165,6 +170,7 @@
 				{
 					"id":"statement",
 					"name":"Условие",
+					"shortName":"У",
 					"lengthLimit": "10240",
 					"nameRegex": ".+\\.(html|txt)",
 					"contentTypes": ["text/html","text/plain"],
@@ -176,6 +182,7 @@
 				{
 					"id":"code",
 					"name":"Решение",
+					"shortName":"Р",
 					"lengthLimit": "10240",
 					"nameRegex": ".+\\.(mips|txt)",
 					"contentTypes": ["text/plain"],
@@ -187,6 +194,7 @@
 				{
 					"id":"test",
 					"name":"Тест",
+					"shortName":"Т",
 					"lengthLimit": "10240",
 					"nameRegex": ".+\\.(mips|txt)",
 					"contentTypes": ["text/plain"],

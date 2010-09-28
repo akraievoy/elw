@@ -583,6 +583,7 @@ public class Ctx {
 		copy.student = student;
 		copy.course = course;
 		copy.index = index;
+		copy.indexEntry = indexEntry;
 		copy.assType = assType;
 		copy.ass = ass;
 		copy.ver = ver;

@@ -53,45 +53,9 @@
 				#if($elw_ctx.enr.classes.get($elw_ctx_ass.indexEntry.classFrom).started)
 				<tr class="index-$idx" style="display:none;">
 					<td style="padding-left: 2.5em; padding-right: 1em; border-right: #999999 dashed 1px;">$elw_ctx_ver.ver.name</td>
-				#*
-							<td style="padding: 0 0.25em; text-align: right;">
-								#elw_code_state($path, $codeMetas.get("$path"))
-								#if($scores.get("$path"))
-									<span style="font-size: smaller;">#elw_code_score($path, $scores.get("$path"))</span>
-								#end
-							</td>
-							<td style="padding: 0 0.25em; text-align: right;">
-								#elw_report_state($path, $reportMetas.get("$path"))
-								#if($scores.get("$path"))
-									<span style="font-size: smaller;">#elw_report_score($path, $scores.get("$path"))</span>
-								#end
-							</td>
-		*#
-					<td style="padding: 0 0.25em; text-align: center;">
-
-					</td>
-					<td style="padding: 0 0.25em; text-align: right;">
-					#*
-						<form action="launch" method="get" style="display: inline; margin: 0;">
-							<input type="hidden" name="elw_ctx" value="$path"/>
-							<input type="submit" value="Code"/>
-						</form>
-						<form action="uploadPage" method="get" style="display: inline; margin: 0;">
-							<input type="hidden" name="elw_ctx" value="$path"/>
-							<input type="submit" value="Report"/>
-						</form>
-*#
-					</td>
-				</tr>
-				<tr class="index-$idx" style="display:none;">
-					<td style="padding-left: 2.5em; padding-right: 1em; border-right: #999999 dashed 1px;">
-						#foreach($slot in $elw_ctx_ass.assType.fileSlots)
-							$slot.name:&nbsp;<span style="font-weight: bold;">$elw_ctx_ver.ver.countFiles($elw_ctx_ass.assType, $elw_ctx_ass.ass, $slot.id, $filesStud)</span>
-						#end
-					</td>
 					<td style="padding: 0 0.25em; text-align: center;">
 						#foreach($slot in $elw_ctx_ass.assType.fileSlots)
-							<a class="expandTrigger" id="index-${idx}--slot-${slot.id}" title="$slot.name">$slot.name.charAt(0):<span
+							<a class="expandTrigger" id="index-${idx}--slot-${slot.id}" title="$slot.name">$slot.shortName:<span
 											style="font-weight: bold;">$elw_ctx_ver.ver.countFiles($elw_ctx_ass.assType, $elw_ctx_ass.ass, $slot.id, $filesStud)</span></a>
 						#end
 					</td>
@@ -102,6 +66,10 @@
 					<tr class="index-${idx}--slot-${slot.id}" style="display:none;">
 						<td style="padding-left: 3em; padding-right: 1em; border-right: #999999 dashed 1px;">
 							<span style="font-weight: bold;" title="${slot.id}">${slot.name}</span>&nbsp;
+							#if($slot.readApprovals.size() > 0)
+								Readable after : <span
+											style="font-weight: bold;">#foreach($slotId in $slot.readApprovals) ${elw_ctx_ass.assType.findSlotById($slotId).name} #end</span>
+							#end
 							#if($slot.writable)
 								#if($slot.writeApprovals.size() > 0)
 									Writable after : <span
@@ -110,9 +78,15 @@
 							#else
 								<span style="font-weight: bold;">Read-only</span>
 							#end
-							#if($slot.readApprovals.size() > 0)
-								Readable after : <span
-											style="font-weight: bold;">#foreach($slotId in $slot.readApprovals) ${elw_ctx_ass.assType.findSlotById($slotId).name} #end</span>
+							#if($elw_ctx_ver.indexEntry.classDue.get($slot.id))
+								#set($classDue = $elw_ctx.enr.classes.get($elw_ctx_ver.indexEntry.classDue.get($slot.id)))
+								#if($classDue.passed)
+									<span style="color: red;">
+										Due $format.format($classDue.toDateTime.millis)
+									</span>
+								#else
+									Due $format.format($classDue.toDateTime.millis)
+								#end
 							#end
 						</td>
 						<td style="padding: 0 0.25em; text-align: center;">

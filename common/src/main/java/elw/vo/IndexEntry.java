@@ -1,11 +1,12 @@
 package elw.vo;
 
+import java.util.Map;
+
 public class IndexEntry {
 	protected String[] path;
 	protected int scoreBudget;
 	protected int classFrom;
-	protected int classCodeDue;
-	protected int classReportDue;
+	protected Map<String, Integer> classDue;
 	protected boolean requireClean;
 
 	public boolean isRequireClean() {
@@ -16,28 +17,12 @@ public class IndexEntry {
 		this.requireClean = requireClean;
 	}
 
-	public int getClassCodeDue() {
-		return classCodeDue;
-	}
-
-	public void setClassCodeDue(int classCodeDue) {
-		this.classCodeDue = classCodeDue;
-	}
-
 	public int getClassFrom() {
 		return classFrom;
 	}
 
 	public void setClassFrom(int classFrom) {
 		this.classFrom = classFrom;
-	}
-
-	public int getClassReportDue() {
-		return classReportDue;
-	}
-
-	public void setClassReportDue(int classReportDue) {
-		this.classReportDue = classReportDue;
 	}
 
 	public int getScoreBudget() {
@@ -54,5 +39,13 @@ public class IndexEntry {
 
 	public void setPath(String[] path) {
 		this.path = path;
+	}
+
+	public Map<String, Integer> getClassDue() {
+		return classDue;
+	}
+
+	public void setClassDue(Map<String, Integer> classDue) {
+		this.classDue = classDue;
 	}
 }
