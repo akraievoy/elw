@@ -1,0 +1,163 @@
+{
+  "classes" : [ {
+    "date" : "2010-09-03",
+    "fromTime" : "14:00",
+    "onSite" : [ ".*" ],
+    "toTime" : "16:10"
+  }, {
+    "date" : "2010-09-10",
+    "fromTime" : "14:00",
+    "onSite" : [ ".*" ],
+    "toTime" : "16:10"
+  }, {
+    "date" : "2010-09-17",
+    "fromTime" : "14:00",
+    "onSite" : [ ".*" ],
+    "toTime" : "16:10"
+  }, {
+    "date" : "2010-09-24",
+    "fromTime" : "14:00",
+    "onSite" : [ ".*" ],
+    "toTime" : "16:10"
+  }, {
+    "date" : "2010-10-01",
+    "fromTime" : "14:00",
+    "onSite" : [ ".*" ],
+    "toTime" : "16:10"
+  }, {
+    "date" : "2010-10-08",
+    "fromTime" : "14:00",
+    "onSite" : [ ".*" ],
+    "toTime" : "16:10"
+  }, {
+    "date" : "2010-10-15",
+    "fromTime" : "14:00",
+    "onSite" : [ ".*" ],
+    "toTime" : "16:10"
+  }, {
+    "date" : "2010-10-22",
+    "fromTime" : "14:00",
+    "onSite" : [ ".*" ],
+    "toTime" : "16:10"
+  }, {
+    "date" : "2010-10-29",
+    "fromTime" : "14:00",
+    "onSite" : [ ".*" ],
+    "toTime" : "16:10"
+  }, {
+    "date" : "2010-11-05",
+    "fromTime" : "14:00",
+    "onSite" : [ ".*" ],
+    "toTime" : "16:10"
+  }, {
+    "date" : "2010-11-12",
+    "fromTime" : "14:00",
+    "onSite" : [ ".*" ],
+    "toTime" : "16:10"
+  }, {
+    "date" : "2010-11-19",
+    "fromTime" : "14:00",
+    "onSite" : [ ".*" ],
+    "toTime" : "16:10"
+  }, {
+    "date" : "2010-11-26",
+    "fromTime" : "14:00",
+    "onSite" : [ ".*" ],
+    "toTime" : "16:10"
+  }, {
+    "date" : "2010-12-03",
+    "fromTime" : "14:00",
+    "onSite" : [ ".*" ],
+    "toTime" : "16:10"
+  }, {
+    "date" : "2010-12-10",
+    "fromTime" : "14:00",
+    "onSite" : [ ".*" ],
+    "toTime" : "16:10"
+  }, {
+    "date" : "2010-12-17",
+    "fromTime" : "14:00",
+    "onSite" : [ ".*" ],
+    "toTime" : "16:10"
+  }, {
+    "date" : "2010-12-24",
+    "fromTime" : "14:00",
+    "onSite" : [ ".*" ],
+    "toTime" : "16:10"
+  }, {
+    "date" : "2011-01-03",
+    "fromTime" : "14:00",
+    "onSite" : [ ".*" ],
+    "toTime" : "16:10"
+  } ],
+  "index" : [ {
+    "path" : [ "lr", "1" ],
+    "classDue" : {
+      "code" : 4,
+      "run" : 4,
+      "ecode" : 5,
+      "erun" : 5,
+      "report" : 6
+    },
+    "scoreBudget" : 5,
+    "requireClean" : false,
+    "classFrom" : 0
+  }, {
+    "path" : [ "lr", "2" ],
+    "classDue" : {
+      "code" : 5,
+      "run" : 5,
+      "ecode" : 5,
+      "erun" : 5,
+      "report" : 6
+    },
+    "scoreBudget" : 5,
+    "requireClean" : false,
+    "classFrom" : 4
+  }, {
+    "path" : [ "lr", "3" ],
+    "classDue" : {
+      "code" : 7,
+      "run" : 7,
+      "ecode" : 8,
+      "erun" : 8,
+      "report" : 9
+    },
+    "scoreBudget" : 5,
+    "requireClean" : false,
+    "classFrom" : 6
+  }, {
+    "path" : [ "lr", "4" ],
+    "classDue" : {
+      "code" : 9,
+      "run" : 9,
+      "ecode" : 10,
+      "erun" : 10,
+      "report" : 11
+    },
+    "scoreBudget" : 5,
+    "requireClean" : false,
+    "classFrom" : 8
+  }, {
+    "path" : [ "lr", "5" ],
+    "classDue" : {
+      "code" : 11,
+      "run" : 11,
+      "ecode" : 12,
+      "erun" : 12,
+      "report" : 13
+    },
+    "scoreBudget" : 5,
+    "requireClean" : false,
+    "classFrom" : 10
+  } ],
+  "courseId" : "tp-w10",
+  "groupId" : "ka99",
+  "path" : null,
+  "createStamp" : {
+    "time" : 1285744153612,
+    "node" : "anton"
+  },
+  "name" : "ka99 @ tp 2010",
+  "id" : "3"
+}

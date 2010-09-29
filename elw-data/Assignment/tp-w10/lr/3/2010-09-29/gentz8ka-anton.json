@@ -1,0 +1,155 @@
+{
+  "shared" : false,
+  "versions" : [ {
+    "solution" : null,
+    "tests" : [ ],
+    "statementHtml" : null,
+    "name" : "Варіант №1",
+    "id" : "1"
+  }, {
+    "solution" : null,
+    "tests" : [ ],
+    "statementHtml" : null,
+    "name" : "Варіант №2",
+    "id" : "2"
+  }, {
+    "solution" : null,
+    "tests" : [ ],
+    "statementHtml" : null,
+    "name" : "Варіант №3",
+    "id" : "3"
+  }, {
+    "solution" : null,
+    "tests" : [ ],
+    "statementHtml" : null,
+    "name" : "Варіант №4",
+    "id" : "4"
+  }, {
+    "solution" : null,
+    "tests" : [ ],
+    "statementHtml" : null,
+    "name" : "Варіант №5",
+    "id" : "5"
+  }, {
+    "solution" : null,
+    "tests" : [ ],
+    "statementHtml" : null,
+    "name" : "Варіант №7",
+    "id" : "7"
+  }, {
+    "solution" : null,
+    "tests" : [ ],
+    "statementHtml" : null,
+    "name" : "Варіант №8",
+    "id" : "8"
+  }, {
+    "solution" : null,
+    "tests" : [ ],
+    "statementHtml" : null,
+    "name" : "Варіант №9",
+    "id" : "9"
+  }, {
+    "solution" : null,
+    "tests" : [ ],
+    "statementHtml" : null,
+    "name" : "Варіант №10",
+    "id" : "10"
+  }, {
+    "solution" : null,
+    "tests" : [ ],
+    "statementHtml" : null,
+    "name" : "Варіант №11",
+    "id" : "11"
+  }, {
+    "solution" : null,
+    "tests" : [ ],
+    "statementHtml" : null,
+    "name" : "Варіант №12",
+    "id" : "12"
+  }, {
+    "solution" : null,
+    "tests" : [ ],
+    "statementHtml" : null,
+    "name" : "Варіант №13",
+    "id" : "13"
+  }, {
+    "solution" : null,
+    "tests" : [ ],
+    "statementHtml" : null,
+    "name" : "Варіант №14",
+    "id" : "14"
+  }, {
+    "solution" : null,
+    "tests" : [ ],
+    "statementHtml" : null,
+    "name" : "Варіант №15",
+    "id" : "15"
+  }, {
+    "solution" : null,
+    "tests" : [ ],
+    "statementHtml" : null,
+    "name" : "Варіант №16",
+    "id" : "16"
+  }, {
+    "solution" : null,
+    "tests" : [ ],
+    "statementHtml" : null,
+    "name" : "Варіант №17",
+    "id" : "17"
+  }, {
+    "solution" : null,
+    "tests" : [ ],
+    "statementHtml" : null,
+    "name" : "Варіант №18",
+    "id" : "18"
+  }, {
+    "solution" : null,
+    "tests" : [ ],
+    "statementHtml" : null,
+    "name" : "Варіант №19",
+    "id" : "19"
+  }, {
+    "solution" : null,
+    "tests" : [ ],
+    "statementHtml" : null,
+    "name" : "Варіант №20",
+    "id" : "20"
+  }, {
+    "solution" : null,
+    "tests" : [ ],
+    "statementHtml" : null,
+    "name" : "Варіант №21",
+    "id" : "21"
+  }, {
+    "solution" : null,
+    "tests" : [ ],
+    "statementHtml" : null,
+    "name" : "Варіант №22",
+    "id" : "22"
+  }, {
+    "solution" : null,
+    "tests" : [ ],
+    "statementHtml" : null,
+    "name" : "Варіант №23",
+    "id" : "23"
+  }, {
+    "solution" : null,
+    "tests" : [ ],
+    "statementHtml" : null,
+    "name" : "Варіант №24",
+    "id" : "24"
+  }, {
+    "solution" : null,
+    "tests" : [ ],
+    "statementHtml" : null,
+    "name" : "Варіант №25",
+    "id" : "25"
+  } ],
+  "path" : [ "tp-w10", "lr", "3" ],
+  "createStamp" : {
+    "time" : 1285742653210,
+    "node" : "anton"
+  },
+  "name" : "ЛР №3: Використання функцій",
+  "id" : "3"
+}
