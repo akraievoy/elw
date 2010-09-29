@@ -6,6 +6,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -251,17 +256,29 @@ public class Ctx {
 			if (index >= 0 && index < enr.getIndex().size()) {
 				indexEntry = enr.getIndex().get(index);
 				resolved.append(ELEM_INDEX_ENTRY);
+
 				assType = IdName.findById(course.getAssTypes(), indexEntry.getPath()[0]);
 				if (assType != null) {
 					resolved.append(ELEM_ASS_TYPE);
 				} else {
 					log.warn("type not found: {}", assTypeId, dump());
 				}
+
 				ass = IdName.findById(assType.getAssignments(), indexEntry.getPath()[1]);
 				if (ass != null) {
 					resolved.append(ELEM_ASS);
 				} else {
 					log.warn("assignment not found: {}", dump());
+				}
+
+				if (student != null && ass != null) {
+					final String salt = student.getName() + ":" + ass.getName();
+					final BigInteger shaNum = new BigInteger(digest(salt), 16);
+					final Version[] vers = ass.getVersions();
+					final int verIdx = shaNum.mod(BigInteger.valueOf(vers.length)).intValue();
+
+					ver = vers[verIdx];
+					resolved.append(ELEM_VER);
 				}
 			} else {
 				log.warn("task not found by index: {}", index, dump());
@@ -287,23 +304,20 @@ public class Ctx {
 		}
 
 		if (has(resolved, ELEM_ASS) && inited(ELEM_VER)) {
-			ver = IdName.findById(ass.getVersions(), verId);
-			if (ver != null && (student == null || !isVersionIncorrect(student, ass, ver))) {
-				resolved.append(ELEM_VER);
+			if (student == null) {
+				ver = IdName.findById(ass.getVersions(), verId);
+				if (ver != null) {
+					resolved.append(ELEM_VER);
+				} else {
+					log.warn("version not found: {}", this);
+				}
 			} else {
-				log.warn("version not found: {}", verId, this);
+				log.warn("student set, version is redundant: {}", this);
 			}
 		}
 
 		resolveState = resolved.toString();
 		return this;
-	}
-
-	public static boolean isVersionIncorrect(Student student, Assignment ass, Version ver) {
-		final int studId = Integer.parseInt(student.getId());
-		final int verIdx = IdName.indexOfId(ass.getVersions(), ver.getId());
-
-		return (studId) % ass.getVersions().length != verIdx;
 	}
 
 	public String toString() {
@@ -347,6 +361,7 @@ public class Ctx {
 				"g:" + groupId + " " +
 				"s:" + studId + " " +
 				"c:" + courseId + " " +
+				"i:" + index + " " +
 				"t:" + assTypeId + " " +
 				"a:" + assId + " " +
 				"v:" + verId;
@@ -482,17 +497,29 @@ public class Ctx {
 				if (ctx.resolveState.indexOf(ELEM_INDEX_ENTRY) < 0) {
 					ctx.resolveState += ELEM_INDEX_ENTRY;
 				}
+
 				ctx.assType = IdName.findById(ctx.course.getAssTypes(), ctx.indexEntry.getPath()[0]);
 				if (ctx.assType != null) {
 					ctx.resolveState += ELEM_ASS_TYPE;
 				} else {
 					log.warn("assignment type not found: {}", assTypeId, dump());
 				}
+
 				ctx.ass = IdName.findById(ctx.assType.getAssignments(), ctx.indexEntry.getPath()[1]);
 				if (ctx.ass != null) {
 					ctx.resolveState += ELEM_ASS;
 				} else {
 					log.warn("assignment not found: {}", dump());
+				}
+
+				if (ctx.student != null && ctx.ass != null) {
+					final String salt = ctx.student.getName() + ":" + ctx.ass.getName();
+					final BigInteger shaNum = new BigInteger(digest(salt), 16);
+					final Version[] vers = ctx.ass.getVersions();
+					final int verIdx = shaNum.mod(BigInteger.valueOf(vers.length)).intValue();
+
+					ctx.ver = vers[verIdx];
+					ctx.resolveState += ELEM_VER;
 				}
 			} else {
 				log.warn("extending with wrong index (or no enr resolved)");
@@ -562,18 +589,6 @@ public class Ctx {
 		return extendAssType(assType).extendAss(ass).extendVer(ver);
 	}
 
-	protected String getAssDirName() {
-		return getAssType().getId() + "." + getAss().getId() + "." + getVer().getId();
-	}
-
-	protected File getStudentRoot(File uploadsDir) {
-		return new File(
-				uploadsDir,
-				"" + getCourse().getId() + "." + getGroup().getId() + "/"
-				+ getStudent().getId() + "." + getStudent().getName() + "/"
-		);
-	}
-
 	public Ctx copy() {
 		final Ctx copy = new Ctx(initState, enrId, groupId, studId, courseId, -1, assTypeId, assId, verId);
 
@@ -634,26 +649,24 @@ public class Ctx {
 		return elemToOrder;
 	}
 
-	protected static boolean isRedundant(char elemBefore, char elemAfter) {
-		if (elemBefore == ELEM_ENR) {
-			return (elemAfter == ELEM_COURSE || elemAfter == ELEM_GROUP);
+	protected static boolean isRedundant(String elemsBefore, char elemAfter) {
+		if (elemsBefore.indexOf(ELEM_ENR) >= 0 && elemsBefore.indexOf(ELEM_INDEX_ENTRY) >= 0 && elemAfter == ELEM_VER) {
+			return true;
 		}
-		if (elemBefore == ELEM_INDEX_ENTRY) {
-			return (elemAfter == ELEM_ASS_TYPE || elemAfter == ELEM_ASS);
+		if (elemsBefore.indexOf(ELEM_ENR) >= 0 && (elemAfter == ELEM_COURSE || elemAfter == ELEM_GROUP)) {
+			return true;
 		}
-		return false;
+
+		return elemsBefore.indexOf(ELEM_INDEX_ENTRY) >= 0 && (elemAfter == ELEM_ASS_TYPE || elemAfter == ELEM_ASS);
 	}
 
 	protected static String removeRedundant(final String format) {
 		boolean anyRedundant = false;
 		boolean[] redundant = new boolean[format.length()];
-		for (int beforePos = 0; beforePos < format.length(); beforePos++) {
-			char before = format.charAt(beforePos);
-			for (int afterPos = beforePos + 1; afterPos < format.length(); afterPos++) {
-				char after = format.charAt(afterPos);
-				if (isRedundant(before, after)) {
-					anyRedundant = redundant[afterPos] = true;
-				}
+		for (int afterPos = 1; afterPos < format.length(); afterPos++) {
+			char after = format.charAt(afterPos);
+			if (isRedundant(format.substring(0, afterPos), after)) {
+				anyRedundant = redundant[afterPos] = true;
 			}
 		}
 
@@ -736,5 +749,28 @@ public class Ctx {
 		result = 31 * result + (assId != null ? assId.hashCode() : 0);
 		result = 31 * result + (verId != null ? verId.hashCode() : 0);
 		return result;
+	}
+
+	//	LATER move this to base.G4mat
+	public static String renderBytes(byte[] checkSum) {
+		final StringBuffer result = new StringBuffer();
+
+		for (byte checkByte : checkSum) {
+			result.append(Integer.toString((checkByte & 0xff) + 0x100, 16).substring(1));
+		}
+
+		return result.toString();
+	}
+
+	public static String digest(String text) {
+		try {
+			final MessageDigest md = MessageDigest.getInstance("SHA-1");
+			md.update(text.getBytes("UTF-8"), 0, text.length());
+			return renderBytes(md.digest());
+		} catch (NoSuchAlgorithmException e) {
+			throw new IllegalStateException(e);
+		} catch (UnsupportedEncodingException e) {
+			throw new IllegalStateException(e);
+		}
 	}
 }

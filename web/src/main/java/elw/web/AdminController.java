@@ -23,9 +23,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 @Controller
@@ -116,7 +113,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 		} else {
 			long nonceStamp = Long.valueOf(nonce, 36);
 			if (System.currentTimeMillis() - nonceStamp < NONCE_TIMEOUT_MILLIS) {
-				final String hashExpected = digest(nonce + "-->" + PASSWORD);
+				final String hashExpected = Ctx.digest(nonce + "-->" + PASSWORD);
 
 				if (hashExpected.equalsIgnoreCase(hash)) {
 					session.setAttribute(S_ADMIN, Boolean.TRUE);
@@ -140,29 +137,6 @@ public class AdminController extends MultiActionController implements WebSymbols
 
 		resp.sendRedirect("login");
 		return null;
-	}
-
-	//	LATER move this to base.G4mat
-	public static String renderBytes(byte[] checkSum) {
-		final StringBuffer result = new StringBuffer();
-
-		for (byte checkByte : checkSum) {
-			result.append(Integer.toString((checkByte & 0xff) + 0x100, 16).substring(1));
-		}
-
-		return result.toString();
-	}
-
-	public static String digest(String text) throws IOException {
-		try {
-			final MessageDigest md = MessageDigest.getInstance("SHA-1");
-			md.update(text.getBytes("UTF-8"), 0, text.length());
-			return renderBytes(md.digest());
-		} catch (NoSuchAlgorithmException e) {
-			throw new IOException(e);
-		} catch (UnsupportedEncodingException e) {
-			throw new IOException(e);
-		}
 	}
 
 	@RequestMapping(value = "logout", method = RequestMethod.GET)
@@ -346,22 +320,16 @@ public class AdminController extends MultiActionController implements WebSymbols
 		final List<LogEntry> logEntries = new ArrayList<LogEntry>();
 
 		for (Student stud : ctx.getGroup().getStudents()) {
-			final Ctx studCtx = ctx.extendStudent(stud);
+			final Ctx ctxStud = ctx.extendStudent(stud);
+			for (int index = 0; index < ctx.getEnr().getIndex().size(); index++) {
+				final Ctx ctxVer = ctxStud.extendIndex(index);
+				final AssignmentType assType = ctxVer.getAssType();
+				final Assignment ass = ctxVer.getAss();
+				final Version ver = ctxVer.getVer();
 
-			for (AssignmentType assType: studCtx.getCourse().getAssTypes()) {
-				for (Assignment ass : assType.getAssignments()) {
-					for (Version ver : ass.getVersions()) {
-						if (Ctx.isVersionIncorrect(studCtx.getStudent(), ass, ver)) {
-							continue;
-						}
-
-						final Ctx assCtx = studCtx.extendTAV(assType, ass, ver);
-
-						final Entry<ReportMeta> lastReport = reportDao.findLast(assCtx);
-						if (lastReport != null) {
-							logEntries.add(new LogEntry(stud, assCtx, ass, lastReport.getMeta()));
-						}
-					}
+				final Entry<ReportMeta> lastReport = reportDao.findLast(ctxVer);
+				if (lastReport != null) {
+					logEntries.add(new LogEntry(stud, ctxVer, ass, lastReport.getMeta()));
 				}
 			}
 		}

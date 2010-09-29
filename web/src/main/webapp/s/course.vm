@@ -25,20 +25,20 @@
 		</tr>
 			#foreach($entry in $elw_ctx.enr.index)
 				#set($idx = $velocityCount - 1)
-				#set($elw_ctx_ass = $elw_ctx.extendIndex($idx))
-				#set($verIdx = $elw_ctx.student.idAsInt % $elw_ctx_ass.ass.versions.size())
-				#set($elw_ctx_ver = $elw_ctx_ass.extendVer($elw_ctx_ass.ass.versions.get($verIdx)))
-				#set($started = $elw_ctx.enr.classes.get($elw_ctx_ass.indexEntry.classFrom).started)
+				#set($elw_ctx_ver = $elw_ctx.extendIndex($idx))
+				#set($started = $elw_ctx.enr.classes.get($elw_ctx_ver.indexEntry.classFrom).started)
 				#set($filesStud = $fileMetas.get("$elw_ctx_ver.toString()"))
 			<tr class="elw_header_row">
 				<td style="padding-left: 2em; padding-right: 1em; border-right: #999999 dashed 1px;">
-					<span style="font-weight: bold;">$elw_ctx_ass.ass.name</span> $elw_ctx_ass.assType.name</td>
+					<span style="font-weight: bold;" title="$elw_ctx_ver.ass.id">$elw_ctx_ver.ass.name</span>
+					<span title="$elw_ctx_ver.assType.id">$elw_ctx_ver.assType.name</span>
+				</td>
 				<td style="padding: 0 0.25em; text-align: center;">
 					#if($started)
 						<a class="expandTrigger"
-							 id="index-$idx">Opened $format.format($elw_ctx.enr.classes.get($elw_ctx_ass.indexEntry.classFrom).fromDateTime.millis)</a>
+							 id="index-$idx">Opened $format.format($elw_ctx.enr.classes.get($elw_ctx_ver.indexEntry.classFrom).fromDateTime.millis)</a>
 					#else
-						Opens $format.format($elw_ctx.enr.classes.get($elw_ctx_ass.indexEntry.classFrom).fromDateTime.millis)
+						Opens $format.format($elw_ctx.enr.classes.get($elw_ctx_ver.indexEntry.classFrom).fromDateTime.millis)
 					#end
 				</td>
 				<td style="padding: 0 0.25em; text-align: right;">
@@ -47,33 +47,35 @@
 					#else
 						&nbsp;
 					#end
-					$elw_ctx_ass.indexEntry.scoreBudget
+					$elw_ctx_ver.indexEntry.scoreBudget
 				</td>
 			</tr>
-				#if($elw_ctx.enr.classes.get($elw_ctx_ass.indexEntry.classFrom).started)
+				#if($elw_ctx.enr.classes.get($elw_ctx_ver.indexEntry.classFrom).started)
 				<tr class="index-$idx" style="display:none;">
-					<td style="padding-left: 2.5em; padding-right: 1em; border-right: #999999 dashed 1px;">$elw_ctx_ver.ver.name</td>
+					<td style="padding-left: 2.5em; padding-right: 1em; border-right: #999999 dashed 1px;">
+						<span title="$elw_ctx_ver.ver.id">$elw_ctx_ver.ver.name</span>
+					</td>
 					<td style="padding: 0 0.25em; text-align: center;">
-						#foreach($slot in $elw_ctx_ass.assType.fileSlots)
+						#foreach($slot in $elw_ctx_ver.assType.fileSlots)
 							<a class="expandTrigger" id="index-${idx}--slot-${slot.id}" title="$slot.name">$slot.shortName:<span
-											style="font-weight: bold;">$elw_ctx_ver.ver.countFiles($elw_ctx_ass.assType, $elw_ctx_ass.ass, $slot.id, $filesStud)</span></a>
+											style="font-weight: bold;">$elw_ctx_ver.ver.countFiles($elw_ctx_ver.assType, $elw_ctx_ver.ass, $slot.id, $filesStud)</span></a>
 						#end
 					</td>
 					<td style="padding: 0 0.25em; text-align: right;">
 					</td>
 				</tr>
-					#foreach($slot in $elw_ctx_ass.assType.fileSlots)
+					#foreach($slot in $elw_ctx_ver.assType.fileSlots)
 					<tr class="index-${idx}--slot-${slot.id}" style="display:none;">
 						<td style="padding-left: 3em; padding-right: 1em; border-right: #999999 dashed 1px;">
 							<span style="font-weight: bold;" title="${slot.id}">${slot.name}</span>&nbsp;
 							#if($slot.readApprovals.size() > 0)
 								Readable after : <span
-											style="font-weight: bold;">#foreach($slotId in $slot.readApprovals) ${elw_ctx_ass.assType.findSlotById($slotId).name} #end</span>
+											style="font-weight: bold;">#foreach($slotId in $slot.readApprovals) ${elw_ctx_ver.assType.findSlotById($slotId).name} #end</span>
 							#end
 							#if($slot.writable)
 								#if($slot.writeApprovals.size() > 0)
 									Writable after : <span
-												style="font-weight: bold;">#foreach($slotId in $slot.writeApprovals) ${elw_ctx_ass.assType.findSlotById($slotId).name} #end</span>
+												style="font-weight: bold;">#foreach($slotId in $slot.writeApprovals) ${elw_ctx_ver.assType.findSlotById($slotId).name} #end</span>
 								#end
 							#else
 								<span style="font-weight: bold;">Read-only</span>
@@ -91,7 +93,7 @@
 						</td>
 						<td style="padding: 0 0.25em; text-align: center;">
 							<a class="expandTrigger" id="index-${idx}--slot-${slot.id}--files">Files:&nbsp;<span
-											style="font-weight: bold;">$elw_ctx_ver.ver.countFiles($elw_ctx_ass.assType, $elw_ctx_ass.ass, $slot.id, $filesStud)</span></a>
+											style="font-weight: bold;">$elw_ctx_ver.ver.countFiles($elw_ctx_ver.assType, $elw_ctx_ver.ass, $slot.id, $filesStud)</span></a>
 							<a class="popupTrigger" id="index-${idx}--slotinfo-${slot.id}">Details</a>
 						</td>
 						<td style="padding: 0 0.25em; text-align: right; position: relative;">

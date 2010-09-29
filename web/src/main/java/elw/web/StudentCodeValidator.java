@@ -58,63 +58,54 @@ public class StudentCodeValidator extends G4Run.Task {
 	protected void runInternal() throws Throwable {
 		final Enrollment[] enrs = enrollDao.findAllEnrollments();
 		for (Enrollment enr : enrs) {
-			final Group group = groupDao.findGroup(enr.getGroupId());
-			final Course course = courseDao.findCourse(enr.getCourseId());
+			final Ctx ctxEnr;
+			{
+				final Course course = courseDao.findCourse(enr.getCourseId());
+				final Group group = groupDao.findGroup(enr.getGroupId());
+				ctxEnr = Ctx.forEnr(enr).extendCourse(course).extendGroup(group);
+			}
 
-			final Student[] students = group.getStudents();
+			final Student[] students = ctxEnr.getGroup().getStudents();
 			for (Student student : students) {
+				final Ctx ctxStud = ctxEnr.extendStudent(student);
 				for (int index = 0; index < enr.getIndex().size(); index++) {
-					final String[] indexPath = enr.getIndex().get(index).getPath();
-					final AssignmentType assType = IdName.findById(course.getAssTypes(), indexPath[0]);
-					final Assignment ass = IdName.findById(assType.getAssignments(), indexPath[1]);
-					for (Version ver : ass.getVersions()) {
-						if (Ctx.isVersionIncorrect(student, ass, ver)) {
-							continue;
+					final Ctx ctxVer = ctxStud.extendIndex(index);
+					final Map<Stamp, Entry<CodeMeta>> metas = codeDao.findAllMetas(ctxVer);
+					final Set<Stamp> stamps = metas.keySet();
+					for (Stamp stamp : stamps) {
+						final Entry<CodeMeta> entry = metas.get(stamp);
+						final CodeMeta meta = entry.getMeta();
+						boolean update = false;
+						final CodeMeta metaSafe;
+						if (meta == null) {	//	FIXME now meta should be always defined!
+							metaSafe = new CodeMeta();
+							metaSafe.setUpdateStamp(stamp);
+							update = true;
+						} else {
+							metaSafe = meta;
 						}
-						final Ctx ctx = new Ctx(
-								Ctx.STATE_EGSCIV,
-								enr.getId(), group.getId(), student.getId(),
-								course.getId(), index, assType.getId(), ass.getId(), ver.getId()
-						);
-						ctx.resolve(enrollDao, groupDao, courseDao);
 
-						final Map<Stamp, Entry<CodeMeta>> metas = codeDao.findAllMetas(ctx);
-						final Set<Stamp> stamps = metas.keySet();
-						for (Stamp stamp : stamps) {
-							final Entry<CodeMeta> entry = metas.get(stamp);
-							final CodeMeta meta = entry.getMeta();
-							boolean update = false;
-							final CodeMeta metaSafe;
-							if (meta == null) {	//	FIXME now meta should be always defined!
-								metaSafe = new CodeMeta();
-								metaSafe.setUpdateStamp(stamp);
-								update = true;
-							} else {
-								metaSafe = meta;
+						if (metaSafe.getValidatorStamp() <= 0) {
+							update = true;
+							try {
+								final Result[] resRef = {new Result("unknown", false)};
+								final int[] passFailCounts = new int[2];
+								validator.batch(resRef, ctxVer.getVer(), entry.dumpText(), passFailCounts);
+								metaSafe.setTestsFailed(passFailCounts[1]);
+								metaSafe.setTestsPassed(passFailCounts[0]);
+							} catch (Throwable t) {
+								log.warn("exception while validating {} / {}", ctxVer, stamp);
+							} finally {
+								metaSafe.setValidatorStamp(System.currentTimeMillis());
+								entry.closeStreams();
 							}
+						}
 
-							if (metaSafe.getValidatorStamp() <= 0) {
-								update = true;
-								try {
-									final Result[] resRef = {new Result("unknown", false)};
-									final int[] passFailCounts = new int[2];
-									validator.batch(resRef, ver, entry.dumpText(), passFailCounts);
-									metaSafe.setTestsFailed(passFailCounts[1]);
-									metaSafe.setTestsPassed(passFailCounts[0]);
-								} catch (Throwable t) {
-									log.warn("exception while validating {} / {}", ctx, stamp);
-								} finally {
-									metaSafe.setValidatorStamp(System.currentTimeMillis());
-									entry.closeStreams();
-								}
-							}
-
-							if (update) {
-								try {
-									codeDao.updateMeta(ctx, stamp, metaSafe);
-								} catch (IOException t) {
-									log.warn("exception while storing update {} / {}", ctx, stamp);
-								}
+						if (update) {
+							try {
+								codeDao.updateMeta(ctxVer, stamp, metaSafe);
+							} catch (IOException t) {
+								log.warn("exception while storing update {} / {}", ctxVer, stamp);
 							}
 						}
 					}

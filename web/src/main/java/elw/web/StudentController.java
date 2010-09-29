@@ -263,57 +263,48 @@ public class StudentController extends MultiActionController implements WebSymbo
 		double grossScoreFuzzy = 0;
 
 		for (int index = 0; index < ctx.getEnr().getIndex().size(); index++) {
-			final Ctx ctxIdx = ctx.extendIndex(index);
-			final AssignmentType assType = ctxIdx.getAssType();
-			final Assignment ass = ctxIdx.getAss();
-			for (Version ver : ass.getVersions()) {
-				Student student = ctxIdx.getStudent();
-				if (Ctx.isVersionIncorrect(student, ass, ver)) {
-					continue;
-				}
+			final Ctx ctxVer = ctx.extendIndex(index);
+			final AssignmentType assType = ctxVer.getAssType();
+			final String assPath = ctxVer.toString();
 
-				final Ctx ctxAss = ctxIdx.extendTAV(assType, ass, ver);
-				final String assPath = ctxAss.toString();
+			if (fileMetas != null) {
+				final TreeMap<String, List<Entry<FileMeta>>> slotIdToFiles = loadFilesStud(fileDao, ctxVer);
+				fileMetas.put(assPath, slotIdToFiles);
+			}
 
-				if (fileMetas != null) {
-					final TreeMap<String, List<Entry<FileMeta>>> slotIdToFiles = loadFilesStud(fileDao, ctxAss);
-					fileMetas.put(ctxAss.toString(), slotIdToFiles);
+			if (codeMetas != null) {
+				final Entry<CodeMeta> last = codeDao.findLast(ctxVer);
+				if (last != null) {
+					codeMetas.put(assPath, last.getMeta());
 				}
-
-				if (codeMetas != null) {
-					final Entry<CodeMeta> last = codeDao.findLast(ctxAss);
-					if (last != null) {
-						codeMetas.put(assPath, last.getMeta());
-					}
+			}
+			if (reportMetas != null) {
+				final Entry<ReportMeta> lastReport = reportDao.findLast(ctxVer);
+				if (lastReport != null) {
+					reportMetas.put(assPath, lastReport.getMeta());
 				}
-				if (reportMetas != null) {
-					final Entry<ReportMeta> lastReport = reportDao.findLast(ctxAss);
-					if (lastReport != null) {
-						reportMetas.put(assPath, lastReport.getMeta());
+			}
+			if (scores != null) {
+				final Entry<Score> lastScore = scoreDao.findLastScore(ctxVer, "FIXME:slotId", "FIXME:fileId");
+				Score effectiveScore = null;
+				if (lastScore == null) {
+					if (codeDao != null) {
+						final Entry<ReportMeta> lastReport = reportDao != null ? reportDao.findLast(ctxVer) : null;
+						final HashMap<Stamp, Score> allCodeScores = new HashMap<Stamp, Score>();
+						final Stamp bestCodeStamp = AdminController.computeCodeScores(
+								ctxVer,
+								codeDao.findAllMetas(ctxVer),
+								allCodeScores,
+								lastReport != null ? lastReport.getMeta().getCreateStamp() : null
+						);
+						effectiveScore = allCodeScores.get(bestCodeStamp);
 					}
+				} else {
+					effectiveScore = lastScore.getMeta();
 				}
-				if (scores != null) {
-					final Entry<Score> lastScore = scoreDao.findLastScore(ctxAss, "FIXME:slotId", "FIXME:fileId");
-					Score effectiveScore = null;
-					if (lastScore == null) {
-						if (codeDao != null) {
-							final Entry<ReportMeta> lastReport = reportDao != null ? reportDao.findLast(ctxAss) : null;
-							final HashMap<Stamp, Score> allCodeScores = new HashMap<Stamp, Score>();
-							final Stamp bestCodeStamp = AdminController.computeCodeScores(
-									ctxAss,
-									codeDao.findAllMetas(ctxAss),
-									allCodeScores,
-									lastReport != null ? lastReport.getMeta().getCreateStamp() : null
-							);
-							effectiveScore = allCodeScores.get(bestCodeStamp);
-						}
-					} else {
-						effectiveScore = lastScore.getMeta();
-					}
-					if (effectiveScore != null) {
-						scores.put(assPath, effectiveScore);
-						grossScoreFuzzy += effectiveScore.getTotal(assType.getScoring(), ctxAss.getIndexEntry());
-					}
+				if (effectiveScore != null) {
+					scores.put(assPath, effectiveScore);
+					grossScoreFuzzy += effectiveScore.getTotal(assType.getScoring(), ctxVer.getIndexEntry());
 				}
 			}
 		}
