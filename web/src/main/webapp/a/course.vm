@@ -8,134 +8,141 @@
 </head>
 <body>
 <div id="elw_header">
-	<div id="nav"><a href="index">Index</a> &gt; <a href="courses">Courses</a> &gt; <span style="font-weight: bold">${elw_ctx.course.name}</span></div>
+	<div id="nav"><a href="index">Index</a> &gt; <a href="courses">Courses</a> &gt; <span
+					style="font-weight: bold">${elw_ctx.course.name}</span></div>
 	#elw_cred_adm($auth)
-	<div id="header_hr"> </div>
+	<div id="header_hr"></div>
 </div>
-#elw_messages($elw_messages)
+	#elw_messages($elw_messages)
 <div id=main>
-	<table cellspacing="0" cellpadding="0"><tbody>
-	<tr>
-		<td style="width: 40em;">Types:</td>
-		<td style="width: 10em;">&nbsp;</td>
-		<td style="width: 6em;">&nbsp;</td>
-	</tr>
-	#foreach($assType in $elw_ctx.course.assTypes)
-		#set($elw_ctx_type = $elw_ctx.extendAssType($assType))
-	<tr class="elw_row_l1">
-		<td class="elw_cell_data">${assType.name}</td>
-		<td class="elw_cell_trig">
-			<span class="expandTrigger" id="${assType.id}">Tasks</span>&nbsp;<span class="expandTrigger" id="slots-${assType.id}">Slots</span>
-		</td>
-		<td>&nbsp;</td>
-	</tr>
-		#foreach($slot in $assType.fileSlots)
-		<tr class="elw_row_l2 slots-${assType.id}" style="display: none;">
-			<td class="elw_cell_data" >
-				<span title="id=${slot.id}">${slot.name}</span>
-			</td>
-			<td class="elw_cell_trig">
-				<span class="expandTrigger" id="slots-${assType.id}-${slot.id}--files">Files</span>
-				<span class="popupTrigger" id="slots-${assType.id}-${slot.id}">Details</span>
-			</td>
-			<td style="position: relative;">
-				<div style="display:none; width: 12em;" class="slots-${assType.id}-${slot.id} popup">
-					Binary? : <span style="font-weight: bold;">#if($slot.binary)Yes#{else}No#end</span><br/>
-					Content Types : <span style="font-weight: bold;">#foreach($contentType in $slot.contentTypes) ${contentType} #end</span><br/>
-					Max Size : <span style="font-weight: bold;">${slot.lengthLimit}</span><br/>
-					Name Regex : <span style="font-weight: bold;">${slot.nameRegex}</span><br/>
-					<hr/>
-					Writable? : <span style="font-weight: bold;">#if($slot.writable)Yes#{else}No#end</span><br/>
-					#if($slot.writeApprovals.size() > 0)
-					Writable after : <span style="font-weight: bold;">#foreach($slotId in $slot.writeApprovals) $assType.findSlotById($slotId).name #end</span><br/>
-					#end
-					#if($slot.readApprovals.size() > 0)
-					Readable after : <span style="font-weight: bold;">#foreach($slotId in $slot.readApprovals) $assType.findSlotById($slotId).name #end</span><br/>
-					#end
-				</div>
-			</td>
+	<table cellspacing="0" cellpadding="0">
+		<tbody>
+		<tr>
+			<td style="width: 40em;">Types:</td>
+			<td style="width: 10em;">&nbsp;</td>
+			<td style="width: 6em;">&nbsp;</td>
 		</tr>
-			#foreach($file in $assType.getFiles(${slot.id}))
-				<tr class="elw_row_l3 slots-${assType.id}-${slot.id}--files" style="display:none;">
+			#foreach($assType in $elw_ctx.course.assTypes)
+				#set($elw_ctx_type = $elw_ctx.extendAssType($assType))
+			<tr class="elw_row_l1">
+				<td class="elw_cell_data">${assType.name}</td>
+				<td class="elw_cell_trig">
+					<span class="expandTrigger" id="${assType.id}">Tasks</span>&nbsp;<span class="expandTrigger"
+																																								 id="slots-${assType.id}">Slots</span>
+				</td>
+				<td>&nbsp;</td>
+			</tr>
+				#foreach($slot in $assType.fileSlots)
+				<tr class="elw_row_l2 slots-${assType.id}" style="display: none;">
 					<td class="elw_cell_data">
-						<a style="font-weight: bold;" title="${file.meta.id} @ t"
-							 href="../s/dl/${file.meta.name}?elw_ctx=$elw_ctx_type&s=t&sId=$slot.id&fId=$file.meta.id"
-										>${file.meta.name}</a>
-						$format.format($file.meta.createStamp.time) $file.meta.author $file.meta.sourceAddress
+						<span title="id=${slot.id}">${slot.name}</span>
 					</td>
 					<td class="elw_cell_trig">
-						#if(!$slot.binary)
-							<a class="popupTrigger"
-								 id="slots-${assType.id}-${slot.id}--files--t-${file.meta.id}">Content</a>
-						#end
-						#if($file.meta.comment && $file.meta.comment.length() > 0)
-							<a class="popupTrigger"
-								 id="slots-${assType.id}-${slot.id}--files--t-${file.meta.id}--comm">Note</a>
-						#end
+						<span class="expandTrigger" id="slots-${assType.id}-${slot.id}--files">Files</span>
+						<span class="popupTrigger" id="slots-${assType.id}-${slot.id}">Details</span>
 					</td>
-					<td class="elw_cell">
-						#if(!$slot.binary)
-							<div style="display: none; text-align: left;"
-									 class="popup slots-${assType.id}-${slot.id}--files--t-${file.meta.id}">
-								${file.text}
-							</div>
-						#end
-						#if($file.meta.comment && $file.meta.comment.length() > 0)
-							<div style="display: none; text-align: left;"
-									 class="popup slots-${assType.id}-${slot.id}--files--t-${file.meta.id}--comm">
-								$file.meta.comment
-							</div>
-						#end
+					<td style="position: relative;">
+						<div style="display:none; width: 12em;" class="slots-${assType.id}-${slot.id} popup">
+							Binary? : <span style="font-weight: bold;">#if($slot.binary)Yes#{else}No#end</span><br/>
+							Content Types : <span
+										style="font-weight: bold;">#foreach($contentType in $slot.contentTypes) ${contentType} #end</span><br/>
+							Max Size : <span style="font-weight: bold;">${slot.lengthLimit}</span><br/>
+							Name Regex : <span style="font-weight: bold;">${slot.nameRegex}</span><br/>
+							<hr/>
+							Writable? : <span style="font-weight: bold;">#if($slot.writable)Yes#{else}No#end</span><br/>
+							#if($slot.writeApprovals.size() > 0)
+								Writable after : <span
+											style="font-weight: bold;">#foreach($slotId in $slot.writeApprovals) $assType.findSlotById($slotId).name #end</span><br/>
+							#end
+							#if($slot.readApprovals.size() > 0)
+								Readable after : <span
+											style="font-weight: bold;">#foreach($slotId in $slot.readApprovals) $assType.findSlotById($slotId).name #end</span><br/>
+							#end
+						</div>
 					</td>
 				</tr>
+					#foreach($file in $assType.getFiles(${slot.id}))
+					<tr class="elw_row_l3 slots-${assType.id}-${slot.id}--files" style="display:none;">
+						<td class="elw_cell_data">
+							<a style="font-weight: bold;" title="${file.meta.id} @ t"
+								 href="../s/dl/${file.meta.name}?elw_ctx=$elw_ctx_type&s=t&sId=$slot.id&fId=$file.meta.id"
+											>${file.meta.name}</a>
+							$format.format($file.meta.createStamp.time) $file.meta.author $file.meta.sourceAddress
+						</td>
+						<td class="elw_cell_trig">
+							#if(!$slot.binary)
+								<a class="popupTrigger"
+									 id="slots-${assType.id}-${slot.id}--files--t-${file.meta.id}">Content</a>
+							#end
+							#if($file.meta.comment && $file.meta.comment.length() > 0)
+								<a class="popupTrigger"
+									 id="slots-${assType.id}-${slot.id}--files--t-${file.meta.id}--comm">Note</a>
+							#end
+						</td>
+						<td class="elw_cell">
+							#if(!$slot.binary)
+								<div style="display: none; text-align: left;"
+										 class="popup slots-${assType.id}-${slot.id}--files--t-${file.meta.id}">
+									${file.text}
+								</div>
+							#end
+							#if($file.meta.comment && $file.meta.comment.length() > 0)
+								<div style="display: none; text-align: left;"
+										 class="popup slots-${assType.id}-${slot.id}--files--t-${file.meta.id}--comm">
+									$file.meta.comment
+								</div>
+							#end
+						</td>
+					</tr>
+					#end
+				<tr class="elw_row_l4 slots-${assType.id}-${slot.id}--files" style="display:none;">
+					<td class="elw_cell_data">
+						<form method="POST" enctype="multipart/form-data"
+									action="ul?elw_ctx=$elw_ctx_type&s=t&sId=$slot.id" style="display: inline;">
+							<input type="hidden" name="expandTriggers" value="[]"/>
+							<input type="text" name="comment" value="" title="Add a note"/>
+							<input type="file" name="file" title="Select a file..."/>
+							<input type="submit" value="Upload"/>
+						</form>
+					</td>
+					<td></td>
+					<td></td>
+				</tr>
+				#end
+				#foreach($ass in $assType.assignments)
+				<tr class="elw_row_l2 ${assType.id}" style="display: none;">
+					<td class="elw_cell_data">
+						<span title="id=#if($ass.id)$ass.id#{else}null#end">$ass.name</span>
+					</td>
+					<td class="elw_cell_trig">
+						<span class="expandTrigger" id="${assType.id}__${ass.id}">Versions</span>
+					</td>
+					<td>&nbsp;</td>
+				</tr>
+					#foreach($ver in $ass.versions)
+						#set($assCtx=$elw_ctx.extendTAV(${assType}, ${ass}, ${ver}))
+					<tr class="elw_row_l3 ${assType.id}__${ass.id}" style="display: none;">
+						<td class="elw_cell_data">
+							$ver.name&nbsp;<span style="font-size: smaller">(id:&nbsp;#if($ver.id)$ver.id#{else}null#end)</span>
+						</td>
+						<td class="elw_cell_trig">
+							[&nbsp;<a href="launch?elw_ctx=$assCtx">Code</a>&nbsp;]
+						</td>
+						<td class="">
+							#if($testResults)
+								#set($res=$testResults.get($assCtx.toString()))
+								#if($res.success)#set($resColor="#00FF00")#else#set($resColor="#FF0000")#end
+								<span style="color:$resColor">$res.message</span>
+							#else
+								&nbsp;
+							#end
+						</td>
+					</tr>
+					#end
+				#end
 			#end
-		<tr class="elw_row_l4 slots-${assType.id}-${slot.id}--files" style="display:none;">
-			<td class="elw_cell_data">
-				<form method="POST" enctype="multipart/form-data"
-							action="ul?elw_ctx=$elw_ctx_type&s=t&sId=$slot.id" style="display: inline;">
-					<input type="hidden" name="expandTriggers" value="[]"/>
-					<input type="text" name="comment" value="" title="Add a note"/>
-					<input type="file" name="file" title="Select a file..."/>
-					<input type="submit" value="Upload"/>
-				</form>
-			</td>
-			<td></td>
-			<td></td>
-		</tr>
-		#end
-		#foreach($ass in $assType.assignments)
-	<tr class="elw_row_l2 ${assType.id}" style="display: none;" >
-		<td class="elw_cell_data">
-			<span title="id=#if($ass.id)$ass.id#{else}null#end">$ass.name</span>
-		</td>
-		<td class="elw_cell_trig">
-			<span class="expandTrigger" id="${assType.id}__${ass.id}">Versions</span>
-		</td>
-		<td>&nbsp;</td>
-	</tr>
-		#foreach($ver in $ass.versions)
-		#set($assCtx=$elw_ctx.extendTAV(${assType}, ${ass}, ${ver}))
-	<tr class="elw_row_l3 ${assType.id}__${ass.id}" style="display: none;">
-		<td class="elw_cell_data">
-			$ver.name&nbsp;<span style="font-size: smaller">(id:&nbsp;#if($ver.id)$ver.id#{else}null#end)</span>
-		</td>
-		<td class="elw_cell_trig">
-			[&nbsp;<a href="launch?elw_ctx=$assCtx">Code</a>&nbsp;]
-		</td>
-		<td class="">
-			#if($testResults)
-			#set($res=$testResults.get($assCtx.toString()))
-				#if($res.success)#set($resColor="#00FF00")#else#set($resColor="#FF0000")#end
-				<span style="color:$resColor">$res.message</span>
-			#else
-				&nbsp;
-			#end
-		</td>
-	</tr>
-		#end
-	 #end
-	#end
-	</tbody></table>
+		</tbody>
+	</table>
 </div>
 </body>
 </html>
