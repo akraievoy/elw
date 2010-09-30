@@ -149,8 +149,8 @@
 
 #macro (elw_file_row $p_path $p_slot $p_files $p_scope)
 	#foreach($file in $p_files)
-		<tr class="index-${p_path.index}--slot-${p_slot.id}--files" style="display:none;">
-			<td style="padding-left: 4em; padding-right: 1em; border-right: #999999 dashed 1px;">
+		<tr class="elw_row_l4 index-${p_path.index}--slot-${p_slot.id}--files" style="display:none;">
+			<td class="elw_cell_data" style="padding-left: 4em; padding-right: 1em;">
 				#if($p_path.ver.checkRead($p_path.assType, $p_path.ass, $p_slot.id, $filesStud))
 					<a style="font-weight: bold;" title="${file.meta.id} @ $p_scope"
 						 href="dl/${file.meta.name}?elw_ctx=$p_path&s=$p_scope&sId=$p_slot.id&fId=$file.meta.id"
@@ -160,7 +160,7 @@
 				#end
 				$format.format($file.meta.createStamp.time) $file.meta.author $file.meta.sourceAddress
 			</td>
-			<td style="padding: 0 0.25em; text-align: center;">
+			<td class="elw_cell_trig" style="padding: 0 0.25em; text-align: center;">
 				#if(!$p_slot.binary && $p_path.ver.checkRead($p_path.assType, $p_path.ass, $p_slot.id, $filesStud))
 					<a class="popupTrigger"
 						 id="index-${p_path.index}--slotinfo-${p_slot.id}--${p_scope}-${file.meta.id}">Content</a>
@@ -170,7 +170,7 @@
 						 id="index-${p_path.index}--slotinfo-${p_slot.id}--${p_scope}-${file.meta.id}--comm">Note</a>
 				#end
 			</td>
-			<td style="padding: 0 0.25em; text-align: right;">
+			<td class="elw_cell_num">
 				#if(!$p_slot.binary && $p_path.ver.checkRead($p_path.assType, $p_path.ass, $p_slot.id, $filesStud))
 					<div style="display: none; text-align: left;"
 							 class="popup index-${p_path.index}--slotinfo-${p_slot.id}--${p_scope}-${file.meta.id}">

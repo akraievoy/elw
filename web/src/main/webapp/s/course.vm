@@ -28,12 +28,12 @@
 				#set($elw_ctx_ver = $elw_ctx.extendIndex($idx))
 				#set($started = $elw_ctx.enr.classes.get($elw_ctx_ver.indexEntry.classFrom).started)
 				#set($filesStud = $fileMetas.get("$elw_ctx_ver.toString()"))
-			<tr class="elw_header_row">
-				<td style="padding-left: 2em; padding-right: 1em; border-right: #999999 dashed 1px;">
+			<tr class="elw_row_l1">
+				<td class="elw_cell_data">
 					<span style="font-weight: bold;" title="$elw_ctx_ver.ass.id">$elw_ctx_ver.ass.name</span>
 					<span title="$elw_ctx_ver.assType.id">$elw_ctx_ver.assType.name</span>
 				</td>
-				<td style="padding: 0 0.25em; text-align: center;">
+				<td class="elw_cell_trig">
 					#if($started)
 						<a class="expandTrigger"
 							 id="index-$idx">Opened $format.format($elw_ctx.enr.classes.get($elw_ctx_ver.indexEntry.classFrom).fromDateTime.millis)</a>
@@ -41,7 +41,7 @@
 						Opens $format.format($elw_ctx.enr.classes.get($elw_ctx_ver.indexEntry.classFrom).fromDateTime.millis)
 					#end
 				</td>
-				<td style="padding: 0 0.25em; text-align: right;">
+				<td class="elw_cell_num">
 					#if($scores.get("$elw_ctx_ver"))
 						#elw_score($elw_ctx_ver, $scores.get("$elw_ctx_ver")) of
 					#else
@@ -51,22 +51,22 @@
 				</td>
 			</tr>
 				#if($elw_ctx.enr.classes.get($elw_ctx_ver.indexEntry.classFrom).started)
-				<tr class="index-$idx" style="display:none;">
-					<td style="padding-left: 2.5em; padding-right: 1em; border-right: #999999 dashed 1px;">
+				<tr class="elw_row_l2 index-$idx" style="display:none;">
+					<td class="elw_cell_data">
 						<span title="$elw_ctx_ver.ver.id">$elw_ctx_ver.ver.name</span>
 					</td>
-					<td style="padding: 0 0.25em; text-align: center;">
+					<td class="elw_cell_trig">
 						#foreach($slot in $elw_ctx_ver.assType.fileSlots)
 							<a class="expandTrigger" id="index-${idx}--slot-${slot.id}" title="$slot.name">$slot.shortName:<span
 											style="font-weight: bold;">$elw_ctx_ver.ver.countFiles($elw_ctx_ver.assType, $elw_ctx_ver.ass, $slot.id, $filesStud)</span></a>
 						#end
 					</td>
-					<td style="padding: 0 0.25em; text-align: right;">
+					<td class="elw_cell_num">
 					</td>
 				</tr>
 					#foreach($slot in $elw_ctx_ver.assType.fileSlots)
-					<tr class="index-${idx}--slot-${slot.id}" style="display:none;">
-						<td style="padding-left: 3em; padding-right: 1em; border-right: #999999 dashed 1px;">
+					<tr class="elw_row_l3 index-${idx}--slot-${slot.id}" style="display:none;">
+						<td class="elw_cell_data">
 							<span style="font-weight: bold;" title="${slot.id}">${slot.name}</span>&nbsp;
 							#if($slot.readApprovals.size() > 0)
 								Readable after : <span
@@ -91,12 +91,12 @@
 								#end
 							#end
 						</td>
-						<td style="padding: 0 0.25em; text-align: center;">
+						<td class="elw_cell_trig">
 							<a class="expandTrigger" id="index-${idx}--slot-${slot.id}--files">Files:&nbsp;<span
 											style="font-weight: bold;">$elw_ctx_ver.ver.countFiles($elw_ctx_ver.assType, $elw_ctx_ver.ass, $slot.id, $filesStud)</span></a>
 							<a class="popupTrigger" id="index-${idx}--slotinfo-${slot.id}">Details</a>
 						</td>
-						<td style="padding: 0 0.25em; text-align: right; position: relative;">
+						<td class="elw_cell_num" style="position: relative;">
 							<div style="display: none;" class="popup index-${idx}--slotinfo-${slot.id}">
 								Content Types : <span
 											style="font-weight: bold;">#foreach($contentType in $slot.contentTypes) ${contentType} #end</span><br/>
@@ -110,8 +110,8 @@
 						#elw_file_row($elw_ctx_ver, $slot, $elw_ctx_ver.ver.getFiles($slot.id), "v")
 						#elw_file_row($elw_ctx_ver, $slot, $filesStud.get($slot.id), "s")
 						#if($elw_ctx_ver.ver.checkWrite($elw_ctx_ver.assType, $elw_ctx_ver.ass, $slot.id, $filesStud))
-							<tr class="index-${idx}--slot-${slot.id}" style="display:none;">
-								<td style="padding-left: 4em; padding-right: 1em; border-right: #999999 dashed 1px;">
+							<tr class="elw_row_l4 index-${idx}--slot-${slot.id}" style="display:none;">
+								<td class="elw_cell_data">
 									<form method="POST" enctype="multipart/form-data" 
 												action="ul?elw_ctx=$elw_ctx_ver&sId=$slot.id" style="display: inline;">
 										<input type="hidden" name="expandTriggers" value="[]"/>
@@ -120,19 +120,19 @@
 										<input type="submit" value="Upload"/>
 									</form>
 								</td>
-								<td style="padding: 0 0.25em; text-align: center;">
+								<td class="elw_cell_trig">
 								</td>
-								<td style="padding: 0 0.25em; text-align: right; position: relative;">
+								<td class="elw_cell_num" style="position: relative;">
 								</td>
 							</tr>
 						#end
 					#end
 				#end
 			#end
-		<tr>
-			<td style="padding-left: 1em;">&nbsp;</td>
-			<td style="padding: 0 0.25em;">Total Score:</td>
-			<td style="padding: 0 0.25em; text-align: right;">$grossScore</td>
+		<tr class="elw_row+l3";>
+			<td >&nbsp;</td>
+			<td class="elw_cell_num">Total Score:</td>
+			<td class="elw_cell_num">$grossScore</td>
 		</tr>
 		</tbody>
 	</table>

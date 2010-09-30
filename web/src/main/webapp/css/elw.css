@@ -104,9 +104,111 @@ div.formButtons {
 	color: #333333;
 }
 
-.elw_header_row {
+tr.elw_header_row td {
 	border-bottom: #CCCCCC dotted 1px;
 	background-color: #EEEEEE;
+}
+
+tr.elw_header_row th {
+	border-bottom: #CCCCCC dotted 1px;
+	background-color: #EEEEEE;
+}
+
+td.elw_cell_data {
+	border-right: #999999 dashed 1px;
+}
+
+td.elw_cell_trig {
+	text-align: center;
+}
+
+td.elw_cell_num {
+	text-align: right;
+}
+
+tr.elw_row td {
+	padding-left: 0.25em;
+	padding-right: 0.25em;
+}
+
+tr.elw_row_l0 > td:first-child {
+	padding-left: 0.25em;
+	padding-right: 0.25em;
+}
+
+tr.elw_row_l0 > td {
+	border-bottom: #EEEEEE dotted 1px;
+	background-color: #FFFFFF;
+}
+
+tr.elw_row_l1 > td:first-child {
+	padding-left: 0.75em;
+	padding-right: 0.25em;
+}
+
+tr.elw_row_l1 > td {
+	border-bottom: #DDDDDD dotted 1px;
+	background-color: #EEEEEE;
+}
+
+tr.elw_row_l2 > td:first-child {
+	padding-left: 1.5em;
+	padding-right: 0.25em;
+}
+
+tr.elw_row_l2 > td {
+	border-bottom: #CCCCCC dotted 1px;
+	background-color: #DDDDDD;
+}
+
+tr.elw_row_l3 > td:first-child {
+	padding-left: 2.25em;
+	padding-right: 0.25em;
+}
+
+tr.elw_row_l3 > td {
+	border-bottom: #BBBBBB dotted 1px;
+	background-color: #CCCCCC;
+}
+
+tr.elw_row_l4 > td:first-child {
+	padding-left: 3em;
+	padding-right: 0.25em;
+}
+
+tr.elw_row_l4 > td {
+	border-bottom: #AAAAAA dotted 1px;
+	background-color: #BBBBBB;
+}
+
+tr.elw_row_l5 > td:first-child {
+	padding-left: 3.75em;
+	padding-right: 0.25em;
+}
+
+tr.elw_row_l5 > td {
+	border-bottom: #999999 dotted 1px;
+	background-color: #AAAAAA;
+}
+
+tr.elw_row_l6 > td:first-child {
+	padding-left: 4.5em;
+	padding-right: 0.25em;
+}
+
+tr.elw_row_l6 > td {
+	border-bottom: #888888 dotted 1px;
+	background-color: #999999;
+}
+
+tr.elw_row_l7 > td:first-child {
+	padding-left: 5.25em;
+	padding-right: 0.25em;
+}
+
+tr.elw_row_l7 > td {
+	border-bottom: #777777 dotted 1px;
+	background-color: #888888;
 }
 
 .expandTrigger {

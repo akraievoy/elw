@@ -16,29 +16,29 @@
 <div id=main>
 	<table cellspacing="0" cellpadding="0"><tbody>
 	<tr>
-		<td style="padding-left: 1em;padding-right: 0.25em; width: 40em;">Types:</td>
+		<td style="width: 40em;">Types:</td>
 		<td style="width: 10em;">&nbsp;</td>
 		<td style="width: 6em;">&nbsp;</td>
 	</tr>
 	#foreach($assType in $elw_ctx.course.assTypes)
 		#set($elw_ctx_type = $elw_ctx.extendAssType($assType))
-	<tr>
-		<td style="padding-left: 1.5em; padding-right: 0.25em;">${assType.name}</td>
-		<td style="text-align: center;">
+	<tr class="elw_row_l1">
+		<td class="elw_cell_data">${assType.name}</td>
+		<td class="elw_cell_trig">
 			<span class="expandTrigger" id="${assType.id}">Tasks</span>&nbsp;<span class="expandTrigger" id="slots-${assType.id}">Slots</span>
 		</td>
 		<td>&nbsp;</td>
 	</tr>
 		#foreach($slot in $assType.fileSlots)
-		<tr class="slots-${assType.id}" style="display: none;">
-			<td style="padding-left: 2.5em; padding-right: 0.25em; position:relative;" >
+		<tr class="elw_row_l2 slots-${assType.id}" style="display: none;">
+			<td class="elw_cell_data" >
 				<span title="id=${slot.id}">${slot.name}</span>
 			</td>
-			<td style="text-align: center;">
+			<td class="elw_cell_trig">
 				<span class="expandTrigger" id="slots-${assType.id}-${slot.id}--files">Files</span>
 				<span class="popupTrigger" id="slots-${assType.id}-${slot.id}">Details</span>
 			</td>
-			<td>
+			<td style="position: relative;">
 				<div style="display:none; width: 12em;" class="slots-${assType.id}-${slot.id} popup">
 					Binary? : <span style="font-weight: bold;">#if($slot.binary)Yes#{else}No#end</span><br/>
 					Content Types : <span style="font-weight: bold;">#foreach($contentType in $slot.contentTypes) ${contentType} #end</span><br/>
@@ -55,16 +55,15 @@
 				</div>
 			</td>
 		</tr>
-			$assType.getFiles(${slot.id})
 			#foreach($file in $assType.getFiles(${slot.id}))
-				<tr class="slots-${assType.id}-${slot.id}--files" style="display:none;">
-					<td style="padding-left: 4em; padding-right: 1em; border-right: #999999 dashed 1px;">
+				<tr class="elw_row_l3 slots-${assType.id}-${slot.id}--files" style="display:none;">
+					<td class="elw_cell_data">
 						<a style="font-weight: bold;" title="${file.meta.id} @ t"
 							 href="../s/dl/${file.meta.name}?elw_ctx=$elw_ctx_type&s=t&sId=$slot.id&fId=$file.meta.id"
 										>${file.meta.name}</a>
 						$format.format($file.meta.createStamp.time) $file.meta.author $file.meta.sourceAddress
 					</td>
-					<td style="padding: 0 0.25em; text-align: center;">
+					<td class="elw_cell_trig">
 						#if(!$slot.binary)
 							<a class="popupTrigger"
 								 id="slots-${assType.id}-${slot.id}--files--t-${file.meta.id}">Content</a>
@@ -74,7 +73,7 @@
 								 id="slots-${assType.id}-${slot.id}--files--t-${file.meta.id}--comm">Note</a>
 						#end
 					</td>
-					<td style="padding: 0 0.25em; text-align: right;">
+					<td class="elw_cell">
 						#if(!$slot.binary)
 							<div style="display: none; text-align: left;"
 									 class="popup slots-${assType.id}-${slot.id}--files--t-${file.meta.id}">
@@ -90,8 +89,8 @@
 					</td>
 				</tr>
 			#end
-		<tr class="slots-${assType.id}-${slot.id}--files" style="display:none;">
-			<td style="padding-left: 4em; padding-right: 1em; border-right: #999999 dashed 1px;">
+		<tr class="elw_row_l4 slots-${assType.id}-${slot.id}--files" style="display:none;">
+			<td class="elw_cell_data">
 				<form method="POST" enctype="multipart/form-data"
 							action="ul?elw_ctx=$elw_ctx_type&s=t&sId=$slot.id" style="display: inline;">
 					<input type="hidden" name="expandTriggers" value="[]"/>
@@ -100,32 +99,30 @@
 					<input type="submit" value="Upload"/>
 				</form>
 			</td>
-			<td style="padding: 0 0.25em; text-align: center;">
-			</td>
-			<td style="padding: 0 0.25em; text-align: right; position: relative;">
-			</td>
+			<td></td>
+			<td></td>
 		</tr>
 		#end
 		#foreach($ass in $assType.assignments)
-	<tr class="elw_header_row ${assType.id}" style="display: none;" >
-		<td style="padding-left: 2em; padding-right: 0.25em;">
+	<tr class="elw_row_l2 ${assType.id}" style="display: none;" >
+		<td class="elw_cell_data">
 			<span title="id=#if($ass.id)$ass.id#{else}null#end">$ass.name</span>
 		</td>
-		<td style="text-align: center;">
+		<td class="elw_cell_trig">
 			<span class="expandTrigger" id="${assType.id}__${ass.id}">Versions</span>
 		</td>
 		<td>&nbsp;</td>
 	</tr>
 		#foreach($ver in $ass.versions)
 		#set($assCtx=$elw_ctx.extendTAV(${assType}, ${ass}, ${ver}))
-	<tr class="${assType.id}__${ass.id}" style="display: none;">
-		<td style="padding-left: 3em;">
+	<tr class="elw_row_l3 ${assType.id}__${ass.id}" style="display: none;">
+		<td class="elw_cell_data">
 			$ver.name&nbsp;<span style="font-size: smaller">(id:&nbsp;#if($ver.id)$ver.id#{else}null#end)</span>
 		</td>
-		<td style="text-align: center;">
+		<td class="elw_cell_trig">
 			[&nbsp;<a href="launch?elw_ctx=$assCtx">Code</a>&nbsp;]
 		</td>
-		<td style="padding-left: 0.25em; padding-right: 0.25em;">
+		<td class="">
 			#if($testResults)
 			#set($res=$testResults.get($assCtx.toString()))
 				#if($res.success)#set($resColor="#00FF00")#else#set($resColor="#FF0000")#end
