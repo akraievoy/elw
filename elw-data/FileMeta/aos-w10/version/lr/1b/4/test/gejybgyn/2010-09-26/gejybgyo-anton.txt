@@ -1,4 +1,0 @@
-#REGISTERS
-$a0:14:14
-$v0::5
-#MEMORY

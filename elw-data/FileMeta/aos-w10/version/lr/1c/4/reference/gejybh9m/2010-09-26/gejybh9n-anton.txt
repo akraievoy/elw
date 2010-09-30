@@ -1,2 +1,0 @@
-mult $a0, $a1
-mflo $v0

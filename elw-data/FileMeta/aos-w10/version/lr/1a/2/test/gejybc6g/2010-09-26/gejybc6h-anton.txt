@@ -1,3 +1,0 @@
-#REGISTERS
-$a0:23:21
-#MEMORY
