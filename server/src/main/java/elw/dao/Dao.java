@@ -713,6 +713,10 @@ public abstract class Dao<Meta extends Stamped> {
 	}
 
 	protected void sortByCreateStamp(Entry<? extends Stamped>[] files) {
+		if (files.length == 0) {
+			return;
+		}
+		
 		Arrays.sort(files, new Comparator<Entry<? extends Stamped>>() {
 			public int compare(Entry<? extends Stamped> o1, Entry<? extends Stamped> o2) {
 				return o1.getMeta().getCreateStamp().compareTo(o2.getMeta().getCreateStamp());

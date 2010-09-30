@@ -56,6 +56,76 @@ public class StudentCodeValidator extends G4Run.Task {
 	}
 
 	protected void runInternal() throws Throwable {
+/*
+		log.error("IMPORT STARTED");
+		final Course[] allCourses = courseDao.findAllCourses();
+		for (int iC = 0; iC < allCourses.length; iC++) {
+			final Course course = allCourses[iC];
+			if (!"aos-w10".equals(course.getId())) {
+				continue;
+			}
+			for (AssignmentType assType : course.getAssTypes()) {
+				for (Assignment ass : assType.getAssignments()) {
+					for (Version ver : ass.getVersions()) {
+						final Ctx ctx_ver = Ctx.forAss(course, assType, ass).extendVer(ver);
+
+						for (FileSlot slot : assType.getFileSlots()) {
+							if ("statement".equals(slot.getId()) && ver.getFiles(slot.getId()).length == 0) {
+								fileDao.createFileFor(
+										FileDao.SCOPE_VER,
+										ctx_ver,
+										slot.getId(),
+										new FileMeta("statement.html", "statement.html", "text/html", "akraievoy", "lynx"),
+										null,
+										new BufferedReader(new StringReader(G4Str.join(ver.getStatementHtml(), "\n")))
+								);
+							} else if ("test".equals(slot.getId()) && ver.getFiles(slot.getId()).length == 0) {
+								final Test[] tests = ver.getTests();
+								for (int i = 0, testsLength = tests.length; i < testsLength; i++) {
+									final Test test = tests[i];
+									fileDao.createFileFor(
+											FileDao.SCOPE_VER,
+											ctx_ver,
+											slot.getId(),
+											new FileMeta("test-"+i+".txt", "test-"+i+".txt", "text/plain", "akraievoy", "lynx"),
+											null,
+											new BufferedReader(new StringReader(
+													"#REGISTERS\n" +
+													(test.getArgs().get("regs") != null ? G4Str.join(test.getArgs().get("regs"), "\n") : G.STRING_EMPTY) +
+													"\n#MEMORY\n" +
+													(test.getArgs().get("mem") != null ? G4Str.join(test.getArgs().get("mem"), "\n") : G.STRING_EMPTY)
+											))
+									);
+								}
+							} else if ("lr".equals(assType.getId()) &&  "reference".equals(slot.getId()) && ver.getFiles(slot.getId()).length == 0) {
+								fileDao.createFileFor(
+										FileDao.SCOPE_VER,
+										ctx_ver,
+										slot.getId(),
+										new FileMeta("reference.mips", "reference.mips", "text/plain", "akraievoy", "lynx"),
+										null,
+										new BufferedReader(new StringReader(G4Str.join(ver.getSolution(), "\n")))
+								);
+							} else if ("cp".equals(assType.getId()) && "code".equals(slot.getId()) && ver.getFiles(slot.getId()).length == 0) {
+								fileDao.createFileFor(
+										FileDao.SCOPE_VER,
+										ctx_ver,
+										slot.getId(),
+										new FileMeta("code.mips", "code.mips", "text/plain", "akraievoy", "lynx"),
+										null,
+										new BufferedReader(new StringReader(G4Str.join(ver.getSolution(), "\n")))
+								);
+							}
+						}
+					}
+
+				}
+			}
+
+		}
+		log.error("IMPORT COMPLETE");
+*/
+
 		final Enrollment[] enrs = enrollDao.findAllEnrollments();
 		for (Enrollment enr : enrs) {
 			final Ctx ctxEnr;
