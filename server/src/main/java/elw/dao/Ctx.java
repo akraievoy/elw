@@ -23,6 +23,9 @@ public class Ctx {
 	public static final String STATE_ECG = "ecg";
 	public static final String STATE_ECGS = "ecgs";
 	public static final String STATE_C = "c";
+	public static final String STATE_CT = "ct";
+	public static final String STATE_CTA = "cta";
+	public static final String STATE_CTAV = "ctav";
 	public static final String STATE_CIV = "civ";
 	public static final String STATE_EGSCIV = "egsciv";
 

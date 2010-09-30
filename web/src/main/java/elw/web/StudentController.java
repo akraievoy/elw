@@ -5,13 +5,7 @@ import elw.miniweb.Message;
 import elw.miniweb.ViewJackson;
 import elw.vo.*;
 import org.akraievoy.gear.G4Io;
-import org.akraievoy.gear.G4Str;
-import org.akraievoy.gear.G4mat;
-import org.apache.commons.fileupload.FileItemIterator;
-import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +22,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.util.*;
-import java.util.regex.Pattern;
 
 @Controller
 @RequestMapping("/s/**/*")
@@ -42,16 +35,15 @@ public class StudentController extends MultiActionController implements WebSymbo
 	protected final ReportDao reportDao;
 	protected final ScoreDao scoreDao;
 	protected final FileDao fileDao;
+	private final AdminController adminController;
 
 	protected final ObjectMapper mapper = new ObjectMapper();
 	protected final long cacheBustingToken = System.currentTimeMillis();
 
-	protected final DiskFileItemFactory fileItemFactory;
-
 	public StudentController(
 			CourseDao courseDao, GroupDao groupDao, EnrollDao enrollDao,
-			CodeDao codeDao, ReportDao reportDao, ScoreDao scoreDao,
-			FileDao fileDao
+			CodeDao codeDao, ReportDao reportDao, ScoreDao scoreDao, FileDao fileDao,
+			AdminController adminController
 	) {
 		this.courseDao = courseDao;
 		this.groupDao = groupDao;
@@ -60,10 +52,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 		this.reportDao = reportDao;
 		this.scoreDao = scoreDao;
 		this.fileDao = fileDao;
-
-		fileItemFactory = new DiskFileItemFactory();
-		fileItemFactory.setRepository(new java.io.File(System.getProperty("java.io.tmpdir")));
-		fileItemFactory.setSizeThreshold(2 * 1024 * 1024);
+		this.adminController = adminController;
 	}
 
 	protected HashMap<String, Object> auth(final HttpServletRequest req, final HttpServletResponse resp, final String pathToRoot) throws IOException {
@@ -331,110 +320,11 @@ public class StudentController extends MultiActionController implements WebSymbo
 		}
 
 		final Ctx ctx = (Ctx) model.get(R_CTX);
-		if (!ctx.resolved(Ctx.STATE_EGSCIV)) {
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "context path problem, please check the logs");
-			return null;
-		}
-
 		final String refreshUri = "course?" + WebSymbols.R_CTX + "=" + Ctx.forEnr(ctx.getEnr()).toString();
-		final String slotId = req.getParameter("sId");
-		if (slotId == null || slotId.trim().length() == 0) {
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "no slotId (sId) defined");
-			return null;
-		}
-
-		final FileSlot slot = ctx.getAssType().findSlotById(slotId);
-		if (slot == null) {
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "slot '" + slotId + "' not found");
-			return null;
-		}
-
-		if (req.getContentLength() == -1) {
-			Message.addWarn(req, "upload size not reported");
-			resp.sendRedirect(refreshUri);
-			return null;
-		}
-
-		if (req.getContentLength() > slot.getLengthLimit()) {
-			Message.addWarn(req, "upload exceeds " + G4mat.formatMem(slot.getLengthLimit()));
-			resp.sendRedirect(refreshUri);
-			return null;
-		}
-
-		if (!ctx.getVer().checkWrite(ctx.getAssType(), ctx.getAss(), slotId, loadFilesStud(fileDao, ctx))) {
-			Message.addWarn(req, "not writable yet");
-			resp.sendRedirect(refreshUri);
-			return null;
-		}
-
-		final boolean binary = slot.isBinary();
-		final ServletFileUpload sfu = new ServletFileUpload(fileItemFactory);
-		final FileItemIterator fii = sfu.getItemIterator(req);
-		int fileCount = 0;
-		String comment = null;
-		while (fii.hasNext()) {
-			final FileItemStream item = fii.next();
-			if (item.isFormField()) {
-				if ("comment".equals(item.getFieldName())) {
-					comment = G4Io.dumpToString(item.openStream());
-				}
-				if ("expandTriggers".equals(item.getFieldName())) {
-					req.getSession().setAttribute("course.expandTriggers", G4Io.dumpToString(item.openStream()));
-				}
-				continue;
-			}
-
-			if (fileCount > 0) {
-				Message.addWarn(req, "one file per upload, please");
-				resp.sendRedirect(refreshUri);
-				return null;
-			}
-
-			final String fileName = item.getName();
-			if (!Pattern.compile(slot.getNameRegex()).matcher(fileName).matches()) {
-				Message.addWarn(req, "check the file name: regex check failed");
-				resp.sendRedirect(refreshUri);
-				return null;
-			}
-
-			final String contentType = item.getContentType();
-			if (G4Str.indexOf(contentType, slot.getContentTypes()) < 0) {
-				Message.addWarn(req, "contentType '" + contentType + "': not allowed");
-				resp.sendRedirect(refreshUri);
-				return null;
-			}
-
-			final FileMeta fileMeta = new FileMeta(
-					fileName,
-					fileName,
-					contentType,
-					ctx.getStudent().getName(),
-					resolveRemoteAddress(req)
-			);
-			if (comment != null) {
-				fileMeta.setComment(comment);
-			}
-
-			fileDao.createFileFor(
-					FileDao.SCOPE_STUD,
-					ctx,
-					slot.getId(),
-					fileMeta,
-					binary ? new BufferedInputStream(item.openStream()) : null,
-					binary ? null : new BufferedReader(new InputStreamReader(item.openStream(), "UTF-8"))
-			);
-			fileCount++;
-		}
-
-		if (fileCount == 1) {
-			Message.addInfo(req, "Your upload has succeeded");
-			resp.sendRedirect(refreshUri);
-		} else {
-			Message.addWarn(req, "Something went terribly wrong");
-			resp.sendRedirect(refreshUri);
-		}
-
-		return null;
+		return adminController.processUpload(
+				req, resp, FileDao.SCOPE_STUD,
+				model, refreshUri, ctx.getStudent().getName()
+		);
 	}
 
 	@RequestMapping(value = "updateExpandTriggers", method = RequestMethod.POST)
@@ -575,14 +465,4 @@ public class StudentController extends MultiActionController implements WebSymbo
 		return new ModelAndView("s/launch", model);
 	}
 
-	protected static String resolveRemoteAddress(HttpServletRequest req) {
-		final String remoteAddr = req.getRemoteAddr();
-
-		final String xff = req.getHeader("X-Forwarded-For");
-		if (xff != null && xff.trim().length() > 0) {
-			return xff.replaceAll("\\s+", "").split(",")[0];
-		}
-
-		return remoteAddr;
-	}
 }

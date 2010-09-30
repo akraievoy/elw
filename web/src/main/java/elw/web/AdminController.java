@@ -6,7 +6,15 @@ import elw.dp.mips.MipsValidator;
 import elw.miniweb.Message;
 import elw.vo.*;
 import elw.vo.Class;
+import org.akraievoy.gear.G4Io;
 import org.akraievoy.gear.G4Parse;
+import org.akraievoy.gear.G4Str;
+import org.akraievoy.gear.G4mat;
+import org.apache.commons.fileupload.FileItemIterator;
+import org.apache.commons.fileupload.FileItemStream;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -21,9 +29,9 @@ import org.springframework.web.servlet.support.RequestContextUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.io.StringWriter;
+import java.io.*;
 import java.util.*;
+import java.util.regex.Pattern;
 
 @Controller
 @RequestMapping("/a/**/*")
@@ -44,7 +52,12 @@ public class AdminController extends MultiActionController implements WebSymbols
 	protected final ObjectMapper mapper = new ObjectMapper();
 	protected final long cacheBustingToken = System.currentTimeMillis();
 
-	public AdminController(CourseDao courseDao, EnrollDao enrollDao, GroupDao groupDao, CodeDao codeDao, ReportDao reportDao, ScoreDao scoreDao, FileDao fileDao) {
+	protected final DiskFileItemFactory fileItemFactory;
+
+	public AdminController(
+			CourseDao courseDao, EnrollDao enrollDao, GroupDao groupDao, CodeDao codeDao,
+			ReportDao reportDao, ScoreDao scoreDao, FileDao fileDao
+	) {
 		this.courseDao = courseDao;
 		this.enrollDao = enrollDao;
 		this.groupDao = groupDao;
@@ -52,6 +65,10 @@ public class AdminController extends MultiActionController implements WebSymbols
 		this.reportDao = reportDao;
 		this.scoreDao = scoreDao;
 		this.fileDao = fileDao;
+
+		fileItemFactory = new DiskFileItemFactory();
+		fileItemFactory.setRepository(new java.io.File(System.getProperty("java.io.tmpdir")));
+		fileItemFactory.setSizeThreshold(2 * 1024 * 1024);
 	}
 
 	protected HashMap<String, Object> auth(final HttpServletRequest req, final HttpServletResponse resp, final String pathToRoot) throws IOException {
@@ -75,8 +92,10 @@ public class AdminController extends MultiActionController implements WebSymbols
 		}
 
 		session.removeAttribute("loginTo");	//	LATER extract constant
+
 		final HashMap<String, Object> model = prepareDefaultModel(req);
 		model.put("auth", req.getSession(true).getAttribute(S_ADMIN));
+		model.put(R_CTX, Ctx.fromString(req.getParameter(R_CTX)).resolve(enrollDao, groupDao, courseDao));
 
 		return model;
 	}
@@ -175,7 +194,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 			return null;
 		}
 
-		final Ctx ctx = Ctx.fromString(req.getParameter("elw_ctx")).resolve(enrollDao, groupDao, courseDao);
+		final Ctx ctx = (Ctx) model.get(R_CTX);
 		if (!ctx.resolved(Ctx.STATE_C)) {
 			Message.addWarn(req, "Course not found");
 			resp.sendRedirect("courses");
@@ -201,8 +220,6 @@ public class AdminController extends MultiActionController implements WebSymbols
 			model.put("testResults", testResults);
 		}
 
-		model.put("elw_ctx", ctx);
-
 		return new ModelAndView("a/course", model);
 	}
 
@@ -213,7 +230,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 			return null;
 		}
 
-		final Ctx ctx = Ctx.fromString(req.getParameter(R_CTX)).resolve(enrollDao, groupDao, courseDao);
+		final Ctx ctx = (Ctx) model.get(R_CTX);
 		if (!ctx.resolved(Ctx.STATE_CIV)) {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "context path problem, please check the logs");
 			return null;
@@ -222,7 +239,6 @@ public class AdminController extends MultiActionController implements WebSymbols
 		final StringWriter verSw = new StringWriter();
 		mapper.writeValue(verSw, ctx.getVer());
 
-		model.put("elw_ctx", ctx);
 		//	LATER use HTTP instead of applet parameter for passing the problem/code to applet
 		model.put("verJson", verSw.toString().replaceAll("&", "&amp;").replaceAll("\"", "&quot;"));
 		model.put("upHeader", "JSESSIONID=" + req.getSession(true).getId());
@@ -259,7 +275,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 			return null;
 		}
 
-		final Ctx ctx = Ctx.fromString(req.getParameter("elw_ctx")).resolve(enrollDao, groupDao, courseDao);
+		final Ctx ctx = (Ctx) model.get(R_CTX);
 		if (!ctx.resolved(Ctx.STATE_ECG)) {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Path problem, please check the logs");
 			return null;
@@ -285,7 +301,6 @@ public class AdminController extends MultiActionController implements WebSymbols
 			grossScores.put(studCtx.toString(), grossScore[0]);
 		}
 
-		model.put("elw_ctx", ctx);
 		model.put("fileMetas", fileMetas);
 		model.put("codeMetas", codeMetas);
 		model.put("reportMetas", reportMetas);
@@ -302,7 +317,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 			return null;
 		}
 
-		final Ctx ctx = Ctx.fromString(req.getParameter("elw_ctx")).resolve(enrollDao, groupDao, courseDao);
+		final Ctx ctx = (Ctx) model.get(R_CTX);
 		if (!ctx.resolved(Ctx.STATE_ECG)) {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Path problem, please check the logs");
 			return null;
@@ -310,7 +325,6 @@ public class AdminController extends MultiActionController implements WebSymbols
 
 		final List<LogEntry> logEntries = prepareLogEntries(ctx);
 
-		model.put("elw_ctx", ctx);
 		model.put("logEntries", logEntries);
 
 		return new ModelAndView("a/log", model);
@@ -337,6 +351,17 @@ public class AdminController extends MultiActionController implements WebSymbols
 		Collections.sort(logEntries);
 
 		return logEntries;
+	}
+
+	protected static String resolveRemoteAddress(HttpServletRequest req) {
+		final String remoteAddr = req.getRemoteAddr();
+
+		final String xff = req.getHeader("X-Forwarded-For");
+		if (xff != null && xff.trim().length() > 0) {
+			return xff.replaceAll("\\s+", "").split(",")[0];
+		}
+
+		return remoteAddr;
 	}
 
 	public static class LogEntry implements Comparable<LogEntry> {
@@ -382,7 +407,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 			return null;
 		}
 
-		final Ctx ctx = Ctx.fromString(req.getParameter("elw_ctx")).resolve(enrollDao, groupDao, courseDao);
+		final Ctx ctx = (Ctx) model.get(R_CTX);
 		if (!ctx.resolved(Ctx.STATE_EGSCIV)) {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Path problem, please check the logs");
 			return null;
@@ -432,7 +457,6 @@ public class AdminController extends MultiActionController implements WebSymbols
 
 		model.put("scores", scoreDao.findAllScores(ctx, "FIXME:slotId", "FIXME:fileId"));
 		model.put("score", reportScore);
-		model.put("elw_ctx", ctx);
 
 		return new ModelAndView("a/approve", model);
 	}
@@ -466,7 +490,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 			return null;
 		}
 
-		final Ctx ctx = Ctx.fromString(req.getParameter("elw_ctx")).resolve(enrollDao, groupDao, courseDao);
+		final Ctx ctx = (Ctx) model.get(R_CTX);
 		if (!ctx.resolved(Ctx.STATE_EGSCIV)) {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Path problem, please check the logs");
 			return null;
@@ -615,4 +639,140 @@ public class AdminController extends MultiActionController implements WebSymbols
 		return new ModelAndView("a/groups", model);
 	}
 
+	@RequestMapping(value = "ul", method = RequestMethod.POST)
+	public ModelAndView do_ul(final HttpServletRequest req, final HttpServletResponse resp) throws IOException, FileUploadException {
+		final HashMap<String, Object> model = auth(req, resp, "");
+		if (model == null) {
+			return null;
+		}
+
+		final Ctx ctx = (Ctx) model.get(R_CTX);
+		final String refreshUri = "course?" + WebSymbols.R_CTX + "=" + Ctx.forCourse(ctx.getCourse()).toString();
+
+		return processUpload(req, resp, null, model, refreshUri, "akraievoy");
+	}
+
+	public ModelAndView processUpload(
+			HttpServletRequest req, HttpServletResponse resp, String scopeForced,
+			HashMap<String, Object> model, String refreshUri, String authorName
+	) throws IOException, FileUploadException {
+		final String scope = scopeForced == null ? req.getParameter("s") : scopeForced;
+		if (scope == null) {
+			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "scope not set");
+			return null;
+		}
+
+		final Ctx ctx = (Ctx) model.get(R_CTX);
+		if (
+				FileDao.SCOPE_COURSE.equals(scope) && !ctx.resolved(Ctx.STATE_C) ||
+				FileDao.SCOPE_ASS_TYPE.equals(scope) && !ctx.resolved(Ctx.STATE_CT) ||
+				FileDao.SCOPE_ASS.equals(scope) && !ctx.resolved(Ctx.STATE_CTA) ||
+				FileDao.SCOPE_VER.equals(scope) && !ctx.resolved(Ctx.STATE_CTAV) ||
+				FileDao.SCOPE_STUD.equals(scope) && !ctx.resolved(Ctx.STATE_EGSCIV)
+		) {
+			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "context path problem, please check the logs");
+			return null;
+		}
+
+		final String slotId = req.getParameter("sId");
+		final boolean course = FileDao.SCOPE_COURSE.equals(scope);
+		if (!course && (slotId == null || slotId.trim().length() == 0)) {
+			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "no slotId (sId) defined");
+			return null;
+		}
+
+		final FileSlot slot;
+		if (!course) {
+			slot = ctx.getAssType().findSlotById(slotId);
+			if (slot == null) {
+				resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "slot '" + slotId + "' not found");
+				return null;
+			}
+		} else {
+			slot = null;
+		}
+
+		if (req.getContentLength() == -1) {
+			Message.addWarn(req, "upload size not reported");
+			resp.sendRedirect(refreshUri);
+			return null;
+		}
+
+		if (!course) {
+			if (req.getContentLength() > slot.getLengthLimit()) {
+				Message.addWarn(req, "upload exceeds " + G4mat.formatMem(slot.getLengthLimit()));
+				resp.sendRedirect(refreshUri);
+				return null;
+			}
+		}
+
+		final boolean binary = course || slot.isBinary() ;
+		final ServletFileUpload sfu = new ServletFileUpload(fileItemFactory);
+		final FileItemIterator fii = sfu.getItemIterator(req);
+		int fileCount = 0;
+		String comment = null;
+		while (fii.hasNext()) {
+			final FileItemStream item = fii.next();
+			if (item.isFormField()) {
+				if ("comment".equals(item.getFieldName())) {
+					comment = G4Io.dumpToString(item.openStream());
+				}
+				if ("expandTriggers".equals(item.getFieldName())) {
+					req.getSession().setAttribute("course.expandTriggers", G4Io.dumpToString(item.openStream()));
+				}
+				continue;
+			}
+
+			if (fileCount > 0) {
+				Message.addWarn(req, "one file per upload, please");
+				resp.sendRedirect(refreshUri);
+				return null;
+			}
+
+			final String fileName = item.getName();
+			if (!course && !Pattern.compile(slot.getNameRegex()).matcher(fileName.toLowerCase()).matches()) {
+				Message.addWarn(req, "check the file name: regex check failed");
+				resp.sendRedirect(refreshUri);
+				return null;
+			}
+
+			final String contentType = item.getContentType();
+			if (!course && G4Str.indexOf(contentType, slot.getContentTypes()) < 0) {
+				Message.addWarn(req, "contentType '" + contentType + "': not allowed");
+				resp.sendRedirect(refreshUri);
+				return null;
+			}
+
+			final FileMeta fileMeta = new FileMeta(
+					fileName,
+					fileName,
+					contentType,
+					authorName,
+					resolveRemoteAddress(req)
+			);
+			if (comment != null) {
+				fileMeta.setComment(comment);
+			}
+
+			fileDao.createFileFor(
+					scope,
+					ctx,
+					course ? null : slot.getId(),
+					fileMeta,
+					binary ? new BufferedInputStream(item.openStream()) : null,
+					binary ? null : new BufferedReader(new InputStreamReader(item.openStream(), "UTF-8"))
+			);
+			fileCount++;
+		}
+
+		if (fileCount == 1) {
+			Message.addInfo(req, "Your upload has succeeded");
+			resp.sendRedirect(refreshUri);
+		} else {
+			Message.addWarn(req, "Something went terribly wrong");
+			resp.sendRedirect(refreshUri);
+		}
+
+		return null;
+	}
 }

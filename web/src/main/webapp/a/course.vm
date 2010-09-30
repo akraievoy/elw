@@ -21,6 +21,7 @@
 		<td style="width: 6em;">&nbsp;</td>
 	</tr>
 	#foreach($assType in $elw_ctx.course.assTypes)
+		#set($elw_ctx_type = $elw_ctx.extendAssType($assType))
 	<tr>
 		<td style="padding-left: 1.5em; padding-right: 0.25em;">${assType.name}</td>
 		<td style="text-align: center;">
@@ -34,6 +35,7 @@
 				<span title="id=${slot.id}">${slot.name}</span>
 			</td>
 			<td style="text-align: center;">
+				<span class="expandTrigger" id="slots-${assType.id}-${slot.id}--files">Files</span>
 				<span class="popupTrigger" id="slots-${assType.id}-${slot.id}">Details</span>
 			</td>
 			<td>
@@ -53,8 +55,58 @@
 				</div>
 			</td>
 		</tr>
+			$assType.getFiles(${slot.id})
+			#foreach($file in $assType.getFiles(${slot.id}))
+				<tr class="slots-${assType.id}-${slot.id}--files" style="display:none;">
+					<td style="padding-left: 4em; padding-right: 1em; border-right: #999999 dashed 1px;">
+						<a style="font-weight: bold;" title="${file.meta.id} @ t"
+							 href="../s/dl/${file.meta.name}?elw_ctx=$elw_ctx_type&s=t&sId=$slot.id&fId=$file.meta.id"
+										>${file.meta.name}</a>
+						$format.format($file.meta.createStamp.time) $file.meta.author $file.meta.sourceAddress
+					</td>
+					<td style="padding: 0 0.25em; text-align: center;">
+						#if(!$slot.binary)
+							<a class="popupTrigger"
+								 id="slots-${assType.id}-${slot.id}--files--t-${file.meta.id}">Content</a>
+						#end
+						#if($file.meta.comment && $file.meta.comment.length() > 0)
+							<a class="popupTrigger"
+								 id="slots-${assType.id}-${slot.id}--files--t-${file.meta.id}--comm">Note</a>
+						#end
+					</td>
+					<td style="padding: 0 0.25em; text-align: right;">
+						#if(!$slot.binary)
+							<div style="display: none; text-align: left;"
+									 class="popup slots-${assType.id}-${slot.id}--files--t-${file.meta.id}">
+								${file.text}
+							</div>
+						#end
+						#if($file.meta.comment && $file.meta.comment.length() > 0)
+							<div style="display: none; text-align: left;"
+									 class="popup slots-${assType.id}-${slot.id}--files--t-${file.meta.id}--comm">
+								$file.meta.comment
+							</div>
+						#end
+					</td>
+				</tr>
+			#end
+		<tr class="slots-${assType.id}-${slot.id}--files" style="display:none;">
+			<td style="padding-left: 4em; padding-right: 1em; border-right: #999999 dashed 1px;">
+				<form method="POST" enctype="multipart/form-data"
+							action="ul?elw_ctx=$elw_ctx_type&s=t&sId=$slot.id" style="display: inline;">
+					<input type="hidden" name="expandTriggers" value="[]"/>
+					<input type="text" name="comment" value="" title="Add a note"/>
+					<input type="file" name="file" title="Select a file..."/>
+					<input type="submit" value="Upload"/>
+				</form>
+			</td>
+			<td style="padding: 0 0.25em; text-align: center;">
+			</td>
+			<td style="padding: 0 0.25em; text-align: right; position: relative;">
+			</td>
+		</tr>
 		#end
-	 #foreach($ass in $assType.assignments)
+		#foreach($ass in $assType.assignments)
 	<tr class="elw_header_row ${assType.id}" style="display: none;" >
 		<td style="padding-left: 2em; padding-right: 0.25em;">
 			<span title="id=#if($ass.id)$ass.id#{else}null#end">$ass.name</span>
