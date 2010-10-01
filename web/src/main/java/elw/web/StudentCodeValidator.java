@@ -57,6 +57,9 @@ public class StudentCodeValidator extends G4Run.Task {
 
 	protected void runInternal() throws Throwable {
 /*
+		log.error("ooops I did that again: log4j email appender check");
+*/
+/*
 		log.error("IMPORT STARTED");
 		final Course[] allCourses = courseDao.findAllCourses();
 		for (int iC = 0; iC < allCourses.length; iC++) {
