@@ -1,3 +1,12 @@
+body {
+	font-family: Lucida Grande, Lucida Sans, Arial, sans-serif; font-size: 0.8em;
+}
+
+.te {
+	visibility:hidden;
+	display:none;
+}
+
 h1 {
 	margin-top: 1em;
 	margin-bottom: 0.5em;
@@ -18,18 +27,14 @@ h3 {
 }
 
 #elw_header {
-	background-color: #ccccff;
-	border-bottom: #6666ff 1px dashed;
+	border-bottom: #339933 1px dashed;
 	text-align: center;
 	font-size: 1.25em;
+	padding-top: 2px;
+	padding-bottom: 2px;
 }
 
 #header_hr {
-	background-color: #9999CC;
-	padding: 0;
-	margin: 1px auto;
-	width: 32em;
-	height: 1px;
 	clear: both;
 }
 
@@ -70,23 +75,23 @@ div.formArea {
 	margin: 3em auto;
 	width: 32em;
 	padding: 1em;
-	border: #CCCCEE solid 1px;
-	background-color: #EEEEEE;
 }
 
 div.formLabel {
 	clear: both;
-	margin-top: 0.5em;
 	margin-right: 0.25em;
 	float: left;
+	padding-top: 0.4em;
 	width: 12em;
+	height: 1.5em;
 	text-align: right;
 }
 
 div.formField {
 	float: left;
-	margin-top: 0.5em;
 	width: 18em;
+	padding-top: 0.2em;
+	height: 1.5em;
 	text-align: left;
 }
 
@@ -214,8 +219,6 @@ tr.elw_row_l7 > td {
 .expandTrigger {
 	background-color: #99FF99;
 	border: 1px #66CC66 solid;
-	padding: 0 2px;
-	margin: 0 1px;
 }
 
 .expandTrigger.expanded {

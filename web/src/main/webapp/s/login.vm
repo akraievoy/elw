@@ -10,20 +10,20 @@
 	<script type="text/javascript" src="../js/jquery.sha1.js"></script>
 </head>
 <body>
-<div id="elw_header">
+<div class="ui-widget-header ui-corner-all" id="elw_header">
 	<div id="nav"><span style="font-weight: bold">Login</span></div>
 	#elw_cred_stud($elw_ctx)
 	<div id="header_hr"> </div>
 </div>
 #elw_messages($elw_messages)
 <div id=main>
-	<div class="formArea" style="height: 7em;">
+	<div class="formArea ui-widget-header ui-corner-all" style="height: 7em;">
 		<form method="POST" action="loginPost">
 			<div class="formLabel">Group:</div>
 			<div class="formField"><input type="text" name="groupName" value="$!groupName"/></div>
 			<div class="formLabel">Last name&nbsp;first name:</div>
 			<div class="formField"><input type="text" name="studentName" value="$!studentName"/></div>
-			<div class="formButtons"><input type="submit" value="Go"/></div>
+			<div class="formButtons"><button type="submit" class="elw_button_login">Log in</button></div>
 		</form>
 	</div>
 </div>

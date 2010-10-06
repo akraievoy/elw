@@ -88,7 +88,7 @@ public class Entry<Meta> {
 	}
 
 	public String getText() throws IOException {
-		return G4Str.join(dumpText(), "<br/>\n");
+		return G4Str.join(dumpText(), "<br/>");
 	}
 
 	public void closeStreams() {

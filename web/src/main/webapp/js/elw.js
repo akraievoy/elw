@@ -3,9 +3,29 @@ var elw_visible = {};
 var elw_ajaxStamp = 0;
 
 function elw_expand(elemId) {
-	jQuery("#" + elemId).addClass("expanded");
+	var trigger = jQuery("#" + elemId);
+
+	trigger.addClass("expanded");
+	if (trigger.hasClass("ui-icon-triangle-1-e")) {
+		trigger.removeClass("ui-icon-triangle-1-e");
+		trigger.addClass("ui-icon-triangle-1-s");
+	}
 	jQuery("." + elemId).slideDown(0);
+	
+
 	elw_visible[elemId] = true;
+}
+
+function elw_collapse(elemId) {
+	jQuery("." + elemId).slideUp(0);
+	var trigger = jQuery("#" + elemId);
+	trigger.removeClass("expanded");
+	if (trigger.hasClass("ui-icon-triangle-1-s")) {
+		trigger.removeClass("ui-icon-triangle-1-s");
+		trigger.addClass("ui-icon-triangle-1-e");
+	}
+
+	elw_visible[elemId] = false;
 }
 
 function elw_mouseHovered(elemId) {
@@ -17,15 +37,11 @@ function elw_mouseHovered(elemId) {
 	if (elw_visible[elemId] === undefined || !elw_visible[elemId]) {
 		elw_expand(elemId);
 	} else {
-		jQuery("." + elemId).slideUp(0);
-		jQuery("#" + elemId).removeClass("expanded");
-		elw_visible[elemId] = false;
+		elw_collapse(elemId);
 		//	process dependent triggers, if any
 		for (var visElemId in elw_visible) {
 			if (visElemId.indexOf(elemId) == 0 && elw_visible[visElemId]) {
-				jQuery("." + visElemId).slideUp(0);
-				jQuery("#" + visElemId).removeClass("expanded");
-				elw_visible[visElemId] = false;
+				elw_collapse(visElemId);
 			}
 		}
 	}
@@ -69,6 +85,33 @@ function elw_ajaxStart(myAjaxStamp) {
 
 
 jQuery(document).ready(function() {
+	jQuery("button.elw_button, input.elw_button:submit, input.elw_button:button").button();
+	jQuery("button.elw_button_info, input.elw_button_info:submit, input.elw_button_info:button").button({
+		icons: {
+			primary: "ui-icon-info"
+		}
+	});
+	jQuery("button.elw_button_alert, input.elw_button_alert:submit, input.elw_button_alert:button").button({
+		icons: {
+			primary: "ui-icon-alert"
+		}
+	});
+	jQuery("button.elw_button_logout, input.elw_button_logout:submit, input.elw_button_logout:button").button({
+		icons: {
+			primary: "ui-icon-power"
+		}
+	});
+	jQuery("button.elw_button_login, input.elw_button_login:submit, input.elw_button_login:button").button({
+		icons: {
+			primary: "ui-icon-unlocked"
+		}
+	});
+	jQuery("button.elw_button_upload, input.elw_button_upload:submit, input.elw_button_upload:button").button({
+		icons: {
+			primary: "ui-icon-arrowstop-1-n"
+		}
+	});
+
 	jQuery(".expandTrigger").mouseenter(function() {
 		elw_enterTimes[this.id] = new Date().getTime();
 		setTimeout("elw_mouseHovered('"+this.id+"')", 600);
@@ -76,8 +119,12 @@ jQuery(document).ready(function() {
 	jQuery(".expandTrigger").mouseleave(function() {
 		elw_enterTimes[this.id] = null;
 	});
-	jQuery(".popupTrigger").mouseenter(function() {
-		jQuery("." + this.id).slideDown(0);
+	jQuery(".elw_dialogTrigger").click(function() {
+		jQuery( "." + this.id ).dialog({
+			modal: true,
+			minWidth: 600,
+			title: jQuery(this).text()
+		});
 	});
 	jQuery(".popupTrigger").mouseleave(function() {
 		jQuery("." + this.id).slideUp(0);

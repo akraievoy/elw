@@ -7,7 +7,7 @@
 	#elw_imports("../")
 </head>
 <body>
-<div id="elw_header">
+<div class="ui-widget-header ui-corner-all" id="elw_header">
 	<div id="nav">
 		<a href="index">Index</a> &gt;
 		<a href="courses">Courses</a> &gt;
@@ -44,5 +44,6 @@
 	</object>
 </div></div>
 </body>
+	#elw_ready("../")
 </html>
 

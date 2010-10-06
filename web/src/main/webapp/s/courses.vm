@@ -9,7 +9,7 @@
 	#elw_imports("../")
 </head>
 <body>
-<div id="elw_header">
+<div class="ui-widget-header ui-corner-all" id="elw_header">
 	<div id="nav"><span style="font-weight: bold">My Courses</span></div>
 	#elw_cred_stud($elw_ctx)
 	<div id="header_hr"> </div>
@@ -21,4 +21,5 @@
 	#end
 </div>
 </body>
+	#elw_ready("../")
 </html>

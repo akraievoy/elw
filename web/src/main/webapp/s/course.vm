@@ -8,7 +8,7 @@
 	#elw_imports("../")
 </head>
 <body>
-<div id="elw_header">
+<div class="ui-widget-header ui-corner-all" id="elw_header">
 	<div id="nav"><a href="courses">My Courses</a> &gt; <span style="font-weight: bold">${elw_ctx.course.name}</span>
 	</div>
 	#elw_cred_stud($elw_ctx)
@@ -16,135 +16,279 @@
 </div>
 	#elw_messages($elw_messages)
 <div id=main>
-	<table cellspacing="0">
-		<tbody>
+	<table class="tp_timeline" cellspacing="0" style="float: left; width: 55%; font-size: 1em;">
+		<thead>
 		<tr>
 			<th>Name</th>
 			<th>State</th>
 			<th>Score</th>
 		</tr>
-			#foreach($entry in $elw_ctx.enr.index)
-				#set($idx = $velocityCount - 1)
-				#set($elw_ctx_ver = $elw_ctx.extendIndex($idx))
-				#set($started = $elw_ctx.enr.classes.get($elw_ctx_ver.indexEntry.classFrom).started)
-				#set($filesStud = $fileMetas.get("$elw_ctx_ver.toString()"))
-			<tr class="elw_row_l1">
-				<td class="elw_cell_data">
-					<span style="font-weight: bold;" title="$elw_ctx_ver.ass.id">$elw_ctx_ver.ass.name</span>
-					<span title="$elw_ctx_ver.assType.id">$elw_ctx_ver.assType.name</span>
-				</td>
-				<td class="elw_cell_trig">
-					#if($started)
-						<a class="expandTrigger"
-							 id="index-$idx">Opened $format.format($elw_ctx.enr.classes.get($elw_ctx_ver.indexEntry.classFrom).fromDateTime.millis)</a>
-					#else
-						Opens $format.format($elw_ctx.enr.classes.get($elw_ctx_ver.indexEntry.classFrom).fromDateTime.millis)
-					#end
-				</td>
-				<td class="elw_cell_num">
-					#if($scores.get("$elw_ctx_ver"))
-						#elw_score($elw_ctx_ver, $scores.get("$elw_ctx_ver")) of
-					#else
-						&nbsp;
-					#end
-					$elw_ctx_ver.indexEntry.scoreBudget
-				</td>
-			</tr>
-				#if($elw_ctx.enr.classes.get($elw_ctx_ver.indexEntry.classFrom).started)
-				<tr class="elw_row_l2 index-$idx" style="display:none;">
-					<td class="elw_cell_data">
-						<span title="$elw_ctx_ver.ver.id">$elw_ctx_ver.ver.name</span>
-					</td>
-					<td class="elw_cell_trig">
-						#foreach($slot in $elw_ctx_ver.assType.fileSlots)
-							<a class="expandTrigger" id="index-${idx}--slot-${slot.id}" title="$slot.name">$slot.shortName:<span
-											style="font-weight: bold;">$elw_ctx_ver.ver.countFiles($elw_ctx_ver.assType, $elw_ctx_ver.ass, $slot.id, $filesStud)</span></a>
-						#end
-					</td>
-					<td class="elw_cell_num">
-					</td>
-				</tr>
-					#foreach($slot in $elw_ctx_ver.assType.fileSlots)
-					<tr class="elw_row_l3 index-${idx}--slot-${slot.id}" style="display:none;">
-						<td class="elw_cell_data">
-							<span style="font-weight: bold;" title="${slot.id}">${slot.name}</span>&nbsp;
-							#if($slot.readApprovals.size() > 0)
-								Readable after : <span
-											style="font-weight: bold;">#foreach($slotId in $slot.readApprovals) ${elw_ctx_ver.assType.findSlotById($slotId).name} #end</span>
-							#end
-							#if($slot.writable)
-								#if($slot.writeApprovals.size() > 0)
-									Writable after : <span
-												style="font-weight: bold;">#foreach($slotId in $slot.writeApprovals) ${elw_ctx_ver.assType.findSlotById($slotId).name} #end</span>
-								#end
-							#else
-								<span style="font-weight: bold;">Read-only</span>
-							#end
-							#if($elw_ctx_ver.indexEntry.classDue.get($slot.id))
-								#set($classDue = $elw_ctx.enr.classes.get($elw_ctx_ver.indexEntry.classDue.get($slot.id)))
-								#if($classDue.passed)
-									<span style="color: red;">
-										Due $format.format($classDue.toDateTime.millis)
-									</span>
-								#else
-									Due $format.format($classDue.toDateTime.millis)
-								#end
-							#end
-						</td>
-						<td class="elw_cell_trig">
-							<a class="expandTrigger" id="index-${idx}--slot-${slot.id}--files">Files:&nbsp;<span
-											style="font-weight: bold;">$elw_ctx_ver.ver.countFiles($elw_ctx_ver.assType, $elw_ctx_ver.ass, $slot.id, $filesStud)</span></a>
-							<a class="popupTrigger" id="index-${idx}--slotinfo-${slot.id}">Details</a>
-						</td>
-						<td class="elw_cell_num" style="position: relative;">
-							<div style="display: none;" class="popup index-${idx}--slotinfo-${slot.id}">
-								Content Types : <span
-											style="font-weight: bold;">#foreach($contentType in $slot.contentTypes) ${contentType} #end</span><br/>
-								Max Size : <span style="font-weight: bold;">${slot.lengthLimit}</span><br/>
-								Name Regex : <span style="font-weight: bold;">${slot.nameRegex}</span><br/>
-							</div>
-						</td>
-					</tr>
-						#elw_file_row($elw_ctx_ver, $slot, $elw_ctx_ver.assType.getFiles($slot.id), "t")
-						#elw_file_row($elw_ctx_ver, $slot, $elw_ctx_ver.ass.getFiles($slot.id), "a")
-						#elw_file_row($elw_ctx_ver, $slot, $elw_ctx_ver.ver.getFiles($slot.id), "v")
-						#elw_file_row($elw_ctx_ver, $slot, $filesStud.get($slot.id), "s")
-						#if($elw_ctx_ver.ver.checkWrite($elw_ctx_ver.assType, $elw_ctx_ver.ass, $slot.id, $filesStud))
-							<tr class="elw_row_l4 index-${idx}--slot-${slot.id}" style="display:none;">
-								<td class="elw_cell_data">
-									<form method="POST" enctype="multipart/form-data" 
-												action="ul?elw_ctx=$elw_ctx_ver&sId=$slot.id" style="display: inline;">
-										<input type="hidden" name="expandTriggers" value="[]"/>
-										<input type="text" name="comment" value="" title="Add a note"/>
-										<input type="file" name="file" title="Select a file..."/>
-										<input type="submit" value="Upload"/>
-									</form>
-								</td>
-								<td class="elw_cell_trig">
-								</td>
-								<td class="elw_cell_num" style="position: relative;">
-								</td>
-							</tr>
-						#end
-					#end
-				#end
-			#end
-		<tr class="elw_row+l3";>
-			<td >&nbsp;</td>
+		</thead>
+		<tbody>
+		<tr class="elw_row_l1 te te_task">
+			<td class="elw_cell_data">
+				<span style="font-weight: bold;" class="tp_task_title">s</span>
+				<span class="ui-icon ui-icon-triangle-1-e expandTrigger" style="float: right;"></span>
+			</td>
+			<td class="elw_cell_trig">
+				<span class="tp_task_opens">Opens Date</span>
+			</td>
+			<td class="elw_cell_num">
+				<span class="tp_task_score">1</span>
+			</td>
+		</tr>
+		<tr class="elw_row_l2 te te_ver" style="display:none;">
+			<td class="elw_cell_data">
+				<span class="tp_ver_title"></span>
+				<span class="ui-icon ui-icon-suitcase expandTrigger" style="float: right;"></span>
+			</td>
+			<td class="elw_cell_trig">
+			</td>
+			<td class="elw_cell_num">
+			</td>
+		</tr>
+		<tr class="elw_row_l3 te te_slot" style="display:none;">
+			<td class="elw_cell_data">
+				<span style="font-weight: bold;" class="tp_slot_title"></span>
+			</td>
+			<td class="elw_cell_trig">
+				<span class="tp_slot_due"></span>
+			</td>
+			<td class="elw_cell_num" style="position: relative;">
+			</td>
+		</tr>
+		<tr class="elw_row_l3 te te_tr_score">
+			<td>&nbsp;</td>
 			<td class="elw_cell_num">Total Score:</td>
-			<td class="elw_cell_num">$grossScore</td>
+			<td class="elw_cell_num">
+				<span class="tp_score">0</span>
+			</td>
 		</tr>
 		</tbody>
 	</table>
-</div>
+ <div style="float: right; width: 44%;" class="tp_slotArea">
+  <div style="display: none; " class="te te_slotEdit">
+   <h3 class="tp_slotEdit_title">Version title</h3>
+   <div class="elw_tabs">
+    <ul>
+     <li class="te_tabControl"><a href="tab">name</a></li>
+    </ul>
+    <div class="te_tabArea">
+     <button class="elw_button_info tp_details elw_dialogTrigger">Details</button>
+     <div class="tp_details_area" style="display:none;">
+      <div class="tp_details_readAfter">Readable after:<span class="tp_details_readAfter_list" style="font-weight: bold;"></span></div>
+      <div class="tp_details_writeAfter">Writable after:<span class="tp_details_writeAfter_list" style="font-weight: bold;"></span></div>
+      <div class="tp_details_ro" style="font-weight: bold;">Read-only</div>
+     </div>
+     <button class="elw_button_alert tp_conditions elw_dialogTrigger">Conditions</button>
+     <div class="tp_conditions_area" style="display:none;">
+      <div>Content Types:<span class="tp_conditions_contentTypes" style="font-weight: bold;"></span></div>
+      <div>Max Size:<span class="tp_conditions_maxSize" style="font-weight: bold;"></span></div>
+      <div>Name Regex:<span class="tp_conditions_nameRegex" style="font-weight: bold;"></span></div>
+     </div>
+     <button class="elw_button_upload elw_dialogTrigger tp_upload" disabled="true">Upload</button>
+     <div class="tp_upload_area" style="display:none;">
+      <div class="formArea ui-widget-header ui-corner-all" style="height: 7em; ">
+       <form method="POST" enctype="multipart/form-data">
+       <input type="hidden" name="expandTriggers" value="[]"/>
+
+        <div class="formLabel">Comment:</div>
+        <div class="formField"><input type="text" name="comment" value="" title="Add a note"/></div>
+        <div class="formLabel">File:</div>
+        <div class="formField"><input type="file" name="file" title="Select a file..."/></div>
+        <div class="formButtons">
+         <button type="submit" class="elw_button_upload">Upload</button>
+        </div>
+       </form>
+      </div>
+     </div>
+     <div style="overflow: auto;">
+      <table cellspacing=0 style="font-size: 1em;">
+       <thead>
+       <tr class="elw_header_row">
+        <th>Name</th> <th>Time</th> <th>Author</th> <th>Address</th> <th>Content</th> <th>Comment</th>
+       </tr>
+       </thead>
+       <tbody class="tp_file_table">
+        <tr class="elw_row te te_file_row">
+         <td><a style="font-weight: bold; color: black;" >n</a></td> <td>t</td> <td>a</td> <td>a</td>
+         <td>
+          <button class="elw_button_info elw_dialogTrigger" disabled="true">Text</button>
+          <div class="popup" style="display: none; text-align:left;">
+           <pre></pre>
+          </div>
+         </td> <td>-</td>
+        </tr>
+       </tbody>
+      </table>
+     </div>
+    </div>
+		</div>
+	</div>
 </body>
-	#if($expandTriggers) 
-		<script type="text/javascript">
-			jQuery(document).ready(function() {
-					jQuery($expandTriggers).each(function(index) {
-						elw_expand(this);
-					});
-			});
-		</script>
-	#end
+<script type="text/javascript">
+ jQuery(document).ready(function() {
+  var te_task = jQuery(".te.te_task:first");
+  var te_ver = jQuery(".te.te_ver:first");
+  var te_slot = jQuery(".te.te_slot:first");
+  var te_slotEdit = jQuery(".te.te_slotEdit:first");
+
+  var tp_timeline = jQuery("table.tp_timeline");
+  var tp_slotArea = jQuery("div.tp_slotArea");
+  var tp_timeline_dest = tp_timeline.children("tbody");
+  #foreach($entry in $elw_ctx.enr.index)
+   #set($idx = $velocityCount - 1)
+   #set($elw_ctx_ver = $elw_ctx.extendIndex($idx))
+   #set($started = $elw_ctx.enr.classes.get($elw_ctx_ver.indexEntry.classFrom).started)
+   {
+    var taskOpens = "$format.format($elw_ctx.enr.classes.get($elw_ctx_ver.indexEntry.classFrom).fromDateTime.millis)";
+    var tp_task = te_task.clone();
+
+    tp_task.toggleClass("te");
+    tp_task.find(".tp_task_title").html($format.json($elw_ctx_ver.ass.name)).attr("title", "${elw_ctx_ver.ass.id}");
+    tp_task.find(".tp_task_score").html("$elw_ctx_ver.indexEntry.scoreBudget");
+    #if($started)
+     tp_task.find(".tp_task_opens").html("Opened " + taskOpens);
+     tp_task.find(".expandTrigger").attr("id", "index-$idx");
+     tp_timeline_dest.append(tp_task);
+
+     var tp_ver = te_ver.clone();
+     tp_ver.toggleClass("te");
+     tp_ver.toggleClass("index-$idx");
+     tp_ver.find(".tp_ver_title").html($format.json(${elw_ctx_ver.ver.name})).attr("title", "${elw_ctx_ver.ver.id}");
+     tp_ver.find(".expandTrigger").attr("id", "index-${idx}--slotedit");
+     tp_timeline_dest.append(tp_ver);
+
+     var tp_slotEdit = te_slotEdit.clone();
+     tp_slotEdit.toggleClass("te");
+     tp_slotEdit.toggleClass("index-${idx}--slotedit");
+     tp_slotEdit.find(".tp_slotEdit_title").html(
+              $format.json($elw_ctx_ver.ass.name)+" : "+$format.json($elw_ctx_ver.ver.name)
+     );
+     tp_slotArea.append(tp_slotEdit);
+
+     var te_tabControl = tp_slotEdit.find(".te_tabControl:first");
+     var te_tabArea = tp_slotEdit.find(".te_tabArea:first");
+     var tp_tabs = tp_slotEdit.find("div.elw_tabs:first");
+     #set($filesStud = $fileMetas.get("$elw_ctx_ver.toString()"))
+     #foreach($slot in $elw_ctx_ver.assType.fileSlots)
+      {
+       #if($elw_ctx_ver.indexEntry.classDue.get($slot.id))
+        #set($classDue = $elw_ctx.enr.classes.get($elw_ctx_ver.indexEntry.classDue.get($slot.id)))
+        var tp_slot = te_slot.clone();
+        tp_slot.toggleClass("te");
+        tp_slot.toggleClass("index-$idx");
+        tp_slot.find(".tp_slot_title").html($format.json(${slot.name})).attr("title", "${slot.id}");
+        var tp_slot_due = tp_slot.find(".tp_slot_due");
+        tp_slot_due.html("Due $format.format($classDue.toDateTime.millis)");
+        #if($classDue.passed)
+         tp_slot_due.css({"color": "red"});
+        #end
+        tp_timeline_dest.append(tp_slot);
+       #end
+
+       var tp_tabControl = te_tabControl.clone();
+       tp_tabControl.find("a").html($format.json(${slot.name})).attr("href", "#index-${idx}--slotedit-${slot.id}");
+       te_tabControl.parent().append(tp_tabControl);
+
+       var tp_tabArea = te_tabArea.clone();
+       tp_tabArea.attr("id", "index-${idx}--slotedit-${slot.id}");
+       var tp_details_area = tp_tabArea.find(".tp_details_area");
+       #if(!$slot.writable || $slot.writeApprovals.size() > 0 || $slot.readApprovals.size() > 0)
+        #if($slot.readApprovals.size() == 0)
+         tp_details_area.find(".tp_details_readAfter").remove();
+        #else
+         tp_details_area.find(".tp_details_readAfter_list").html(
+                 "#foreach($slotId in $slot.readApprovals) ${elw_ctx_ver.assType.findSlotById($slotId).name} #end"
+         );
+        #end
+        #if($slot.writable)
+         tp_details_area.find(".tp_details_ro").remove();
+         #if($slot.writeApprovals.size() == 0)
+          tp_details_area.find(".tp_details_writeAfter").remove();
+         #else
+          tp_details_area.find(".tp_details_writeAfter_list").html(
+                  "#foreach($slotId in $slot.readApprovals) ${elw_ctx_ver.assType.findSlotById($slotId).name} #end"
+          );
+         #end
+        #else
+         tp_details_area.find(".tp_details_writeAfter").remove();
+        #end
+        tp_tabArea.find(".tp_details").removeAttr("disabled").attr("id","index-${idx}--slotinfo-${slot.id}-details");
+        tp_details_area.toggleClass("index-${idx}--slotinfo-${slot.id}-details");
+       #else
+        tp_details_area.remove();
+       #end
+
+       var tp_conditions_area = tp_tabArea.find(".tp_conditions_area");
+       tp_conditions_area.find(".tp_conditions_contentTypes").html(
+               "#foreach($contentType in $slot.contentTypes) ${contentType} #end"
+       );
+       tp_conditions_area.find(".tp_conditions_maxSize").html("$format.formatSize($slot.lengthLimit)");
+       tp_conditions_area.find(".tp_conditions_nameRegex").html($format.json($slot.nameRegex));
+       tp_tabArea.find(".tp_conditions").attr("id","index-${idx}--slotinfo-${slot.id}-conditions");
+       tp_conditions_area.toggleClass("index-${idx}--slotinfo-${slot.id}-conditions");
+
+       var tp_upload_area = tp_tabArea.find(".tp_upload_area");
+       #if($elw_ctx_ver.ver.checkWrite($elw_ctx_ver.assType, $elw_ctx_ver.ass, $slot.id, $filesStud))
+        tp_upload_area.find("form").attr("action", "ul?elw_ctx=$elw_ctx_ver&sId=$slot.id");
+        tp_tabArea.find(".tp_upload").removeAttr("disabled").attr("id","index-${idx}--slotinfo-${slot.id}-upload");
+        tp_upload_area.toggleClass("index-${idx}--slotinfo-${slot.id}-upload");
+       #else
+        tp_upload_area.remove();
+       #end
+
+       var tp_file_table = tp_tabArea.find(".tp_file_table").first();
+       var te_file_row = tp_file_table.find(".te_file_row").first();
+
+       #macro (elw_file_row $p_path $p_slot $p_files $p_scope)
+        #foreach($file in $p_files)
+         var tp_file_row = te_file_row.clone().toggleClass("te");
+         var nameRef = tp_file_row.find("td:eq(0) a");
+         #if($p_path.ver.checkRead($p_path.assType, $p_path.ass, $p_slot.id, $filesStud))
+          nameRef.attr("href", "dl/${file.meta.name}?elw_ctx=$p_path&s=$p_scope&sId=$p_slot.id&fId=$file.meta.id");
+         #end
+         nameRef.attr("title", "${file.meta.id} @ $p_scope");
+         nameRef.html($format.json(${file.meta.name}));
+
+         tp_file_row.find("td:eq(1)").html("$format.format($file.meta.createStamp.time)");
+         tp_file_row.find("td:eq(2)").html($format.json($file.meta.author));
+         tp_file_row.find("td:eq(3)").html($format.json($file.meta.sourceAddress));
+         #if(!$p_slot.binary && $p_path.ver.checkRead($p_path.assType, $p_path.ass, $p_slot.id, $filesStud))
+          tp_file_row.find("td:eq(4) button").removeAttr("disabled").attr("id", "index-${p_path.index}--slotinfo-${p_slot.id}--${p_scope}-${file.meta.id}--text");
+          tp_file_row.find("td:eq(4) div pre").html($format.json(${file.text})).toggleClass("index-${p_path.index}--slotinfo-${p_slot.id}--${p_scope}-${file.meta.id}--text");
+         #end
+         #if($file.meta.comment && $file.meta.comment.length() > 0)
+          tp_file_row.find("td:eq(5)").html($format.json($file.meta.comment));
+         #end
+         tp_file_table.append(tp_file_row);
+        #end
+       #end
+
+       #elw_file_row($elw_ctx_ver, $slot, $elw_ctx_ver.assType.getFiles($slot.id), "t")
+       #elw_file_row($elw_ctx_ver, $slot, $elw_ctx_ver.ass.getFiles($slot.id), "a")
+       #elw_file_row($elw_ctx_ver, $slot, $elw_ctx_ver.ver.getFiles($slot.id), "v")
+       #elw_file_row($elw_ctx_ver, $slot, $filesStud.get($slot.id), "s")
+
+       tp_tabs.append(tp_tabArea);
+      }
+     #end
+     te_tabControl.remove();
+     te_tabArea.remove();
+     tp_tabs.tabs({ cookie: { expires: 3, name: ".index-${idx}--slotedit-tab" } });
+    #else
+     te_task.find(".expandTrigger").remove();
+     te_task.find(".tp_task_opens").html("Opens " + taskOpens);
+     tp_timeline_dest.append(tp_task);
+    #end
+   }
+  #end
+  #if($expandTriggers)
+   jQuery($expandTriggers).each(function(index) {
+    elw_expand(this);
+   });
+  #end
+ });
+</script>
+ #elw_ready("../")
 </html>

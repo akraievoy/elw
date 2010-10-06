@@ -6,7 +6,7 @@
 	#elw_imports("../")
 </head>
 <body style="text-align: left;">
-<div id="elw_header">
+<div class="ui-widget-header ui-corner-all" id="elw_header">
 	<div id="nav"><a href="index">Index</a> &gt; <span style="font-weight: bold">Courses</span></div>
 	#elw_cred_adm($auth)
 	<div id="header_hr"> </div>
@@ -22,4 +22,5 @@
 #end
 </tbody></table>
 </body>
+	#elw_ready("../")
 </html>

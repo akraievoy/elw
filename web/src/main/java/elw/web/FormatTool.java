@@ -1,18 +1,24 @@
 package elw.web;
 
+import elw.miniweb.ViewJackson;
 import org.joda.time.DateTime;
 import org.joda.time.Period;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.*;
 
 /**
  * Inspired by @link{org.apache.velocity.tools.generic.FormatTool}, but has more specific and fine-tuned methods.
  */
 public class FormatTool {
+	private static final Logger log = LoggerFactory.getLogger(FormatTool.class);
+
 	protected final static Map<Locale, FormatTool> cache = new HashMap<Locale, FormatTool>();
 
 	protected static final long KB = 1024;
@@ -26,8 +32,8 @@ public class FormatTool {
 	protected final Map<String, DateTimeFormatter> dtfCache = new TreeMap<String, DateTimeFormatter>();
 	protected final Map<String, PeriodFormatter> pfCache = new TreeMap<String, PeriodFormatter>();
 
-	protected String pattern = "MMM d, yy";
-	protected String patternWeek = "MMM d HH:mm";
+	protected String pattern = "MMM d";
+	protected String patternWeek = "EEE d HH:mm";
 	protected String patternToday = "HH:mm";
 
 	protected FormatTool(Locale locale) {
@@ -273,6 +279,20 @@ public class FormatTool {
 		} else {
 			//  LATER sometimes durations less than one second occur
 			return lookupPeriodFormatter("s").print(periodNorm);
+		}
+	}
+
+	public String json(final Object o) {
+		try {
+			return ViewJackson.MAPPER.writeValueAsString(o);
+		} catch (IOException e) {
+			if (o != null) {
+				log.error("failed to render object of class: " + o.getClass().getSimpleName(), e);
+			} else {
+				log.error("failed to render null object", e);
+			}
+
+			return "";
 		}
 	}
 }

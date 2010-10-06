@@ -7,7 +7,7 @@
 	#elw_imports("../")
 </head>
 <body>
-<div id="elw_header">
+<div class="ui-widget-header ui-corner-all" id="elw_header">
 	<div id="nav">
 		<a href="index">Index</a> &gt; <a href="enrolls">Enrollments</a> &gt;
 		<a href="log?elw_ctx=e--$elw_ctx.enr.id">Group $elw_ctx.group.name Reports</a> &gt;
@@ -19,7 +19,7 @@
 #elw_messages($elw_messages)
 <div id=main>
 	<h3><span title="$elw_ctx.student.id">$elw_ctx.student.name</span> <span title="$elw_ctx.ass.id">$elw_ctx.ass.name</span> <span title="$elw_ctx.ver.id">$elw_ctx.ver.name</span></h3>
-	<div class="formArea" style="height: 22em; width: 24em; float: left; margin: 0 2em;">
+	<div class="formArea ui-widget-header ui-corner-all" style="height: 22em; width: 24em; float: left; margin: 0 2em;">
 		<form method="POST" action="approve">
 			#foreach($cri in $elw_ctx.assType.scoring.criterias)
 				#if(!$elw_ctx.assType.scoring.isAuto($cri))
@@ -105,4 +105,5 @@
 	</div>
 </div>
 </body>
+#elw_ready("../")
 </html>
