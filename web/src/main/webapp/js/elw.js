@@ -120,10 +120,11 @@ jQuery(document).ready(function() {
 		elw_enterTimes[this.id] = null;
 	});
 	jQuery(".elw_dialogTrigger").click(function() {
-		jQuery( "." + this.id ).dialog({
+  var thisJQ = jQuery(this);
+  thisJQ.next(".elw_dialogContent:first").clone().dialog({
 			modal: true,
 			minWidth: 600,
-			title: jQuery(this).text()
+			title: thisJQ.text()
 		});
 	});
 	jQuery(".popupTrigger").mouseleave(function() {
