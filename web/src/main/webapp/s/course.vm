@@ -127,6 +127,7 @@
     </div>
 		</div>
 	</div>
+ </div>
 </body>
 <script type="text/javascript">
  jQuery(document).ready(function() {
@@ -274,8 +275,8 @@
      te_tabArea.remove();
      tp_tabs.tabs({ cookie: { expires: 3, name: ".index-${idx}--slotedit-tab" } });
     #else
-     te_task.find(".expandTrigger").remove();
-     te_task.find(".tp_task_opens").html("Opens " + $format.json($taskOpens));
+     tp_task.find(".expandTrigger").remove();
+     tp_task.find(".tp_task_opens").html("Opens " + $format.json($taskOpens));
      tp_timeline.append(tp_task);
     #end
    }
