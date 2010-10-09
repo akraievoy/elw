@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.*;
+import java.lang.Class;
 import java.util.*;
 
 @Controller
@@ -426,8 +427,8 @@ public class StudentController extends MultiActionController implements WebSymbo
 		return null;
 	}
 
-	@RequestMapping(value = "launch", method = RequestMethod.GET)
-	public ModelAndView do_launch(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+	@RequestMapping(value = "edit", method = RequestMethod.GET)
+	public ModelAndView do_edit(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
 		final HashMap<String, Object> model = auth(req, resp, "");
 		if (model == null) {
 			return null;
@@ -439,30 +440,80 @@ public class StudentController extends MultiActionController implements WebSymbo
 			return null;
 		}
 
-		final StringWriter verSw = new StringWriter();
-		mapper.writeValue(verSw, ctx.getVer());
-		final Version verCopy = mapper.readValue(verSw.toString(), Version.class);
-
-		final Entry<CodeMeta> last = codeDao.findLast(ctx);
-
-		if (last != null) {
-			try {
-				verCopy.setSolution(last.dumpText());
-			} finally {
-				last.closeStreams();
-			}
+		final String slotId = req.getParameter("sId");
+		if (slotId == null || slotId.trim().length() == 0) {
+			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "no slotId (sId) defined");
+			return null;
 		}
 
-		final StringWriter verCopySol = new StringWriter();
-		mapper.writeValue(verCopySol, verCopy);
-		final String solutionStr = verCopySol.toString();
+		final FileSlot slot = ctx.getAssType().findSlotById(slotId);
 
-		//	LATER use HTTP instead of applet parameter for passing the problem/code to applet
-		model.put("verJson", solutionStr.replaceAll("&", "&amp;").replaceAll("\"", "&quot;"));
-		model.put("upHeader", "JSESSIONID=" + req.getSession(true).getId());
-		model.put("cacheBustingToken", cacheBustingToken);
+		final TreeMap<String, List<Entry<FileMeta>>> filesStud = loadFilesStud(fileDao, ctx);
+		if (!ctx.getVer().checkRead(ctx.getAssType(), ctx.getAss(), slotId, filesStud)) {
+			resp.sendError(HttpServletResponse.SC_FORBIDDEN, "not readable yet");
+			return null;
+		}
 
-		return new ModelAndView("s/launch", model);
+		final String customEditName = slot.getEditor();
+		if (customEditName == null || customEditName.trim().length() == 0) {
+			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "editor not set for slot " + slot.getId());
+			return null;
+		}
+
+		Editor editor;
+		try {
+			editor = (Editor) Class.forName(customEditName).newInstance();
+		} catch (InstantiationException e) {
+			log.error("failed for ctx " + ctx + " and slotId " + slot.getId(), e);
+			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, String.valueOf(e));
+			return null;
+		} catch (IllegalAccessException e) {
+			log.error("failed for ctx " + ctx + " and slotId " + slot.getId(), e);
+			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, String.valueOf(e));
+			return null;
+		} catch (ClassNotFoundException e) {
+			log.error("failed for ctx " + ctx + " and slotId " + slot, e);
+			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, String.valueOf(e));
+			return null;
+		}
+
+		model.put("slot", slot);
+		model.put("editor", editor.render(req, resp, ctx, slot));
+
+		return new ModelAndView("s/edit", model);
 	}
 
+	@RequestMapping(value = "list", method = RequestMethod.GET)
+	public ModelAndView do_list(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+		final HashMap<String, Object> model = auth(req, resp, "");
+		if (model == null) {
+			return null;
+		}
+
+		final Ctx ctx = (Ctx) model.get(R_CTX);
+		if (!ctx.resolved(Ctx.STATE_EGSCIV)) {
+			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "context path problem, please check the logs");
+			return null;
+		}
+
+		final Map<String, Map<String, String[]>> slotToScopeToFileId =
+				new HashMap<String, Map<String, String[]>>();
+
+		for (FileSlot slot : ctx.getAssType().getFileSlots()) {
+			final HashMap<String, String[]> scopeToFileId = new HashMap<String, String[]>();
+			slotToScopeToFileId.put(slot.getId(), scopeToFileId);
+
+			for (String scope : FileDao.SCOPES) {
+				final Entry<FileMeta>[] fileEntries = fileDao.findFilesFor(scope, ctx, slot.getId());
+				final String[] fileIds = new String[fileEntries.length];
+
+				for (int i = 0, filesLength = fileEntries.length; i < filesLength; i++) {
+					fileIds[i] = fileEntries[i].getMeta().getId();
+				}
+
+				scopeToFileId.put(scope, fileIds);
+			}
+		}
+		return new ModelAndView(ViewJackson.success(slotToScopeToFileId));
+	}
 }

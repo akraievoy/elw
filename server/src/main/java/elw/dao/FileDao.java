@@ -19,6 +19,7 @@ public class FileDao extends Dao<FileMeta> {
 	private static final Logger log = LoggerFactory.getLogger(FileDao.class);
 
 	protected final ScoreDao scoreDao;
+	public static final String[] SCOPES = new String[] {FileDao.SCOPE_COURSE, FileDao.SCOPE_ASS_TYPE, FileDao.SCOPE_ASS, FileDao.SCOPE_VER, FileDao.SCOPE_STUD};
 
 	public FileDao(final ScoreDao scoreDao) {
 		this.scoreDao = scoreDao;

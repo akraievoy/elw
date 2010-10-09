@@ -85,28 +85,33 @@ function elw_ajaxStart(myAjaxStamp) {
 
 
 jQuery(document).ready(function() {
-	jQuery("button.elw_button, input.elw_button:submit, input.elw_button:button").button();
-	jQuery("button.elw_button_info, input.elw_button_info:submit, input.elw_button_info:button").button({
+	jQuery(".elw_button").button();
+	jQuery(".elw_button_info").button({
 		icons: {
 			primary: "ui-icon-info"
 		}
 	});
-	jQuery("button.elw_button_alert, input.elw_button_alert:submit, input.elw_button_alert:button").button({
+	jQuery(".elw_button_alert").button({
 		icons: {
 			primary: "ui-icon-alert"
 		}
 	});
-	jQuery("button.elw_button_logout, input.elw_button_logout:submit, input.elw_button_logout:button").button({
+	jQuery(".elw_button_logout").button({
 		icons: {
 			primary: "ui-icon-power"
 		}
 	});
-	jQuery("button.elw_button_login, input.elw_button_login:submit, input.elw_button_login:button").button({
+	jQuery(".elw_button_login").button({
 		icons: {
 			primary: "ui-icon-unlocked"
 		}
 	});
-	jQuery("button.elw_button_upload, input.elw_button_upload:submit, input.elw_button_upload:button").button({
+	jQuery(".elw_button_edit").button({
+		icons: {
+			primary: "ui-icon-pencil"
+		}
+	});
+	jQuery(".elw_button_upload").button({
 		icons: {
 			primary: "ui-icon-arrowstop-1-n"
 		}

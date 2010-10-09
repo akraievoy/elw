@@ -104,6 +104,7 @@
        </form>
       </div>
      </div>
+     <a class="elw_button_edit tp_edit" href="about:blank" disabled="true" target="_blank">Edit</a>
      <div style="overflow: auto;">
      <table cellspacing=0 style="font-size: 1em;">
        <thead>
@@ -234,6 +235,12 @@
         tp_tabArea.find(".tp_upload").removeAttr("disabled");
        #else
         tp_upload_area.remove();
+       #end
+
+       var tp_edit = tp_tabArea.find(".tp_edit");
+       #if($slot.editor)
+        tp_edit.attr("href", "edit?elw_ctx=$elw_ctx_ver&sId=$slot.id");
+        tp_edit.removeAttr("disabled");
        #end
 
        var tp_file_table = tp_tabArea.find(".tp_file_table").first();

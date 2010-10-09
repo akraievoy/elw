@@ -1,0 +1,29 @@
+#* @vtlvariable name="elw_messages" type="elw.miniweb.Message[]" *#
+#* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
+#* @vtlvariable name="editor" type="java.lang.String" *#
+#* @vtlvariable name="slot" type="elw.vo.FileSlot" *#
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+ <meta content="text/html; charset=UTF-8">
+ <title>$elw_ctx.ver.name - Code</title>
+ #elw_imports("../")
+</head>
+<body>
+<div class="ui-widget-header ui-corner-all" id="elw_header">
+ <div id="nav">
+  <a href="courses">My Courses</a> &gt;
+  <a href="course?elw_ctx=e--${elw_ctx.enr.id}">${elw_ctx.course.name}</a> &gt;
+  <span style="font-weight: bold">$elw_ctx.ver.name - $slot.name</span></div>
+ #elw_cred_stud($elw_ctx)
+ <div id="header_hr"></div>
+</div>
+ #elw_messages($elw_messages)
+<div id=main>
+ <div style="text-align:center;">
+  $editor
+ </div>
+</div>
+</body>
+ #elw_ready("../")
+</html>
+

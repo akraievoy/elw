@@ -295,4 +295,8 @@ public class FormatTool {
 			return "";
 		}
 	}
+
+	public String esc(final String str) {
+		return str.replaceAll("&", "&amp;").replaceAll("\"", "&quot;").replaceAll(">", "&gt;").replaceAll("<", "&lt;");
+	}
 }

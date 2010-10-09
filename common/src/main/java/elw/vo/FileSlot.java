@@ -13,6 +13,7 @@ public class FileSlot extends IdNameStamped {
 	protected String nameRegex;
 	protected boolean binary;
 	protected boolean writable;
+	protected String editor;
 
 	public boolean isBinary() {
 		return binary;
@@ -79,5 +80,13 @@ public class FileSlot extends IdNameStamped {
 
 	public void setWritable(boolean writable) {
 		this.writable = writable;
+	}
+
+	public String getEditor() {
+		return editor;
+	}
+
+	public void setEditor(String editor) {
+		this.editor = editor;
 	}
 }
