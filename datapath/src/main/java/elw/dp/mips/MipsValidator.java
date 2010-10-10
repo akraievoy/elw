@@ -3,8 +3,6 @@ package elw.dp.mips;
 import base.Die;
 import base.pattern.Result;
 import elw.dp.mips.asm.MipsAssembler;
-import elw.vo.Test;
-import elw.vo.Version;
 import gnu.trove.TIntIntHashMap;
 import org.akraievoy.gear.G;
 import org.slf4j.Logger;
@@ -12,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 public class MipsValidator {
 	private static final Logger log = LoggerFactory.getLogger(MipsValidator.class);
@@ -50,22 +49,29 @@ public class MipsValidator {
 		}
 	}
 
-	public void loadTest(Result[] resRef, Test test) {
-		final String[] regsLines = test.getArgs().get("regs") != null ? test.getArgs().get("regs") : G.STRINGS_EMPTY;
+	public void loadTest(Result[] resRef, String test) {
+		final String[] regs = new String[1];
+		final String[] mem = new String[1];
+		if (!TaskBean.parseTest(test, regs, mem)) {
+			Result.failure(log, resRef, "test marks broken");
+			return;
+		}
+
+		final String[] regsLines = regs[0].split("\r|\n");
 
 		final TIntIntHashMap[] newRegs = assembler.loadRegs(regsLines, resRef);
 		if (newRegs != null && resRef[0].isSuccess()) {
-			final String[] memLines = test.getArgs().get("mem") != null ? test.getArgs().get("mem") : G.STRINGS_EMPTY;
+			final String[] memLines = mem[0].split("\r|\n");
 			final TIntIntHashMap[] newData = assembler.loadData(memLines, resRef);
 
 			if (newData != null && resRef[0].isSuccess()) {
-				regs = newRegs;
-				data = newData;
+				this.regs = newRegs;
+				this.data = newData;
 			} else {
-				regs = data = null;
+				this.regs = this.data = null;
 			}
 		} else {
-			regs = data = null;
+			this.regs = this.data = null;
 		}
 	}
 
@@ -179,7 +185,7 @@ public class MipsValidator {
 		Result.success(log, resRef, "Test Passed Register Spec");
 	}
 
-	public void run(Result[] resRef, final Test test, final String[] code) {
+	public void run(Result[] resRef, final String test, final String[] code) {
 		assemble(resRef, code);
 		if (resRef[0].isSuccess()) {
 			loadTest(resRef, test);
@@ -194,11 +200,11 @@ public class MipsValidator {
 		}
 	}
 
-	public void batch(Result[] resRef, final Version task, final String[] code, final int[] passFailCounts) {
+	public void batch(Result[] resRef, final TaskBean task, final String[] code, final int[] passFailCounts) {
 		int failCount = 0;
-		Test[] tests = task.getTests();
-		for (int i = 0, testsLength = tests.length; i < testsLength; i++) {
-			Test test = tests[i];
+		List<String> tests = task.getTests();
+		for (int i = 0, testsLength = tests.size(); i < testsLength; i++) {
+			String test = tests.get(i);
 			final Result[] localResRef = {new Result("test status unknown", false)};
 			try {
 				run(localResRef, test, code);
@@ -220,9 +226,9 @@ public class MipsValidator {
 		}
 
 		if (failCount > 0) {
-			Result.failure(log, resRef, failCount + " of " + tests.length + " tests failed");
+			Result.failure(log, resRef, failCount + " of " + tests.size() + " tests failed");
 		} else {
-			Result.success(log, resRef, tests.length + " tests passed");
+			Result.success(log, resRef, tests.size() + " tests passed");
 		}
 	}
 

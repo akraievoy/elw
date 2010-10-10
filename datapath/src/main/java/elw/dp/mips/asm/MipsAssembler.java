@@ -308,7 +308,7 @@ public class MipsAssembler {
 			final String dataLine = dataLines[lineNum];
 			final String line = dataLine.replaceAll("\\s+", "");
 
-			if (line.length() == 0 || line.startsWith("#")) {
+			if (line.trim().length() == 0 || line.trim().startsWith("#")) {
 				continue;
 			}
 
@@ -368,7 +368,7 @@ public class MipsAssembler {
 			final String dataLine = regsLines[lineNum];
 			final String line = dataLine.replaceAll("\\s+", "");
 
-			if (line.length() == 0 || line.startsWith("#")) {
+			if (line.trim().length() == 0 || line.trim().startsWith("#")) {
 				continue;
 			}
 

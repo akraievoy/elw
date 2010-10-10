@@ -5,10 +5,7 @@ import elw.dp.mips.*;
 import elw.dp.ui.DataPathForm;
 import elw.dp.ui.FeedbackAppender;
 import elw.dp.ui.RendererFactory;
-import elw.vo.Test;
-import elw.vo.Version;
 import org.akraievoy.gear.G;
-import org.akraievoy.gear.G4Str;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,28 +18,28 @@ import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLDecoder;
+import java.net.*;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
 
-public class Controller {
+public class Controller implements ControllerSetup, CallbackLoadTask {
 	private static final org.slf4j.Logger log = LoggerFactory.getLogger(Controller.class);
 
-	protected static final String LINE_SEPARATOR = System.getProperty("line.separator");
+	public static final String PREFIX_TEST = "Test #";
 	protected static final Pattern PATTERN_LINE_SEPARATOR = Pattern.compile("\r|\r\n|\n");
 
 	protected final DataPathForm view = new DataPathForm();
+	protected final JLabel labelStatus = new JLabel();
 
 	//  application state
 	protected AtomicLong sourceStamp = new AtomicLong(1); // NOTE: no modifications still require assembly to run before stepping
 	protected AtomicLong assembleStamp = new AtomicLong(0);
 
-	protected Version selectedTask;
-	protected String uploadUrl;
+	protected TaskBean task;
+
+	protected String baseUrl;
 	protected String uploadHeader;
 	protected String elwCtx;
 
@@ -68,12 +65,8 @@ public class Controller {
 	protected final RunStepAction aRunRun = new RunStepAction("Run", validator.getRunSteps());
 	protected final RunResetAction aRunReset = new RunResetAction("Reset");
 
-	public void setSelectedTask(Version selectedTask) {
-		this.selectedTask = selectedTask;
-	}
-
-	public void setUploadUrl(String uploadUrl) {
-		this.uploadUrl = uploadUrl;
+	public void setBaseUrl(String baseUrl) {
+		this.baseUrl = baseUrl;
 	}
 
 	public void setUploadHeader(String uploadHeader) {
@@ -84,35 +77,77 @@ public class Controller {
 		this.elwCtx = elwCtx;
 	}
 
-	public DataPathForm getView() {
-		return view;
+	public String getElwCtx() {
+		return elwCtx;
 	}
 
-	public void init() {
-		if (selectedTask == null) {
-			throw new IllegalStateException("No selected task");
-		}
+	public String getBaseUrl() {
+		return baseUrl;
+	}
 
-		testComboModel.removeAllElements();
-		int testId = 0;
-		for (Test test : selectedTask.getTests()) {
-			testId ++;
-			test.setId(String.valueOf(testId));
-			test.setId("#" + String.valueOf(testId));
-			
-			testComboModel.addElement(test);
-		}
-		selectTest(selectedTask.getTests()[0]);
+	public String getUploadHeader() {
+		return uploadHeader;
+	}
+
+	public JPanel getPanelView() {
+		return view.getRootPanel();
+	}
+
+	public JLabel getLabelStatus() {
+		return labelStatus;
+	}
+
+	public void setTask(TaskBean task) {
+		this.task = task;
+	}
+
+	public void start() {
+		view.getTestComboBox().setEnabled(false);
 
 		final FeedbackAppender feedbackAppender = new FeedbackAppender(view.getLogTextPane());
 		feedbackAppender.setThreshold(Level.ALL);
 		Logger.getRootLogger().addAppender(feedbackAppender);
 
-		view.getProblemTextPane().setText(G4Str.join(selectedTask.getStatementHtml(), "\n"));
+		view.getProblemTextPane().setText("loading...");
+		view.getSourceTextArea().setText("loading...");
+
+		view.getSourceAssembleButton().setEnabled(false);
+		view.getSourceVerifyButton().setEnabled(false);
+		view.getSourceSubmitButton().setEnabled(false);
+
+		view.getTestAddCustomButton().setEnabled(false);
+		view.getTestStepButton().setEnabled(false);
+		view.getTestRunButton().setEnabled(false);
+		view.getTestBatchButton().setEnabled(false);
+
+		view.getRunStepButton().setEnabled(false);
+		view.getRunRunButton().setEnabled(false);
+		view.getRunResetButton().setEnabled(false);
+
+		executor.submit(new RunnableLoadTask(this, this));
+	}
+
+	public void updateStatus(final String newStatus, Throwable fault) {
+		if (fault == null) {
+			log.info(newStatus);
+		} else {
+			log.error(newStatus, fault);
+		}
+	}
+
+	public void onTaskLoadComplete() {
+		testComboModel.removeAllElements();
+		java.util.List<String> tests = task.getTests();
+		for (int i = 0, testsSize = tests.size(); i < testsSize; i++) {
+			testComboModel.addElement(PREFIX_TEST + (i + 1));
+		}
+		selectTest(0);
+
+		view.getProblemTextPane().setText(task.getStatement());
 		view.getTestComboBox().setModel(testComboModel);
 
 		//  TODO hide this
-		view.getSourceTextArea().setText(G4Str.join(selectedTask.getSolution(), "\n"));
+		view.getSourceTextArea().setText(task.getSolution());
 		view.getSourceTextArea().getDocument().addDocumentListener(new SourceDocumentListener());
 
 		view.getSourceAssembleButton().setAction(aAssemble);
@@ -168,7 +203,7 @@ public class Controller {
 		view.getRunResetButton().setAction(aRunReset);
 		view.getRunResetButton().setMnemonic('e');
 
-		log.info("started up, yeah!");
+		log.info("startup sequence complete");
 	}
 
 	protected void fireDataPathChanged() {
@@ -177,15 +212,21 @@ public class Controller {
 		tmRegs.fireTableDataChanged();
 	}
 
-	protected void selectTest(Test test) {
-		testComboModel.setSelectedItem(test);
-		final String[] memText = test.getArgs().get("mem") != null ? test.getArgs().get("mem") : G.STRINGS_EMPTY;
-		view.getTestMemTextArea().setText(G4Str.join(memText, LINE_SEPARATOR));
-		final String[] regsText = test.getArgs().get("regs") != null ? test.getArgs().get("regs") : G.STRINGS_EMPTY;
-		view.getTestRegsTextArea().setText(G4Str.join(regsText, LINE_SEPARATOR));
+	protected void selectTest(int i) {
+		testComboModel.setSelectedItem(testComboModel.getElementAt(i));
 
-		view.getTestMemTextArea().setEditable(!test.isShared());
-		view.getTestRegsTextArea().setEditable(!test.isShared());
+		final String[] regsText = new String[1];
+		final String[] memText = new String[1];
+		if (!TaskBean.parseTest(task.getTests().get(i), regsText, memText)) {
+			log.warn("marks broken, not loading test");
+			return;
+		}
+
+		view.getTestRegsTextArea().setText(regsText[0]);
+		view.getTestMemTextArea().setText(memText[0]);
+
+		view.getTestMemTextArea().setEditable(false);
+		view.getTestRegsTextArea().setEditable(false);
 
 		setupStatus(view.getTestStatusLabel());
 		setupStatus(view.getRunStatusLabel());
@@ -208,7 +249,7 @@ public class Controller {
 	}
 
 	protected void job_submit(final JLabel statusLabel, final Result[] resRef, String sourceText) {
-		if (uploadUrl == null || uploadUrl.length() == 0) {
+		if (baseUrl == null || baseUrl.length() == 0) {
 			Result.failure(log, resRef, "Upload URL not set");
 			return;
 		}
@@ -224,7 +265,7 @@ public class Controller {
 		try {
 			final byte[] textBytes = sourceText.getBytes("UTF-8");
 
-			final HttpURLConnection connection = (HttpURLConnection) new URL(uploadUrl+"?elw_ctx="+ elwCtx).openConnection();
+			final HttpURLConnection connection = (HttpURLConnection) new URL(baseUrl +"?elw_ctx="+ elwCtx).openConnection();
 			connection.setFixedLengthStreamingMode(textBytes.length);
 			connection.setRequestMethod("POST");
 			connection.setDoOutput(true);
@@ -265,16 +306,14 @@ public class Controller {
 		Result.success(log, resRef, "Submitted");
 	}
 
-	protected void job_loadTest(final JLabel statusLabel, Result[] resRef, final Test test) {
+	protected void job_loadTest(final JLabel statusLabel, Result[] resRef, final String test) {
 		final boolean assemble = assembleStamp.get() < sourceStamp.get();
 		if (assemble) {
 			job_assemble(statusLabel, resRef);
 		}
 
 		if (!assemble || resRef[0].isSuccess()) {
-			//	LATER #163
-			//	TODO test.getName() seems to return null in most cases
-			setupStatus(statusLabel, "Loading Regs and Mem for " + test.getName() + "...");
+			setupStatus(statusLabel, "Loading Regs and Mem for...");
 			validator.loadTest(resRef, test);
 		} else {
 			validator.clearTest();
@@ -343,12 +382,16 @@ public class Controller {
 	}
 
 	class UpdateTestSelectionAction extends AbstractAction {
+
 		public UpdateTestSelectionAction() {
 			super("Update Test Selection");
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			selectTest((Test) testComboModel.getSelectedItem());
+			final String selectedItem = (String) testComboModel.getSelectedItem();
+			if (selectedItem.startsWith(PREFIX_TEST)) {
+				selectTest(Integer.parseInt(selectedItem.substring(PREFIX_TEST.length())) - 1);
+			}
 		}
 	}
 
@@ -366,7 +409,13 @@ public class Controller {
 					final Result[] resRef = new Result[]{new Result("status unknown", false)};
 
 					try {
-						job_loadTest(statusLabel, resRef, (Test) testComboModel.getSelectedItem());
+						final String testItem = (String) testComboModel.getSelectedItem();
+						if (testItem.startsWith(PREFIX_TEST)) {
+							final int testIndex = Integer.parseInt(testItem.substring(PREFIX_TEST.length())) - 1;
+							job_loadTest(statusLabel, resRef, task.getTests().get(testIndex));
+						} else {
+							Result.failure(log, resRef, "Failed to parse test index: " + testItem);
+						}
 
 						if (resRef[0].isSuccess()) {
 							setupStatus(statusLabel, "Resetting...");
@@ -476,8 +525,13 @@ public class Controller {
 					try {
 						setupStatus(statusLabel, "Running...");
 
-						final Test test = (Test) testComboModel.getSelectedItem();
-						validator.run(resRef, test, getSource());
+						final String testItem = (String) testComboModel.getSelectedItem();
+						if (testItem.startsWith(PREFIX_TEST)) {
+							final int testIndex = Integer.parseInt(testItem.substring(PREFIX_TEST.length())) - 1;
+							validator.run(resRef, task.getTests().get(testIndex), getSource());
+						} else {
+							Result.failure(log, resRef, "Failed to parse test index: " + testItem);
+						}
 					} catch (Throwable t) {
 						Result.failure(log, resRef, "Failed: " + G.report(t));
 						log.trace("trace", t);
@@ -508,7 +562,7 @@ public class Controller {
 					final Result[] resRef = new Result[]{new Result("status unknown", false)};
 
 					try {
-						validator.batch(resRef, selectedTask, getSource(), null);
+						validator.batch(resRef, task, getSource(), null);
 					} finally {
 						SwingUtilities.invokeLater(new Runnable() {
 							public void run() {
@@ -577,4 +631,5 @@ public class Controller {
 			});
 		}
 	}
+
 }

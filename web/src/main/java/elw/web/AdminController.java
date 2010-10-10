@@ -208,7 +208,9 @@ public class AdminController extends MultiActionController implements WebSymbols
 				for (Assignment ass : assType.getAssignments()) {
 					for (Version ver : ass.getVersions()) {
 						final Result[] resRef = {new Result("unknown", false)};
+/*
 						validator.batch(resRef, ver, ver.getSolution(), null);
+*/
 						testResults.put(
 								ctx.extendTAV(assType, ass, ver).toString(),
 								resRef[0]
