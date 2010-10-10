@@ -313,7 +313,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 		return slotIdToFiles;
 	}
 
-	@RequestMapping(value = "ul", method = RequestMethod.POST)
+	@RequestMapping(value = "ul", method = {RequestMethod.POST, RequestMethod.PUT})
 	public ModelAndView do_ul(final HttpServletRequest req, final HttpServletResponse resp) throws IOException, FileUploadException {
 		final HashMap<String, Object> model = auth(req, resp, "");
 		if (model == null) {

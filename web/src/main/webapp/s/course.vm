@@ -82,11 +82,11 @@
                                                               style="font-weight: bold;"></span></div>
       <div class="tp_details_ro" style="font-weight: bold;">Read-only</div>
      </div>
-     <button class="elw_button_alert tp_conditions elw_dialogTrigger">Conditions</button>
-     <div class="tp_conditions_area elw_dialogContent">
-      <div>Content Types:<span class="tp_conditions_contentTypes" style="font-weight: bold;"></span></div>
-      <div>Max Size:<span class="tp_conditions_maxSize" style="font-weight: bold;"></span></div>
-      <div>Name Regex:<span class="tp_conditions_nameRegex" style="font-weight: bold;"></span></div>
+     <button class="elw_button_alert tp_filters elw_dialogTrigger">Filters</button>
+     <div class="tp_filters_area elw_dialogContent">
+      <div>Content Types:<span class="tp_filters_contentTypes" style="font-weight: bold;"></span></div>
+      <div>Max Size:<span class="tp_filters_maxSize" style="font-weight: bold;"></span></div>
+      <div>Name Regex:<span class="tp_filters_nameRegex" style="font-weight: bold;"></span></div>
      </div>
      <button class="elw_button_upload elw_dialogTrigger tp_upload" disabled="true">Upload</button>
      <div class="tp_upload_area elw_dialogContent">
@@ -221,13 +221,12 @@
         tp_details_area.remove();
        #end
 
-       var tp_conditions_area = tp_tabArea.find(".tp_conditions_area");
-       tp_conditions_area.find(".tp_conditions_contentTypes").html(
+       var tp_filters_area = tp_tabArea.find(".tp_filters_area");
+       tp_filters_area.find(".tp_filters_contentTypes").html(
                "#foreach($contentType in $slot.contentTypes) ${contentType} #end"
        );
-       tp_conditions_area.find(".tp_conditions_maxSize").html("$format.formatSize($slot.lengthLimit)");
-       tp_conditions_area.find(".tp_conditions_nameRegex").html($format.json($slot.nameRegex));
-       tp_tabArea.find(".tp_conditions");
+       tp_filters_area.find(".tp_filters_maxSize").html("$format.formatSize($slot.lengthLimit)");
+       tp_filters_area.find(".tp_filters_nameRegex").html($format.json($slot.nameRegex));
 
        var tp_upload_area = tp_tabArea.find(".tp_upload_area");
        #if($elw_ctx_ver.ver.checkWrite($elw_ctx_ver.assType, $elw_ctx_ver.ass, $slot.id, $filesStud))

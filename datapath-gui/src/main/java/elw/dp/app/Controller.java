@@ -265,9 +265,10 @@ public class Controller implements ControllerSetup, CallbackLoadTask {
 		try {
 			final byte[] textBytes = sourceText.getBytes("UTF-8");
 
-			final HttpURLConnection connection = (HttpURLConnection) new URL(baseUrl +"?elw_ctx="+ elwCtx).openConnection();
+			final String ulStr = baseUrl + "ul?elw_ctx=" + elwCtx+"&sId=code&s=s";
+			final HttpURLConnection connection = (HttpURLConnection) new URL(ulStr).openConnection();
 			connection.setFixedLengthStreamingMode(textBytes.length);
-			connection.setRequestMethod("POST");
+			connection.setRequestMethod("PUT");
 			connection.setDoOutput(true);
 			connection.setRequestProperty("Content-type", "text; charset=UTF-8");
 			connection.setRequestProperty("Accept", "text");

@@ -694,21 +694,59 @@ public class AdminController extends MultiActionController implements WebSymbols
 			slot = null;
 		}
 
+		final boolean put = "PUT".equalsIgnoreCase(req.getMethod());
 		if (req.getContentLength() == -1) {
-			Message.addWarn(req, "upload size not reported");
-			resp.sendRedirect(refreshUri);
+			if (!put) {
+				Message.addWarn(req, "upload size not reported");
+				resp.sendRedirect(refreshUri);
+			} else {
+				resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "upload size not reported");
+			}
 			return null;
 		}
 
 		if (!course) {
 			if (req.getContentLength() > slot.getLengthLimit()) {
-				Message.addWarn(req, "upload exceeds " + G4mat.formatMem(slot.getLengthLimit()));
-				resp.sendRedirect(refreshUri);
+				final String message = "upload exceeds " + G4mat.formatMem(slot.getLengthLimit());
+				if (!put) {
+					Message.addWarn(req, message);
+					resp.sendRedirect(refreshUri);
+				} else {
+					resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
+				}
 				return null;
 			}
 		}
 
 		final boolean binary = course || slot.isBinary() ;
+		if (put) {
+			if (course) {
+				resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "no course-scope PUT uploads, please");
+				return null;
+			}
+
+			//	LATER add some sensible defaults to the FileSlot entity 
+			final String name = "upload" + (binary ? ".bin" : ".txt");
+			final FileMeta fileMeta = new FileMeta(
+					name,
+					name,
+					binary ? "application/octet-stream" : "text/plain",
+					authorName,
+					resolveRemoteAddress(req)
+			);
+
+			fileDao.createFileFor(
+					scope,
+					ctx,
+					slot.getId(),
+					fileMeta,
+					binary ? new BufferedInputStream(req.getInputStream()) : null,
+					binary ? null : new BufferedReader(new InputStreamReader(req.getInputStream(), "UTF-8"))
+			);
+
+			return null;
+		}
+
 		final ServletFileUpload sfu = new ServletFileUpload(fileItemFactory);
 		final FileItemIterator fii = sfu.getItemIterator(req);
 		int fileCount = 0;
