@@ -16,6 +16,17 @@ import java.io.*;
 import java.util.*;
 import java.util.regex.Pattern;
 
+/**
+ * Ultra-simplistic json-based entity persistence.
+ *
+ * This of course could be done via JDBC, but:
+ * <ul><li>directly editable on file system w/o JDBC console and server shutdown
+ * </li><li>more or less comprehensible (JSON format)
+ * </li><li>rsync-able
+ * </li></ul>
+ *
+ * @param <Meta> your entity to be persisted
+ */
 public abstract class Dao<Meta extends Stamped> {
 	protected static final DateTimeFormatter FMT_DATE = DateTimeFormat.forPattern("yyyy-MM-dd");
 	protected static final Pattern PATTERN_DATE = Pattern.compile("\\d\\d\\d\\d-\\d\\d-\\d\\d");
@@ -128,7 +139,7 @@ public abstract class Dao<Meta extends Stamped> {
 		final File inbox = new File(base, NAME_INBOX);
 		if (!inbox.isDirectory()) {
 			if (!inbox.mkdirs()) {
-				log.warn("failed to create inbox: {}", inbox.getAbsolutePath());
+				log.error("failed to create inbox: {}", inbox.getAbsolutePath());
 				return;
 			}
 		}
@@ -140,7 +151,7 @@ public abstract class Dao<Meta extends Stamped> {
 		});
 
 		if (filesMeta == null) {
-			log.warn("failed to list: {}", inbox.getAbsolutePath());
+			log.error("failed to list: {}", inbox.getAbsolutePath());
 			return;
 		}
 
@@ -172,7 +183,7 @@ public abstract class Dao<Meta extends Stamped> {
 					meta = mapper.readValue(fileMeta, metaClass);
 				}
 			} catch (IOException e) {
-				log.warn("failed to read meta: {}", fileMeta.getAbsolutePath());
+				log.error("failed to read meta: {}", fileMeta.getAbsolutePath());
 				continue;
 			}
 
@@ -184,18 +195,16 @@ public abstract class Dao<Meta extends Stamped> {
 					grossStamp
 			);
 
-
 			try {
 				final Path path = pathFromMeta(meta);
 				if (path == null) {
-					log.warn("NOT created record of class {}: no path provided", metaClass.getSimpleName());
+					log.error("NOT created record of class {}: no path provided", metaClass.getSimpleName());
 				} else {
 					create(path, meta, value.openBinaryStream(), value.openTextReader());
 					log.info("created record of class {}", metaClass.getSimpleName());
 				}
 			} catch (IOException e) {
-				log.warn("rolling back/removing inputs: {}", metaClass.getSimpleName());
-				log.warn("failed", e);
+				log.error("rolling back/removing inputs: " + metaClass.getSimpleName(), e);
 			} finally {
 				value.closeStreams();
 				deleteAll(fileMeta, fileBinary, fileText, "created");
@@ -235,7 +244,7 @@ public abstract class Dao<Meta extends Stamped> {
 		if (groupByDate) {
 			dataDir = new File(dirs.iterator().next(), FMT_DATE.print(meta.getCreateStamp().getTime()));
 			if (!dataDir.exists() && (!requireExistingMeta && !dataDir.mkdirs())) {
-				log.warn("failed to create data dir: {}", dataDir.getAbsolutePath());
+				log.error("failed to create data dir: {}", dataDir.getAbsolutePath());
 			}
 		} else {
 			dataDir = dirs.iterator().next();
@@ -413,7 +422,7 @@ public abstract class Dao<Meta extends Stamped> {
 
 	protected static void deleteFile(File file, final String which, final String what) {
 		if (file.isFile() && !file.delete()) {
-			log.warn("failed to delete " + which + " " + what + ": {}", file.getAbsolutePath());
+			log.error("failed to delete " + which + " " + what + ": {}", file.getAbsolutePath());
 		}
 	}
 
@@ -508,7 +517,7 @@ public abstract class Dao<Meta extends Stamped> {
 		for (File dir : dirs) {
 			final File[] filesMeta = listMetas(dir);
 			if (filesMeta == null) {
-				log.warn("failed to list: {}", dir.getAbsolutePath());
+				log.error("failed to list: {}", dir.getAbsolutePath());
 				continue;
 			}
 
@@ -542,13 +551,12 @@ public abstract class Dao<Meta extends Stamped> {
 						meta = mapper.readValue(fileMeta, metaClass);
 					}
 				} catch (IOException e) {
-					log.warn("failed to read meta {}: {}", fileMeta.getAbsolutePath(), G.report(e));
-					log.info("failed", e);
+					log.error("failed to read meta "+ fileMeta.getAbsolutePath(), e);
 					continue;
 				}
 
 				if (!expectedStamp.equals(meta.getCreateStamp())) {
-					log.warn("create stamp mismatch for meta: {}", fileMeta.getAbsolutePath());
+					log.error("create stamp mismatch for meta: {}", fileMeta.getAbsolutePath());
 					continue;
 				}
 
@@ -647,7 +655,7 @@ public abstract class Dao<Meta extends Stamped> {
 						});
 					}
 					if (childDirs == null) {
-						log.warn("failed to list: {}", curDir.getAbsolutePath());
+						log.error("failed to list: {}", curDir.getAbsolutePath());
 						continue;
 					}
 					for (final File childDir : childDirs) {
@@ -661,7 +669,7 @@ public abstract class Dao<Meta extends Stamped> {
 					synchronized (fsMonitor) {
 						if (!nextDir.exists() && create) {
 							if (!nextDir.mkdirs()) {
-								log.warn("failed to create dir: {}", nextDir.getAbsolutePath());
+								log.error("failed to create dir: {}", nextDir.getAbsolutePath());
 							}
 						}
 						if (nextDir.isDirectory()) {
@@ -699,7 +707,7 @@ public abstract class Dao<Meta extends Stamped> {
 			for (File dir : nextDirs) {
 				final File[] metas = listMetas(dir);
 				if (metas == null) {
-					log.warn("failed to list: {}", dir.getAbsolutePath());
+					log.error("failed to list: {}", dir.getAbsolutePath());
 					continue;
 				}
 				if (metas.length == 0) {
