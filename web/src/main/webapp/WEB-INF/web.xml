@@ -45,6 +45,10 @@
 		<servlet-name>elw-mvc</servlet-name>
 		<url-pattern>/s/*</url-pattern>
 	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>elw-mvc</servlet-name>
+		<url-pattern>/err/*</url-pattern>
+	</servlet-mapping>
 
 	<servlet>
 		<servlet-name>code</servlet-name>
@@ -54,6 +58,41 @@
 		<servlet-name>code</servlet-name>
 		<url-pattern>/code/*</url-pattern>
 	</servlet-mapping>
+
+	<error-page>
+		<error-code>400</error-code>
+		<location>/err/400</location>
+	</error-page>
+
+	<error-page>
+		<error-code>404</error-code>
+		<location>/err/404</location>
+	</error-page>
+
+	<error-page>
+		<error-code>403</error-code>
+		<location>/err/403</location>
+	</error-page>
+
+	<error-page>
+		<error-code>500</error-code>
+		<location>/err/500</location>
+	</error-page>
+
+	<error-page>
+		<error-code>503</error-code>
+		<location>/err/503</location>
+	</error-page>
+
+	<error-page>
+		<error-code>503</error-code>
+		<location>/err/503</location>
+	</error-page>
+
+	<error-page>
+		<exception-type>java.lang.Throwable</exception-type>
+		<location>/err/ex</location>
+	</error-page>
 
 	<session-config>
 		<session-timeout>120</session-timeout>
