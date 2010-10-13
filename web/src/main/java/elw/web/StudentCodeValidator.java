@@ -18,7 +18,6 @@
 
 package elw.web;
 
-import base.pattern.Result;
 import elw.dao.*;
 import elw.dp.mips.MipsValidator;
 import elw.vo.*;

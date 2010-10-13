@@ -4,7 +4,6 @@ import elw.vo.Entry;
 import elw.vo.Path;
 import elw.vo.Stamp;
 import elw.vo.Stamped;
-import org.akraievoy.gear.G;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.joda.time.format.DateTimeFormat;
@@ -54,10 +53,14 @@ public abstract class Dao<Meta extends Stamped> {
 	protected long createStamp = -1;
 
 	protected final Object cacheMonitor = new Object();
-	protected final Map<Path, Long> cacheStamps
+	protected final Map<Path, Long> cacheRecStamps
 			= new HashMap<Path, Long>();
-	protected final Map<Path, SortedMap<Stamp, Entry<Meta>>> cache
+	protected final Map<Path, SortedMap<Stamp, Entry<Meta>>> cacheRecs
 			= new HashMap<Path, SortedMap<Stamp, Entry<Meta>>>();
+	protected final Map<Path, Long> cachePEStamps
+			= new HashMap<Path, Long>();
+	protected final Map<Path, String[][]> cachePathElems
+			= new HashMap<Path, String[][]>();
 
 	protected final Object fsMonitor = new Object();
 
@@ -252,6 +255,9 @@ public abstract class Dao<Meta extends Stamped> {
 
 		try {
 			writeAtomically(dataDir, requireExistingMeta, meta, binary, text);
+		} catch (IOException e) {
+			log.error("failed: " + metaClass.getSimpleName() + " path=" + p, e);
+			throw e;
 		} finally {
 			invalidate(p);
 		}
@@ -340,21 +346,18 @@ public abstract class Dao<Meta extends Stamped> {
 		return metas.size();
 	}
 
-	public String[][] list(Path p) {
-		return listCriteria(p, null, false, false, groupByDate, null);
-	}
-
+	//	TODO caching review: returned value is modified!
 	protected SortedMap<Stamp, Entry<Meta>> load(Path p) {
 		final long now = System.currentTimeMillis();
 		final SortedMap<Stamp, Entry<Meta>> loaded;
 
 		synchronized (cacheMonitor) {
-			final Long cacheStamp = cacheStamps.get(p);
-			final SortedMap<Stamp, Entry<Meta>> precached = cache.get(p);
+			final Long cacheStamp = cacheRecStamps.get(p);
+			final SortedMap<Stamp, Entry<Meta>> precached = cacheRecs.get(p);
 			if (cacheStamp != null) {
 				if (now - cacheStamp < cacheTime) {
 					//	okay, the cache is valid
-					return precached;
+					return new TreeMap<Stamp, Entry<Meta>>(precached);
 				}
 			}
 
@@ -362,19 +365,29 @@ public abstract class Dao<Meta extends Stamped> {
 			listCriteria(p, null, false, true, groupByDate, dirs);
 			loaded = listRecords(dirs, precached);
 
-			cacheStamps.put(p, now);
-			cache.put(p, loaded);
+			cacheRecStamps.put(p, now);
+			cacheRecs.put(p, new TreeMap<Stamp, Entry<Meta>>(loaded));
 		}
 
 		return loaded;
 	}
 
+	protected String[][] listCriteria(final Path path) {
+		return listCriteria(path, null, false, true, false, null);
+	}
+
 	protected void invalidate(Path p) {
 		synchronized (cacheMonitor) {
-			final Set<Path> cSet = cache.keySet();
-			for (final Path cCached : cSet) {
-				if (cCached.intersects(p)) {
-					cacheStamps.put(cCached, 0L);
+			final Set<Path> cRecStampPaths = cacheRecStamps.keySet();
+			for (final Path pCached : cRecStampPaths) {
+				if (pCached.intersects(p)) {
+					cacheRecStamps.put(pCached, 0L);
+				}
+			}
+			final Set<Path> cPEStampPaths = cachePEStamps.keySet();
+			for (final Path pCached : cPEStampPaths) {
+				if (pCached.intersects(p)) {
+					cachePEStamps.put(pCached, 0L);
 				}
 			}
 		}
@@ -539,10 +552,12 @@ public abstract class Dao<Meta extends Stamped> {
 				}
 				final long grossStamp = Math.max(fileMeta.lastModified(), Math.max(textStamp, binaryStamp));
 
-				final Entry<Meta> precached = result.get(expectedStamp);
-				if (precached != null && precached.getStamp() == grossStamp) {
-					alive.add(expectedStamp);
-					continue;	//	don't parse anything
+				synchronized (cacheMonitor) { //	operating on a cached map
+					final Entry<Meta> precached = result.get(expectedStamp);
+					if (precached != null && precached.getStamp() == grossStamp) {
+						alive.add(expectedStamp);
+						continue;	//	don't parse anything
+					}
 				}
 
 				final Meta meta;
@@ -569,11 +584,15 @@ public abstract class Dao<Meta extends Stamped> {
 				);
 
 				alive.add(expectedStamp);
-				result.put(expectedStamp, value);
+				synchronized (cacheMonitor) {	//	operating on cached map
+					result.put(expectedStamp, value);
+				}
 			}
 		}
 
-		result.keySet().retainAll(alive);
+		synchronized (cacheMonitor) {	//	operating on cached map
+			result.keySet().retainAll(alive);
+		}
 
 		return result;
 	}
@@ -624,9 +643,21 @@ public abstract class Dao<Meta extends Stamped> {
 			final boolean localGroupByDate,
 			final SortedSet<File> dirs
 	) {
-		//	TODO employ caching here too
 		final Path pEff = p == null ? pathFromMeta(meta) : p;
 		final String[] path = pEff.getPath();
+
+		if (!create && groupByDate == localGroupByDate && dirs == null) {
+			final long now = System.currentTimeMillis();
+			synchronized (cacheMonitor) {
+				final Long cachePEStamp = cachePEStamps.get(pEff);
+				if (cachePEStamp != null && now - cachePEStamp < cacheTime) {
+					final String[][] cachedPathElems = cachePathElems.get(pEff);
+					if (cachedPathElems != null) {
+						return cachedPathElems;
+					}
+				}
+			}
+		}
 
 		//	these grow exponentially
 		final SortedSet<File> curDirs = new TreeSet<File>();
@@ -715,6 +746,13 @@ public abstract class Dao<Meta extends Stamped> {
 				}
 			}
 			nextDirs.removeAll(curDirs);
+		}
+
+		if (!create && groupByDate == localGroupByDate) {
+			synchronized (cacheMonitor) {
+				cachePEStamps.put(pEff, System.currentTimeMillis());
+				cachePathElems.put(pEff, pathElems);
+			}
 		}
 
 		return pathElems;

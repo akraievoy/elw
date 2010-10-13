@@ -21,7 +21,7 @@ public class CourseDao extends Dao<Course> {
 
 	public synchronized String[] findCourseIds() {
 		final Path pathAll = new Path(new String[]{null});
-		final String[][] pathElems = listCriteria(pathAll, null, false, true, false, null);
+		final String[][] pathElems = listCriteria(pathAll);
 
 		return pathElems[0];
 	}

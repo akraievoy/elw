@@ -18,10 +18,7 @@ public class AssDao extends Dao<Assignment> {
 	}
 
 	protected String[] findIdsForAssType(final Course course, final AssignmentType assType) {
-		final String[][] pathElems = listCriteria(
-				forType(course, assType, null),
-				null, false, true, false, null
-		);
+		final String[][] pathElems = listCriteria(forType(course, assType, null));
 
 		return pathElems[2];
 	}

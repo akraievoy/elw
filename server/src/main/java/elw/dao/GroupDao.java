@@ -12,7 +12,7 @@ public class GroupDao extends Dao<Group> {
 
 	public String[] findGroupIds() {
 		final Path pathAll = new Path(new String[]{null});
-		final String[][] pathElems = listCriteria(pathAll, null, false, true, false, null);
+		final String[][] pathElems = listCriteria(pathAll);
 
 		return pathElems[0];
 	}

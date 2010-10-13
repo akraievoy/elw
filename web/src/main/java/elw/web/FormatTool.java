@@ -317,4 +317,26 @@ public class FormatTool {
 	public String esc(final String str) {
 		return str.replaceAll("&", "&amp;").replaceAll("\"", "&quot;").replaceAll(">", "&gt;").replaceAll("<", "&lt;");
 	}
+
+	public String lines(final String text) {
+		final StringBuilder res = new StringBuilder(text == null ? "" : text);
+		int lineNo = 1;
+		int lineStart = 0;
+		final char[] padding = {' ',' ',' ',' '};
+		do {
+			final String strLineNo = Integer.toString(lineNo);
+
+			res.insert(lineStart, ' ');
+			res.insert(lineStart, lineNo);
+			final int lineNoLen = strLineNo.length();
+			res.insert(lineStart, padding, 0, padding.length - lineNoLen);
+
+			lineStart = Math.max(res.indexOf("\n", lineStart), res.indexOf("\r", lineStart+1+(Math.max(4, lineNoLen)))) + 1;
+			lineNo+=1;
+		} while (lineStart > 0);
+
+		return res.toString();
+	}
+
+	
 }

@@ -260,7 +260,7 @@
          tp_file_row.find("td:eq(3)").html($format.json($file.meta.sourceAddress));
          #if(!$p_slot.binary && $p_path.ver.checkRead($p_path.assType, $p_path.ass, $p_slot.id, $filesStud))
           tp_file_row.find("td:eq(4) button").removeAttr("disabled");
-          tp_file_row.find("td:eq(4) div pre").html($format.json(${file.text}));
+          tp_file_row.find("td:eq(4) div pre").html($format.json($format.lines($format.esc(${file.text}))));
          #end
          #if($file.meta.comment && $file.meta.comment.length() > 0)
           tp_file_row.find("td:eq(5)").html($format.json($file.meta.comment));

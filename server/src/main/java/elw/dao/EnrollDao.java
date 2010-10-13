@@ -23,7 +23,7 @@ public class EnrollDao extends Dao<Enrollment> {
 
 	public String[] findEnrollmentIds() {
 		final String[] pathAll = {null, null, null};
-		final String[][] pathElems = listCriteria(new Path(pathAll), null, false, true, false, null);
+		final String[][] pathElems = listCriteria(new Path(pathAll));
 
 		return pathElems[2];
 	}
@@ -57,7 +57,7 @@ public class EnrollDao extends Dao<Enrollment> {
 
 	public Enrollment[] findEnrollmentsForGroupId(final String groupId) {
 		final Path pathGroup = new Path(new String[]{groupId, null, null});
-		final String[][] pathElems = listCriteria(pathGroup, null, false, true, false, null);
+		final String[][] pathElems = listCriteria(pathGroup);
 		final String[] enrIds = pathElems[2];
 
 		return load(enrIds);
@@ -65,7 +65,7 @@ public class EnrollDao extends Dao<Enrollment> {
 
 	public Course[] findCoursesByGroupId(String groupId) {
 		final Path pathGroup = new Path(new String[]{groupId, null, null});
-		final String[][] pathElems = listCriteria(pathGroup, null, false, true, false, null);
+		final String[][] pathElems = listCriteria(pathGroup);
 		final String[] courseIds = pathElems[1];
 
 		return courseDao.load(courseIds);
@@ -73,7 +73,7 @@ public class EnrollDao extends Dao<Enrollment> {
 
 	public Enrollment findEnrollmentForGroupAndCourse(String groupId, String courseId) {
 		final Path pathGroupAndCourse = new Path(new String[]{groupId, courseId, null});
-		final String[][] pathElems = listCriteria(pathGroupAndCourse, null, false, true, false, null);
+		final String[][] pathElems = listCriteria(pathGroupAndCourse);
 		final String[] enrollmentIds = pathElems[2];
 
 		if (enrollmentIds.length == 0) {

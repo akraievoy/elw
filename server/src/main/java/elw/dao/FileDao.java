@@ -144,7 +144,7 @@ public class FileDao extends Dao<FileMeta> {
 	}
 
 	protected Entry<FileMeta>[] findFiles(final Path path) {
-		final String[][] pathElems = listCriteria(path, null, false, true, false, null);
+		final String[][] pathElems = listCriteria(path);
 		return load(path, pathElems[pathElems.length - 1]);
 	}
 
