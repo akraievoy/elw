@@ -21,15 +21,16 @@
 #macro(elw_messages $elw_messages)
 <script type="text/javascript">
 	jQuery(document).ready(function() {
-		#foreach($m in $elw_messages)
+  jQuery.jGrowl.defaults.position = "center";
+  #foreach($m in $elw_messages)
 			#if($m.type == "err")
-				jQuery.jGrowl("$m.message", {"header":"Error", "sticky": true});
+				jQuery.jGrowl("$m.message", {"header":"Error", "theme": "ui-state-error", "sticky": true});
 			#end
 			#if($m.type == "warn")
-				jQuery.jGrowl("$m.message", {"header":"Warning", "life": 10000});
+				jQuery.jGrowl("$m.message", {"header":"Warning", "theme": "ui-state-error", "sticky": true});
 			#end
 			#if($m.type == "info")
-				jQuery.jGrowl("$m.message", {"header":"Info"});
+				jQuery.jGrowl("$m.message", {"header":"Info", "life": 7000,  "theme": "ui-state-highlight"});
 			#end
 		#end
 	});
@@ -40,12 +41,12 @@
 #if($elw_ctx.group)#if($elw_ctx.student)#set($auth="true") #end #end
 <div id="cred">
 	#if($auth)
-		[&nbsp;$elw_ctx.group.name&nbsp;$elw_ctx.student.name&nbsp;]&nbsp;
+		<span style="font-size: 1.3em">[&nbsp;$elw_ctx.group.name&nbsp;$elw_ctx.student.name&nbsp;]</span>&nbsp;
 		<form method="GET" style="display:inline; margin: 0 0.25em; padding: 0;" action="logout">
 			<button type="submit" class="elw_button_logout">Log Out</button>
 		</form>
 	#else
-		[&nbsp;Anonymous&nbsp;]
+		<span style="font-size: 1.3em">[&nbsp;Anonymous&nbsp;]</span>
 	#end
 </div>
 #end

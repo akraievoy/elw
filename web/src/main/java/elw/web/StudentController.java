@@ -163,7 +163,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 				groupName == null || studentName == null ||
 				groupName.trim().length() == 0 || studentName.trim().length() == 0
 		) {
-			Message.addWarn(req, "fields NOT set");
+			Message.addErr(req, "fields NOT set");
 		} else {
 			final Group[] groups = groupDao.findAllGroups();
 			final Group group = IdName.findByName(groups, groupName, true);
@@ -188,10 +188,10 @@ public class StudentController extends MultiActionController implements WebSymbo
 					}
 					return null;
 				} else {
-					Message.addWarn(req, "no such student");
+					Message.addErr(req, "no such student");
 				}
 			} else {
-				Message.addWarn(req, "no such group");
+				Message.addErr(req, "no such group");
 			}
 		}
 
