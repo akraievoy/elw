@@ -12,7 +12,9 @@
 #macro(elw_ready $p_relPath $p_page)
 	<script type="text/javascript" src="${p_relPath}js/elw.js"></script>
 	#if($p_page)
-		<script type="text/javascript" src="${p_relPath}js/${p_page}.js"></script>
+		<script type="text/javascript">
+   elw_updateExpandTriggersUri = "${p_relPath}s/updateExpandTriggers?view=$p_page";
+		</script>
 	#end
 #end
 

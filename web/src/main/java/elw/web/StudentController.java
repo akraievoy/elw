@@ -137,6 +137,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 
 		model.put(S_MESSAGES, Message.drainMessages(req));
 		model.put("format", FormatTool.forLocale(RequestContextUtils.getLocale(req)));
+		model.put("expandTriggers", req.getSession().getAttribute("viewToExpandTriggers"));
 
 		return model;
 	}
@@ -255,7 +256,6 @@ public class StudentController extends MultiActionController implements WebSymbo
 		model.put("reportMetas", reportMetas);
 		model.put("scores", scores);
 		model.put("grossScore", grossScore[0]);
-		model.put("expandTriggers", req.getSession().getAttribute("course.expandTriggers"));
 
 		return new ModelAndView("s/course", model);
 	}
@@ -350,10 +350,21 @@ public class StudentController extends MultiActionController implements WebSymbo
 	public ModelAndView do_updateExpandTriggers(
 			final HttpServletRequest req, final HttpServletResponse resp
 	) throws IOException {
-		req.getSession().setAttribute(
-				"course.expandTriggers",
-				G4Io.dumpToString(req.getInputStream(), "UTF-8")
-		);
+		final HttpSession session = req.getSession();
+		@SuppressWarnings({"unchecked"})
+		Map<String, String> viewToExpandTriggers = (Map<String, String>) session.getAttribute("viewToExpandTriggers");
+		//noinspection SynchronizationOnLocalVariableOrMethodParameter
+		synchronized(session) {
+			if (viewToExpandTriggers == null) {
+				viewToExpandTriggers = Collections.synchronizedMap(new TreeMap<String, String>());
+				session.setAttribute("viewToExpandTriggers", viewToExpandTriggers);
+			}
+		}
+
+		final String postBody = G4Io.dumpToString(req.getInputStream(), "UTF-8");
+		final String viewName = req.getParameter("view");
+		final String viewNameEff = viewName == null ? "" : viewName;
+		viewToExpandTriggers.put(viewNameEff, postBody);
 
 		return new ModelAndView(ViewJackson.success("success"));
 	}

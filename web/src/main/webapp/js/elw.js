@@ -19,6 +19,7 @@
 var elw_enterTimes = {};
 var elw_visible = {};
 var elw_ajaxStamp = 0;
+var elw_updateExpandTriggersUri = null; 
 
 function elw_expand(elemId) {
 	var trigger = jQuery("#" + elemId);
@@ -79,13 +80,13 @@ function elw_expandedTriggers() {
 }
 
 function elw_ajaxStart(myAjaxStamp) {
-	if (elw_ajaxStamp > myAjaxStamp) {
+	if (elw_ajaxStamp > myAjaxStamp || elw_updateExpandTriggersUri == null) {
 		return;
 	}
 
 	jQuery.ajax({
 		"type": "POST",
-		"url": "updateExpandTriggers",
+		"url": elw_updateExpandTriggersUri,
 		"data": jQuery.toJSON(elw_expandedTriggers()),
 		"success": function(resp) {
 			if (resp == null || !resp.success) {
@@ -134,12 +135,12 @@ jQuery(document).ready(function() {
 			primary: "ui-icon-arrowstop-1-n"
 		}
 	});
-
-	jQuery(".expandTrigger").mouseenter(function() {
+ var jQexpand = jQuery(".expandTrigger");
+ jQexpand.mouseenter(function() {
 		elw_enterTimes[this.id] = new Date().getTime();
 		setTimeout("elw_mouseHovered('"+this.id+"')", 600);
 	});
-	jQuery(".expandTrigger").mouseleave(function() {
+	jQexpand.mouseleave(function() {
 		elw_enterTimes[this.id] = null;
 	});
 	jQuery(".elw_dialogTrigger").click(function() {

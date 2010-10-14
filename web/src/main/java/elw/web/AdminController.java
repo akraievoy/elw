@@ -123,6 +123,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 
 		model.put(S_MESSAGES, Message.drainMessages(req));
 		model.put("format", FormatTool.forLocale(RequestContextUtils.getLocale(req)));
+		model.put("expandTriggers", req.getSession().getAttribute("viewToExpandTriggers"));
 
 		return model;
 	}
