@@ -216,7 +216,8 @@
         #else
          tp_details_area.find(".tp_details_writeAfter").remove();
         #end
-        tp_tabArea.find(".tp_details").removeAttr("disabled");
+        tp_tabArea.find(".tp_details").removeAttr("disabled").attr("id","index-${idx}--slotinfo-${slot.id}-details");
+        tp_details_area.toggleClass("index-${idx}--slotinfo-${slot.id}-details");
        #else
         tp_details_area.remove();
        #end
@@ -227,11 +228,14 @@
        );
        tp_filters_area.find(".tp_filters_maxSize").html("$format.formatSize($slot.lengthLimit)");
        tp_filters_area.find(".tp_filters_nameRegex").html($format.json($slot.nameRegex));
+       tp_tabArea.find(".tp_filters").attr("id","index-${idx}--slotinfo-${slot.id}-filters");
+       tp_filters_area.toggleClass("index-${idx}--slotinfo-${slot.id}-filters");
 
        var tp_upload_area = tp_tabArea.find(".tp_upload_area");
        #if($elw_ctx_ver.ver.checkWrite($elw_ctx_ver.assType, $elw_ctx_ver.ass, $slot.id, $filesStud))
         tp_upload_area.find("form").attr("action", "ul?elw_ctx=$elw_ctx_ver&sId=$slot.id");
-        tp_tabArea.find(".tp_upload").removeAttr("disabled");
+        tp_tabArea.find(".tp_upload").removeAttr("disabled").attr("id","index-${idx}--slotinfo-${slot.id}-upload");
+        tp_upload_area.toggleClass("index-${idx}--slotinfo-${slot.id}-upload");
        #else
         tp_upload_area.remove();
        #end

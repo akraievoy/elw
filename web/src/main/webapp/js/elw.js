@@ -144,9 +144,10 @@ jQuery(document).ready(function() {
 	});
 	jQuery(".elw_dialogTrigger").click(function() {
   var thisJQ = jQuery(this);
-  thisJQ.next(".elw_dialogContent:first").clone().dialog({
+  jQuery("."+thisJQ.attr("id")).dialog({
 			modal: true,
 			minWidth: 600,
+			minHeight: 400,
 			title: thisJQ.text()
 		});
 	});

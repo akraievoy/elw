@@ -95,7 +95,7 @@ h3 {
 
 div.formArea {
 	margin: 3em auto;
-	width: 32em;
+	width: 36em;
 	padding: 1em;
 }
 
@@ -115,6 +115,10 @@ div.formField {
 	padding-top: 0.2em;
 	height: 1.5em;
 	text-align: left;
+}
+
+div.formfield input {
+ width: 17em;
 }
 
 div.formButtons {
