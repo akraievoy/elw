@@ -50,7 +50,7 @@ public class ErrController {
 			final HttpSession session = req.getSession(false);
 
 			logOut.println("web error: eventId="+eventId+" status=" + statusCode + " message='" + message + "'");
-			logOut.println("url: " + req.getRequestURL());
+			logOut.println("url: " + req.getAttribute("javax.servlet.error.request_uri"));
 			logOut.print("attributes: ");
 			final Enumeration reqAttrNames = req.getAttributeNames();
 			while (reqAttrNames.hasMoreElements()) {
