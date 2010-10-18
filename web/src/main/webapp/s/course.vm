@@ -262,10 +262,15 @@
          tp_file_row.find("td:eq(1)").html("$format.format($file.meta.createStamp.time)");
          tp_file_row.find("td:eq(2)").html($format.json($file.meta.author));
          tp_file_row.find("td:eq(3)").html($format.json($file.meta.sourceAddress));
-         #if(!$p_slot.binary && $p_path.ver.checkRead($p_path.assType, $p_path.ass, $p_slot.id, $filesStud))
-          tp_file_row.find("td:eq(4) button").removeAttr("disabled");
-          tp_file_row.find("td:eq(4) div pre").html($format.json($format.lines($format.esc(${file.text}))));
-         #end
+         #if(!$p_slot.binary && $p_path.ver.checkRead($p_path.assType, $p_path.ass, $p_slot.id, $filesStud)){
+          var tdId = "index-${p_path.index}--slotinfo-${p_slot.id}--${p_scope}-${file.meta.id}--text";
+          tp_file_row.find("td:eq(4) button").removeAttr("disabled").attr("id", tdId);
+          #if($p_slot.escaped)
+           tp_file_row.find("td:eq(4) div pre").html($format.json($format.lines($format.esc(${file.text})))).toggleClass(tdId);
+          #else
+           tp_file_row.find("td:eq(4) div pre").html($format.json(${file.text})).toggleClass(tdId);
+          #end
+         }#end
          #if($file.meta.comment && $file.meta.comment.length() > 0)
           tp_file_row.find("td:eq(5)").html($format.json($file.meta.comment));
          #end

@@ -11,6 +11,7 @@ public class FileSlot extends IdNameStamped {
 	protected String shortName;
 	protected long lengthLimit;
 	protected String nameRegex;
+	protected boolean escaped = true;
 	protected boolean binary;
 	protected boolean writable;
 	protected String editor;
@@ -88,5 +89,13 @@ public class FileSlot extends IdNameStamped {
 
 	public void setEditor(String editor) {
 		this.editor = editor;
+	}
+
+	public boolean isEscaped() {
+		return escaped;
+	}
+
+	public void setEscaped(boolean escaped) {
+		this.escaped = escaped;
 	}
 }
