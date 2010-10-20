@@ -315,6 +315,9 @@ public class FormatTool {
 	}
 
 	public String esc(final String str) {
+		if (str == null || str.trim().length() == 0) {
+			return "";
+		}
 		return str.replaceAll("&", "&amp;").replaceAll("\"", "&quot;").replaceAll(">", "&gt;").replaceAll("<", "&lt;");
 	}
 

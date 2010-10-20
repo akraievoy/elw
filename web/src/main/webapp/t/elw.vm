@@ -56,7 +56,7 @@
 	#if($auth)
 		[&nbsp;Admin&nbsp;]&nbsp;
 		<form method="GET" style="display:inline; margin: 0 0.25em; padding: 0;" action="logout">
-			<input type="Submit" value="Log Out" style="margin: 0;"/>
+			<input type="Submit" value="Log Out" class="elw_button_logout"/>
 		</form>
 	#{else}
 		[&nbsp;Anonymous&nbsp;]

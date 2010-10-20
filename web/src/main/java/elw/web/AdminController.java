@@ -344,27 +344,43 @@ public class AdminController extends MultiActionController implements WebSymbols
 			return null;
 		}
 
-		final List<LogEntry> logEntries = prepareLogEntries(ctx);
+		final boolean noDues = "yes".equals(req.getParameter("nodues"));
+		final String slotId = req.getParameter("slotId");
+
+		final List<LogEntry> logEntries = prepareLogEntries(ctx, noDues, slotId);
 
 		model.put("logEntries", logEntries);
+
+		model.put("noDues", noDues);
+		if (slotId != null && slotId.length() > 0) {
+			model.put("slotId", slotId);
+		}
 
 		return new ModelAndView("a/log", model);
 	}
 
-	protected List<LogEntry> prepareLogEntries(Ctx ctx) {
+	protected List<LogEntry> prepareLogEntries(Ctx ctx, boolean noDues, String slotId) {
 		final List<LogEntry> logEntries = new ArrayList<LogEntry>();
 
 		for (Student stud : ctx.getGroup().getStudents()) {
 			final Ctx ctxStud = ctx.extendStudent(stud);
 			for (int index = 0; index < ctx.getEnr().getIndex().size(); index++) {
 				final Ctx ctxVer = ctxStud.extendIndex(index);
-				final AssignmentType assType = ctxVer.getAssType();
-				final Assignment ass = ctxVer.getAss();
-				final Version ver = ctxVer.getVer();
+				final FileSlot[] slots = ctxVer.getAssType().getFileSlots();
 
-				final Entry<ReportMeta> lastReport = reportDao.findLast(ctxVer);
-				if (lastReport != null) {
-					logEntries.add(new LogEntry(stud, ctxVer, ass, lastReport.getMeta()));
+				for (FileSlot slot : slots) {
+					if (!noDues && ctxVer.getIndexEntry().getClassDue().get(slot.getId()) == null) {
+						continue;
+					}
+					if (slotId != null && slotId.trim().length() > 0 && !slotId.equals(slot.getId())) {
+						continue;
+					}
+					final Entry<FileMeta>[] uploads = fileDao.findFilesFor(FileDao.SCOPE_STUD, ctxVer, slot.getId());
+					if (uploads != null) {
+						for (int i = 0, uploadsLength = uploads.length; i < uploadsLength; i++) {
+							logEntries.add(new LogEntry(ctxVer, slot, uploads[i].getMeta(), i + 1 == uploadsLength));
+						}
+					}
 				}
 			}
 		}
@@ -386,16 +402,16 @@ public class AdminController extends MultiActionController implements WebSymbols
 	}
 
 	public static class LogEntry implements Comparable<LogEntry> {
-		protected final Assignment ass;
-		protected final ReportMeta meta;
-		protected final Student student;
 		protected final Ctx ctx;
+		protected final FileSlot slot;
+		protected final FileMeta meta;
+		protected final boolean last;
 
-		public LogEntry(Student student, Ctx ctx, Assignment ass, ReportMeta meta) {
-			this.ass = ass;
+		public LogEntry(Ctx ctx, FileSlot slot, FileMeta meta, boolean last) {
+			this.slot = slot;
 			this.meta = meta;
-			this.student = student;
 			this.ctx = ctx;
+			this.last = last;
 		}
 
 		public int compareTo(LogEntry o) {
@@ -404,20 +420,20 @@ public class AdminController extends MultiActionController implements WebSymbols
 			return (thisVal < anotherVal ? -1 : (thisVal == anotherVal ? 0 : 1));
 		}
 
-		public ReportMeta getMeta() {
+		public FileMeta getMeta() {
 			return meta;
-		}
-
-		public Student getStudent() {
-			return student;
 		}
 
 		public Ctx getCtx() {
 			return ctx;
 		}
 
-		public Assignment getAss() {
-			return ass;
+		public FileSlot getSlot() {
+			return slot;
+		}
+
+		public boolean isLast() {
+			return last;
 		}
 	}
 
@@ -566,10 +582,10 @@ public class AdminController extends MultiActionController implements WebSymbols
 			Message.addInfo(req, "Report approved");
 		}
 
-		final List<LogEntry> entries = prepareLogEntries(ctx);
+		final List<LogEntry> entries = prepareLogEntries(ctx, true, null);
 		LogEntry nextEntry = null;
 		for (LogEntry entry : entries) {
-			if (entry.getMeta().getScoreStamp() == null && entry.getMeta().getTotalUploads() > 0) {
+			if (entry.getMeta().getScore() == null) {
 				nextEntry = entry;
 				break;
 			}

@@ -1,44 +1,109 @@
 #* @vtlvariable name="logEntries" type="elw.web.AdminController.LogEntry[]" *#
 #* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
+#* @vtlvariable name="format" type="elw.web.FormatTool" *#
+#* @vtlvariable name="noDues" type="java.lang.Boolean" *#
+#* @vtlvariable name="slotId" type="java.lang.String" *#
 <html>
 <head>
-	<meta content="text/html; charset=UTF-8">
-	<title>Group $elw_ctx.group.name Report Uploads : ELW Admin</title>
-	#elw_imports("../")
+ <meta content="text/html; charset=UTF-8">
+ <title>Group $elw_ctx.group.name Report Uploads : ELW Admin</title>
+ #elw_imports("../")
 </head>
 <body style="text-align: left;">
 <div class="ui-widget-header ui-corner-all" id="elw_header">
-	<div id="nav"><a href="index">Index</a> &gt; <a href="enrolls">Enrollments</a> &gt; <span style="font-weight: bold">Group $elw_ctx.group.name Report Uploads</span></div>
-	#elw_cred_adm($auth)
-	<div id="header_hr"> </div>
+ <div id="nav"><a href="index">Index</a> &gt; <a href="enrolls">Enrollments</a> &gt; <span style="font-weight: bold">Group $elw_ctx.group.name
+  Report Uploads</span></div>
+ #elw_cred_adm($auth)
+ <div id="header_hr"></div>
 </div>
-#elw_messages($elw_messages)
-<table cellspacing="0"><tbody>
-<tr class="elw_header_row">
-	<th style="padding-left: 0.25em; padding-right: 0.25em; text-align: center;">Time Stamp</th>
-	<th style="padding-left: 0.25em; padding-right: 0.25em; text-align: center;">Student name</th>
-	<th style="padding-left: 0.25em; padding-right: 0.25em; text-align: center;">Class</th>
-	<th style="padding-left: 0.25em; padding-right: 0.25em; text-align: center;">Status</th>
-	<th style="padding-left: 0.25em; padding-right: 0.25em; text-align: center;">Actions</th>
-</tr>
-#foreach($e in $logEntries)
-	<tr >
-		<td style="padding-left: 0.25em; padding-right: 0.25em;"><span title="$e.meta.niceUploadStamp">$e.meta.briefUploadStamp</span></td>
-		<td style="padding-left: 0.25em; padding-right: 0.25em;"><span title="$e.student.id">$e.student.name</span></td>
-		<td style="padding-left: 0.25em; padding-right: 0.25em;"><span title="$e.ass.id">$e.ass.name</span></td>
-		<td style="padding-left: 0.25em; padding-right: 0.25em;">
-			#elw_report_state($e.ctx, $e.meta)
-		</td>
-		<td style="padding-left: 0.25em; padding-right: 0.25em;">
-			<form action="approve" method="get" style="margin: 0;">
-				<input type="hidden" name="elw_ctx" value="$e.ctx"/>
-				<input type="hidden" name="stamp" value="$e.meta.createStamp"/>
-				<input type="submit" value="Approve"/>
-			</form>
-		</td>
-	</tr>
-#end
-</tbody></table>
+ #elw_messages($elw_messages)
+<form action="log" method="GET">
+ <input type="hidden" name="elw_ctx" value="$elw_ctx.toString()"/>
+ Slot&nbsp;ID:&nbsp;<input type="text" name="slotId" value=""/>
+ Show&nbsp;no&nbsp;dues:&nbsp;<input type="checkbox" name="nodues" value="yes"/>&nbsp;yes
+ <input type="submit" value="Refresh"/>
+</form>
+<table cellspacing="0">
+ <thead>
+ <tr class="elw_header_row">
+  <th>Time</th>
+  <th>Student name</th>
+  <th>Class</th>
+  <th>Slot</th>
+  <th>Comment</th>
+  <th>Status</th>
+  <th>Actions</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr class="te te_log elw_row">
+  <td class="tp_stamp"></td>
+  <td class="tp_stud"></td>
+  <td class="tp_ass"></td>
+  <td class="tp_slot"></td>
+  <td style="width: 12em;" class="tp_comment"></td>
+  <td class="tp_status"> fixme </td>
+  <td class="tp_actions">
+   <a style="font-size: 0.75em;" href="about:blank" target="_blank" class="elw_button tp_approve">Approve</a>
+  </td>
+ </tr>
+ </tbody>
+</table>
 </body>
-	#elw_ready("../")
+<script type="text/javascript">
+ jQuery(document).ready(function() {
+  #if($noDues)
+   jQuery("input[name=nodues]").attr("checked", $noDues);
+  #end
+  #if($slotId)
+   jQuery("input[name=slotId]").val($format.json($slotId));
+  #end
+
+  var te_log = jQuery(".te.te_log:first");
+  var tp_log;
+  #foreach($e in $logEntries)
+   tp_log = te_log.clone().toggleClass("te");
+
+   tp_log.find(".tp_stamp")
+    .attr("title", $format.json($format.format($e.meta.createStamp.time, "EEE d HH:mm")))
+    .html($format.json($format.format($e.meta.createStamp.time)));
+   tp_log.find(".tp_stud")
+    .attr("title", $format.json($e.ctx.student.id))
+    .html($format.json($format.esc($e.ctx.student.name)));
+   tp_log.find(".tp_ass")
+    .attr("title", $format.json($e.ctx.ass.id))
+    .html($format.json($format.esc($e.ctx.ass.name)));
+   tp_log.find(".tp_slot")
+    .attr("title", $format.json($e.slot.id))
+    .html($format.json($e.slot.name));
+   tp_log.find(".tp_comment")
+    .html($format.json($format.esc($e.meta.comment)));
+   tp_log.find(".tp_actions .tp_approve")
+    .attr("href", "approve?elw_ctx="+$format.json($e.ctx.toString())+"&stamp="+$format.json($e.meta.createStamp.toString()));
+
+##   #set($dueClass = $elw_ctx.enr.classes.get($elw_ctx.ass.scoring.classReportDue))
+##  #set($overdue = $dueClass.passed && ($meta.totalUploads == 0 || $meta.scoreStamp == -1))
+##  <div style="width: 100%; text-align: center; #if($overdue)background-color: #EE9999;#end">
+##  #if($meta.totalUploads > 0)
+##    <span title="$meta.niceUploadStamp">
+##     #if($meta.scoreStamp < 0)
+##      <span style="color: #FF0000">Declined</span>
+##     #else
+##      #if($meta.scoreStamp > 0)
+##       <span style="color: #00FF00">Approved</span>
+##      #else
+##       <span style="color: #999999">Pending</span>
+##      #end
+##     #end
+##    </span>
+##   #else
+##    None
+##   #end
+##  </div>
+
+   te_log.parent().append(tp_log);
+  #end
+ });
+</script>
+ #elw_ready("../")
 </html>

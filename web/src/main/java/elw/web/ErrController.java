@@ -55,7 +55,7 @@ public class ErrController {
 			final Enumeration reqAttrNames = req.getAttributeNames();
 			while (reqAttrNames.hasMoreElements()) {
 				final String aName = (String) reqAttrNames.nextElement();
-				if (!aName.startsWith("javax.servlet.error")) {
+				if (!aName.startsWith("javax.servlet") && !aName.startsWith("org.springframework")) {
 					logOut.print(aName + "="+String.valueOf(req.getAttribute(aName)) + " ");
 				}
 			}
@@ -67,7 +67,7 @@ public class ErrController {
 				final Enumeration sessAttrNames = session.getAttributeNames();
 				while (sessAttrNames.hasMoreElements()) {
 					final String aName = (String) sessAttrNames.nextElement();
-					if (!aName.startsWith("javax.servlet.error")) {
+					if (!aName.startsWith("javax.servlet") && !aName.startsWith("org.springframework")) {
 						logOut.print(aName + "="+String.valueOf(session.getAttribute(aName)) + " ");
 					}
 				}
