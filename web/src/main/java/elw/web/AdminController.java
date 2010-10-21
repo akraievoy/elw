@@ -369,7 +369,8 @@ public class AdminController extends MultiActionController implements WebSymbols
 				final FileSlot[] slots = ctxVer.getAssType().getFileSlots();
 
 				for (FileSlot slot : slots) {
-					if (!noDues && ctxVer.getIndexEntry().getClassDue().get(slot.getId()) == null) {
+					final Map<String, Integer> dueMap = ctxVer.getIndexEntry().getClassDue();
+					if (!noDues && (dueMap == null || dueMap.get(slot.getId()) == null)) {
 						continue;
 					}
 					if (slotId != null && slotId.trim().length() > 0 && !slotId.equals(slot.getId())) {

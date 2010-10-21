@@ -19,6 +19,7 @@
 package elw.web;
 
 import elw.miniweb.ViewJackson;
+import elw.vo.Format;
 import org.joda.time.DateTime;
 import org.joda.time.Period;
 import org.joda.time.format.DateTimeFormat;
@@ -34,7 +35,7 @@ import java.util.*;
 /**
  * Inspired by @link{org.apache.velocity.tools.generic.FormatTool}, but has more specific and fine-tuned methods.
  */
-public class FormatTool {
+public class FormatTool implements Format {
 	private static final Logger log = LoggerFactory.getLogger(FormatTool.class);
 
 	protected final static Map<Locale, FormatTool> cache = new HashMap<Locale, FormatTool>();

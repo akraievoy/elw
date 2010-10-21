@@ -276,3 +276,24 @@ a.popupTrigger:hover {
 	background: #EEEEEE;
 	border: #CCCCCC thin dashed; 
 }
+
+.elw_open {
+}
+.elw_pending {
+ color: #333333;
+}
+.elw_approved {
+ color: #00FF00;
+}
+.elw_declined {
+ color: #FF0000;
+}
+.elw_due_passed {
+ font-weight: bold;
+}
+.elw_overdue {
+ background-color: #FFCCCC;
+}
+.elw_nodue {
+ opacity: .25;
+}

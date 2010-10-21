@@ -182,10 +182,8 @@
 
         tp_slot.find(".tp_slot_title").html($format.json(${slot.name})).attr("title", "${slot.id}");
         var tp_slot_due = tp_slot.find(".tp_slot_due");
-        tp_slot_due.html("Due $format.format($classDue.toDateTime.millis)");
-        #if($classDue.passed)
-         tp_slot_due.css({"color": "red"});
-        #end
+        tp_slot_due.html($format.json($elw_ctx_ver.indexEntry.getListStatusHtml($format, $elw_ctx_ver.enr, $slot, $filesStud.get($slot.id))));
+        tp_slot_due.toggleClass($format.json($elw_ctx_ver.indexEntry.getListStatusClasses($elw_ctx_ver.enr, $slot, $filesStud.get($slot.id))));
         tp_timeline.append(tp_slot);
        #end
 

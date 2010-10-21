@@ -42,7 +42,7 @@
   <td class="tp_ass"></td>
   <td class="tp_slot"></td>
   <td style="width: 12em;" class="tp_comment"></td>
-  <td class="tp_status"> fixme </td>
+  <td class="tp_status"></td>
   <td class="tp_actions">
    <a style="font-size: 0.75em;" href="about:blank" target="_blank" class="elw_button tp_approve">Approve</a>
   </td>
@@ -81,25 +81,10 @@
    tp_log.find(".tp_actions .tp_approve")
     .attr("href", "approve?elw_ctx="+$format.json($e.ctx.toString())+"&stamp="+$format.json($e.meta.createStamp.toString()));
 
-##   #set($dueClass = $elw_ctx.enr.classes.get($elw_ctx.ass.scoring.classReportDue))
-##  #set($overdue = $dueClass.passed && ($meta.totalUploads == 0 || $meta.scoreStamp == -1))
-##  <div style="width: 100%; text-align: center; #if($overdue)background-color: #EE9999;#end">
-##  #if($meta.totalUploads > 0)
-##    <span title="$meta.niceUploadStamp">
-##     #if($meta.scoreStamp < 0)
-##      <span style="color: #FF0000">Declined</span>
-##     #else
-##      #if($meta.scoreStamp > 0)
-##       <span style="color: #00FF00">Approved</span>
-##      #else
-##       <span style="color: #999999">Pending</span>
-##      #end
-##     #end
-##    </span>
-##   #else
-##    None
-##   #end
-##  </div>
+
+   tp_log.find(".tp_status")
+     .html($format.json($e.ctx.indexEntry.getStatusHtml($format, $e.ctx.enr, $e.slot, $e.meta)))
+     .toggleClass($format.json($e.ctx.indexEntry.getStatusClasses($e.ctx.enr, $e.slot, $e.meta)));
 
    te_log.parent().append(tp_log);
   #end
