@@ -65,26 +65,33 @@ public class IndexEntry {
 		}
 		final StringBuilder result = new StringBuilder();
 
-		if (uploadMeta == null) {
-			result.append("Open");
+		if (!enr.getClasses().get(classFrom).isStarted()) {
+			result.append("Closed");
+
+			result.append("; Opens ").append(fmt.format(enr.getClasses().get(classFrom).getFromDateTime().getMillis()));
 		} else {
-			if (uploadMeta.getScore() == null) {
-				result.append("Pending");
+			if (uploadMeta == null) {
+				result.append("Open");
 			} else {
-				if (uploadMeta.getScore().isApproved()) {
-					result.append("Approved");
+				if (uploadMeta.getScore() == null) {
+					result.append("Pending");
 				} else {
-					result.append("Declined");
+					if (uploadMeta.getScore().isApproved()) {
+						result.append("Approved");
+					} else {
+						result.append("Declined");
+					}
 				}
+			}
+
+			if (classDueIdx == null) {
+				result.append("; No Due Date");
+			} else {
+				final Class dueClass = enr.getClasses().get(classDueIdx);
+				result.append("; Due ").append(fmt.format(dueClass.getToDateTime().getMillis()));
 			}
 		}
 
-		if (classDueIdx == null) {
-			result.append("; No Due Date");
-		} else {
-			final Class dueClass = enr.classes.get(classDueIdx);
-			result.append("; Due ").append(fmt.format(dueClass.getToDateTime().getMillis()));
-		}
 
 		return result.toString();
 	}
@@ -102,21 +109,27 @@ public class IndexEntry {
 		if (classDue != null) {
 			classDueIdx = classDue.get(slot.getId());
 		}
+
 		final StringBuilder result = new StringBuilder();
 
-		if (uploadMeta != null) {
-			if (uploadMeta.getScore() == null) {
-				result.append(" elw_pending");
-			} else {
-				if (uploadMeta.getScore().isApproved()) {
-					result.append(" elw_approved");
-				} else {
-					result.append(" elw_declined");
-				}
-			}
+		if (!enr.getClasses().get(classFrom).isStarted()) {
+			result.append(" elw_closed");
 		} else {
-			result.append(" elw_open");
+			if (uploadMeta != null) {
+				if (uploadMeta.getScore() == null) {
+					result.append(" elw_pending");
+				} else {
+					if (uploadMeta.getScore().isApproved()) {
+						result.append(" elw_approved");
+					} else {
+						result.append(" elw_declined");
+					}
+				}
+			} else {
+				result.append(" elw_open");
+			}
 		}
+
 
 		if (classDueIdx != null) {
 			final Class dueClass = enr.classes.get(classDueIdx);

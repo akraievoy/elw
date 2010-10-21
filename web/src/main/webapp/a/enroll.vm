@@ -1,57 +1,99 @@
-#* @vtlvariable name="courses" type="elw.vo.Course[]" *#
 #* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
-#* @vtlvariable name="codeMetas" type="java.util.Map<java.lang.String,elw.vo.CodeMeta>" *#
-#* @vtlvariable name="reportMetas" type="java.util.Map<java.lang.String,elw.vo.ReportMeta>" *#
+#* @vtlvariable name="fileMetas" type="java.util.Map<java.lang.String,java.util.Map<java.lang.String,java.util.List<elw.vo.Entry<elw.vo.FileMeta>>>>" *#
+#* @vtlvariable name="grossScores" type="java.util.Map<java.lang.String,java.lang.Integer>" *#
+#* @vtlvariable name="format" type="elw.web.FormatTool" *#
+#* @vtlvariable name="studRowsCreated" type="java.lang.Boolean" *#
 <html>
 <head>
-	<meta content="text/html; charset=UTF-8">
-	<title>Group $elw_ctx.group.name Status : ELW Admin</title>
-	#elw_imports("../")
+ <meta content="text/html; charset=UTF-8">
+ <title>Group $elw_ctx.group.name Status : ELW Admin</title>
+ #elw_imports("../")
 </head>
 <body style="text-align: left;">
 <div class="ui-widget-header ui-corner-all" id="elw_header">
-	<div id="nav"><a href="index">Index</a> &gt; <a href="enrolls">Enrollments</a> &gt; <span style="font-weight: bold">Group $elw_ctx.group.name Status</span></div>
-	#elw_cred_adm($auth)
-	<div id="header_hr"> </div>
+ <div id="nav"><a href="index">Index</a> &gt; <a href="enrolls">Enrollments</a> &gt; <span style="font-weight: bold">Group $elw_ctx.group.name
+  Status</span></div>
+ #elw_cred_adm($auth)
+ <div id="header_hr"></div>
 </div>
-#elw_messages($elw_messages)
-<table cellspacing="0"><tbody>
-<tr class="elw_header_row">
-	<th style="padding-left: 1em; padding-right: 0.25em;"><a name="${elw_ctx.group.id}" title="id : ${elw_ctx.group.id}">${elw_ctx.group.name}</a></th>
-	<th style="padding: 0 0.25em;">Score</th>
-#foreach($assBundle in $elw_ctx.course.assTypes)#set($bunI = $velocityCount - 1)
-	#foreach($ass in $assBundle.assignments)#set($assI = $velocityCount)
-		#if($ass.id)
-				<th style="padding-left: 0.25em; padding-right: 0.25em; text-align: center;" colspan="2"><span title="$ass.name">$ass.id</span></th>
-		#end
-	#end
-#end
-</tr>
-#foreach($stud in $elw_ctx.group.students)
-	#set($studCtx = $elw_ctx.extendStudent($stud))
-	<tr >
-		<td style="padding-left: 2em; padding-right: 0.25em;"><span title="(id : ${stud.id})">$stud.name</span></td>
-		<td style="padding: 0 0.25em;">$grossScores.get("$studCtx")</td>
-	#foreach($assBundle in $elw_ctx.course.assTypes)#set($bunI = $velocityCount - 1)
-		#foreach($ass in $assBundle.assignments)#set($assI = $velocityCount)
-			#if($ass.id)
-				#set($verIdx = $stud.idAsInt % $ass.versions.size())
-				#set($ver = $ass.versions.get($verIdx))
-				#set($path = $studCtx.extendBAV(${bunI}, ${ass}, ${ver}))
-		<td style="padding-left: 0.25em; padding-right: 0.25em; text-align: right;">
-			#elw_code_state($path, $codeMetas.get("$path"))
-			<span style="font-size: 0.6em;">#elw_code_score($path, $scores.get("$path"))</span>
-		</td>
-		<td style="padding-left: 0.25em; padding-right: 0.25em; text-align: right; border-left: 1px dashed #CCCCCC;'">
-			#elw_report_state($path, $reportMetas.get("$path"))
-			<span style="font-size: 0.6em;">#elw_report_score($path, $scores.get("$path"))</span>
-		</td>
-			#end
-		#end
-	#end
-	</tr>
-#end
-</tbody></table>
+ #elw_messages($elw_messages)
+<table cellspacing="0">
+ <thead>
+ <tr class="elw_header_row">
+  <th class="tp_groupName">Group Name</th>
+  <th>Score</th>
+  <th class="te te_taskHeader">Task</th>
+ </tr>
+ <tr class="elw_header_row">
+  <th></th>
+  <th></th>
+  <th class="te te_slotHeader">Slot</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr class="elw_row te te_studRow">
+  <td class="tp_name"></td>
+  <td class="elw_cell_num tp_score"></td>
+  <td class="te te_status"></td>
+ </tr>
+ </tbody>
+</table>
 </body>
-	#elw_ready("../")
+<script type="text/javascript">
+ jQuery(document).ready(function() {
+  var te_taskHeader = jQuery(".te.te_taskHeader:first");
+  var tp_taskHeader;
+
+  var te_slotHeader = jQuery(".te.te_slotHeader:first");
+  var tp_slotHeader;
+  var te_studRow = jQuery(".te.te_studRow:first");
+  var tp_studRows = {};
+  var tp_studRow;
+  var tp_status;
+  #foreach($entry in $elw_ctx.enr.index)
+   #set($idx = $velocityCount - 1)
+   #set($elw_ctx_ass = $elw_ctx.extendIndex($idx))
+
+   #set($tp_taskHeader_colspan = 0)
+   #foreach($slot in $elw_ctx_ass.assType.fileSlots)
+    #if($elw_ctx_ass.indexEntry.classDue.get($slot.id))
+     tp_slotHeader = te_slotHeader.clone().toggleClass("te").html($format.json($slot.name));
+     te_slotHeader.parent().append(tp_slotHeader);
+     #set($tp_taskHeader_colspan = $tp_taskHeader_colspan + 1)
+
+     #foreach($stud in $elw_ctx.group.students)
+      #set($elw_ctx_stud = $elw_ctx.extendStudent($stud))
+      #if($studRowsCreated)
+       tp_studRow = tp_studRows[$format.json($stud.id)];
+      #else
+       tp_studRow = tp_studRows[$format.json($stud.id)] = te_studRow.clone().toggleClass("te");
+       tp_studRow.find(".tp_name").html($format.json($stud.name));
+       tp_studRow.find(".tp_score").html($format.json($grossScores.get($elw_ctx_stud.toString())));
+       tp_studRow.attr("id", "#studRow--$stud.id");
+
+       te_studRow.parent().append(tp_studRow);
+      #end
+      #set($elw_ctx_ver = $elw_ctx_stud.extendIndex($idx))
+      #set($filesStud = $fileMetas.get("$elw_ctx_ver.toString()").get($slot.id))
+
+      tp_status = tp_studRow.find(".te.te_status:first").clone().toggleClass("te")
+       .html($format.json($elw_ctx_ver.indexEntry.getListStatusHtml($format, $elw_ctx.enr, $slot, $filesStud)))
+       .toggleClass($format.json($elw_ctx_ver.indexEntry.getListStatusClasses($elw_ctx.enr, $slot, $filesStud)));
+      tp_studRow.append(tp_status);
+     #end
+     #set($studRowsCreated = true)
+    #end
+   #end
+   #if($tp_taskHeader_colspan > 0)
+    tp_taskHeader = te_taskHeader.clone().toggleClass("te")
+        .html($format.json($elw_ctx_ass.ass.name))
+        .attr("colspan", "$tp_taskHeader_colspan");
+    te_taskHeader.parent().append(tp_taskHeader);
+   #end
+  #end
+
+  jQuery(".tp_groupName").html($format.json($elw_ctx.group.name));  
+ });
+</script>
+ #elw_ready("../")
 </html>

@@ -279,6 +279,10 @@ a.popupTrigger:hover {
 
 .elw_open {
 }
+.elw_closed {
+ color: #CCCCCC;
+ font-style: italic;
+}
 .elw_pending {
  color: #333333;
 }

@@ -302,13 +302,10 @@ public class AdminController extends MultiActionController implements WebSymbols
 			return null;
 		}
 
-		//	TODO: check that studentId is not deleted from the context as redundant element
 		final TreeMap<String, Map<String, List<Entry<FileMeta>>>> fileMetas =
 				new TreeMap<String, Map<String, List<Entry<FileMeta>>>>();
-		final HashMap<String, CodeMeta> codeMetas = new HashMap<String, CodeMeta>();
-		final HashMap<String, ReportMeta> reportMetas = new HashMap<String, ReportMeta>();
-		final HashMap<String, Score> scores = new HashMap<String, Score>();
 		final HashMap<String, Integer> grossScores = new HashMap<String, Integer>();
+
 		final int[] grossScore = new int[1];
 		for (Student stud : ctx.getGroup().getStudents()) {
 			final Ctx studCtx = ctx.extendStudent(stud);
@@ -316,16 +313,14 @@ public class AdminController extends MultiActionController implements WebSymbols
 			StudentController.storeMetas(
 					studCtx,
 					codeDao, reportDao, scoreDao, fileDao,
-					fileMetas, codeMetas, reportMetas, scores,
-					grossScore);
+					fileMetas, null, null, null,
+					grossScore
+			);
 
 			grossScores.put(studCtx.toString(), grossScore[0]);
 		}
 
 		model.put("fileMetas", fileMetas);
-		model.put("codeMetas", codeMetas);
-		model.put("reportMetas", reportMetas);
-		model.put("scores", scores);
 		model.put("grossScores", grossScores);
 
 		return new ModelAndView("a/enroll", model);
