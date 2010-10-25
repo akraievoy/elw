@@ -298,6 +298,9 @@ a.popupTrigger:hover {
 .elw_overdue {
  background-color: #FFCCCC;
 }
+.elw_open.elw_overdue {
+ background-color: #FF9999;
+}
 .elw_nodue {
  opacity: .25;
 }
