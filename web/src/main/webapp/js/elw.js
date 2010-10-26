@@ -135,6 +135,7 @@ jQuery(document).ready(function() {
 			primary: "ui-icon-arrowstop-1-n"
 		}
 	});
+
  var jQexpand = jQuery(".expandTrigger");
  jQexpand.mouseenter(function() {
 		elw_enterTimes[this.id] = new Date().getTime();
@@ -159,5 +160,7 @@ jQuery(document).ready(function() {
 	jQuery("form[method=POST]").submit(function() {
 		var visElemIds = elw_expandedTriggers();
 		jQuery(this).children("input[type=hidden][name=expandTriggers]").val(jQuery.toJSON(visElemIds));
+  jQuery(this).find("input[type=submit]").attr("disabled", "true");
+  jQuery(this).find("button[type=submit]").attr("disabled", "true");
 	});
 });
