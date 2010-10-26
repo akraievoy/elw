@@ -21,6 +21,11 @@ public class FileMeta extends IdNameStamped {
 		this.sourceAddress = sourceAddress;
 	}
 
+	@Override
+	public String getName() {
+		return extractNameFromPath(super.getName());
+	}
+
 	public String getContentType() {
 		return contentType;
 	}
@@ -69,5 +74,12 @@ public class FileMeta extends IdNameStamped {
 	@JsonIgnore
 	public void setScore(Score score) {
 		this.score = score;
+	}
+
+	public static String extractNameFromPath(final String name) {
+		final int lastSlash = Math.max(name.lastIndexOf("\\"), name.lastIndexOf("/"));
+		final String fName = lastSlash >= 0 ? name.substring(lastSlash + 1) : name;
+
+		return fName;
 	}
 }
