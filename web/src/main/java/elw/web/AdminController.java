@@ -788,7 +788,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 				if ("comment".equals(item.getFieldName())) {
 					comment = G4Io.dumpToString(item.openStream());
 				}
-				if ("expandTriggers".equals(item.getFieldName())) {
+				if ("expandTriggers".equals(item.getFieldName())) {	//	FIXME review
 					req.getSession().setAttribute("course.expandTriggers", G4Io.dumpToString(item.openStream()));
 				}
 				continue;
@@ -800,8 +800,8 @@ public class AdminController extends MultiActionController implements WebSymbols
 				return null;
 			}
 
-			final String fileName = item.getName();
-			if (!course && !Pattern.compile(slot.getNameRegex()).matcher(fileName.toLowerCase()).matches()) {
+			final String fName = FileMeta.extractNameFromPath(item.getName());
+			if (!course && !Pattern.compile(slot.getNameRegex()).matcher(fName.toLowerCase()).matches()) {
 				Message.addWarn(req, "check the file name: regex check failed");
 				resp.sendRedirect(refreshUri);
 				return null;
@@ -815,8 +815,8 @@ public class AdminController extends MultiActionController implements WebSymbols
 			}
 
 			final FileMeta fileMeta = new FileMeta(
-					fileName,
-					fileName,
+					fName,
+					fName,
 					contentType,
 					authorName,
 					resolveRemoteAddress(req)
