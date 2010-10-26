@@ -501,6 +501,10 @@ public class Controller implements ControllerSetup, CallbackLoadTask {
 					} finally {
 						SwingUtilities.invokeLater(new Runnable() {
 							public void run() {
+								setupStatus(statusLabel, resRef[0]);
+								if (resRef[0].isSuccess()) {
+									fireDataPathChanged();
+								}
 								setEnabled(true);
 							}
 						});
