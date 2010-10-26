@@ -147,7 +147,7 @@ class RunnableLoadTask implements Runnable {
 				return;
 			}
 		} else {
-			solution = "#" + statement;	//	LATER we might as well have multiple lines in the statement
+			solution = comment(statement, 40);
 		}
 
 		final Map<String, String[]> slotTest = respList.getData().get("test");
@@ -182,6 +182,48 @@ class RunnableLoadTask implements Runnable {
 				}
 		);
 	}
+
+	protected static String comment(String statement, final int lineWidth) {
+		final StringBuilder st = new StringBuilder(statement.replaceAll("\\s+", " ").trim());
+
+		int pos = 0;
+		while (pos + 1 < st.length()) {
+			final String header = pos > 0 ? "\n# " : "# ";
+			st.insert(pos, header);
+			pos += header.length();
+
+			int lineLen = 0;
+			while (lineLen < lineWidth && pos + lineLen + 1 < st.length()) {
+				int nextSpace = st.indexOf(" ", pos + lineLen);
+				int nextPos = nextSpace >= 0 ? nextSpace + 1 : st.length() - 1;
+				if (lineLen != 0 && nextPos - pos > lineWidth) {
+					break;
+				}
+
+				lineLen = nextPos - pos;
+			}
+
+			pos += lineLen;
+		}
+
+		return st.toString();
+	}
+
+/*
+	public static void main(String[] args) {
+		for (int lw = 1; lw < 1000; lw++) {
+			System.out.println(comment(
+					"   aiuhiudfh asd haiufshiudhfk sjdfhk jhskdjfhk sjdf ksdjfh  \n" +
+					"  ksfh ksdjfhkjhkjd hfskjdfhks jdfhksjdfhksjd fhkjhskjdfhskj dfhskdj fhkjhsk djf " +
+					"  ksfh ksdjfhkjhk jdhfskjdfhksj xdfhk sjdfhksjdfhkjhskjdfhs kjdfhskdjfhkjhskdjf " +
+					"  ksfh ksdjfhkjhkjdhfskjdfhks jdfhksjdfhksjdfhkjhskjdfhskjdf hskdjfhkjhskdjf " +
+					"  ksfh ksdjfhkjhkjdhfskjdfhksjdfhksjdfhksjdfhkjhskjdfhskjdfhskdjfhkjhskdjf " +
+					"ksdjfh ksdfjh skdfjh ksjdfh skdjfh ",
+					lw
+			));
+		}
+	}
+*/
 
 	protected void setupGet(URLConnection ucList) {
 		ucList.setRequestProperty("Cookie", setup.getUploadHeader());
