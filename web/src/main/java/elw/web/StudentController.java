@@ -146,6 +146,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 	public ModelAndView do_login(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
 		final HashMap<String, Object> model = prepareDefaultModel(req);
 
+		model.put("groups", groupDao.findAllGroups());
 		model.put("groupName", req.getSession(true).getAttribute("groupName"));
 		model.put("studentName", req.getSession(true).getAttribute("studentName"));
 
@@ -166,11 +167,11 @@ public class StudentController extends MultiActionController implements WebSymbo
 			Message.addErr(req, "fields NOT set");
 		} else {
 			final Group[] groups = groupDao.findAllGroups();
-			final Group group = IdName.findByName(groups, groupName, true);
+			final Group group = IdName.findByName(groups, groupName.trim(), true);
 
 			if (group != null) {
 				final Student[] students = group.getStudents();
-				final Student student = IdName.findByName(students, studentName, true);
+				final Student student = IdName.findByName(students, studentName.trim(), true);
 
 				if (student != null) {
 					session.setAttribute(S_GROUP, group);

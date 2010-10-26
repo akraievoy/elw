@@ -92,12 +92,19 @@ public class IdName {
 	public static <E extends IdName> E findByName(final E[] elems, String name, final boolean ignoreCase) {
 		E found = null;
 		for (E e : elems) {
-			if ((ignoreCase && name.equalsIgnoreCase(e.getName())) || name.equals(e.getName())) {
+			if (
+					(ignoreCase && ws(name).equalsIgnoreCase(ws(e.getName()))) ||
+							ws(name).equals(ws(e.getName()))
+			) {
 				found = e;
 				break;
 			}
 		}
 
 		return found;
+	}
+
+	public static String ws(final String text) {
+		return text.replaceAll("\\s+", " ").trim();
 	}
 }
