@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/" debug="false">
+	<appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern"
+				   value="%d{yyyy-MM-dd HH:mm:ss::SSS} %5p %t %l%n%C{1}.%M() %x %m%n%n"/>
+		</layout>
+	</appender>
+
+	<appender name="SMTP" class="org.apache.log4j.net.SMTPAppender">
+		<param name="BufferSize" value="23"/>
+		<param name="SMTPHost" value="smtp.gmail.com"/>
+		<param name="SMTPPort" value="465"/>
+		<param name="SMTPUsername" value="robot@akraievoy.org"/>
+		<param name="SMTPPassword" value="************"/>
+		<param name="SMTPProtocol" value="smtps"/>
+		<param name="Subject" value="[lynx:elw:log4j]"/>
+		<param name="To" value="iasa@akraievoy.org"/>
+		<param name="From" value="robot@akraievoy.org"/>
+		<param name="Threshold" value="WARN"/>
+
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern"
+				   value="%d{yyyy-MM-dd HH:mm:ss::SSS} %5p %t %l%n%C{1}.%M() %x %m%n%n"/>
+		</layout>
+	</appender>
+
+	<category name="org.springframework.aop.framework.Cglib2AopProxy"><level value="ERROR"/></category>
+	<category name="org.springframework.beans"><level value="INFO"/></category>
+	<category name="org.springframework.core.CollectionFactory"><level value="INFO"/></category>
+	<category name="org.springframework.util.ClassUtils"><level value="INFO"/></category>
+
+	<root>
+		<priority value="info"/>
+		<appender-ref ref="CONSOLE"/>
+		<appender-ref ref="SMTP"/>
+	</root>
+</log4j:configuration>
