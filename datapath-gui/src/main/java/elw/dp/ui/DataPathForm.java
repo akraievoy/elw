@@ -237,8 +237,8 @@ public class DataPathForm {
 		gbc.insets = new Insets(0, 2, 0, 2);
 		panel5.add(label1, gbc);
 		testComboBox = new JComboBox();
-		testComboBox.setMinimumSize(new Dimension(64, 25));
-		testComboBox.setPreferredSize(new Dimension(64, 25));
+		testComboBox.setMinimumSize(new Dimension(96, 25));
+		testComboBox.setPreferredSize(new Dimension(96, 25));
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 0;

@@ -141,8 +141,8 @@
                           <gridbag weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
-                          <minimumSize width="64" height="25"/>
-                          <preferredSize width="64" height="25"/>
+                          <minimumSize width="96" height="25"/>
+                          <preferredSize width="96" height="25"/>
                         </properties>
                       </component>
                       <component id="2ec89" class="javax.swing.JButton" binding="testAddCustomButton">
