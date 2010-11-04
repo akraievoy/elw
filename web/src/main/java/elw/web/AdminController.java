@@ -809,9 +809,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 
 			final String contentType = item.getContentType();
 			if (!course && G4Str.indexOf(contentType, slot.getContentTypes()) < 0) {
-				Message.addWarn(req, "contentType '" + contentType + "': not allowed");
-				resp.sendRedirect(refreshUri);
-				return null;
+				Message.addWarn(req, "contentType '" + contentType + "': not listed in the slot");
 			}
 
 			final FileMeta fileMeta = new FileMeta(
