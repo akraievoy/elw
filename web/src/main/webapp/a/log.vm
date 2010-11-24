@@ -83,12 +83,16 @@
 
 
    tp_log.find(".tp_status")
-     .html($format.json($e.ctx.indexEntry.getStatusHtml($format, $e.ctx.enr, $e.slot, $e.meta)))
-     .toggleClass($format.json($e.ctx.indexEntry.getStatusClasses($e.ctx.enr, $e.slot, $e.meta)));
+    .html($format.json($e.ctx.indexEntry.getStatusHtml($format, $e.ctx.enr, $e.slot, $e.meta)))
+    .toggleClass($format.json($e.ctx.indexEntry.getStatusClasses($e.ctx.enr, $e.slot, $e.meta)))
+    .append(jQuery("<a>V</a>").attr({
+     "href":"../s/dl/$e.ctx.indexEntry.normName($e.ctx.enr, $e.ctx.student, $e.ctx.ass, $e.ctx.ver, $e.slot, $e.meta, $format)?elw_ctx=$e.ctx&s=s&sId=$e.slot.id&fId=$e.meta.id",
+     "target":"_blank"
+     }));
 
    te_log.parent().append(tp_log);
   #end
- });
+ })
 </script>
  #elw_ready("../")
 </html>

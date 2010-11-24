@@ -1,5 +1,7 @@
 package elw.vo;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 
@@ -147,5 +149,28 @@ public class IndexEntry {
 		}
 
 		return result.toString().trim();
+	}
+
+	//	TODO pass Ctx to this place somehow
+	public String normName(final Enrollment enr, final Student stud, final Assignment ass, final Version ver,
+						   final FileSlot slot, final FileMeta meta, final Format format) {
+		try {
+			final String normName = enr.getName() + "-" + stud.getName() + "--" +
+					ass.getName() + "-" + ver.getName() + "--" +
+					slot.getName() + "-" + format.format(meta.getCreateStamp().getTime(), "MMdd-HHmm");
+
+			final String oriName = meta.getName();
+			final int oriLastDot = oriName.lastIndexOf(".");
+			final String oriExt = oriLastDot < 0 ? "" : oriName.substring(oriLastDot);
+
+			final String normNameNoWs = normName.replaceAll("\\s", "_") + oriExt;
+
+			return URLEncoder.encode(
+					normNameNoWs,
+					"UTF-8"
+			);
+		} catch (UnsupportedEncodingException e) {
+			throw new IllegalStateException("UTF-8 is NOT supported?!");
+		}
 	}
 }
