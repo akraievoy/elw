@@ -163,7 +163,7 @@ public class IndexEntry {
 			final int oriLastDot = oriName.lastIndexOf(".");
 			final String oriExt = oriLastDot < 0 ? "" : oriName.substring(oriLastDot);
 
-			final String normNameNoWs = normName.replaceAll("\\s", "_") + oriExt;
+			final String normNameNoWs = normName.replaceAll("[\\s\\\\/]+", "_") + oriExt;
 
 			return URLEncoder.encode(
 					normNameNoWs,
