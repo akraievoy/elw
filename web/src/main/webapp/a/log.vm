@@ -1,98 +1,125 @@
-#* @vtlvariable name="logEntries" type="elw.web.AdminController.LogEntry[]" *#
 #* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
 #* @vtlvariable name="format" type="elw.web.FormatTool" *#
-#* @vtlvariable name="noDues" type="java.lang.Boolean" *#
-#* @vtlvariable name="slotId" type="java.lang.String" *#
+#* @vtlvariable name="f_noDues" type="java.lang.Boolean" *#
+#* @vtlvariable name="f_latest" type="java.lang.Boolean" *#
+#* @vtlvariable name="f_studId" type="java.lang.String" *#
+#* @vtlvariable name="f_slotId" type="java.lang.String" *#
 <html>
 <head>
  <meta content="text/html; charset=UTF-8">
  <title>Group $elw_ctx.group.name Report Uploads : ELW Admin</title>
- #elw_imports("../")
+ #set($__relPath = "../") #parse("/__/imports.vm")
 </head>
 <body style="text-align: left;">
 <div class="ui-widget-header ui-corner-all" id="elw_header">
  <div id="nav"><a href="index">Index</a> &gt; <a href="enrolls">Enrollments</a> &gt; <span style="font-weight: bold">Group $elw_ctx.group.name
-  Report Uploads</span></div>
+  Uploads</span></div>
  #elw_cred_adm($auth)
  <div id="header_hr"></div>
 </div>
  #elw_messages($elw_messages)
-<form action="log" method="GET">
- <input type="hidden" name="elw_ctx" value="$elw_ctx.toString()"/>
- Slot&nbsp;ID:&nbsp;<input type="text" name="slotId" value=""/>
- Show&nbsp;no&nbsp;dues:&nbsp;<input type="checkbox" name="nodues" value="yes"/>&nbsp;yes
- <input type="submit" value="Refresh"/>
-</form>
-<table cellspacing="0">
- <thead>
- <tr class="elw_header_row">
-  <th>Time</th>
-  <th>Student name</th>
-  <th>Class</th>
-  <th>Slot</th>
-  <th>Comment</th>
-  <th>Status</th>
-  <th>Actions</th>
- </tr>
- </thead>
- <tbody>
- <tr class="te te_log elw_row">
-  <td class="tp_stamp"></td>
-  <td class="tp_stud"></td>
-  <td class="tp_ass"></td>
-  <td class="tp_slot"></td>
-  <td style="width: 12em;" class="tp_comment"></td>
-  <td class="tp_status"></td>
-  <td class="tp_actions">
-   <a style="font-size: 0.75em;" href="about:blank" target="_blank" class="elw_button tp_approve">Approve</a>
-  </td>
- </tr>
- </tbody>
-</table>
+ <div style="float: left;">
+  <form style="text-align: center;">
+   <input type="hidden" name="elw_ctx" value="$elw_ctx.toString()"/>
+   <select name="f_studId"><option value="">Choose...</option></select>
+   <select name="f_slotId"><option value="">Choose...</option></select>
+   <input type="checkbox" name="f_nodues" value="true"/>No&nbsp;dues
+   <input type="checkbox" name="f_latest" value="true"/>Latest&nbsp;only
+   <input id="dataLoader" type="button" value="Refresh"/>
+  </form>
+  <table id="dataTable" cellspacing="0"></table>
+ </div>
 </body>
 <script type="text/javascript">
  jQuery(document).ready(function() {
-  #if($noDues)
-   jQuery("input[name=nodues]").attr("checked", $noDues);
+  #if($f_noDues)
+   jQuery("input[name=f_nodues]").attr("checked", $f_noDues);
   #end
-  #if($slotId)
-   jQuery("input[name=slotId]").val($format.json($slotId));
+  #if($f_slotId)
+   jQuery("input[name=f_slotId]").val($format.json($f_slotId));
+  #end
+  var f_studId = jQuery("select[name=f_studId]");
+  #foreach($stud in $elw_ctx.group.students)
+   f_studId.append(
+     jQuery("<option></option>").attr("value", $format.json($stud.id)).text($format.json($stud.getName()))
+   );
+  #end
+  var f_slotId = jQuery("select[name=f_slotId]");
+  #foreach($aType in $elw_ctx.course.assTypes)
+   #foreach($slot in $aType.fileSlots)
+   f_slotId.append(
+     jQuery("<option></option>")
+       .attr("value", $format.json($aType.id) + "--" + $format.json($slot.id))
+       .text($format.json($aType.name) + " - " + $format.json($slot.name)
+     )
+   );
+   #end
   #end
 
-  var te_log = jQuery(".te.te_log:first");
-  var tp_log;
-  #foreach($e in $logEntries)
-   tp_log = te_log.clone().toggleClass("te");
+  var dataTable = jQuery('#dataTable').dataTable({
+   "sDom": 'lprf<"clear">ti',
+   'aaData': [ ],
+   'aoColumns': [
+    #* 0 index *# {"bVisible": false, "bSortable": false},
+    #* 1 upload millis *# {"bVisible": false, "bSortable": false},
+    #* 2 upload date - full *# {"bVisible": false, "bSortable": false},
+    #* 3 upload date - nice*# {'sTitle': 'Time', "iDataSort": 1, "sWidth": "7em"},
+    #* 4 author.id *# {"bVisible": false, "bSortable": false},
+    #* 5 author.name *# {'sTitle': 'Author', "iDataSort": 3, "sWidth": "13em"},
+    #* 6 class.index *# {"bVisible": false, "bSortable": false},
+    #* 7 class.name *# {'sTitle': 'Class', "iDataSort": 5, "sWidth": "11em"},
+    #* 8 slot.id *# {"bVisible": false, "bSortable": false},
+    #* 9 slot.name *# {'sTitle': 'Slot', "iDataSort": 7, "sWidth": "5em" },
+    #* 10 comment *# {'sTitle': 'Comment', "sWidth": "21em" },
+    #* 11 status text*# {'sTitle': 'Status', "sWidth": "7em" },
+    #* 12 status classes *# {"bVisible": false, "bSortable": false},
+    #* 13 approve *# {'sTitle': 'A', "sWidth": "1em", "bSortable": false },
+    #* 14 download *# {'sTitle': 'D', "sWidth": "1em", "bSortable": false }
+   ],
+   "aaSorting": [ [4,'asc'] ],
+   "aaSortingFixed": [ [3,'asc'] ],
+   "fnRowCallback": function(node, data, dispIndex, dataIndex) {
+    jQuery("td:eq(5)", node).toggleClass(data[11]);
+    jQuery("td:eq(1)", node).attr("title", data[2]);
+    return node;
+   }
+  });
 
-   tp_log.find(".tp_stamp")
-    .attr("title", $format.json($format.format($e.meta.createStamp.time, "EEE d HH:mm")))
-    .html($format.json($format.format($e.meta.createStamp.time)));
-   tp_log.find(".tp_stud")
-    .attr("title", $format.json($e.ctx.student.id))
-    .html($format.json($format.esc($e.ctx.student.name)));
-   tp_log.find(".tp_ass")
-    .attr("title", $format.json($e.ctx.ass.id))
-    .html($format.json($format.esc($e.ctx.ass.name)));
-   tp_log.find(".tp_slot")
-    .attr("title", $format.json($e.slot.id))
-    .html($format.json($e.slot.name));
-   tp_log.find(".tp_comment")
-    .html($format.json($format.esc($e.meta.comment)));
-   tp_log.find(".tp_actions .tp_approve")
-    .attr("href", "approve?elw_ctx="+$format.json($e.ctx.toString())+"&stamp="+$format.json($e.meta.createStamp.toString()));
+  function loadData() {
+   var f_data = {};
+   f_data["elw_ctx"] = jQuery("input[name=elw_ctx]").val();
+   f_data["f_studId"] = jQuery("select[name=f_studId]").val();
+   f_data["f_slotId"] = jQuery("select[name=f_slotId]").val();
+   f_data["f_nodues"] = jQuery("input[name=f_nodues]").attr("checked");
+   f_data["f_latest"] = jQuery("input[name=f_latest]").attr("checked");
 
 
-   tp_log.find(".tp_status")
-    .html($format.json($e.ctx.indexEntry.getStatusHtml($format, $e.ctx.enr, $e.slot, $e.meta)))
-    .toggleClass($format.json($e.ctx.indexEntry.getStatusClasses($e.ctx.enr, $e.slot, $e.meta)))
-    .append(jQuery("<a>V</a>").attr({
-     "href":"../s/dl/$e.ctx.indexEntry.normName($e.ctx.enr, $e.ctx.student, $e.ctx.ass, $e.ctx.ver, $e.slot, $e.meta, $format)?elw_ctx=$e.ctx&s=s&sId=$e.slot.id&fId=$e.meta.id",
-     "target":"_blank"
-     }));
+   jQuery.ajax({
+    "type": "GET",
+    "url": "rest/log",
+    "data": f_data,
+    "success": function(resp) {
+     if (resp == null || !resp.success) {
+      jQuery.jGrowl("Response error", {"header":"AJAX error", "theme": "ui-state-error"});
+      return;
+     }
 
-   te_log.parent().append(tp_log);
-  #end
- })
+     dataTable.fnClearTable(resp.data.length == 0);
+     dataTable.fnAddData(resp.data);
+    },
+    "error": function() {
+     jQuery.jGrowl("General error", {"header":"AJAX error", "theme": "ui-state-error"});
+    },
+    "dataType": 'json'
+   });
+
+   return false;
+  }
+
+  jQuery("#dataLoader").click(loadData);
+
+  loadData();
+ });
 </script>
  #elw_ready("../")
 </html>

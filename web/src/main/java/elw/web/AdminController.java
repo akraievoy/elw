@@ -22,6 +22,7 @@ import base.pattern.Result;
 import elw.dao.*;
 import elw.dp.mips.MipsValidator;
 import elw.miniweb.Message;
+import elw.miniweb.ViewJackson;
 import elw.vo.*;
 import elw.vo.Class;
 import org.akraievoy.gear.G4Io;
@@ -339,51 +340,91 @@ public class AdminController extends MultiActionController implements WebSymbols
 			return null;
 		}
 
-		final boolean noDues = "yes".equals(req.getParameter("nodues"));
-		final String slotId = req.getParameter("slotId");
-
-		final List<LogEntry> logEntries = prepareLogEntries(ctx, noDues, slotId);
-
-		model.put("logEntries", logEntries);
-
-		model.put("noDues", noDues);
-		if (slotId != null && slotId.length() > 0) {
-			model.put("slotId", slotId);
+		final Map params = req.getParameterMap();
+		for (Iterator paramNameIt = params.keySet().iterator(); paramNameIt.hasNext();) {
+			String paramName = (String) paramNameIt.next();
+			if (paramName.startsWith("f_")) {
+				model.put(paramName, params.get(paramName));
+			}
 		}
 
 		return new ModelAndView("a/log", model);
 	}
 
-	protected List<LogEntry> prepareLogEntries(Ctx ctx, boolean noDues, String slotId) {
-		final List<LogEntry> logEntries = new ArrayList<LogEntry>();
+	protected List<Object[]> prepareLogEntries(
+			Ctx ctx, Format format, 
+			boolean noDues, boolean latest, String slotId, String studId
+	) {
+		final List<Object[]> logData = new ArrayList<Object[]>();
 
 		for (Student stud : ctx.getGroup().getStudents()) {
+			if (studId != null && studId.trim().length() > 0 && !studId.equals(stud.getId())) {
+				continue;
+			}
+
 			final Ctx ctxStud = ctx.extendStudent(stud);
 			for (int index = 0; index < ctx.getEnr().getIndex().size(); index++) {
 				final Ctx ctxVer = ctxStud.extendIndex(index);
-				final FileSlot[] slots = ctxVer.getAssType().getFileSlots();
+				final AssignmentType aType = ctxVer.getAssType();
+				final FileSlot[] slots = aType.getFileSlots();
 
 				for (FileSlot slot : slots) {
 					final Map<String, Integer> dueMap = ctxVer.getIndexEntry().getClassDue();
 					if (!noDues && (dueMap == null || dueMap.get(slot.getId()) == null)) {
 						continue;
 					}
-					if (slotId != null && slotId.trim().length() > 0 && !slotId.equals(slot.getId())) {
+					if (slotId != null && slotId.trim().length() > 0 && !slotId.equals(aType.getId()+ "--" + slot.getId())) {
 						continue;
 					}
+
 					final Entry<FileMeta>[] uploads = fileDao.findFilesFor(FileDao.SCOPE_STUD, ctxVer, slot.getId());
 					if (uploads != null) {
 						for (int i = 0, uploadsLength = uploads.length; i < uploadsLength; i++) {
-							logEntries.add(new LogEntry(ctxVer, slot, uploads[i].getMeta(), i + 1 == uploadsLength));
+							final boolean last = i + 1 == uploadsLength;
+							if (latest && !last) {
+								continue;
+							}
+
+							logData.add(createLogRow(ctx, format, logData, index, ctxVer, slot, uploads[i]));
 						}
 					}
 				}
 			}
 		}
 
-		Collections.sort(logEntries);
+		return logData;
+	}
 
-		return logEntries;
+	protected Object[] createLogRow(
+			Ctx ctx, Format format, List<Object[]> data,
+			int index, Ctx ctxVer, FileSlot slot, Entry<FileMeta> e
+	) {
+		final long time = e.getMeta().getCreateStamp().getTime();
+
+		final IndexEntry iEntry = ctxVer.getIndexEntry();
+		final String nameNorm = iEntry.normName(
+				ctxVer.getEnr(), ctxVer.getStudent(), ctxVer.getAss(),
+				ctxVer.getVer(), slot, e.getMeta(), format
+		);
+		final String q = "?elw_ctx=" + ctxVer.toString() + "&s=s&sId=" + slot.getId() + "&fId=" + e.getMeta().getId();
+		final Object[] dataRow = {
+				/* 0 index */ data.size(),
+				/* 1 upload millis */ time,
+				/* 2 nice date - full */ format.format(time, "EEE d HH:mm"),
+				/* 3 nice date - nice */ format.format(time),
+				/* 4 author.id */ ctxVer.getStudent().getId(),
+				/* 5 author.name */ ctxVer.getStudent().getName(),
+				/* 6 class.index */ index,
+				/* 7 class.name */ ctxVer.getAss().getName(),
+				/* 8 slot.id */ slot.getId(),
+				/* 9 slot.name */ slot.getName(),
+				/* 10 comment */ e.getMeta().getComment(),
+				/* 11 status text*/ iEntry.getStatusHtml(format, ctx.getEnr(), slot, e.getMeta()),
+				/* 12 status classes */ iEntry.getStatusClasses(ctx.getEnr(), slot, e.getMeta()),
+				/* 13 approve */ "<a href=\"../s/dl/" + nameNorm + q + "\">A</a>",
+				/* 14 download */ "<a href=\"approve" + q + "\">D</a>"
+		};
+		return dataRow;
 	}
 
 	protected static String resolveRemoteAddress(HttpServletRequest req) {
@@ -397,40 +438,32 @@ public class AdminController extends MultiActionController implements WebSymbols
 		return remoteAddr;
 	}
 
-	public static class LogEntry implements Comparable<LogEntry> {
-		protected final Ctx ctx;
-		protected final FileSlot slot;
-		protected final FileMeta meta;
-		protected final boolean last;
-
-		public LogEntry(Ctx ctx, FileSlot slot, FileMeta meta, boolean last) {
-			this.slot = slot;
-			this.meta = meta;
-			this.ctx = ctx;
-			this.last = last;
+	@RequestMapping(value = "rest/log", method = RequestMethod.GET)
+	public ModelAndView do_restLog(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+		final HashMap<String, Object> model = auth(req, resp, "");
+		if (model == null) {
+			return null;
 		}
 
-		public int compareTo(LogEntry o) {
-			final long thisVal = meta.getCreateStamp().getTime();
-			final long anotherVal = o.meta.getCreateStamp().getTime();
-			return (thisVal < anotherVal ? -1 : (thisVal == anotherVal ? 0 : 1));
+		final Ctx ctx = (Ctx) model.get(R_CTX);
+		if (!ctx.resolved(Ctx.STATE_ECG)) {
+			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Path problem, please check the logs");
+			return null;
 		}
 
-		public FileMeta getMeta() {
-			return meta;
-		}
+		final Format format = (Format) model.get("format");
 
-		public Ctx getCtx() {
-			return ctx;
-		}
+		final boolean noDues = "true".equals(req.getParameter("f_nodues"));
+		final boolean latest = "true".equals(req.getParameter("f_latest"));
+		final String slotId = req.getParameter("f_slotId");
+		final String studId = req.getParameter("f_studId");
 
-		public FileSlot getSlot() {
-			return slot;
-		}
+		final List<Object[]> logData = prepareLogEntries(
+				ctx, format,
+				noDues, latest, slotId, studId
+		);
 
-		public boolean isLast() {
-			return last;
-		}
+		return new ModelAndView(ViewJackson.success(logData));
 	}
 
 	@RequestMapping(value = "approve", method = RequestMethod.GET)
@@ -578,16 +611,18 @@ public class AdminController extends MultiActionController implements WebSymbols
 			Message.addInfo(req, "Report approved");
 		}
 
-		final List<LogEntry> entries = prepareLogEntries(ctx, true, null);
-		LogEntry nextEntry = null;
+//		final List<LogEntry> entries = prepareLogEntries(ctx, true, latest, null, studId);
+		Object[] nextEntry = null;
+/*
 		for (LogEntry entry : entries) {
 			if (entry.getMeta().getScore() == null) {
 				nextEntry = entry;
 				break;
 			}
 		}
+*/
 		if (nextEntry != null) {
-			final String nextUri = "approve?elw_ctx=" + nextEntry.getCtx() + "&stamp=" + nextEntry.getMeta().getCreateStamp();
+			final String nextUri = "approve?elw_ctx=" /*+ nextEntry.getCtx() + "&stamp=" + nextEntry.getMeta().getCreateStamp()*/;
 			resp.sendRedirect(nextUri);
 		} else {
 			resp.sendRedirect(refreshUri);
