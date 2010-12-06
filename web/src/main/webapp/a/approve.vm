@@ -1,10 +1,14 @@
 #* @vtlvariable name="elw_messages" type="elw.miniweb.Message[]" *#
+#* @vtlvariable name="format" type="elw.web.FormatTool" *#
+#* @vtlvariable name="scores" type="elw.vo.Score[]" *#
+#* @vtlvariable name="score" type="elw.vo.Score" *#
+#* @vtlvariable name="slot" type="elw.vo.FileSlot" *#
 #* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta content="text/html; charset=UTF-8">
 	<title>Approval</title>
-	#elw_imports("../")
+ #set($__relPath = "../") #parse("/__/imports.vm")
 </head>
 <body>
 <div class="ui-widget-header ui-corner-all" id="elw_header">
@@ -18,92 +22,134 @@
 </div>
 #elw_messages($elw_messages)
 <div id=main>
-	<h3><span title="$elw_ctx.student.id">$elw_ctx.student.name</span> <span title="$elw_ctx.ass.id">$elw_ctx.ass.name</span> <span title="$elw_ctx.ver.id">$elw_ctx.ver.name</span></h3>
-	<div class="formArea ui-widget-header ui-corner-all" style="height: 22em; width: 24em; float: left; margin: 0 2em;">
-		<form method="POST" action="approve">
-			#foreach($cri in $elw_ctx.assType.scoring.criterias)
-				#if(!$elw_ctx.assType.scoring.isAuto($cri))
-					<div class="formLabel" style="width:16em;"><span title="$cri.ratio">$cri.name</span>:</div>
-					<div class="formField" style="width:6em;">
-						<select name="cri--$cri.id">
-							#foreach($pow in $cri.pows)
-								<option value="$pow" #if($score.isSetTo($cri.id, $pow))selected#end>$pow</option>
-							#end
-						</select>
-					</div>
-				#end
-			#end
-			#foreach($cri in $elw_ctx.assType.scoring.criterias)
-				#if($elw_ctx.assType.scoring.isAuto($cri))
-					<div class="formLabel" style="width:16em;"><span title="$cri.ratio" style="color:#669999;">$cri.name</span>:</div>
-					<div class="formField" style="width:6em;">
-						<select name="cri--$cri.id">
-							#foreach($pow in $cri.pows)
-								<option value="$pow" #if($score.isSetTo($cri.id, $pow))selected#end>$pow</option>
-							#end
-						</select>
-					</div>
-				#end
-			#end
-			<input type="hidden" name="elw_ctx" value="$elw_ctx"/>
-			<input type="hidden" name="stamp" value="$stamp"/>
-			<input type="hidden" name="codeStamp" value="$codeStamp"/>
-			<div class="formButtons"><input type="submit" name="action" value="Decline"/>&nbsp;&nbsp;&nbsp;<input type="submit" name="action" value="Approve"/></div>
-		</form>
-	</div>
-	<div>
-		<div style="float: left; margin: 0 3em;">
-			<h3>Code submissions</h3>
-			<table cellspacing="0" align="center"><tbody>
-				<tr>
-					<th></th>
-					<th>Date</th>
-					<th>State</th>
-					<th>Score</th>
-					<th>Link</th>
-				</tr>
-#foreach($c in $codes.values())
-				<tr>
-					<td style="padding: 0 0.25em; text-align: center;">#if($c.uploadStamp == $codeStamp)<span style="font-weight: bold;">*</span>#else<a href="approve?elw_ctx=$elw_ctx&codeStamp=$c.uploadStamp&stamp=$stamp">~</a>#end </td>
-					<td style="padding: 0 0.25em;"><span title="$c.niceUploadStamp">$c.briefUploadStamp</span></td>
-					<td style="padding: 0 0.25em;">
-						#elw_code_state($elw_ctx, $c)
-					</td>
-					<td style="padding: 0 0.25em;">
-						#elw_code_score($elw_ctx, $codeScores.get($c.uploadStamp))
-					</td>
-					<td style="padding: 0 0.25em;">[&nbsp;<a href="../s/codeDl/$c.fileName?elw_ctx=$elw_ctx&stamp=$c.uploadStamp" target="_blank">Download</a>&nbsp;]</td>
-				</tr>
-#end
-			</tbody></table>
-		</div>
-		<div style="float: left; margin: 0 3em;">
-			<h3>Report Uploads</h3>
-			<table cellspacing="0" align="center"><tbody>
-				<tr>
-					<th></th>
-					<th>Date</th>
-					<th>State</th>
-					<th>Score</th>
-					<th>Link</th>
-				</tr>
-#foreach($rep in $reports.values())
-				<tr>
-					<td style="padding: 0 0.25em; text-align: center;">#if($rep.uploadStamp == $stamp)<span style="font-weight: bold;">*</span>#else<a href="approve?elw_ctx=$elw_ctx&stamp=$rep.uploadStamp&codeStamp=$codeStamp">~</a>#end </td>
-					<td style="padding: 0 0.25em;"><span title="$rep.niceUploadStamp">$rep.briefUploadStamp</span></td>
-					<td style="padding: 0 0.25em;">
-						#elw_report_state($elw_ctx, $rep)
-					</td>
-					<td style="padding: 0 0.25em;">
-						#elw_report_score($elw_ctx, $scores.get($rep.scoreStamp))
-					</td>
-					<td style="padding: 0 0.25em;">[&nbsp;<a href="../s/reportDl/$rep.fileName?elw_ctx=$elw_ctx&stamp=$rep.uploadStamp" target="_blank">Download</a>&nbsp;]</td>
-				</tr>
-#end
-			</tbody></table>
-		</div>
-	</div>
+	<h3 id="title"/>
+ <div class="formArea ui-widget-header ui-corner-all" style="height: 22em; width: 32em; float: left; margin: 0 2em;">
+  <form method="POST" action="approve">
+   <input type="hidden" name="elw_ctx" value=""/>
+   <input type="hidden" name="stamp" value=""/>
+   <div id="sliders"></div>
+   <div id="sliders_auto"></div>
+   <div class="formLabel" style="width:12em;">Comment:</div>
+   <div class="formField" style="width:16em;"><input type="text" value=""/></div>
+   <div class="formButtons">
+    <input type="submit" name="action" value="Decline"/>
+    &nbsp;&nbsp;&nbsp;
+    <input type="submit" name="action" value="Approve"/>
+   </div>
+  </form>
+ </div>
+ <div>
 </div>
 </body>
-#elw_ready("../")
+<script type="text/javascript">
+ jQuery(document).ready(function() {
+  jQuery("#title")
+    .append(jQuery("<span/>").text($format.json($elw_ctx.student.name)).attr("title", $format.json($elw_ctx.student.id)))
+    .append(jQuery("<span/>").text(" "))
+    .append(jQuery("<span/>").text($format.json($elw_ctx.ass.name)).attr("title", $format.json($elw_ctx.ass.id)))
+    .append(jQuery("<span/>").text(" "))
+    .append(jQuery("<span/>").text($format.json($elw_ctx.ver.name)).attr("title", $format.json($elw_ctx.ver.id)));
+
+  var sliders = jQuery("#sliders");
+  var sliders_auto = jQuery("#sliders_auto");
+  #foreach($cri in $slot.criterias)
+   (function() {
+    var criId = $format.json($slot.id) + "--" + $format.json($cri.id);
+    sliders#if($cri.isAuto())_auto#{end}.append(
+      jQuery("<div/>").toggleClass("formLabel").css({"width":"16em"}).append(
+        jQuery("<span/>").text($format.json($cri.name)).attr("title", $format.json($cri.ratio))
+      )
+    ).append(
+      jQuery("<div/>").toggleClass("formField").css({"width":"12em"}).append(
+        jQuery("<div/>").css({"margin":"0.25em 1em 0 1em","float":"left","width":"6em"}).attr("id", criId + "--slider")
+      ).append(
+        jQuery("<select/>").attr("id", criId).attr("name", criId).css({"float": "left"})
+          #foreach($pow in $cri.pows)
+           .append(jQuery("<option/>").attr("value", $pow).text($pow))
+          #end
+      )
+    );
+
+    jQuery("#" + criId + "--slider").slider({
+     "min": 0,
+     "max": $cri.powMax,
+     "range": "min",
+     "value": $score.getPow($slot, $cri),
+     "slide": function( event, ui ) {
+      jQuery("#" + criId).val(ui.value);
+     }
+    });
+    jQuery("#" + criId).change(function() {
+     jQuery("#" + criId + "--slider").slider("value", this.selectedIndex);
+    }).val($score.getPow($slot, $cri));
+   })();
+  #end
+
+##  var dataTable = jQuery('#dataTable').dataTable({
+##   "sDom": 'lprf<"clear">ti',
+##   'aaData': [ ],
+##   'aoColumns': [
+##    #* 0 index *# {"bVisible": false, "bSortable": false},
+##    #* 1 upload millis *# {"bVisible": false, "bSortable": false},
+##    #* 2 upload date - full *# {"bVisible": false, "bSortable": false},
+##    #* 3 upload date - nice*# {'sTitle': 'Time', "iDataSort": 1, "sWidth": "7em"},
+##    #* 4 author.id *# {"bVisible": false, "bSortable": false},
+##    #* 5 author.name *# {'sTitle': 'Author', "iDataSort": 3, "sWidth": "13em"},
+##    #* 6 class.index *# {"bVisible": false, "bSortable": false},
+##    #* 7 class.name *# {'sTitle': 'Class', "iDataSort": 5, "sWidth": "11em"},
+##    #* 8 slot.id *# {"bVisible": false, "bSortable": false},
+##    #* 9 slot.name *# {'sTitle': 'Slot', "iDataSort": 7, "sWidth": "5em" },
+##    #* 10 comment *# {'sTitle': 'Comment', "sWidth": "21em" },
+##    #* 11 status text*# {'sTitle': 'Status', "sWidth": "7em" },
+##    #* 12 status classes *# {"bVisible": false, "bSortable": false},
+##    #* 13 approve *# {'sTitle': 'A', "sWidth": "1em", "bSortable": false },
+##    #* 14 download *# {'sTitle': 'D', "sWidth": "1em", "bSortable": false }
+##   ],
+##   "aaSorting": [ [3,'asc'] ],
+##   "aaSortingFixed": [ ],
+##   "fnRowCallback": function(node, data, dispIndex, dataIndex) {
+##    jQuery("td:eq(5)", node).toggleClass(data[12]);
+##    jQuery("td:eq(0)", node).attr("title", data[2]);
+##    return node;
+##   }
+##  });
+
+//  function loadData() {
+//   var f_data = {};
+//   f_data["elw_ctx"] = jQuery("input[name=elw_ctx]").val();
+//   f_data["f_studId"] = jQuery("select[name=f_studId]").val();
+//   f_data["f_slotId"] = jQuery("select[name=f_slotId]").val();
+//   f_data["f_nodues"] = jQuery("input[name=f_nodues]").attr("checked");
+//   f_data["f_latest"] = jQuery("input[name=f_latest]").attr("checked");
+//
+//
+//   jQuery.ajax({
+//    "type": "GET",
+//    "url": "rest/log",
+//    "data": f_data,
+//    "success": function(resp) {
+//     if (resp == null || !resp.success) {
+//      jQuery.jGrowl("Response error", {"header":"AJAX error", "theme": "ui-state-error"});
+//      return;
+//     }
+//
+//     dataTable.fnClearTable(resp.data.length == 0);
+//     dataTable.fnAddData(resp.data);
+//    },
+//    "error": function() {
+//     jQuery.jGrowl("General error", {"header":"AJAX error", "theme": "ui-state-error"});
+//    },
+//    "dataType": 'json'
+//   });
+//
+//   return false;
+//  }
+
+//  jQuery("#dataLoader").click(loadData);
+
+//  loadData();
+ });
+</script>
+
+ #elw_ready("../")
 </html>

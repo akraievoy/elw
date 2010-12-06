@@ -26,7 +26,6 @@ import elw.miniweb.ViewJackson;
 import elw.vo.*;
 import elw.vo.Class;
 import org.akraievoy.gear.G4Io;
-import org.akraievoy.gear.G4Parse;
 import org.akraievoy.gear.G4Str;
 import org.akraievoy.gear.G4mat;
 import org.apache.commons.fileupload.FileItemIterator;
@@ -35,7 +34,6 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -63,8 +61,6 @@ public class AdminController extends MultiActionController implements WebSymbols
 	protected final CourseDao courseDao;
 	protected final GroupDao groupDao;
 	protected final EnrollDao enrollDao;
-	protected final CodeDao codeDao;
-	protected final ReportDao reportDao;
 	protected final ScoreDao scoreDao;
 	protected final FileDao fileDao;
 
@@ -74,14 +70,11 @@ public class AdminController extends MultiActionController implements WebSymbols
 	protected final DiskFileItemFactory fileItemFactory;
 
 	public AdminController(
-			CourseDao courseDao, EnrollDao enrollDao, GroupDao groupDao, CodeDao codeDao,
-			ReportDao reportDao, ScoreDao scoreDao, FileDao fileDao
+			CourseDao courseDao, EnrollDao enrollDao, GroupDao groupDao, ScoreDao scoreDao, FileDao fileDao
 	) {
 		this.courseDao = courseDao;
 		this.enrollDao = enrollDao;
 		this.groupDao = groupDao;
-		this.codeDao = codeDao;
-		this.reportDao = reportDao;
 		this.scoreDao = scoreDao;
 		this.fileDao = fileDao;
 
@@ -313,7 +306,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 
 			StudentController.storeMetas(
 					studCtx,
-					codeDao, reportDao, scoreDao, fileDao,
+					scoreDao, fileDao,
 					fileMetas, null, null, null,
 					grossScore
 			);
@@ -421,8 +414,8 @@ public class AdminController extends MultiActionController implements WebSymbols
 				/* 10 comment */ e.getMeta().getComment(),
 				/* 11 status text*/ iEntry.getStatusHtml(format, ctx.getEnr(), slot, e.getMeta()),
 				/* 12 status classes */ iEntry.getStatusClasses(ctx.getEnr(), slot, e.getMeta()),
-				/* 13 approve */ "<a href=\"../s/dl/" + nameNorm + q + "\">A</a>",
-				/* 14 download */ "<a href=\"approve" + q + "\">D</a>"
+				/* 13 approve */ "<a href=\"approve" + q + "\">A</a>",
+				/* 14 download */ "<a href=\"../s/dl/" + nameNorm + q + "\">D</a>"
 		};
 		return dataRow;
 	}
@@ -479,55 +472,73 @@ public class AdminController extends MultiActionController implements WebSymbols
 			return null;
 		}
 
-		final Map<Stamp, Entry<ReportMeta>> reports = reportDao.findAll(ctx);
-
-		final String reportStampStr = req.getParameter("stamp");
-		Stamp reportStamp = Stamp.parse(reportStampStr, null);
-		if (reportStamp == null) {
-			reportStamp = reports.keySet().iterator().next();
+		final String slotId = req.getParameter("sId");
+		if ((slotId == null || slotId.trim().length() == 0)) {
+			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "no slotId (sId) defined");
+			return null;
 		}
 
-		model.put("stamp", reportStamp);
-		model.put("reports", reports);
-
-		final Map<Stamp, Entry<CodeMeta>> codes = codeDao.findAllMetas(ctx);
-		model.put("codes", codes);
-
-		final Map<Stamp, Score> codeScores = new TreeMap<Stamp, Score>();
-
-		Stamp codeStamp = computeCodeScores(ctx, codes, codeScores, reportStamp);
-
-		model.put("codeStamp", Stamp.parse(req.getParameter("codeStamp"), codeStamp));
-
-		model.put("codeScores", codeScores);
-
-		final Score reportScore;
-		final ReportMeta reportMeta = reports.get(reportStamp).getMeta();
-		final Stamp scoreStamp = reportMeta.getScoreStamp();
-		if (scoreStamp == null) {
-			final Score reportBaseScore;
-			final Score codeScore = codeScores.get(codeStamp);
-			if (codeStamp == null || codeScore == null){
-				Message.addWarn(req, "Unable to find any codes preceding selected report");
-				reportBaseScore = new Score();
-			} else {
-				reportBaseScore = codeScore.copy();
-			}
-			reportScore = computeReportAuto(ctx, reportMeta, reportBaseScore);
-			computeReportDefault(ctx, reportScore);
-		} else {
-			final Entry<Score> score = scoreDao.findScoreByStamp(ctx, scoreStamp, "FIXME:slotId", "FIXME:fileId");
-			reportScore = score.getMeta();
-			codeScores.put(score.getMeta().getCodeStamp(), score.getMeta());
+		final FileSlot slot = ctx.getAssType().findSlotById(slotId);
+		if (slot == null) {
+			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "slot for id " + slotId + " not found");
+			return null;
 		}
 
-		model.put("scores", scoreDao.findAllScores(ctx, "FIXME:slotId", "FIXME:fileId"));
-		model.put("score", reportScore);
+		final String fileId = req.getParameter("fId");
+		if ((fileId == null || fileId.trim().length() == 0)) {
+			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "no fileId (fId) defined");
+			return null;
+		}
+
+		final Entry<FileMeta> file = fileDao.findFileFor(FileDao.SCOPE_STUD, ctx, slotId, fileId);
+		if (file == null) {
+			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "file for id " + fileId + " not found");
+			return null;
+		}
+
+		final SortedMap<Stamp, Entry<Score>> allScores = scoreDao.findAllScores(ctx, slotId, fileId);
+
+		final Stamp stamp = req.getParameter("stamp") != null ? Stamp.fromString(req.getParameter("stamp")) : null;
+		final Entry<Score> lastScoreEntry = allScores.isEmpty() ? null : allScores.get(allScores.lastKey());
+		final Entry<Score> scoreEntry = stamp == null ? lastScoreEntry : scoreDao.findScoreByStamp(ctx, stamp, slotId, fileId);
+		final Score score = updateAutos(scoreEntry == null ? null : scoreEntry.getMeta(), ctx, slotId, file);
+
+		model.put("scores", allScores);
+		model.put("score", score);
+		model.put("slot", slot);
 
 		return new ModelAndView("a/approve", model);
 	}
 
-	public static Stamp computeCodeScores(Ctx ctx, Map<Stamp, Entry<CodeMeta>> codes, Map<Stamp, Score> codeScores, Stamp reportStamp) {
+	protected Score updateAutos(final Score score, Ctx ctx, final String slotId, Entry<FileMeta> file) {
+		final Class classDue = ctx.getEnr().getClasses().get(ctx.getIndexEntry().getClassDue().get(slotId));
+		final FileSlot slot = ctx.getAssType().findSlotById(slotId);
+
+		final Map<String, Double> vars = new TreeMap<String, Double>();
+		vars.put("$overdue", classDue.computeDaysOverdue(file.getMeta().getCreateStamp()));
+		if (slot.getValidator() != null && file.getMeta().isValidated()) {
+			vars.put("$passratio", classDue.computeDaysOverdue(file.getMeta().getCreateStamp()));
+		}
+
+		final Score res = score == null ? new Score() : score.copy();
+		for (Criteria c : slot.getCriterias()) {
+			if (!c.isAuto()) {
+				continue;
+			}
+
+			final Double ratio = c.resolveRatio(vars);
+			final Integer powDef = c.resolvePowDef(vars);
+			if (ratio != null && powDef != null) {
+				final String id = res.idFor(slot, c);
+				res.getPows().put(id, powDef);
+				res.getRatios().put(id, ratio);
+			}
+		}
+
+		return res;
+	}
+
+	public static Stamp computeCodeScores(Ctx ctx, Map<Stamp, Entry<CodeMeta>> codes, Map<Stamp, Score> codeScores, Stamp reportStamp, final FileSlot slot) {
 		double bestRatio = 0;
 		Stamp codeStamp = null;
 
@@ -539,10 +550,10 @@ public class AdminController extends MultiActionController implements WebSymbols
 			codeScores.put(cStamp, score);
 
 			//	here we select the best code scoring to base our report rating on
-			final double ratio = score.getRatio(ctx.getAssType().getScoring().getBreakdown().get("code").getAuto());
-			if ((reportStamp == null || meta.getCreateStamp().getTime() <= reportStamp.getTime()) && ratio > bestRatio) {
+			final double points = ctx.getIndexEntry().computePoints(score, slot);
+			if ((reportStamp == null || meta.getCreateStamp().getTime() <= reportStamp.getTime()) && points > bestRatio) {
 				codeStamp = cStamp;
-				bestRatio = ratio;
+				bestRatio = points;
 			}
 		}
 
@@ -575,6 +586,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 			return null;
 		}
 
+/*
 		final ReportMeta reportMeta = reportDao.findByStamp(ctx, reportStamp).getMeta();
 		final CodeMeta codeMeta = codeDao.findMetaByStamp(ctx, codeStamp).getMeta();
 
@@ -610,6 +622,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 			reportDao.updateMeta(ctx, reportMeta);
 			Message.addInfo(req, "Report approved");
 		}
+*/
 
 //		final List<LogEntry> entries = prepareLogEntries(ctx, true, latest, null, studId);
 		Object[] nextEntry = null;
@@ -631,7 +644,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 	}
 
 	protected static void computeReportDefault(Ctx ctx, Score reportScore) {
-		final Criteria[] criterias = ctx.getAssType().getScoring().getCriterias();
+		final Criteria[] criterias = ctx.getAssType().findSlotById("report").getCriterias();
 		for (Criteria c : criterias) {
 			if (!reportScore.contains(c.getId())) {
 				reportScore.getPows().put(c.getId(), c.resolvePowDef(null));
@@ -642,16 +655,9 @@ public class AdminController extends MultiActionController implements WebSymbols
 
 	protected static Score computeReportAuto(Ctx ctx, ReportMeta meta, final Score baseScore) {
 		final Class classDue = ctx.getEnr().getClasses().get(ctx.getIndexEntry().getClassDue().get("report"));
-		final TypeScoring reportScoring = ctx.getAssType().getScoring().getBreakdown().get("report");
-		final Criteria[] autos = reportScoring.resolveAuto();
+		final Criteria[] autos = ctx.getAssType().findSlotById("report").getCriterias();
 
-		final DateTime uploadStamp = new DateTime(meta.getCreateStamp());
-		final double overdue;
-		if (classDue.isPassed(uploadStamp)) {
-			overdue = classDue.getDayDiff(uploadStamp);
-		} else {
-			overdue = 0.0;
-		}
+		final double overdue = classDue.computeDaysOverdue(meta.getCreateStamp());
 		final Map<String, Double> vars = new TreeMap<String, Double>();
 		vars.put("$overdue", overdue);
 
@@ -666,20 +672,13 @@ public class AdminController extends MultiActionController implements WebSymbols
 
 	protected static Score computeCodeAuto(CodeMeta meta, Ctx ctx) {
 		final Class classCodeDue = ctx.getEnr().getClasses().get(ctx.getIndexEntry().getClassDue().get("code"));
-		final TypeScoring codeScoring = ctx.getAssType().getScoring().getBreakdown().get("code");
-		final Criteria[] autos = codeScoring.resolveAuto();
+		final Criteria[] autos = ctx.getAssType().findSlotById("code").getCriterias();
 
 		if (meta.getValidatorStamp() <= 0) {
 			return null;
 		}
 
-		final DateTime uploadStamp = new DateTime(meta.getCreateStamp().getTime());
-		final double overdue;
-		if (classCodeDue.isPassed(uploadStamp)) {
-			overdue = classCodeDue.getDayDiff(uploadStamp);
-		} else {
-			overdue = 0.0;
-		}
+		final double overdue = classCodeDue.computeDaysOverdue(meta.getCreateStamp());
 		final Map<String, Double> vars = new TreeMap<String, Double>();
 		vars.put("$passratio", meta.getPassRatio());
 		vars.put("$overdue", overdue);
@@ -732,7 +731,6 @@ public class AdminController extends MultiActionController implements WebSymbols
 
 		final Ctx ctx = (Ctx) model.get(R_CTX);
 		if (
-				FileDao.SCOPE_COURSE.equals(scope) && !ctx.resolved(Ctx.STATE_C) ||
 				FileDao.SCOPE_ASS_TYPE.equals(scope) && !ctx.resolved(Ctx.STATE_CT) ||
 				FileDao.SCOPE_ASS.equals(scope) && !ctx.resolved(Ctx.STATE_CTA) ||
 				FileDao.SCOPE_VER.equals(scope) && !ctx.resolved(Ctx.STATE_CTAV) ||
@@ -743,21 +741,15 @@ public class AdminController extends MultiActionController implements WebSymbols
 		}
 
 		final String slotId = req.getParameter("sId");
-		final boolean course = FileDao.SCOPE_COURSE.equals(scope);
-		if (!course && (slotId == null || slotId.trim().length() == 0)) {
+		if ((slotId == null || slotId.trim().length() == 0)) {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "no slotId (sId) defined");
 			return null;
 		}
 
-		final FileSlot slot;
-		if (!course) {
-			slot = ctx.getAssType().findSlotById(slotId);
-			if (slot == null) {
-				resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "slot '" + slotId + "' not found");
-				return null;
-			}
-		} else {
-			slot = null;
+		final FileSlot slot = ctx.getAssType().findSlotById(slotId);
+		if (slot == null) {
+			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "slot '" + slotId + "' not found");
+			return null;
 		}
 
 		final boolean put = "PUT".equalsIgnoreCase(req.getMethod());
@@ -771,27 +763,20 @@ public class AdminController extends MultiActionController implements WebSymbols
 			return null;
 		}
 
-		if (!course) {
-			if (req.getContentLength() > slot.getLengthLimit()) {
-				final String message = "upload exceeds " + G4mat.formatMem(slot.getLengthLimit());
-				if (!put) {
-					Message.addWarn(req, message);
-					resp.sendRedirect(refreshUri);
-				} else {
-					resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
-				}
-				return null;
+		if (req.getContentLength() > slot.getLengthLimit()) {
+			final String message = "upload exceeds " + G4mat.formatMem(slot.getLengthLimit());
+			if (!put) {
+				Message.addWarn(req, message);
+				resp.sendRedirect(refreshUri);
+			} else {
+				resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
 			}
+			return null;
 		}
 
-		final boolean binary = course || slot.isBinary() ;
+		final boolean binary = slot.isBinary() ;
 		if (put) {
-			if (course) {
-				resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "no course-scope PUT uploads, please");
-				return null;
-			}
-
-			//	LATER add some sensible defaults to the FileSlot entity 
+			//	LATER add some sensible defaults to the FileSlot entity
 			final String name = "upload" + (binary ? ".bin" : ".txt");
 			final FileMeta fileMeta = new FileMeta(
 					name,
@@ -836,14 +821,14 @@ public class AdminController extends MultiActionController implements WebSymbols
 			}
 
 			final String fName = FileMeta.extractNameFromPath(item.getName());
-			if (!course && !Pattern.compile(slot.getNameRegex()).matcher(fName.toLowerCase()).matches()) {
+			if (!Pattern.compile(slot.getNameRegex()).matcher(fName.toLowerCase()).matches()) {
 				Message.addWarn(req, "check the file name: regex check failed");
 				resp.sendRedirect(refreshUri);
 				return null;
 			}
 
 			final String contentType = item.getContentType();
-			if (!course && G4Str.indexOf(contentType, slot.getContentTypes()) < 0) {
+			if (G4Str.indexOf(contentType, slot.getContentTypes()) < 0) {
 				Message.addWarn(req, "contentType '" + contentType + "': not listed in the slot");
 			}
 
@@ -861,7 +846,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 			fileDao.createFileFor(
 					scope,
 					ctx,
-					course ? null : slot.getId(),
+					slot.getId(),
 					fileMeta,
 					binary ? new BufferedInputStream(item.openStream()) : null,
 					binary ? null : new BufferedReader(new InputStreamReader(item.openStream(), "UTF-8"))
@@ -873,7 +858,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 			Message.addInfo(req, "Your upload has succeeded");
 			resp.sendRedirect(refreshUri);
 		} else {
-			Message.addWarn(req, "Something went terribly wrong");
+			Message.addWarn(req, "Multiple uploads not allowed");
 			resp.sendRedirect(refreshUri);
 		}
 

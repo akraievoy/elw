@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.lang.reflect.Array;
 
 public class FileDao extends Dao<FileMeta> {
-	public static final String SCOPE_COURSE = "c";
 	public static final String SCOPE_ASS_TYPE = "t";
 	public static final String SCOPE_ASS = "a";
 	public static final String SCOPE_VER = "v";
@@ -19,7 +18,7 @@ public class FileDao extends Dao<FileMeta> {
 	private static final Logger log = LoggerFactory.getLogger(FileDao.class);
 
 	protected final ScoreDao scoreDao;
-	public static final String[] SCOPES = new String[] {FileDao.SCOPE_COURSE, FileDao.SCOPE_ASS_TYPE, FileDao.SCOPE_ASS, FileDao.SCOPE_VER, FileDao.SCOPE_STUD};
+	public static final String[] SCOPES = new String[] {FileDao.SCOPE_ASS_TYPE, FileDao.SCOPE_ASS, FileDao.SCOPE_VER, FileDao.SCOPE_STUD};
 
 	public FileDao(final ScoreDao scoreDao) {
 		this.scoreDao = scoreDao;
@@ -77,13 +76,7 @@ public class FileDao extends Dao<FileMeta> {
 	protected Path pathFor(final String scope, Ctx ctx, String slotId, FileMeta meta) {
 		final String[] pathStr;
 
-		if (SCOPE_COURSE.equals(scope)) {
-			pathStr = new String[] {
-					ctx.getCourse().getId(),
-					"global",
-					idForMeta(meta)
-			};
-		} else if (SCOPE_ASS_TYPE.equals(scope)) {
+		if (SCOPE_ASS_TYPE.equals(scope)) {
 			pathStr = new String[]{
 					ctx.getCourse().getId(),
 					"assType",

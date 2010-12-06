@@ -131,4 +131,18 @@ public class Class {
 	public void setToTime(String toTime) {
 		this.toTime = toTime;
 	}
+
+	public double computeDaysOverdue(final Stamp uploadStamp) {
+		return getDaysOverdue(new DateTime(uploadStamp.getTime()));
+	}
+
+	public double getDaysOverdue(DateTime uploadStamp) {
+		final double overdue;
+		if (isPassed(uploadStamp)) {
+			overdue = getDayDiff(uploadStamp);
+		} else {
+			overdue = 20;
+		}
+		return overdue;
+	}
 }

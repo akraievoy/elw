@@ -32,12 +32,6 @@
 </body>
 <script type="text/javascript">
  jQuery(document).ready(function() {
-  #if($f_noDues)
-   jQuery("input[name=f_nodues]").attr("checked", $f_noDues);
-  #end
-  #if($f_slotId)
-   jQuery("input[name=f_slotId]").val($format.json($f_slotId));
-  #end
   var f_studId = jQuery("select[name=f_studId]");
   #foreach($stud in $elw_ctx.group.students)
    f_studId.append(
@@ -54,6 +48,19 @@
      )
    );
    #end
+  #end
+
+  #if($f_noDues)
+   jQuery("input[name=f_nodues]").attr("checked", $f_noDues);
+  #end
+  #if($f_latest)
+   jQuery("input[name=f_latest]").attr("checked", $f_latest);
+  #end
+  #if($f_slotId)
+   jQuery("select[name=f_slotId]").val($format.json($f_slotId));
+  #end
+  #if($f_studId)
+   jQuery("select[name=f_studId]").val($format.json($f_studId));
   #end
 
   var dataTable = jQuery('#dataTable').dataTable({
@@ -76,11 +83,11 @@
     #* 13 approve *# {'sTitle': 'A', "sWidth": "1em", "bSortable": false },
     #* 14 download *# {'sTitle': 'D', "sWidth": "1em", "bSortable": false }
    ],
-   "aaSorting": [ [4,'asc'] ],
-   "aaSortingFixed": [ [3,'asc'] ],
+   "aaSorting": [ [3,'asc'] ],
+   "aaSortingFixed": [ ],
    "fnRowCallback": function(node, data, dispIndex, dataIndex) {
-    jQuery("td:eq(5)", node).toggleClass(data[11]);
-    jQuery("td:eq(1)", node).attr("title", data[2]);
+    jQuery("td:eq(5)", node).toggleClass(data[12]);
+    jQuery("td:eq(0)", node).attr("title", data[2]);
     return node;
    }
   });

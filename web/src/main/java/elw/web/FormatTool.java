@@ -20,6 +20,7 @@ package elw.web;
 
 import elw.miniweb.ViewJackson;
 import elw.vo.Format;
+import org.akraievoy.gear.G4mat;
 import org.joda.time.DateTime;
 import org.joda.time.Period;
 import org.joda.time.format.DateTimeFormat;
@@ -342,5 +343,7 @@ public class FormatTool implements Format {
 		return res.toString();
 	}
 
-	
+	public String format2(final Double num) {
+		return num != null ? G4mat.format2(num) : "";
+	}
 }

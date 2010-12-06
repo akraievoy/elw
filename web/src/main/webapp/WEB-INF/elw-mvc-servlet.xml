@@ -54,12 +54,6 @@
 	<bean id="enrollmentDao" class="elw.dao.EnrollDao">
 		<property name="metaClass" value="elw.vo.Enrollment"/>
 	</bean>
-	<bean id="codeDao" class="elw.dao.CodeDao">
-		<property name="metaClass" value="elw.vo.CodeMeta"/>
-	</bean>
-	<bean id="reportDao" class="elw.dao.ReportDao">
-		<property name="metaClass" value="elw.vo.ReportMeta"/>
-	</bean>
 	<bean id="scoreDao" class="elw.dao.ScoreDao">
 		<property name="metaClass" value="elw.vo.Score"/>
 	</bean>
@@ -70,8 +64,6 @@
 				<ref bean="assDao"/>
 				<ref bean="courseDao"/>
 				<ref bean="groupDao"/>
-				<ref bean="codeDao"/>
-				<ref bean="reportDao"/>
 				<ref bean="enrollmentDao"/>
 				<ref bean="scoreDao"/>
 			</list>

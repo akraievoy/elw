@@ -8,8 +8,6 @@ import java.util.List;
 
 public class Course extends IdName implements Stamped {
 	protected final List<AssignmentType> assTypes = new ArrayList<AssignmentType>();
-	protected final List<QuizType> quizTypes = new ArrayList<QuizType>();
-	protected List<Entry<FileMeta>> files = new ArrayList<Entry<FileMeta>>();
 
 	protected Stamp createStamp;
 
@@ -30,27 +28,6 @@ public class Course extends IdName implements Stamped {
 	public void setAssTypes(AssignmentType[] assTypes) {
 		this.assTypes.clear();
 		this.assTypes.addAll(Arrays.asList(assTypes));
-	}
-
-	@SuppressWarnings({"unchecked"})
-	@JsonIgnore
-	public Entry<FileMeta>[] getFiles() {
-		return files.toArray(new Entry[files.size()]);
-	}
-
-	@JsonIgnore
-	public void setFiles(Entry<FileMeta>[] files) {
-		this.files.clear();
-		this.files.addAll(Arrays.asList(files));
-	}
-
-	public QuizType[] getQuizTypes() {
-		return quizTypes.toArray(new QuizType[quizTypes.size()]);
-	}
-
-	public void setQuizTypes(QuizType[] quizTypes) {
-		this.quizTypes.clear();
-		this.quizTypes.addAll(Arrays.asList(quizTypes));
 	}
 
 	public Stamp getCreateStamp() {

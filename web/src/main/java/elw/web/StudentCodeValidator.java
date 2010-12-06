@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
@@ -35,7 +36,6 @@ public class StudentCodeValidator extends G4Run.Task {
 
 	protected int periodMillis = 300000;
 	protected final EnrollDao enrollDao;
-	protected final CodeDao codeDao;
 	protected final GroupDao groupDao;
 	protected final CourseDao courseDao;
 	protected final ScoreDao scoreDao;
@@ -44,10 +44,9 @@ public class StudentCodeValidator extends G4Run.Task {
 
 	public StudentCodeValidator(
 			ScheduledExecutorService executor,
-			CodeDao codeDao, EnrollDao enrollDao, GroupDao groupDao,
+			EnrollDao enrollDao, GroupDao groupDao,
 			CourseDao courseDao, ScoreDao scoreDao, FileDao fileDao) {
 		super(executor);
-		this.codeDao = codeDao;
 		this.enrollDao = enrollDao;
 		this.groupDao = groupDao;
 		this.courseDao = courseDao;
@@ -83,7 +82,7 @@ public class StudentCodeValidator extends G4Run.Task {
 				final Ctx ctxStud = ctxEnr.extendStudent(student);
 				for (int index = 0; index < enr.getIndex().size(); index++) {
 					final Ctx ctxVer = ctxStud.extendIndex(index);
-					final Map<Stamp, Entry<CodeMeta>> metas = codeDao.findAllMetas(ctxVer);
+					final Map<Stamp, Entry<CodeMeta>> metas = /*codeDao.findAllMetas(ctxVer)*/ Collections.emptyMap();
 					final Set<Stamp> stamps = metas.keySet();
 					for (Stamp stamp : stamps) {
 						final Entry<CodeMeta> entry = metas.get(stamp);
@@ -117,11 +116,13 @@ public class StudentCodeValidator extends G4Run.Task {
 						}
 
 						if (update) {
+/*
 							try {
 								codeDao.updateMeta(ctxVer, stamp, metaSafe);
 							} catch (IOException t) {
 								log.warn("exception while storing update {} / {}", ctxVer, stamp);
 							}
+*/
 						}
 					}
 				}

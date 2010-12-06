@@ -1,5 +1,8 @@
 package elw.vo;
 
+import org.akraievoy.gear.G4mat;
+import org.codehaus.jackson.annotate.JsonIgnore;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
@@ -173,4 +176,25 @@ public class IndexEntry {
 			throw new IllegalStateException("UTF-8 is NOT supported?!");
 		}
 	}
+
+	@JsonIgnore
+	public double computePoints(Score score, final FileSlot slot) {
+		return getScoreBudget() * slot.getScoreWeight() * score.computeRatio(slot);
+	}
+
+	@JsonIgnore
+	public double getTotal(final AssignmentType aType, Score score) {
+		double result = 0.0;
+
+		for (FileSlot slot : aType.getFileSlots()) {
+			if ("report".equals(slot.getId()) && score.getCreateStamp() == null) {
+				continue;
+			}
+
+			result += computePoints(score, slot);
+		}
+
+		return result;
+	}
+
 }

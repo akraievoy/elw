@@ -1,13 +1,20 @@
-package elw.vo;
+	package elw.vo;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 
 public class FileMeta extends IdNameStamped {
 	protected String contentType;
-	protected String nameNorm;
+	protected String nameNorm;	//	TODO wipe FileMeta.nameNorm as it`s now computed on the fly
 	protected String comment;
 	protected String sourceAddress;
 	protected String author;
+
+	//	second pass properties, issued by validator (if any)
+	protected int testsPassed;
+	protected int testsFailed;
+	protected long validatorStamp;
+
+	//	transient
 	protected Score score;
 
 	public FileMeta() {
@@ -64,6 +71,51 @@ public class FileMeta extends IdNameStamped {
 
 	public void setComment(String comment) {
 		this.comment = comment;
+	}
+
+	public int getTestsFailed() {
+		return testsFailed;
+	}
+
+	public void setTestsFailed(int testsFailed) {
+		this.testsFailed = testsFailed;
+	}
+
+	public int getTestsPassed() {
+		return testsPassed;
+	}
+
+	public void setTestsPassed(int testsPassed) {
+		this.testsPassed = testsPassed;
+	}
+
+	public long getValidatorStamp() {
+		return validatorStamp;
+	}
+
+	public void setValidatorStamp(long validatorStamp) {
+		this.validatorStamp = validatorStamp;
+	}
+
+	@JsonIgnore
+	public boolean isValidated() {
+		return validatorStamp > 0;
+	}
+
+	@JsonIgnore
+	public int getTotalTests() {
+		return testsPassed + testsFailed;
+	}
+
+	@JsonIgnore
+	public double getPassRatio() {
+		final double totalTests = 0.0 + getTotalTests();
+
+		if (totalTests == 0) {
+			return 0.0;
+		}
+
+		return testsPassed / totalTests;
 	}
 
 	@JsonIgnore

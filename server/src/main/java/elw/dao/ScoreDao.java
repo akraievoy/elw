@@ -30,7 +30,7 @@ public class ScoreDao extends Dao<Score> {
 		return create(path, score, null, null);
 	}
 
-	public Map<Stamp, Entry<Score>> findAllScores(Ctx ctx, final String slotId, final String fileId) {
+	public SortedMap<Stamp, Entry<Score>> findAllScores(Ctx ctx, final String slotId, final String fileId) {
 		return findAll(toPath(ctx, slotId, fileId), false, false);
 	}
 

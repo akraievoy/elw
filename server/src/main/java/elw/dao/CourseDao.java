@@ -34,7 +34,6 @@ public class CourseDao extends Dao<Course> {
 		final Entry<Course> entry = findLast(new Path(id), null, null);
 
 		final Course course = entry.getMeta();
-		course.setFiles(fileDao.findFilesFor(FileDao.SCOPE_COURSE, Ctx.forCourse(course), null));
 
 		final AssignmentType[] assTypes = course.getAssTypes();
 		for (final AssignmentType assType : assTypes) {

@@ -8,6 +8,7 @@ public class FileSlot extends IdNameStamped {
 	protected List<String> readApprovals = new ArrayList<String>();
 	protected List<String> writeApprovals = new ArrayList<String>();
 	protected List<String> contentTypes = new ArrayList<String>();
+	protected Class validator = null;
 	protected String shortName;
 	protected long lengthLimit;
 	protected String nameRegex;
@@ -15,6 +16,9 @@ public class FileSlot extends IdNameStamped {
 	protected boolean binary;
 	protected boolean writable;
 	protected String editor;
+
+	protected double scoreWeight = 0.0;
+	protected final List<Criteria> criterias = new ArrayList<Criteria>();
 
 	public boolean isBinary() {
 		return binary;
@@ -97,5 +101,30 @@ public class FileSlot extends IdNameStamped {
 
 	public void setEscaped(boolean escaped) {
 		this.escaped = escaped;
+	}
+
+	public double getScoreWeight() {
+		return scoreWeight;
+	}
+
+	public void setScoreWeight(double scoreWeight) {
+		this.scoreWeight = scoreWeight;
+	}
+
+	public Criteria[] getCriterias() {
+		return criterias.toArray(new Criteria[criterias.size()]);
+	}
+
+	public void setCriterias(Criteria[] criterias) {
+		this.criterias.clear();
+		this.criterias.addAll(Arrays.asList(criterias));
+	}
+
+	public Class getValidator() {
+		return validator;
+	}
+
+	public void setValidator(Class validator) {
+		this.validator = validator;
 	}
 }

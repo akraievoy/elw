@@ -46,4 +46,6 @@ public interface Format {
 	String esc(String str);
 
 	String lines(String text);
+
+	String format2(Double num);
 }

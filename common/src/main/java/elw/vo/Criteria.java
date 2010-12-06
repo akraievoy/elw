@@ -8,6 +8,7 @@ public class Criteria extends IdName {
 	String ratio = "1.0";
 	String powDef = "";
 	int powMax = 1;
+	boolean auto = false;
 
 	public String getPowDef() {
 		return powDef;
@@ -33,25 +34,41 @@ public class Criteria extends IdName {
 		this.ratio = ratio;
 	}
 
-	public int resolvePowDef(Map<String, Double> vars) {
-		if (vars != null) {
-			for (String var : vars.keySet()) {
-				if (powDef.trim().equalsIgnoreCase(var)) {
-					return vars.get(var).intValue();
+	public boolean isAuto() {
+		return auto;
+	}
+
+	public void setAuto(boolean auto) {
+		this.auto = auto;
+	}
+
+	public Integer resolvePowDef(Map<String, Double> vars) {
+		if (powDef.startsWith("$")) {
+			if (vars != null) {
+				for (String var : vars.keySet()) {
+					if (powDef.trim().equalsIgnoreCase(var)) {
+						return vars.get(var).intValue();
+					}
 				}
 			}
+
+			return null;
 		}
 
 		return Integer.parseInt(powDef);
 	}
 
-	public double resolveRatio(Map<String, Double> vars) {
-		if (vars != null) {
-			for (String var : vars.keySet()) {
-				if (ratio.trim().equalsIgnoreCase(var)) {
-					return vars.get(var);
+	public Double resolveRatio(Map<String, Double> vars) {
+		if (ratio.startsWith("$")) {
+			if (vars != null) {
+				for (String var : vars.keySet()) {
+					if (ratio.trim().equalsIgnoreCase(var)) {
+						return vars.get(var);
+					}
 				}
 			}
+
+			return null;
 		}
 
 		return Double.parseDouble(ratio);

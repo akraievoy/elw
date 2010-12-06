@@ -9,7 +9,6 @@ public class AssignmentType extends IdName {
 	protected final List<FileSlot> fileSlots = new ArrayList<FileSlot>();
 	protected Map<String, List<Entry<FileMeta>>> files = new TreeMap<String, List<Entry<FileMeta>>>();
 
-	protected BundleScoring scoring = null;
 	protected AssignmentSetup setup = null;
 
 	@JsonIgnore
@@ -56,14 +55,6 @@ public class AssignmentType extends IdName {
 
 		filesForSlot.clear();
 		filesForSlot.addAll(Arrays.asList(files));
-	}
-
-	public BundleScoring getScoring() {
-		return scoring;
-	}
-
-	public void setScoring(BundleScoring scoring) {
-		this.scoring = scoring;
 	}
 
 	public AssignmentSetup getSetup() {

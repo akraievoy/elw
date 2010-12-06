@@ -50,8 +50,6 @@ public class StudentController extends MultiActionController implements WebSymbo
 	protected final CourseDao courseDao;
 	protected final GroupDao groupDao;
 	protected final EnrollDao enrollDao;
-	protected final CodeDao codeDao;
-	protected final ReportDao reportDao;
 	protected final ScoreDao scoreDao;
 	protected final FileDao fileDao;
 	private final AdminController adminController;
@@ -61,14 +59,12 @@ public class StudentController extends MultiActionController implements WebSymbo
 
 	public StudentController(
 			CourseDao courseDao, GroupDao groupDao, EnrollDao enrollDao,
-			CodeDao codeDao, ReportDao reportDao, ScoreDao scoreDao, FileDao fileDao,
+			ScoreDao scoreDao, FileDao fileDao,
 			AdminController adminController
 	) {
 		this.courseDao = courseDao;
 		this.groupDao = groupDao;
 		this.enrollDao = enrollDao;
-		this.codeDao = codeDao;
-		this.reportDao = reportDao;
 		this.scoreDao = scoreDao;
 		this.fileDao = fileDao;
 		this.adminController = adminController;
@@ -251,7 +247,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 		final TreeMap<String, Map<String, List<Entry<FileMeta>>>> fileMetas =
 				new TreeMap<String, Map<String, List<Entry<FileMeta>>>>();
 		final int[] grossScore = new int[1];
-		storeMetas(ctx, codeDao, reportDao, scoreDao, fileDao, fileMetas, codeMetas, reportMetas, scores, grossScore);
+		storeMetas(ctx, scoreDao, fileDao, fileMetas, codeMetas, reportMetas, scores, grossScore);
 		model.put("fileMetas", fileMetas);
 		model.put("codeMetas", codeMetas);
 		model.put("reportMetas", reportMetas);
@@ -262,7 +258,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 	}
 
 	public static void storeMetas(
-			Ctx ctx, CodeDao codeDao, ReportDao reportDao, ScoreDao scoreDao, FileDao fileDao,
+			Ctx ctx, ScoreDao scoreDao, FileDao fileDao,
 			Map<String, Map<String, List<Entry<FileMeta>>>> fileMetas,
 			Map<String, CodeMeta> codeMetas,
 			Map<String, ReportMeta> reportMetas,
@@ -282,13 +278,13 @@ public class StudentController extends MultiActionController implements WebSymbo
 			}
 
 			if (codeMetas != null) {
-				final Entry<CodeMeta> last = codeDao.findLast(ctxVer);
+				final Entry<CodeMeta> last = /*codeDao.findLast(ctxVer)*/ null;
 				if (last != null) {
 					codeMetas.put(assPath, last.getMeta());
 				}
 			}
 			if (reportMetas != null) {
-				final Entry<ReportMeta> lastReport = reportDao.findLast(ctxVer);
+				final Entry<ReportMeta> lastReport = /*reportDao.findLast(ctxVer)*/ null;
 				if (lastReport != null) {
 					reportMetas.put(assPath, lastReport.getMeta());
 				}
@@ -297,23 +293,23 @@ public class StudentController extends MultiActionController implements WebSymbo
 				final Entry<Score> lastScore = scoreDao.findLastScore(ctxVer, "FIXME:slotId", "FIXME:fileId");
 				Score effectiveScore = null;
 				if (lastScore == null) {
-					if (codeDao != null) {
-						final Entry<ReportMeta> lastReport = reportDao != null ? reportDao.findLast(ctxVer) : null;
+						final Entry<ReportMeta> lastReport = /*reportDao.findLast(ctxVer)*/ null;
 						final HashMap<Stamp, Score> allCodeScores = new HashMap<Stamp, Score>();
+						//	FIXME this should be abstracted-away
 						final Stamp bestCodeStamp = AdminController.computeCodeScores(
 								ctxVer,
-								codeDao.findAllMetas(ctxVer),
+								Collections.<Stamp, Entry<CodeMeta>>emptyMap(),
 								allCodeScores,
-								lastReport != null ? lastReport.getMeta().getCreateStamp() : null
+								lastReport != null ? lastReport.getMeta().getCreateStamp() : null,
+								ctxVer.getAssType().getFileSlots()[0] // FIXME pass correct param
 						);
 						effectiveScore = allCodeScores.get(bestCodeStamp);
-					}
 				} else {
 					effectiveScore = lastScore.getMeta();
 				}
 				if (effectiveScore != null) {
 					scores.put(assPath, effectiveScore);
-					grossScoreFuzzy += effectiveScore.getTotal(assType.getScoring(), ctxVer.getIndexEntry());
+					grossScoreFuzzy += ctxVer.getIndexEntry().getTotal(ctx.getAssType(), effectiveScore);
 				}
 			}
 		}
@@ -390,7 +386,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 		}
 
 		final String slotId = req.getParameter("sId");
-		if (!FileDao.SCOPE_COURSE.equals(scope) && (slotId == null || slotId.trim().length() == 0)) {
+		if (slotId == null || slotId.trim().length() == 0) {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "no slotId (sId) defined");
 			return null;
 		}
