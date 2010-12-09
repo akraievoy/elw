@@ -13,12 +13,69 @@
 </div>
  #parse("/__/messages.vm")
 <div id=main>
-Available pages:<ul>
-	<li>Registered <a href="courses">courses</a></li>
-	<li>Registered <a href="groups">groups</a></li>
-	<li>Registered <a href="enrolls">enrollments</a></li>
-</ul>
+ <div style="float: left;">
+  <form style="text-align: center;">
+   <label for="dataLoader"></label>
+   <input id="dataLoader" type="button" value="Refresh"/>
+  </form>
+  <table id="dataTable" cellspacing="0" cellpadding="1"></table>
+ </div>
 </div>
 </body>
+<script type="text/javascript">
+ jQuery(document).ready(function() {
+  var dataTable = jQuery('#dataTable').dataTable({
+   "sDom": 'lprf<"clear">ti',
+   'aaData': [ ],
+   'aoColumns': [
+    #* 0 index - *# {"bVisible": false, "bSortable": false},
+    #* 1 enr.id - *# {"bVisible": false, "bSortable": false},
+    #* 2 group.id - *# {"bVisible": false, "bSortable": false},
+    #* 3 group.name 0*# {'sTitle': 'Group', "sWidth": "7em"},
+    #* 4 course.id - *# {"bVisible": false, "bSortable": false},
+    #* 5 course.name 1 *# {'sTitle': 'Course', "sWidth": "23em"},
+    #* 6 summary ref 2 *# {'sTitle': '<span title="Summary">S</span>', "bSortable": false, "sWidth": "2em", "fnRender": elw_dt_url(6, 'S')},
+    #* 7 assignments ref 3 *# {'sTitle': '<span title="Assignments">A</span>', "bSortable": false, "sWidth": "2em", "fnRender": elw_dt_url(7, 'A')},
+    #* 8 uploads ref 4 *# {'sTitle': '<span title="Uploads">U</span>', "bSortable": false, "sWidth": "2em", "fnRender": elw_dt_url(8, 'U')},
+    #* 9 classes ref 5 *# {'sTitle': '<span title="Classes">C</span>', "bSortable": false, "sWidth": "2em", "fnRender": elw_dt_url(9, 'C')},
+    #* 10 students ref 6 *# {'sTitle': '<span title="Students">St</span>', "bSortable": false, "sWidth": "2em", "fnRender": elw_dt_url(10, 'St')}
+   ],
+   "aaSorting": [ [5,'asc'], [3,'asc'] ],
+   "aaSortingFixed": [ ],
+   "fnRowCallback": function(node, data/*, dispIndex, dataIndex*/) {
+    jQuery("td:eq(0)", node).attr("title", data[2]);
+    jQuery("td:eq(1)", node).attr("title", data[4]);
+    return node;
+   }
+  });
+
+  function loadData() {
+   jQuery.ajax({
+    "type": "GET",
+    "url": "rest/index",
+    "data": {},
+    "success": function(resp) {
+     if (resp == null || !resp.success) {
+      jQuery.jGrowl("Response error", {"header":"AJAX error", "theme": "ui-state-error"});
+      return;
+     }
+
+     dataTable.fnClearTable(resp.data.length == 0);
+     dataTable.fnAddData(resp.data);
+    },
+    "error": function() {
+     jQuery.jGrowl("General error", {"header":"AJAX error", "theme": "ui-state-error"});
+    },
+    "dataType": 'json'
+   });
+
+   return false;
+  }
+
+  jQuery("#dataLoader").click(loadData);
+
+  loadData();
+ });
+</script>
  #parse("/__/ready.vm")
 </html>

@@ -351,7 +351,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 		final List<Object[]> logData = new ArrayList<Object[]>();
 
 		for (Student stud : ctx.getGroup().getStudents()) {
-			if (studId != null && studId.trim().length() > 0 && !studId.equals(stud.getId())) {
+			if (filtered(studId, stud.getId())) {
 				continue;
 			}
 
@@ -366,7 +366,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 					if (!noDues && (dueMap == null || dueMap.get(slot.getId()) == null)) {
 						continue;
 					}
-					if (slotId != null && slotId.trim().length() > 0 && !slotId.equals(aType.getId()+ "--" + slot.getId())) {
+					if (filtered(slotId, aType.getId()+ "--" + slot.getId())) {
 						continue;
 					}
 
@@ -378,7 +378,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 								continue;
 							}
 
-							logData.add(createLogRow(ctx, format, logData, index, ctxVer, slot, uploads[i]));
+							logData.add(createRowLog(ctx, format, logData, index, ctxVer, slot, uploads[i]));
 						}
 					}
 				}
@@ -388,7 +388,11 @@ public class AdminController extends MultiActionController implements WebSymbols
 		return logData;
 	}
 
-	protected Object[] createLogRow(
+	protected boolean filtered(String studId, String actualValue) {
+		return studId != null && studId.trim().length() > 0 && !studId.equals(actualValue);
+	}
+
+	protected Object[] createRowLog(
 			Ctx ctx, Format format, List<Object[]> data,
 			int index, Ctx ctxVer, FileSlot slot, Entry<FileMeta> e
 	) {
@@ -433,7 +437,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 
 	@RequestMapping(value = "rest/log", method = RequestMethod.GET)
 	public ModelAndView do_restLog(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		final HashMap<String, Object> model = auth(req, resp, "");
+		final HashMap<String, Object> model = auth(req, resp, null);
 		if (model == null) {
 			return null;
 		}
@@ -457,6 +461,43 @@ public class AdminController extends MultiActionController implements WebSymbols
 		);
 
 		return new ModelAndView(ViewJackson.success(logData));
+	}
+
+	@RequestMapping(value = "rest/index", method = RequestMethod.GET)
+	public ModelAndView do_restIndex(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+		final HashMap<String, Object> model = auth(req, resp, null);
+		if (model == null) {
+			return null;
+		}
+
+		final Enrollment[] enrolls = enrollDao.findAllEnrollments();
+
+		final List<Object[]> indexData = new ArrayList<Object[]>();
+		for (Enrollment enr : enrolls) {
+			indexData.add(createRowIndex(indexData, enr));
+		}
+
+		return new ModelAndView(ViewJackson.success(indexData));
+	}
+
+	protected Object[] createRowIndex(List<Object[]> indexData, Enrollment enr) {
+		final Group group = groupDao.findGroup(enr.getGroupId());
+		final Course course = courseDao.findCourse(enr.getCourseId());
+
+		final Object[] arr = {
+				/* 0 index - */ indexData.size(),
+				/* 1 enr.id - */ enr.getId(),
+				/* 2 group.id - */ group.getId(),
+				/* 3 group.name 0*/ group.getName(),
+				/* 4 course.id - */ course.getId(),
+				/* 5 course.name 1 */ course.getName(),
+				/* 6 summary ref 2 */ "enroll?elw_ctx=e--"+enr.getId(),
+				/* 7 assignments ref 3 */ "#",
+				/* 8 uploads ref 4 */ "log?elw_ctx=e--"+enr.getId(),
+				/* 9 classes ref 5 */ "#",
+				/* 10 students ref 6 */ "#"
+		};
+		return arr;
 	}
 
 	@RequestMapping(value = "approve", method = RequestMethod.GET)

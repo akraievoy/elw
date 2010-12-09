@@ -31,7 +31,7 @@
 }
 
 table.display thead th {
-	padding: 3px 0px 3px 10px;
+	padding: 3px 0 3px 10px;
 	cursor: pointer;
 	* cursor: hand;
 }
@@ -89,7 +89,6 @@ table.display thead th div.DataTables_sort_wrapper span {
 }
 
 .dataTables_filter {
-	width: 25%;
 	float: right;
 	text-align: right;
 }

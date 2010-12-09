@@ -1,5 +1,5 @@
 #* @vtlvariable name="__relPath" type="java.lang.String" *#
-#if(!$__relPath) #set($__relPath="..") #end
+#if(!$__relPath) #set($__relPath="../") #end
 
 <link type="text/css" rel="stylesheet" href="${__relPath}css/elw.css"/>
 <link type="text/css" rel="stylesheet" href="${__relPath}css/datatables_jui.css"/>

@@ -102,6 +102,9 @@ function elw_ajaxStart(myAjaxStamp) {
 	});
 }
 
+function elw_dt_url(idx, inner) {
+ return function(oObj) { return '<a href="'+oObj.aData[idx]+'">'+inner+'</a>'; };
+}
 
 jQuery(document).ready(function() {
 	jQuery(".elw_button").button();
