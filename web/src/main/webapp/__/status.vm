@@ -38,12 +38,17 @@
   #set($__statusClasses = "$__statusClasses elw_due_passed")
  #end
 #elseif($__mode == "d") ## due date
-  #if(
-   ($__file && $__classDue.computeDaysOverdue($__file.createStamp) > 0) || 
-   (!$__file && $__classDue.passed)
-  )
-   #set($__statusClasses = "$__statusClasses elw_overdue")
-  #end
+ #if(
+  ($__file && $__classDue.computeDaysOverdue($__file.createStamp) > 0) ||
+  (!$__file && $__classDue.passed)
+ )
+  #set($__statusClasses = "$__statusClasses elw_overdue")
+ #end
+ #if(!$__classDue)
+  #set($__statusText = "No Due Date")
+  #set($__statusClasses = "elw_nodue")
+ #else
+  #set($__statusText = "Due $f.format($__classDue.toDateTime.millis)")
  #end
 #elseif($__mode == "dd") ## due diff
  #if(!$__classDue)
@@ -54,19 +59,18 @@
    #set($__statusClasses = "elw_due_passed")
   #end
   #if($__file)
-    #set($__createStamp = $__file.createStamp)
-   #end
+   #set($__createStamp = $__file.createStamp)
   #end
-  #set($__dueDiff = $__classDue.computeToDiff($__createStamp))
-  #if($__dueDiff > 0)
-   #set($__statusClasses = "$__statusClasses elw_overdue")
-   #set($__statusText = "$__dueDiff days overdue")
-  #elseif($__dueDiff == 0)
-   #set($__statusText = "Same day")
-  #else
-   #set($__statusClasses = "")
-   #set($__statusText = "$__dueDiff days ahead")
-  #end
+ #end
+ #set($__dueDiff = $__classDue.computeToDiff($__createStamp))
+ #if($__dueDiff > 0)
+  #set($__statusClasses = "$__statusClasses elw_overdue")
+  #set($__statusText = "$__dueDiff days overdue")
+ #elseif($__dueDiff == 0)
+  #set($__statusText = "Same day")
+ #else
+  #set($__statusClasses = "")
+  #set($__statusText = "$__dueDiff days ahead")
  #end
 #end
 <div $__statusClasses.trim()>$__statusText</div>
