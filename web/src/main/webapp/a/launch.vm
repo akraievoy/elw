@@ -13,7 +13,7 @@
 		<a href="course?elw_ctx=c--${elw_ctx.course.id}">${elw_ctx.course.name}</a> &gt;
 		<span style="font-weight: bold;">$elw_ctx.ver.name - Code</span>
 	</div>
-	#elw_cred_adm($auth)
+ #parse("/__/credAdm.vm")
 	<div id="header_hr"> </div>
 </div>
  #parse("/__/messages.vm")

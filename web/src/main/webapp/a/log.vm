@@ -14,7 +14,7 @@
 <div class="ui-widget-header ui-corner-all" id="elw_header">
  <div id="nav"><a href="index">Index</a> &gt; <a href="enrolls">Enrollments</a> &gt; <span style="font-weight: bold">Group $elw_ctx.group.name
   Uploads</span></div>
- #elw_cred_adm($auth)
+ #parse("/__/credAdm.vm")
  <div id="header_hr"></div>
 </div>
  #parse("/__/messages.vm")

@@ -16,7 +16,7 @@
 		<a href="log?elw_ctx=e--$elw_ctx.enr.id">Group $elw_ctx.group.name Reports</a> &gt;
 		<span style="font-weight: bold">Approval</span>
 	</div>
-	#elw_cred_adm($auth)
+ #parse("/__/credAdm.vm")
 	<div id="header_hr"> </div>
 </div>
  #parse("/__/messages.vm")

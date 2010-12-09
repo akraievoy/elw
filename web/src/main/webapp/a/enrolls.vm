@@ -9,7 +9,7 @@
 <body style="text-align: left;">
 <div class="ui-widget-header ui-corner-all" id="elw_header">
 	<div id="nav"><a href="index">Index</a> &gt; <span style="font-weight: bold">Enrollments</span></div>
-	#elw_cred_adm($auth)
+ #parse("/__/credAdm.vm")
 	<div id="header_hr"> </div>
 </div>
  #parse("/__/messages.vm")
