@@ -1,0 +1,72 @@
+#* @vtlvariable name="f" type="elw.web.FormatTool" *#
+#* @vtlvariable name="__mode" type="java.lang.String" *#
+#* @vtlvariable name="__ctx" type="elw.dao.Ctx" *#
+#* @vtlvariable name="__slot" type="elw.vo.FileSlot" *#
+#* @vtlvariable name="__file" type="elw.vo.FileMeta" *#
+
+#* internally set*#
+#* @vtlvariable name="__classDue" type="elw.vo.Class" *#
+#* @vtlvariable name="__createStamp" type="elw.vo.Stamp" *#
+
+#if($__ctx.indexEntry.classDue)
+ #set($__classDueIdx = $__ctx.indexEntry.classDue.get($__slot.id))
+ #set($__classDue = $__ctx.enr.classes.get($__classDueIdx))
+#end
+#set($__classFrom = $__ctx.enr.classes.get($__ctx.indexEntry.classFrom))
+#set($__statusText = "")
+#set($__statusClasses = "")
+
+#if($__mode == "a") ## approval
+ #if(!$__classFrom.started)
+  #set($__statusText = "Closed; Opens $f.format($__classFrom.fromDateTime.millis)")
+  #set($__statusClasses = "elw_closed")
+ #elseif(!$__file)
+  #set($__statusText = "Open")
+  #set($__statusClasses = "elw_open")
+ #elseif(!$__file.score && !($__file.score == false))
+  #set($__statusText = "Pending")
+  #set($__statusClasses = "elw_pending")
+ #elseif($__file.score)
+  #set($__statusText = "Approved")
+  #set($__statusClasses = "elw_approved")
+ #else
+  #set($__statusText = "Declined")
+  #set($__statusClasses = "elw_declined")
+ #end
+
+ #if($__file && $__classDue.passed)
+  #set($__statusClasses = "$__statusClasses elw_due_passed")
+ #end
+#elseif($__mode == "d") ## due date
+  #if(
+   ($__file && $__classDue.computeDaysOverdue($__file.createStamp) > 0) || 
+   (!$__file && $__classDue.passed)
+  )
+   #set($__statusClasses = "$__statusClasses elw_overdue")
+  #end
+ #end
+#elseif($__mode == "dd") ## due diff
+ #if(!$__classDue)
+  #set($__statusText = "No Due Date")
+  #set($__statusClasses = "elw_nodue")
+ #else
+  #if($__classDue.passed)
+   #set($__statusClasses = "elw_due_passed")
+  #end
+  #if($__file)
+    #set($__createStamp = $__file.createStamp)
+   #end
+  #end
+  #set($__dueDiff = $__classDue.computeToDiff($__createStamp))
+  #if($__dueDiff > 0)
+   #set($__statusClasses = "$__statusClasses elw_overdue")
+   #set($__statusText = "$__dueDiff days overdue")
+  #elseif($__dueDiff == 0)
+   #set($__statusText = "Same day")
+  #else
+   #set($__statusClasses = "")
+   #set($__statusText = "$__dueDiff days ahead")
+  #end
+ #end
+#end
+<div $__statusClasses.trim()>$__statusText</div>

@@ -556,9 +556,9 @@ public class AdminController extends MultiActionController implements WebSymbols
 		final FileSlot slot = ctx.getAssType().findSlotById(slotId);
 
 		final Map<String, Double> vars = new TreeMap<String, Double>();
-		vars.put("$overdue", classDue.computeDaysOverdue(file.getMeta().getCreateStamp()));
+		vars.put("$overdue", (double) classDue.computeDaysOverdue(file.getMeta().getCreateStamp()));
 		if (slot.getValidator() != null && file.getMeta().isValidated()) {
-			vars.put("$passratio", classDue.computeDaysOverdue(file.getMeta().getCreateStamp()));
+			vars.put("$passratio", (double) classDue.computeDaysOverdue(file.getMeta().getCreateStamp()));
 		}
 
 		final Score res = score == null ? new Score() : score.copy();
@@ -698,9 +698,9 @@ public class AdminController extends MultiActionController implements WebSymbols
 		final Class classDue = ctx.getEnr().getClasses().get(ctx.getIndexEntry().getClassDue().get("report"));
 		final Criteria[] autos = ctx.getAssType().findSlotById("report").getCriterias();
 
-		final double overdue = classDue.computeDaysOverdue(meta.getCreateStamp());
+		final int overdue = classDue.computeDaysOverdue(meta.getCreateStamp());
 		final Map<String, Double> vars = new TreeMap<String, Double>();
-		vars.put("$overdue", overdue);
+		vars.put("$overdue", (double) overdue);
 
 		final Score score = baseScore == null ? new Score() : baseScore;
 		for (Criteria c : autos) {
@@ -719,10 +719,10 @@ public class AdminController extends MultiActionController implements WebSymbols
 			return null;
 		}
 
-		final double overdue = classCodeDue.computeDaysOverdue(meta.getCreateStamp());
+		final int overdue = classCodeDue.computeDaysOverdue(meta.getCreateStamp());
 		final Map<String, Double> vars = new TreeMap<String, Double>();
 		vars.put("$passratio", meta.getPassRatio());
-		vars.put("$overdue", overdue);
+		vars.put("$overdue", (double) overdue);
 
 		final Score score = new Score();
 		for (Criteria c : autos) {

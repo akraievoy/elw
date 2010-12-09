@@ -88,6 +88,22 @@ public class Class {
 		return getDayDiff(new DateTime());
 	}
 
+	public int computeToDiff(Stamp stamp) {
+		final DateTime time = stamp == null ? new DateTime() : new DateTime(stamp.getTime());
+		final DateTime toDateTime = getToDateTime();
+		final DateTime toMidnight = new DateTime(
+				toDateTime.getYear(), toDateTime.getMonthOfYear(), toDateTime.getDayOfMonth(),
+				0, 0, 0, 0
+		);
+		if (toMidnight.isAfter(time)) {
+			return -Days.daysBetween(time, toMidnight).getDays() - 1;
+		} else if (toMidnight.plusDays(1).isAfter(time)) {
+			return 0;
+		} else {
+			return Days.daysBetween(toMidnight, time).getDays();
+		}
+	}
+
 	public int getDayDiff(final DateTime toDate) {
 		final DateTime date = getFromDateTime();
 		final DateTime dateMidnight = new DateTime(
@@ -132,16 +148,17 @@ public class Class {
 		this.toTime = toTime;
 	}
 
-	public double computeDaysOverdue(final Stamp uploadStamp) {
-		return getDaysOverdue(new DateTime(uploadStamp.getTime()));
+	public int computeDaysOverdue(final Stamp uploadStamp) {
+		final DateTime stamp = uploadStamp == null ? new DateTime() : new DateTime(uploadStamp.getTime());
+		return getDaysOverdue(stamp);
 	}
 
-	public double getDaysOverdue(DateTime uploadStamp) {
-		final double overdue;
+	public int getDaysOverdue(DateTime uploadStamp) {
+		final int overdue;
 		if (isPassed(uploadStamp)) {
 			overdue = getDayDiff(uploadStamp);
 		} else {
-			overdue = 20;
+			overdue = 0;
 		}
 		return overdue;
 	}
