@@ -58,7 +58,7 @@
 #macro (elw_code_score $elw_ctx, $score)
 	#if($score)
 		<span style="#if($score.preliminary)font-style: italic;#end">
-			<span title="$score.niceStamp">$format.format2($elw_ctx.indexEntry.getPoints($score))</span>
+			<span title="$score.niceStamp">$f.format2($elw_ctx.indexEntry.getPoints($score))</span>
 			#set($terms = $score.getTerms($elw_ctx.bundle.scoring.breakdown.get("code")))
 			#if($terms.size() > 0):
 				#foreach($term in $terms)
@@ -100,7 +100,7 @@
 #macro (elw_score $elw_ctx, $score)
 	#if($score)
 		<span style="#if($score.preliminary)font-style: italic;#end">
-			<span title="$score.niceStamp">$format.format2($elw_ctx.indexEntry.getTotal($score))</stamp>
+			<span title="$score.niceStamp">$f.format2($elw_ctx.indexEntry.getTotal($score))</stamp>
 		</span>
 	#else
 		None

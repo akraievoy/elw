@@ -1,4 +1,4 @@
-#* @vtlvariable name="format" type="elw.web.FormatTool" *#
+#* @vtlvariable name="f" type="elw.web.FormatTool" *#
 #* @vtlvariable name="scores" type="elw.vo.Score[]" *#
 #* @vtlvariable name="score" type="elw.vo.Score" *#
 #* @vtlvariable name="slot" type="elw.vo.FileSlot" *#
@@ -43,20 +43,20 @@
 <script type="text/javascript">
  jQuery(document).ready(function() {
   jQuery("#title")
-    .append(jQuery("<span/>").text($format.json($elw_ctx.student.name)).attr("title", $format.json($elw_ctx.student.id)))
+    .append(jQuery("<span/>").text($f.json($elw_ctx.student.name)).attr("title", $f.json($elw_ctx.student.id)))
     .append(jQuery("<span/>").text(" "))
-    .append(jQuery("<span/>").text($format.json($elw_ctx.ass.name)).attr("title", $format.json($elw_ctx.ass.id)))
+    .append(jQuery("<span/>").text($f.json($elw_ctx.ass.name)).attr("title", $f.json($elw_ctx.ass.id)))
     .append(jQuery("<span/>").text(" "))
-    .append(jQuery("<span/>").text($format.json($elw_ctx.ver.name)).attr("title", $format.json($elw_ctx.ver.id)));
+    .append(jQuery("<span/>").text($f.json($elw_ctx.ver.name)).attr("title", $f.json($elw_ctx.ver.id)));
 
   var sliders = jQuery("#sliders");
   var sliders_auto = jQuery("#sliders_auto");
   #foreach($cri in $slot.criterias)
    (function() {
-    var criId = $format.json($slot.id) + "--" + $format.json($cri.id);
+    var criId = $f.json($slot.id) + "--" + $f.json($cri.id);
     sliders#if($cri.isAuto())_auto#{end}.append(
       jQuery("<div/>").toggleClass("formLabel").css({"width":"16em"}).append(
-        jQuery("<span/>").text($format.json($cri.name)).attr("title", $format.json($cri.ratio))
+        jQuery("<span/>").text($f.json($cri.name)).attr("title", $f.json($cri.ratio))
       )
     ).append(
       jQuery("<div/>").toggleClass("formField").css({"width":"12em"}).append(

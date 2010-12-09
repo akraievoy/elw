@@ -2,7 +2,7 @@
 #* @vtlvariable name="groupName" type="java.lang.String" *#
 #* @vtlvariable name="studentName" type="java.lang.String" *#
 #* @vtlvariable name="groups" type="elw.vo.Group[]" *#
-#* @vtlvariable name="format" type="elw.web.FormatTool" *#
+#* @vtlvariable name="f" type="elw.web.FormatTool" *#
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta content="text/html; charset=UTF-8">
@@ -32,7 +32,7 @@
 <script type="text/javascript">
  jQuery(document).ready(function() {
   var groupNames = [#foreach($g in $groups)
-   $format.json($g.name)#if($velocityHasNext),#end
+   $f.json($g.name)#if($velocityHasNext),#end
   #end];
   jQuery("form input[name=groupName]").autocomplete({"source": groupNames});
  });

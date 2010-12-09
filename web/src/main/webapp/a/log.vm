@@ -1,5 +1,5 @@
 #* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
-#* @vtlvariable name="format" type="elw.web.FormatTool" *#
+#* @vtlvariable name="f" type="elw.web.FormatTool" *#
 #* @vtlvariable name="f_noDues" type="java.lang.Boolean" *#
 #* @vtlvariable name="f_latest" type="java.lang.Boolean" *#
 #* @vtlvariable name="f_studId" type="java.lang.String" *#
@@ -35,7 +35,7 @@
   var f_studId = jQuery("select[name=f_studId]");
   #foreach($stud in $elw_ctx.group.students)
    f_studId.append(
-     jQuery("<option></option>").attr("value", $format.json($stud.id)).text($format.json($stud.getName()))
+     jQuery("<option></option>").attr("value", $f.json($stud.id)).text($f.json($stud.getName()))
    );
   #end
   var f_slotId = jQuery("select[name=f_slotId]");
@@ -43,8 +43,8 @@
    #foreach($slot in $aType.fileSlots)
    f_slotId.append(
      jQuery("<option></option>")
-       .attr("value", $format.json($aType.id) + "--" + $format.json($slot.id))
-       .text($format.json($aType.name) + " - " + $format.json($slot.name)
+       .attr("value", $f.json($aType.id) + "--" + $f.json($slot.id))
+       .text($f.json($aType.name) + " - " + $f.json($slot.name)
      )
    );
    #end
@@ -57,10 +57,10 @@
    jQuery("input[name=f_latest]").attr("checked", $f_latest);
   #end
   #if($f_slotId)
-   jQuery("select[name=f_slotId]").val($format.json($f_slotId));
+   jQuery("select[name=f_slotId]").val($f.json($f_slotId));
   #end
   #if($f_studId)
-   jQuery("select[name=f_studId]").val($format.json($f_studId));
+   jQuery("select[name=f_studId]").val($f.json($f_studId));
   #end
 
   var dataTable = jQuery('#dataTable').dataTable({

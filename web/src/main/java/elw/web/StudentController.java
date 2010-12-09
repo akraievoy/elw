@@ -132,7 +132,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 		final HashMap<String, Object> model = new HashMap<String, Object>();
 
 		model.put(S_MESSAGES, Message.drainMessages(req));
-		model.put("format", FormatTool.forLocale(RequestContextUtils.getLocale(req)));
+		model.put(FormatTool.MODEL_KEY, FormatTool.forLocale(RequestContextUtils.getLocale(req)));
 		model.put("expandTriggers", req.getSession().getAttribute("viewToExpandTriggers"));
 
 		return model;

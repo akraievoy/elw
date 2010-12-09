@@ -116,7 +116,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 		final HashMap<String, Object> model = new HashMap<String, Object>();
 
 		model.put(S_MESSAGES, Message.drainMessages(req));
-		model.put("format", FormatTool.forLocale(RequestContextUtils.getLocale(req)));
+		model.put(FormatTool.MODEL_KEY, FormatTool.forLocale(RequestContextUtils.getLocale(req)));
 		model.put("expandTriggers", req.getSession().getAttribute("viewToExpandTriggers"));
 
 		return model;
@@ -448,7 +448,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 			return null;
 		}
 
-		final Format format = (Format) model.get("format");
+		final Format format = (Format) model.get(FormatTool.MODEL_KEY);
 
 		final boolean noDues = "true".equals(req.getParameter("f_nodues"));
 		final boolean latest = "true".equals(req.getParameter("f_latest"));

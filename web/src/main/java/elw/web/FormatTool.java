@@ -55,6 +55,7 @@ public class FormatTool implements Format {
 	protected String pattern = "MMM d";
 	protected String patternWeek = "EEE d HH:mm";
 	protected String patternToday = "HH:mm";
+	public static final String MODEL_KEY = "f";
 
 	protected FormatTool(Locale locale) {
 		this.locale = locale;

@@ -1,4 +1,5 @@
 #* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
+#* @vtlvariable name="f" type="elw.web.FormatTool" *#
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta content="text/html; charset=UTF-8">
@@ -66,7 +67,7 @@
 							<a style="font-weight: bold;" title="${file.meta.id} @ t"
 								 href="../s/dl/${file.meta.name}?elw_ctx=$elw_ctx_type&s=t&sId=$slot.id&fId=$file.meta.id"
 											>${file.meta.name}</a>
-							$format.format($file.meta.createStamp.time) $file.meta.author $file.meta.sourceAddress
+							$f.format($file.meta.createStamp.time) $file.meta.author $file.meta.sourceAddress
 						</td>
 						<td class="elw_cell_trig">
 							#if(!$slot.binary)
@@ -136,7 +137,7 @@
 									<a style="font-weight: bold;" title="${file.meta.id} @ a"
 										 href="../s/dl/${file.meta.name}?elw_ctx=$elw_ctx_ass&s=a&sId=$slot.id&fId=$file.meta.id"
 													>${file.meta.name}</a>
-									$format.format($file.meta.createStamp.time) $file.meta.author $file.meta.sourceAddress
+									$f.format($file.meta.createStamp.time) $file.meta.author $file.meta.sourceAddress
 								</td>
 								<td class="elw_cell_trig">
 									#if(!$slot.binary)
@@ -214,7 +215,7 @@
 										<a style="font-weight: bold;" title="${file.meta.id} @ v"
 											 href="../s/dl/${file.meta.name}?elw_ctx=$elw_ctx_ass&s=v&sId=$slot.id&fId=$file.meta.id"
 														>${file.meta.name}</a>
-										$format.format($file.meta.createStamp.time) $file.meta.author $file.meta.sourceAddress
+										$f.format($file.meta.createStamp.time) $file.meta.author $file.meta.sourceAddress
 									</td>
 									<td class="elw_cell_trig">
 										#if(!$slot.binary)
