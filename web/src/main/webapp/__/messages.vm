@@ -1,0 +1,18 @@
+#* @vtlvariable name="elw_messages" type="elw.miniweb.Message[]" *#
+
+<script type="text/javascript">
+ jQuery(document).ready(function() {
+  jQuery.jGrowl.defaults.position = "center";
+  #foreach($m in $elw_messages)
+   #if($m.type == "err")
+    jQuery.jGrowl("$m.message", {"header":"Error", "theme": "ui-state-error", "sticky": true});
+   #end
+   #if($m.type == "warn")
+    jQuery.jGrowl("$m.message", {"header":"Warning", "theme": "ui-state-error", "sticky": true});
+   #end
+   #if($m.type == "info")
+    jQuery.jGrowl("$m.message", {"header":"Info", "life": 7000,  "theme": "ui-state-highlight"});
+   #end
+  #end
+ });
+</script>

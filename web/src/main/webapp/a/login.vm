@@ -1,4 +1,3 @@
-#* @vtlvariable name="elw_messages" type="elw.miniweb.Message[]" *#
 #* @vtlvariable name="elw_student" type="elw.vo.Student" *#
 #* @vtlvariable name="elw_group" type="elw.vo.Group" *#
 #* @vtlvariable name="groupName" type="java.lang.String" *#
@@ -7,7 +6,7 @@
 <head>
 	<meta content="text/html; charset=UTF-8">
 	<title>Login : ELW Admin</title>
-	#elw_imports("../")
+ #parse("/__/imports.vm")
 	<script type="text/javascript" src="../js/jquery.sha1.js"></script>
 </head>
 <body>
@@ -16,7 +15,7 @@
 	#elw_cred_adm($auth)
 	<div id="header_hr"> </div>
 </div>
-#elw_messages($elw_messages)
+ #parse("/__/messages.vm")
 <div id=main>
 <div class="formArea ui-widget-header ui-corner-all" style="height: 5em;">
 	<form method="POST" action="loginPost" id="elw_formLoginPost">
@@ -42,5 +41,5 @@
 		jQuery("#elw_inputPassword").focus();
 	});
 </script>
-	#elw_ready("../")
+ #parse("/__/ready.vm")
 </html>

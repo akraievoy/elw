@@ -1,4 +1,3 @@
-#* @vtlvariable name="elw_messages" type="elw.miniweb.Message[]" *#
 #* @vtlvariable name="format" type="elw.web.FormatTool" *#
 #* @vtlvariable name="scores" type="elw.vo.Score[]" *#
 #* @vtlvariable name="score" type="elw.vo.Score" *#
@@ -8,7 +7,7 @@
 <head>
 	<meta content="text/html; charset=UTF-8">
 	<title>Approval</title>
- #set($__relPath = "../") #parse("/__/imports.vm")
+ #parse("/__/imports.vm")
 </head>
 <body>
 <div class="ui-widget-header ui-corner-all" id="elw_header">
@@ -20,17 +19,17 @@
 	#elw_cred_adm($auth)
 	<div id="header_hr"> </div>
 </div>
-#elw_messages($elw_messages)
+ #parse("/__/messages.vm")
 <div id=main>
-	<h3 id="title"/>
- <div class="formArea ui-widget-header ui-corner-all" style="height: 22em; width: 32em; float: left; margin: 0 2em;">
+	<h3 id="title"></h3>
+ <div class="formArea ui-widget-header ui-corner-all">
   <form method="POST" action="approve">
    <input type="hidden" name="elw_ctx" value=""/>
    <input type="hidden" name="stamp" value=""/>
    <div id="sliders"></div>
    <div id="sliders_auto"></div>
-   <div class="formLabel" style="width:12em;">Comment:</div>
-   <div class="formField" style="width:16em;"><input type="text" value=""/></div>
+   <div class="formLabel" style="width:12em;">Comment</div>
+   <div class="formField" style="width:16em; height: 7em;"><textarea name="comment" cols="25" rows="5"></textarea></div>
    <div class="formButtons">
     <input type="submit" name="action" value="Decline"/>
     &nbsp;&nbsp;&nbsp;
@@ -150,6 +149,5 @@
 //  loadData();
  });
 </script>
-
- #elw_ready("../")
+ #parse("/__/ready.vm")
 </html>

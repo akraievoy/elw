@@ -1,11 +1,10 @@
-#* @vtlvariable name="elw_messages" type="elw.miniweb.Message[]" *#
 #* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
 #* @vtlvariable name="format" type="elw.web.FormatTool" *#
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta content="text/html; charset=UTF-8">
 	<title>Course ${elw_ctx.course.name} Structure</title>
-	#elw_imports("../")
+ #parse("/__/imports.vm")
 </head>
 <body>
 <div class="ui-widget-header ui-corner-all" id="elw_header">
@@ -14,7 +13,7 @@
 	#elw_cred_stud($elw_ctx)
 	<div id="header_hr"></div>
 </div>
-	#elw_messages($elw_messages)
+ #parse("/__/messages.vm")
 <div id=main>
 	<table cellspacing="0" style="float: left; width: 45%; font-size: 1em;">
 		<thead>
@@ -301,5 +300,6 @@
   #end
  });
 </script>
- #elw_ready("../", "s/course")
+ #set($__page="s/course")
+ #parse("/__/ready.vm")
 </html>

@@ -3,7 +3,7 @@
 <head>
 	<meta content="text/html; charset=UTF-8">
 	<title>Groups List : ELW Admin</title>
-	#elw_imports("../")
+ #parse("/__/imports.vm")
 </head>
 <body style="text-align: left;">
 <div class="ui-widget-header ui-corner-all" id="elw_header">
@@ -11,7 +11,7 @@
 	#elw_cred_adm($auth)
 	<div id="header_hr"> </div>
 </div>
-#elw_messages($elw_messages)
+ #parse("/__/messages.vm")
 <table cellspacing="0"><tbody>
 #foreach($group in $groups)
 <tr class="elw_header_row">
@@ -29,5 +29,5 @@
 #end
 </tbody></table>
 </body>
-	#elw_ready("../")
+ #parse("/__/ready.vm")
 </html>

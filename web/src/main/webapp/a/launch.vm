@@ -1,10 +1,9 @@
-#* @vtlvariable name="elw_messages" type="elw.miniweb.Message[]" *#
 #* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta content="text/html; charset=UTF-8">
 	<title>$elw_ctx.ver.name - Code : ELW Admin</title>
-	#elw_imports("../")
+ #parse("/__/imports.vm")
 </head>
 <body>
 <div class="ui-widget-header ui-corner-all" id="elw_header">
@@ -17,7 +16,7 @@
 	#elw_cred_adm($auth)
 	<div id="header_hr"> </div>
 </div>
-#elw_messages($elw_messages)
+ #parse("/__/messages.vm")
 <div id=main>
 <div style="text-align:center;">	<object classid="clsid:8AD9C840-044E-11D1-B3E9-00805F499D93" width="800" height="600">
 		<param name="type" value="application/x-java-applet;version=1.5"/>
@@ -44,6 +43,6 @@
 	</object>
 </div></div>
 </body>
-	#elw_ready("../")
+ #parse("/__/ready.vm")
 </html>
 

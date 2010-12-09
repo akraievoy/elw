@@ -8,7 +8,7 @@
 <head>
  <meta content="text/html; charset=UTF-8">
  <title>Group $elw_ctx.group.name Report Uploads : ELW Admin</title>
- #set($__relPath = "../") #parse("/__/imports.vm")
+ #parse("/__/imports.vm")
 </head>
 <body style="text-align: left;">
 <div class="ui-widget-header ui-corner-all" id="elw_header">
@@ -17,7 +17,7 @@
  #elw_cred_adm($auth)
  <div id="header_hr"></div>
 </div>
- #elw_messages($elw_messages)
+ #parse("/__/messages.vm")
  <div style="float: left;">
   <form style="text-align: center;">
    <input type="hidden" name="elw_ctx" value="$elw_ctx.toString()"/>
@@ -128,5 +128,5 @@
   loadData();
  });
 </script>
- #elw_ready("../")
+ #parse("/__/ready.vm")
 </html>
