@@ -298,23 +298,22 @@ public class AdminController extends MultiActionController implements WebSymbols
 		}
 
 		W.storeFilter(req, model);
-
-		if (model.get("f_mode") == null || model.get("f_mode").toString().trim().length() == 0) {
-			model.put("f_mode", "a");
-		}
+		W.filterDefault(model, "f_mode", "a");
 
 		final TreeMap<String, Map<String, List<Entry<FileMeta>>>> fileMetas = new TreeMap<String, Map<String, List<Entry<FileMeta>>>>();
 		final HashMap<String, Integer> grossScores = new HashMap<String, Integer>();
 
 		final int[] grossScore = new int[1];
 		for (Student stud : ctx.getGroup().getStudents()) {
+			if (W.excluded(model.get("f_studId"), stud.getId())) {
+				continue;
+			}
 			final Ctx studCtx = ctx.extendStudent(stud);
 
 			StudentController.storeMetas(
-					studCtx,
+					studCtx, (String) model.get("f_slotId"),
 					scoreDao, fileDao,
-					fileMetas, null, null, null,
-					grossScore
+					fileMetas, grossScore
 			);
 
 			grossScores.put(studCtx.toString(), grossScore[0]);
@@ -351,7 +350,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 		final List<Object[]> logData = new ArrayList<Object[]>();
 
 		for (Student stud : ctx.getGroup().getStudents()) {
-			if (filtered(studId, stud.getId())) {
+			if (W.excluded(studId, stud.getId())) {
 				continue;
 			}
 
@@ -366,7 +365,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 					if (!noDues && (dueMap == null || dueMap.get(slot.getId()) == null)) {
 						continue;
 					}
-					if (filtered(slotId, aType.getId()+ "--" + slot.getId())) {
+					if (W.excluded(slotId, aType, slot)) {
 						continue;
 					}
 
@@ -386,10 +385,6 @@ public class AdminController extends MultiActionController implements WebSymbols
 		}
 
 		return logData;
-	}
-
-	protected boolean filtered(String studId, String actualValue) {
-		return studId != null && studId.trim().length() > 0 && !studId.equals(actualValue);
 	}
 
 	protected Object[] createRowLog(
@@ -422,17 +417,6 @@ public class AdminController extends MultiActionController implements WebSymbols
 				/* 14 download */ "<a href=\"../s/dl/" + nameNorm + q + "\">D</a>"
 		};
 		return dataRow;
-	}
-
-	protected static String resolveRemoteAddress(HttpServletRequest req) {
-		final String remoteAddr = req.getRemoteAddr();
-
-		final String xff = req.getHeader("X-Forwarded-For");
-		if (xff != null && xff.trim().length() > 0) {
-			return xff.replaceAll("\\s+", "").split(",")[0];
-		}
-
-		return remoteAddr;
 	}
 
 	@RequestMapping(value = "rest/log", method = RequestMethod.GET)
@@ -684,33 +668,6 @@ public class AdminController extends MultiActionController implements WebSymbols
 		return null;
 	}
 
-	protected static void computeReportDefault(Ctx ctx, Score reportScore) {
-		final Criteria[] criterias = ctx.getAssType().findSlotById("report").getCriterias();
-		for (Criteria c : criterias) {
-			if (!reportScore.contains(c.getId())) {
-				reportScore.getPows().put(c.getId(), c.resolvePowDef(null));
-				reportScore.getRatios().put(c.getId(), c.resolveRatio(null));
-			}
-		}
-	}
-
-	protected static Score computeReportAuto(Ctx ctx, ReportMeta meta, final Score baseScore) {
-		final Class classDue = ctx.getEnr().getClasses().get(ctx.getIndexEntry().getClassDue().get("report"));
-		final Criteria[] autos = ctx.getAssType().findSlotById("report").getCriterias();
-
-		final int overdue = classDue.computeDaysOverdue(meta.getCreateStamp());
-		final Map<String, Double> vars = new TreeMap<String, Double>();
-		vars.put("$overdue", (double) overdue);
-
-		final Score score = baseScore == null ? new Score() : baseScore;
-		for (Criteria c : autos) {
-			score.getPows().put(c.getId(), c.resolvePowDef(vars));
-			score.getRatios().put(c.getId(), c.resolveRatio(vars));
-		}
-
-		return score;
-	}
-
 	protected static Score computeCodeAuto(CodeMeta meta, Ctx ctx) {
 		final Class classCodeDue = ctx.getEnr().getClasses().get(ctx.getIndexEntry().getClassDue().get("code"));
 		final Criteria[] autos = ctx.getAssType().findSlotById("code").getCriterias();
@@ -824,7 +781,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 					name,
 					binary ? "application/octet-stream" : "text/plain",
 					authorName,
-					resolveRemoteAddress(req)
+					W.resolveRemoteAddress(req)
 			);
 
 			fileDao.createFileFor(
@@ -878,7 +835,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 					fName,
 					contentType,
 					authorName,
-					resolveRemoteAddress(req)
+					W.resolveRemoteAddress(req)
 			);
 			if (comment != null) {
 				fileMeta.setComment(comment);
@@ -912,9 +869,43 @@ public class AdminController extends MultiActionController implements WebSymbols
 			for (Object o : params.keySet()) {
 				String paramName = (String) o;
 				if (paramName.startsWith("f_")) {
-					model.put(paramName, req.getParameter(paramName));
+					final String value = req.getParameter(paramName);
+					if (value != null && value.length() > 0) {
+						model.put(paramName, value);
+					}
 				}
 			}
+		}
+
+		protected static String resolveRemoteAddress(HttpServletRequest req) {
+			final String remoteAddr = req.getRemoteAddr();
+
+			final String xff = req.getHeader("X-Forwarded-For");
+			if (xff != null && xff.trim().length() > 0) {
+				return xff.replaceAll("\\s+", "").split(",")[0];
+			}
+
+			return remoteAddr;
+		}
+
+		protected static boolean excluded(Object filterValue, String actualValue) {
+			if (!(filterValue instanceof String)) {
+				return false;
+			}
+			return ((String) filterValue).trim().length() > 0 && !filterValue.equals(actualValue);
+		}
+
+		protected static void filterDefault(HashMap<String, Object> model, String fKey, String fDefault) {
+			if (model.get(fKey) == null || model.get(fKey).toString().trim().length() == 0) {
+				model.put(fKey, fDefault);
+			}
+		}
+
+		public static boolean excluded(String aTypeSlotFilter, AssignmentType aType, FileSlot slot) {
+			if (aType == null || slot == null) {
+				return true;
+			}
+			return excluded(aTypeSlotFilter, aType.getId()+ "--" + slot.getId());
 		}
 	}
 }

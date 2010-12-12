@@ -8,6 +8,10 @@ import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 public class FileDao extends Dao<FileMeta> {
 	public static final String SCOPE_ASS_TYPE = "t";
@@ -153,5 +157,16 @@ public class FileDao extends Dao<FileMeta> {
 		sortByCreateStamp(files);
 
 		return files;
+	}
+
+	public SortedMap<String, List<Entry<FileMeta>>> loadFilesStud(Ctx ctxAss) {
+		final TreeMap<String, List<Entry<FileMeta>>> slotIdToFiles = new TreeMap<String, List<Entry<FileMeta>>>();
+
+		for (FileSlot slot : ctxAss.getAssType().getFileSlots()) {
+			final Entry<FileMeta>[] filesStud = findFilesFor(SCOPE_STUD, ctxAss, slot.getId());
+			slotIdToFiles.put(slot.getId(), Arrays.asList(filesStud));
+		}
+
+		return slotIdToFiles;
 	}
 }

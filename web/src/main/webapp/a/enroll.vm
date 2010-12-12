@@ -4,7 +4,10 @@
 #* @vtlvariable name="f" type="elw.web.FormatTool" *#
 #* @vtlvariable name="u" type="elw.web.VelocityUtils" *#
 #* @vtlvariable name="studRowsCreated" type="java.lang.Boolean" *#
+
 #* @vtlvariable name="f_mode" type="java.lang.String" *#
+#* @vtlvariable name="f_studId" type="java.lang.String" *#
+#* @vtlvariable name="f_slotId" type="java.lang.String" *#
 <html>
 <head>
  <meta content="text/html; charset=UTF-8">
@@ -21,6 +24,8 @@
  #parse("/__/messages.vm")
 <form style="text-align: center;" action="enroll">
  <input type="hidden" name="elw_ctx" value="$elw_ctx.toString()"/>
+ <select name="f_studId"><option value="">Choose...</option></select>
+ <select name="f_slotId"><option value="">Choose...</option></select>
  <select name="f_mode">
   <option value="a">Approval</option>
   <option value="d">Due</option>
@@ -58,6 +63,8 @@
 <script type="text/javascript">
  jQuery(document).ready(function() {
   jQuery("select[name=f_mode]").val($f.json($f_mode));
+  #parse("/__/studCombo.vm")
+  #parse("/__/slotCombo.vm")
 
   var te_taskHeader = jQuery(".te.te_taskHeader:first");
   var tp_taskHeader;
@@ -75,36 +82,42 @@
    #set($tp_taskHeader_colspan = 0)
    #foreach($slot in $elw_ctx_ass.assType.fileSlots)
     #if($elw_ctx_ass.indexEntry.classDue.get($slot.id))
-     tp_slotHeader = te_slotHeader.clone().toggleClass("te").html($f.json($slot.name));
-     te_slotHeader.parent().append(tp_slotHeader);
-     #set($tp_taskHeader_colspan = $tp_taskHeader_colspan + 1)
+     #set($z = "--") #* idea yells at me if I do this directly*#
+     #set($z = "${elw_ctx_ass.assType.id}${z}${slot.id}")
+     #if(!$f_slotId || $f_slotId == $z)
+      tp_slotHeader = te_slotHeader.clone().toggleClass("te").html($f.json($slot.name));
+      te_slotHeader.parent().append(tp_slotHeader);
+      #set($tp_taskHeader_colspan = $tp_taskHeader_colspan + 1)
 
-     #foreach($stud in $elw_ctx.group.students)
-      #set($elw_ctx_stud = $elw_ctx.extendStudent($stud))
-      #if($studRowsCreated)
-       tp_studRow = tp_studRows[$f.json($stud.id)];
-      #else
-       tp_studRow = tp_studRows[$f.json($stud.id)] = te_studRow.clone().toggleClass("te");
-       tp_studRow.find(".tp_name").html($f.json($stud.name));
-       tp_studRow.find(".tp_score").html($f.json($grossScores.get($elw_ctx_stud.toString())));
-       tp_studRow.attr("id", "#studRow--$stud.id");
+      #foreach($stud in $elw_ctx.group.students)
+       #if(!$f_studId || $f_studId == $stud.id)
+        #set($elw_ctx_stud = $elw_ctx.extendStudent($stud))
+        #if($studRowsCreated)
+         tp_studRow = tp_studRows[$f.json($stud.id)];
+        #else
+         tp_studRow = tp_studRows[$f.json($stud.id)] = te_studRow.clone().toggleClass("te");
+         tp_studRow.find(".tp_name").html($f.json($stud.name));
+         tp_studRow.find(".tp_score").html($f.json($grossScores.get($elw_ctx_stud.toString())));
+         tp_studRow.attr("id", "#studRow--$stud.id");
 
-       te_studRow.parent().append(tp_studRow);
+         te_studRow.parent().append(tp_studRow);
+        #end
+        #set($elw_ctx_ver = $elw_ctx_stud.extendIndex($idx))
+        #set($filesStud = $fileMetas.get("$elw_ctx_ver.toString()").get($slot.id))
+
+        #set($__mode = $f_mode)
+        #set($__ctx = $elw_ctx_ver)
+        #set($__slot = $slot)
+        #set($__file = $u.ref($u.lastOrNull($filesStud)))
+        #parse("/__/status.vm")
+        tp_status = tp_studRow.find(".te.te_status:first").clone().toggleClass("te")
+         .html($f.json($__statusText))
+         .toggleClass($f.json($__statusClasses.trim()));
+        tp_studRow.append(tp_status);
+        #end
       #end
-      #set($elw_ctx_ver = $elw_ctx_stud.extendIndex($idx))
-      #set($filesStud = $fileMetas.get("$elw_ctx_ver.toString()").get($slot.id))
-
-      #set($__mode = $f_mode)
-      #set($__ctx = $elw_ctx_ver)
-      #set($__slot = $slot)
-      #set($__file = $u.ref($u.lastOrNull($filesStud)))
-      #parse("/__/status.vm")
-      tp_status = tp_studRow.find(".te.te_status:first").clone().toggleClass("te")
-       .html($f.json($__statusText))
-       .toggleClass($f.json($__statusClasses.trim()));
-      tp_studRow.append(tp_status);
+      #set($studRowsCreated = true)
      #end
-     #set($studRowsCreated = true)
     #end
    #end
    #if($tp_taskHeader_colspan > 0)

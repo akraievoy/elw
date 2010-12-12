@@ -248,7 +248,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 		final TreeMap<String, Map<String, List<Entry<FileMeta>>>> fileMetas =
 				new TreeMap<String, Map<String, List<Entry<FileMeta>>>>();
 		final int[] grossScore = new int[1];
-		storeMetas(ctx, scoreDao, fileDao, fileMetas, codeMetas, reportMetas, scores, grossScore);
+		storeMetas(ctx, null, scoreDao, fileDao, fileMetas, grossScore);
 		model.put("fileMetas", fileMetas);
 		model.put("codeMetas", codeMetas);
 		model.put("reportMetas", reportMetas);
@@ -259,74 +259,42 @@ public class StudentController extends MultiActionController implements WebSymbo
 	}
 
 	public static void storeMetas(
-			Ctx ctx, ScoreDao scoreDao, FileDao fileDao,
+			Ctx ctx, String aTypeSlotId,
+			ScoreDao scoreDao, FileDao fileDao,
 			Map<String, Map<String, List<Entry<FileMeta>>>> fileMetas,
-			Map<String, CodeMeta> codeMetas,
-			Map<String, ReportMeta> reportMetas,
-			Map<String, Score> scores,
 			int[] grossScore
 	) {
-		double grossScoreFuzzy = 0;
+		double gsFuzzy = 0;
 
 		for (int index = 0; index < ctx.getEnr().getIndex().size(); index++) {
 			final Ctx ctxVer = ctx.extendIndex(index);
 			final AssignmentType assType = ctxVer.getAssType();
 			final String assPath = ctxVer.toString();
 
+			final SortedMap<String, List<Entry<FileMeta>>> slotIdToFiles = fileDao.loadFilesStud(ctxVer);
+
 			if (fileMetas != null) {
-				final TreeMap<String, List<Entry<FileMeta>>> slotIdToFiles = loadFilesStud(fileDao, ctxVer);
 				fileMetas.put(assPath, slotIdToFiles);
 			}
 
-			if (codeMetas != null) {
-				final Entry<CodeMeta> last = /*codeDao.findLast(ctxVer)*/ null;
-				if (last != null) {
-					codeMetas.put(assPath, last.getMeta());
+			for (String slotId : slotIdToFiles.keySet()) {
+				if (AdminController.W.excluded(aTypeSlotId, assType, assType.findSlotById(slotId))) {
+					continue;
 				}
-			}
-			if (reportMetas != null) {
-				final Entry<ReportMeta> lastReport = /*reportDao.findLast(ctxVer)*/ null;
-				if (lastReport != null) {
-					reportMetas.put(assPath, lastReport.getMeta());
-				}
-			}
-			if (scores != null) {
-				final Entry<Score> lastScore = scoreDao.findLastScore(ctxVer, "FIXME:slotId", "FIXME:fileId");
-				Score effectiveScore = null;
-				if (lastScore == null) {
-						final Entry<ReportMeta> lastReport = /*reportDao.findLast(ctxVer)*/ null;
-						final HashMap<Stamp, Score> allCodeScores = new HashMap<Stamp, Score>();
-						//	FIXME this should be abstracted-away
-						final Stamp bestCodeStamp = AdminController.computeCodeScores(
-								ctxVer,
-								Collections.<Stamp, Entry<CodeMeta>>emptyMap(),
-								allCodeScores,
-								lastReport != null ? lastReport.getMeta().getCreateStamp() : null,
-								ctxVer.getAssType().getFileSlots()[0] // FIXME pass correct param
-						);
-						effectiveScore = allCodeScores.get(bestCodeStamp);
-				} else {
-					effectiveScore = lastScore.getMeta();
-				}
-				if (effectiveScore != null) {
-					scores.put(assPath, effectiveScore);
-					grossScoreFuzzy += ctxVer.getIndexEntry().getTotal(ctx.getAssType(), effectiveScore);
+
+				final List<Entry<FileMeta>> filesForSlot = slotIdToFiles.get(slotId);
+				if (filesForSlot != null && !filesForSlot.isEmpty()) {
+					//	TODO: use last vs use best file (now only last is used)
+					final Entry<FileMeta> usedFile = filesForSlot.get(filesForSlot.size()  - 1);
+					final FileMeta usedMeta = usedFile.getMeta();
+					if (usedMeta.getScore() != null && usedMeta.getScore().isApproved()) {
+						gsFuzzy += ctxVer.getIndexEntry().getTotal(ctx.getAssType(), usedMeta.getScore());
+					}
 				}
 			}
 		}
 
-		grossScore[0] = (int) Math.floor(grossScoreFuzzy + 0.1);
-	}
-
-	private static TreeMap<String, List<Entry<FileMeta>>> loadFilesStud(FileDao fileDao, Ctx ctxAss) {
-		final TreeMap<String, List<Entry<FileMeta>>> slotIdToFiles =
-				new TreeMap<String, List<Entry<FileMeta>>>();
-		for (FileSlot slot : ctxAss.getAssType().getFileSlots()) {
-			final Entry<FileMeta>[] filesStud =
-					fileDao.findFilesFor(FileDao.SCOPE_STUD, ctxAss, slot.getId());
-			slotIdToFiles.put(slot.getId(), Arrays.asList(filesStud));
-		}
-		return slotIdToFiles;
+		grossScore[0] = (int) Math.floor(gsFuzzy + 0.1);
 	}
 
 	@RequestMapping(value = "ul", method = {RequestMethod.POST, RequestMethod.PUT})
@@ -404,7 +372,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 			return null;
 		}
 
-		final TreeMap<String, List<Entry<FileMeta>>> filesStud = loadFilesStud(fileDao, ctx);
+		final SortedMap<String, List<Entry<FileMeta>>> filesStud = fileDao.loadFilesStud(ctx);
 		if (slotId != null && !ctx.getVer().checkRead(ctx.getAssType(), ctx.getAss(), slotId, filesStud)) {
 			resp.sendError(HttpServletResponse.SC_FORBIDDEN, "not readable yet");
 			return null;
@@ -475,7 +443,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 
 		final FileSlot slot = ctx.getAssType().findSlotById(slotId);
 
-		final TreeMap<String, List<Entry<FileMeta>>> filesStud = loadFilesStud(fileDao, ctx);
+		final SortedMap<String, List<Entry<FileMeta>>> filesStud = fileDao.loadFilesStud(ctx);
 		if (!ctx.getVer().checkRead(ctx.getAssType(), ctx.getAss(), slotId, filesStud)) {
 			resp.sendError(HttpServletResponse.SC_FORBIDDEN, "not readable yet");
 			return null;

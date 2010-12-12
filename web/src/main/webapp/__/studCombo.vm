@@ -1,0 +1,12 @@
+#* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
+#* @vtlvariable name="f" type="elw.web.FormatTool" *#
+#* @vtlvariable name="f_studId" type="java.lang.String" *#
+var f_studId = jQuery("select[name=f_studId]");
+#foreach($stud in $elw_ctx.group.students)
+ f_studId.append(
+   jQuery("<option></option>").attr("value", $f.json($stud.id)).text($f.json($stud.getName()))
+ );
+#end
+#if($f_studId)
+  jQuery("select[name=f_studId]").val($f.json($f_studId));
+#end

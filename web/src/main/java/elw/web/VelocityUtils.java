@@ -30,6 +30,6 @@ public class VelocityUtils {
 	}
 
 	public <E> E lastOrNull(List<E> es) {
-		return es.isEmpty() ? null : es.get(es.size() - 1);
+		return es==null || es.isEmpty() ? null : es.get(es.size() - 1);
 	}
 }

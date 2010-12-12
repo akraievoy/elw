@@ -32,35 +32,14 @@
 </body>
 <script type="text/javascript">
  jQuery(document).ready(function() {
-  var f_studId = jQuery("select[name=f_studId]");
-  #foreach($stud in $elw_ctx.group.students)
-   f_studId.append(
-     jQuery("<option></option>").attr("value", $f.json($stud.id)).text($f.json($stud.getName()))
-   );
-  #end
-  var f_slotId = jQuery("select[name=f_slotId]");
-  #foreach($aType in $elw_ctx.course.assTypes)
-   #foreach($slot in $aType.fileSlots)
-   f_slotId.append(
-     jQuery("<option></option>")
-       .attr("value", $f.json($aType.id) + "--" + $f.json($slot.id))
-       .text($f.json($aType.name) + " - " + $f.json($slot.name)
-     )
-   );
-   #end
-  #end
+  #parse("/__/studCombo.vm")
+  #parse("/__/slotCombo.vm")
 
   #if($f_noDues)
    jQuery("input[name=f_nodues]").attr("checked", $f_noDues);
   #end
   #if($f_latest)
    jQuery("input[name=f_latest]").attr("checked", $f_latest);
-  #end
-  #if($f_slotId)
-   jQuery("select[name=f_slotId]").val($f.json($f_slotId));
-  #end
-  #if($f_studId)
-   jQuery("select[name=f_studId]").val($f.json($f_studId));
   #end
 
   var dataTable = jQuery('#dataTable').dataTable({
@@ -99,7 +78,6 @@
    f_data["f_slotId"] = jQuery("select[name=f_slotId]").val();
    f_data["f_nodues"] = jQuery("input[name=f_nodues]").attr("checked");
    f_data["f_latest"] = jQuery("input[name=f_latest]").attr("checked");
-
 
    jQuery.ajax({
     "type": "GET",
