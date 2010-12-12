@@ -283,10 +283,20 @@ a.popupTrigger:hover {
 .elw_pending {
  color: #333333;
 }
+
+.elw_negTerm {
+ color: #66FF66;
+}
+.elw_posTerm {
+ color: #FF6666;
+}
+
 .elw_approved {
+ font-weight: bold;
  color: #00FF00;
 }
 .elw_declined {
+ font-weight: bold;
  color: #FF0000;
 }
 .elw_due_passed {

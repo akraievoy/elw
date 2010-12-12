@@ -133,6 +133,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 
 		model.put(S_MESSAGES, Message.drainMessages(req));
 		model.put(FormatTool.MODEL_KEY, FormatTool.forLocale(RequestContextUtils.getLocale(req)));
+		model.put(VelocityUtils.MODEL_KEY, VelocityUtils.INSTANCE);
 		model.put("expandTriggers", req.getSession().getAttribute("viewToExpandTriggers"));
 
 		return model;

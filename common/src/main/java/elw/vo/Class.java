@@ -88,8 +88,12 @@ public class Class {
 		return getDayDiff(new DateTime());
 	}
 
-	public int computeToDiff(Stamp stamp) {
-		final DateTime time = stamp == null ? new DateTime() : new DateTime(stamp.getTime());
+	public int computeToDiffStamp(Stamped stamped) {
+		final DateTime time = stamped == null ? new DateTime() : new DateTime(stamped.getCreateStamp().getTime());
+		return computeToDiff(time);
+	}
+
+	public int computeToDiff(DateTime time) {
 		final DateTime toDateTime = getToDateTime();
 		final DateTime toMidnight = new DateTime(
 				toDateTime.getYear(), toDateTime.getMonthOfYear(), toDateTime.getDayOfMonth(),

@@ -2,7 +2,9 @@
 #* @vtlvariable name="fileMetas" type="java.util.Map<java.lang.String,java.util.Map<java.lang.String,java.util.List<elw.vo.Entry<elw.vo.FileMeta>>>>" *#
 #* @vtlvariable name="grossScores" type="java.util.Map<java.lang.String,java.lang.Integer>" *#
 #* @vtlvariable name="f" type="elw.web.FormatTool" *#
+#* @vtlvariable name="u" type="elw.web.VelocityUtils" *#
 #* @vtlvariable name="studRowsCreated" type="java.lang.Boolean" *#
+#* @vtlvariable name="f_mode" type="java.lang.String" *#
 <html>
 <head>
  <meta content="text/html; charset=UTF-8">
@@ -17,6 +19,20 @@
  <div id="header_hr"></div>
 </div>
  #parse("/__/messages.vm")
+<form style="text-align: center;" action="enroll">
+ <input type="hidden" name="elw_ctx" value="$elw_ctx.toString()"/>
+ <select name="f_mode">
+  <option value="a">Approval</option>
+  <option value="d">Due</option>
+  <option value="dd">Due Diff</option>
+  <option value="p">Points</option>
+  <option value="s">Scoring</option>
+  <option value="dtu">Days to Upload</option>
+  <option value="dta">Days to Approve</option>
+  <option value="v">Version ID</option>
+ </select>
+ <input id="dataLoader" type="submit" value="Refresh"/>
+</form>
 <table cellspacing="0">
  <thead>
  <tr class="elw_header_row">
@@ -41,6 +57,8 @@
 </body>
 <script type="text/javascript">
  jQuery(document).ready(function() {
+  jQuery("select[name=f_mode]").val($f.json($f_mode));
+
   var te_taskHeader = jQuery(".te.te_taskHeader:first");
   var tp_taskHeader;
 
@@ -76,9 +94,14 @@
       #set($elw_ctx_ver = $elw_ctx_stud.extendIndex($idx))
       #set($filesStud = $fileMetas.get("$elw_ctx_ver.toString()").get($slot.id))
 
+      #set($__mode = $f_mode)
+      #set($__ctx = $elw_ctx_ver)
+      #set($__slot = $slot)
+      #set($__file = $u.ref($u.lastOrNull($filesStud)))
+      #parse("/__/status.vm")
       tp_status = tp_studRow.find(".te.te_status:first").clone().toggleClass("te")
-       .html($f.json($elw_ctx_ver.indexEntry.getListStatusHtml($f, $elw_ctx.enr, $slot, $filesStud)))
-       .toggleClass($f.json($elw_ctx_ver.indexEntry.getListStatusClasses($elw_ctx.enr, $slot, $filesStud)));
+       .html($f.json($__statusText))
+       .toggleClass($f.json($__statusClasses.trim()));
       tp_studRow.append(tp_status);
      #end
      #set($studRowsCreated = true)

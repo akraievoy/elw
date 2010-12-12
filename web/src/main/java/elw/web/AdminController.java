@@ -117,6 +117,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 
 		model.put(S_MESSAGES, Message.drainMessages(req));
 		model.put(FormatTool.MODEL_KEY, FormatTool.forLocale(RequestContextUtils.getLocale(req)));
+		model.put(VelocityUtils.MODEL_KEY, VelocityUtils.INSTANCE);
 		model.put("expandTriggers", req.getSession().getAttribute("viewToExpandTriggers"));
 
 		return model;
@@ -296,8 +297,13 @@ public class AdminController extends MultiActionController implements WebSymbols
 			return null;
 		}
 
-		final TreeMap<String, Map<String, List<Entry<FileMeta>>>> fileMetas =
-				new TreeMap<String, Map<String, List<Entry<FileMeta>>>>();
+		W.storeFilter(req, model);
+
+		if (model.get("f_mode") == null || model.get("f_mode").toString().trim().length() == 0) {
+			model.put("f_mode", "a");
+		}
+
+		final TreeMap<String, Map<String, List<Entry<FileMeta>>>> fileMetas = new TreeMap<String, Map<String, List<Entry<FileMeta>>>>();
 		final HashMap<String, Integer> grossScores = new HashMap<String, Integer>();
 
 		final int[] grossScore = new int[1];
@@ -333,13 +339,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 			return null;
 		}
 
-		final Map params = req.getParameterMap();
-		for (Iterator paramNameIt = params.keySet().iterator(); paramNameIt.hasNext();) {
-			String paramName = (String) paramNameIt.next();
-			if (paramName.startsWith("f_")) {
-				model.put(paramName, params.get(paramName));
-			}
-		}
+		W.storeFilter(req, model);
 
 		return new ModelAndView("a/log", model);
 	}
@@ -905,4 +905,17 @@ public class AdminController extends MultiActionController implements WebSymbols
 
 		return null;
 	}
+
+	static class W {
+		protected static void storeFilter(HttpServletRequest req, HashMap<String, Object> model) {
+			final Map params = req.getParameterMap();
+			for (Object o : params.keySet()) {
+				String paramName = (String) o;
+				if (paramName.startsWith("f_")) {
+					model.put(paramName, req.getParameter(paramName));
+				}
+			}
+		}
+	}
 }
+

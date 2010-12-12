@@ -2,7 +2,7 @@
 #* @vtlvariable name="__mode" type="java.lang.String" *#
 #* @vtlvariable name="__ctx" type="elw.dao.Ctx" *#
 #* @vtlvariable name="__slot" type="elw.vo.FileSlot" *#
-#* @vtlvariable name="__file" type="elw.vo.FileMeta" *#
+#* @vtlvariable name="__file" type="elw.web.Ref<elw.vo.Entry<elw.vo.FileMeta>>" *#
 
 #* internally set*#
 #* @vtlvariable name="__classDue" type="elw.vo.Class" *#
@@ -20,13 +20,13 @@
  #if(!$__classFrom.started)
   #set($__statusText = "Closed; Opens $f.format($__classFrom.fromDateTime.millis)")
   #set($__statusClasses = "elw_closed")
- #elseif(!$__file)
+ #elseif(!$__file.e)
   #set($__statusText = "Open")
   #set($__statusClasses = "elw_open")
- #elseif(!$__file.score && !($__file.score == false))
+ #elseif(!$__file.e.meta.score || (!$__file.e.meta.score.approved && $__file.e.meta.score.approved != false))
   #set($__statusText = "Pending")
   #set($__statusClasses = "elw_pending")
- #elseif($__file.score)
+ #elseif($__file.e.meta.score.approved)
   #set($__statusText = "Approved")
   #set($__statusClasses = "elw_approved")
  #else
@@ -34,13 +34,13 @@
   #set($__statusClasses = "elw_declined")
  #end
 
- #if($__file && $__classDue.passed)
+ #if($__file.e && $__classDue.passed)
   #set($__statusClasses = "$__statusClasses elw_due_passed")
  #end
 #elseif($__mode == "d") ## due date
  #if(
-  ($__file && $__classDue.computeDaysOverdue($__file.createStamp) > 0) ||
-  (!$__file && $__classDue.passed)
+  ($__file.e && $__classDue.computeDaysOverdue($__file.e.meta.createStamp) > 0) ||
+  (!$__file.e && $__classDue.passed)
  )
   #set($__statusClasses = "$__statusClasses elw_overdue")
  #end
@@ -58,19 +58,118 @@
   #if($__classDue.passed)
    #set($__statusClasses = "elw_due_passed")
   #end
-  #if($__file)
-   #set($__createStamp = $__file.createStamp)
-  #end
  #end
- #set($__dueDiff = $__classDue.computeToDiff($__createStamp))
+ #set($__dueDiff = $__classDue.computeToDiffStamp($__file.e.meta))
  #if($__dueDiff > 0)
   #set($__statusClasses = "$__statusClasses elw_overdue")
   #set($__statusText = "$__dueDiff days overdue")
  #elseif($__dueDiff == 0)
   #set($__statusText = "Same day")
  #else
-  #set($__statusClasses = "")
+  #set($__dueDiff = 0 - $__dueDiff)
   #set($__statusText = "$__dueDiff days ahead")
  #end
+#elseif($__mode == "p") ## points
+ #if(!$__classFrom.started)
+  #set($__statusText = "Closed")
+  #set($__statusClasses = "elw_closed")
+ #elseif(!$__file.e)
+  #set($__statusText = "Open")
+  #set($__statusClasses = "elw_open")
+ #elseif(!$__file.e.meta.score)
+  #set($__statusText = "Pending")
+  #set($__statusClasses = "elw_open")
+  #if($__classDue.passed)
+   #set($__statusClasses = "$__statusClasses elw_overdue")
+  #end
+ #else
+  #set($__statusText = "$f.format2($__ctx.indexEntry.computePoints($__file.e.meta.score, $__slot)) of $f.format2($__ctx.indexEntry.computePoints($__slot))")
+  #if(!$__file.e.meta.score.approved && $__file.e.meta.score.approved != false)
+   #set($__statusText = "$__statusText ?")
+   #set($__statusClasses = "elw_pending")
+   #if($__classDue.passed)
+    #set($__statusClasses = "$__statusClasses elw_overdue")
+   #end
+  #elseif($__file.e.meta.score.approved)
+   #set($__statusText = "Approved $f.format($__file.e.meta.score.createStamp.time)")
+   #set($__statusClasses = "elw_approved")
+  #else
+   #set($__statusText = "Approved $f.format($__file.e.meta.score.createStamp.time)")
+   #set($__statusClasses = "elw_declined")
+  #end
+ #end
+#elseif($__mode == "s") ## scoring
+ #if(!$__classFrom.started)
+  #set($__statusText = "Closed")
+  #set($__statusClasses = "elw_closed")
+ #elseif(!$__file.e)
+  #set($__statusText = "Open")
+  #set($__statusClasses = "elw_open")
+ #elseif(!$__file.e.meta.score)
+  #set($__statusText = "Pending")
+  #set($__statusClasses = "elw_pending")
+ #else
+  #set($__statusText = "$f.format2($__ctx.indexEntry.computePoints($__file.e.meta.score, $__slot)) of $f.format2($__ctx.indexEntry.computePoints($__slot))")
+
+  #set($terms = $__file.e.meta.score.getTerms($__ctx.assType, false))
+  #foreach($t in $terms)
+   #set($__tCl = "elw_posTerm")
+   #if($t.ratio < 1) #set($__tCl = "elw_negTerm") #end
+   #set($__statusText = "$__statusText <span class='$__tCl' title='$f.esc($t.criteria.name) x $t.pow'>$f.format2($t.ratio)</span>")
+  #end
+
+  #if(!$__file.e.meta.score.approved && $__file.e.meta.score.approved != false)
+   #set($__statusText = "$__statusText ?")
+   #set($__statusClasses = "elw_pending")
+  #elseif($__file.e.meta.score.approved)
+   #set($__statusText = "<span class='elw_approved'>A</span> $__statusText")
+  #else
+   #set($__statusText = "<span class='elw_declined'>D</span> $__statusText")
+  #end
+ #end
+#elseif($__mode == "dta") ## days to approve
+ #if(!$__classFrom.started)
+  #set($__statusText = "Closed")
+  #set($__statusClasses = "elw_closed")
+ #elseif(!$__file.e)
+  #set($__statusText = "Open")
+  #set($__statusClasses = "elw_open")
+ #else
+  #set($dta = $__classFrom.computeToDiffStamp($__file.e.meta.score) - $__classFrom.computeToDiffStamp($__file.e.meta))
+  #set($__statusText = "$dta days")
+
+  #if($__file.e && $__classDue.passed &&!$__file.e.meta.score)
+   #set($__statusClasses = "$__statusClasses elw_overdue")
+  #end
+ #end
+#elseif($__mode == "dtu") ## days to upload
+ #if(!$__classFrom.started)
+  #set($__statusText = "Closed")
+  #set($__statusClasses = "elw_closed")
+ #else
+
+  #if(!$__file.e)
+   #set($__statusText = "$__classFrom.computeToDiffStamp($null) days")
+   #set($__statusClasses = "$__statusClasses elw_open")
+   #if($__classDue.passed)
+    #set($__statusClasses = "$__statusClasses elw_overdue")
+   #end
+  #end
+  #if($__file.e)
+   #set($__statusText = "$__classFrom.computeToDiffStamp($__file.e.meta) days")
+   #if($__classDue.passed)
+    #set($__statusClasses = "$__statusClasses elw_due_passed")
+   #end 
+  #end
+ #end
+#elseif($__mode == "v") ## version
+ #if(!$__classFrom.started)
+  #set($__statusText = "Closed")
+  #set($__statusClasses = "elw_closed")
+ #else
+  #set($__statusText = "<span title='$__ctx.ver.name'>$__ctx.ver.id</span>")
+ #end
 #end
-<div $__statusClasses.trim()>$__statusText</div>
+#*
+<div class="$__statusClasses.trim()">$__statusText</div>
+*#

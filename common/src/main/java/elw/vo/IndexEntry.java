@@ -183,6 +183,11 @@ public class IndexEntry {
 	}
 
 	@JsonIgnore
+	public double computePoints(final FileSlot slot) {
+		return getScoreBudget() * slot.getScoreWeight();
+	}
+
+	@JsonIgnore
 	public double getTotal(final AssignmentType aType, Score score) {
 		double result = 0.0;
 
