@@ -113,7 +113,7 @@ public class VelocityUtils {
 						scoreStud = 0;
 					}
 					final double scoreSlot = ctx.getIndexEntry().computePoints(slot);
-					text.append(f.format2(scoreStud)).append(" of ").append(scoreSlot);
+					text.append(f.format2(scoreStud)).append(" of ").append(f.format2(scoreSlot));
 				}
 
 				if (file == null) {
