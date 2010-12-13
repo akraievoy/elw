@@ -248,7 +248,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 		final TreeMap<String, Map<String, List<Entry<FileMeta>>>> fileMetas =
 				new TreeMap<String, Map<String, List<Entry<FileMeta>>>>();
 		final int[] grossScore = new int[1];
-		storeMetas(ctx, null, scoreDao, fileDao, fileMetas, grossScore);
+		storeMetas(ctx, null, fileDao, fileMetas, grossScore);
 		model.put("fileMetas", fileMetas);
 		model.put("codeMetas", codeMetas);
 		model.put("reportMetas", reportMetas);
@@ -260,7 +260,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 
 	public static void storeMetas(
 			Ctx ctx, String aTypeSlotId,
-			ScoreDao scoreDao, FileDao fileDao,
+			FileDao fileDao,
 			Map<String, Map<String, List<Entry<FileMeta>>>> fileMetas,
 			int[] grossScore
 	) {
@@ -278,17 +278,40 @@ public class StudentController extends MultiActionController implements WebSymbo
 			}
 
 			for (String slotId : slotIdToFiles.keySet()) {
-				if (AdminController.W.excluded(aTypeSlotId, assType, assType.findSlotById(slotId))) {
+				if (AdminController.W.excluded(aTypeSlotId, assType.getId(), slotId)) {
 					continue;
 				}
 
 				final List<Entry<FileMeta>> filesForSlot = slotIdToFiles.get(slotId);
 				if (filesForSlot != null && !filesForSlot.isEmpty()) {
-					//	TODO: use last vs use best file (now only last is used)
-					final Entry<FileMeta> usedFile = filesForSlot.get(filesForSlot.size()  - 1);
-					final FileMeta usedMeta = usedFile.getMeta();
-					if (usedMeta.getScore() != null && usedMeta.getScore().isApproved()) {
-						gsFuzzy += ctxVer.getIndexEntry().getTotal(ctx.getAssType(), usedMeta.getScore());
+					for (Entry<FileMeta> e : filesForSlot) {
+						if (e.getMeta().getScore() != null && e.getMeta().getScore().isApproved() != null) {
+							continue;	//	don't alter any scores once they're approved
+						}
+						final Score autoScore = AdminController.W.updateAutos(
+								ctxVer, slotId, e, e.getMeta().getScore()
+						);
+						e.getMeta().setScore(autoScore);
+					}
+
+					Entry<FileMeta> usedEntry = null;
+					double maxScore = 0;
+					for (Entry<FileMeta> e : filesForSlot) {
+						final double eScore = ctxVer.getIndexEntry().getTotal(ctxVer.getAssType(), e.getMeta().getScore());
+						if (usedEntry == null || maxScore < eScore) {
+							maxScore = eScore;
+							usedEntry = e;
+						}
+					}
+
+					if (usedEntry != null) {
+						final Score s = usedEntry.getMeta().getScore();
+						if (s != null) {
+							s.setBest(true);
+							if (Boolean.TRUE.equals(s.isApproved())) {
+								gsFuzzy += maxScore;
+							}
+						}
 					}
 				}
 			}

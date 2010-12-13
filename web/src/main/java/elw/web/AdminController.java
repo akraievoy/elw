@@ -312,7 +312,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 
 			StudentController.storeMetas(
 					studCtx, (String) model.get("f_slotId"),
-					scoreDao, fileDao,
+					fileDao,
 					fileMetas, grossScore
 			);
 
@@ -365,7 +365,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 					if (!noDues && (dueMap == null || dueMap.get(slot.getId()) == null)) {
 						continue;
 					}
-					if (W.excluded(slotId, aType, slot)) {
+					if (W.excluded(slotId, aType.getId(), slot.getId())) {
 						continue;
 					}
 
@@ -526,63 +526,13 @@ public class AdminController extends MultiActionController implements WebSymbols
 		final Stamp stamp = req.getParameter("stamp") != null ? Stamp.fromString(req.getParameter("stamp")) : null;
 		final Entry<Score> lastScoreEntry = allScores.isEmpty() ? null : allScores.get(allScores.lastKey());
 		final Entry<Score> scoreEntry = stamp == null ? lastScoreEntry : scoreDao.findScoreByStamp(ctx, stamp, slotId, fileId);
-		final Score score = updateAutos(scoreEntry == null ? null : scoreEntry.getMeta(), ctx, slotId, file);
+		final Score score = W.updateAutos(ctx, slotId, file, scoreEntry == null ? null : scoreEntry.getMeta());
 
 		model.put("scores", allScores);
 		model.put("score", score);
 		model.put("slot", slot);
 
 		return new ModelAndView("a/approve", model);
-	}
-
-	protected Score updateAutos(final Score score, Ctx ctx, final String slotId, Entry<FileMeta> file) {
-		final Class classDue = ctx.getEnr().getClasses().get(ctx.getIndexEntry().getClassDue().get(slotId));
-		final FileSlot slot = ctx.getAssType().findSlotById(slotId);
-
-		final Map<String, Double> vars = new TreeMap<String, Double>();
-		vars.put("$overdue", (double) classDue.computeDaysOverdue(file.getMeta().getCreateStamp()));
-		if (slot.getValidator() != null && file.getMeta().isValidated()) {
-			vars.put("$passratio", (double) classDue.computeDaysOverdue(file.getMeta().getCreateStamp()));
-		}
-
-		final Score res = score == null ? new Score() : score.copy();
-		for (Criteria c : slot.getCriterias()) {
-			if (!c.isAuto()) {
-				continue;
-			}
-
-			final Double ratio = c.resolveRatio(vars);
-			final Integer powDef = c.resolvePowDef(vars);
-			if (ratio != null && powDef != null) {
-				final String id = res.idFor(slot, c);
-				res.getPows().put(id, powDef);
-				res.getRatios().put(id, ratio);
-			}
-		}
-
-		return res;
-	}
-
-	public static Stamp computeCodeScores(Ctx ctx, Map<Stamp, Entry<CodeMeta>> codes, Map<Stamp, Score> codeScores, Stamp reportStamp, final FileSlot slot) {
-		double bestRatio = 0;
-		Stamp codeStamp = null;
-
-		for (Stamp cStamp : codes.keySet()) {
-			final Entry<CodeMeta> entry = codes.get(cStamp);
-			final CodeMeta meta = entry.getMeta();
-			final Score score = computeCodeAuto(meta, ctx);
-
-			codeScores.put(cStamp, score);
-
-			//	here we select the best code scoring to base our report rating on
-			final double points = ctx.getIndexEntry().computePoints(score, slot);
-			if ((reportStamp == null || meta.getCreateStamp().getTime() <= reportStamp.getTime()) && points > bestRatio) {
-				codeStamp = cStamp;
-				bestRatio = points;
-			}
-		}
-
-		return codeStamp;
 	}
 
 	@RequestMapping(value = "approve", method = RequestMethod.POST)
@@ -901,11 +851,42 @@ public class AdminController extends MultiActionController implements WebSymbols
 			}
 		}
 
-		public static boolean excluded(String aTypeSlotFilter, AssignmentType aType, FileSlot slot) {
-			if (aType == null || slot == null) {
-				return true;
+		public static boolean excluded(String aTypeSlotFilter, String typeId, String slotId) {
+			return excluded(aTypeSlotFilter, typeId + "--" + slotId);
+		}
+
+		protected static Score updateAutos(Ctx ctx, final String slotId, Entry<FileMeta> file, final Score score) {
+			final Map<String, Integer> dueMap = ctx.getIndexEntry().getClassDue();
+			final Class classDue;
+			if (dueMap == null) {
+				classDue = ctx.getEnr().getClasses().get(ctx.getEnr().getClasses().size() - 1);
+			} else {
+				classDue = ctx.getEnr().getClasses().get(dueMap.get(slotId));
 			}
-			return excluded(aTypeSlotFilter, aType.getId()+ "--" + slot.getId());
+			final FileSlot slot = ctx.getAssType().findSlotById(slotId);
+
+			final Map<String, Double> vars = new TreeMap<String, Double>();
+			vars.put("$overdue", (double) classDue.computeDaysOverdue(file.getMeta().getCreateStamp()));
+			if (slot.getValidator() != null && file.getMeta().isValidated()) {
+				vars.put("$passratio", (double) classDue.computeDaysOverdue(file.getMeta().getCreateStamp()));
+			}
+
+			final Score res = score == null ? new Score() : score.copy();
+			for (Criteria c : slot.getCriterias()) {
+				if (!c.isAuto()) {
+					continue;
+				}
+
+				final Double ratio = c.resolveRatio(vars);
+				final Integer powDef = c.resolvePowDef(vars);
+				if (ratio != null && powDef != null) {
+					final String id = res.idFor(slot, c);
+					res.getPows().put(id, powDef);
+					res.getRatios().put(id, ratio);
+				}
+			}
+
+			return res;
 		}
 	}
 }

@@ -14,15 +14,31 @@ public class Score implements Stamped {
 	protected Stamp createStamp;
 	protected String[] path;
 
-	protected boolean approved;
+	protected Boolean approved;
 	protected String comment;
 
-	public boolean isApproved() {
+	protected boolean best;	//	transient
+
+	public Boolean isApproved() {
 		return approved;
 	}
 
-	public void setApproved(boolean approved) {
+	public Boolean getApproved() {
+		return approved;
+	}
+
+	public void setApproved(Boolean approved) {
 		this.approved = approved;
+	}
+
+	@JsonIgnore
+	public boolean isBest() {
+		return best;
+	}
+
+	@JsonIgnore
+	public void setBest(boolean best) {
+		this.best = best;
 	}
 
 	public String getComment() {
@@ -74,7 +90,7 @@ public class Score implements Stamped {
 		final Score copy = new Score();
 
 		copy.setCreateStamp(createStamp);
-		copy.setPath(path.clone());
+		copy.setPath(null != path ? path.clone() : null);
 		copy.ratios.putAll(ratios);
 		copy.pows.putAll(pows);
 
