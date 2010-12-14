@@ -51,7 +51,7 @@ public class VelocityUtils {
 	}
 
 	public Map<String, String> status(
-			FormatTool f, String mode,
+			Format f, String mode,
 			Ctx ctx, FileSlot slot, Entry<FileMeta> file
 	) {
 		return status(f, mode, ctx, slot, file, file != null ? file.getMeta().getScore() : null);

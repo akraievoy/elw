@@ -344,7 +344,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 	}
 
 	protected List<Object[]> prepareLogEntries(
-			Ctx ctx, Format format, 
+			Ctx ctx, Format format, VelocityUtils u,
 			boolean noDues, boolean latest, String slotId, String studId
 	) {
 		final List<Object[]> logData = new ArrayList<Object[]>();
@@ -377,7 +377,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 								continue;
 							}
 
-							logData.add(createRowLog(ctx, format, logData, index, ctxVer, slot, uploads[i]));
+							logData.add(createRowLog(ctx, format, u, logData, index, ctxVer, slot, uploads[i]));
 						}
 					}
 				}
@@ -388,7 +388,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 	}
 
 	protected Object[] createRowLog(
-			Ctx ctx, Format format, List<Object[]> data,
+			Ctx ctx, Format format, VelocityUtils u, List<Object[]> data,
 			int index, Ctx ctxVer, FileSlot slot, Entry<FileMeta> e
 	) {
 		final long time = e.getMeta().getCreateStamp().getTime();
@@ -399,6 +399,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 				ctxVer.getVer(), slot, e.getMeta(), format
 		);
 		final String q = "?elw_ctx=" + ctxVer.toString() + "&s=s&sId=" + slot.getId() + "&fId=" + e.getMeta().getId();
+		final Map<String, String> status = u.status(format, "s", ctxVer, slot, e);
 		final Object[] dataRow = {
 				/* 0 index */ data.size(),
 				/* 1 upload millis */ time,
@@ -411,8 +412,8 @@ public class AdminController extends MultiActionController implements WebSymbols
 				/* 8 slot.id */ slot.getId(),
 				/* 9 slot.name */ slot.getName(),
 				/* 10 comment */ e.getMeta().getComment(),
-				/* 11 status text*/ iEntry.getStatusHtml(format, ctx.getEnr(), slot, e.getMeta()),
-				/* 12 status classes */ iEntry.getStatusClasses(ctx.getEnr(), slot, e.getMeta()),
+				/* 11 status text*/ status.get("text"),
+				/* 12 status classes */ status.get("classes"),
 				/* 13 approve */ "<a href=\"approve" + q + "\">A</a>",
 				/* 14 download */ "<a href=\"../s/dl/" + nameNorm + q + "\">D</a>"
 		};
@@ -433,6 +434,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 		}
 
 		final Format format = (Format) model.get(FormatTool.MODEL_KEY);
+		final VelocityUtils u = (VelocityUtils) model.get(VelocityUtils.MODEL_KEY);
 
 		final boolean noDues = "true".equals(req.getParameter("f_nodues"));
 		final boolean latest = "true".equals(req.getParameter("f_latest"));
@@ -440,7 +442,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 		final String studId = req.getParameter("f_studId");
 
 		final List<Object[]> logData = prepareLogEntries(
-				ctx, format,
+				ctx, format, u,
 				noDues, latest, slotId, studId
 		);
 

@@ -65,7 +65,7 @@
    "aaSorting": [ [3,'asc'] ],
    "aaSortingFixed": [ ],
    "fnRowCallback": function(node, data, dispIndex, dataIndex) {
-    jQuery("td:eq(5)", node).toggleClass(data[12]);
+    jQuery("td:eq(5)", node).addClass(data[12]);
     jQuery("td:eq(0)", node).attr("title", data[2]);
     return node;
    }
