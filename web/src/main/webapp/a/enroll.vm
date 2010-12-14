@@ -26,16 +26,7 @@
  <input type="hidden" name="elw_ctx" value="$elw_ctx.toString()"/>
  <select name="f_studId"><option value="">Choose...</option></select>
  <select name="f_slotId"><option value="">Choose...</option></select>
- <select name="f_mode">
-  <option value="a">Approval</option>
-  <option value="d">Due</option>
-  <option value="dd">Due Diff</option>
-  <option value="p">Points</option>
-  <option value="s">Scoring</option>
-  <option value="dtu">Days to Upload</option>
-  <option value="dta">Days to Approve</option>
-  <option value="v">Version ID</option>
- </select>
+ #parse("/__/modeCombo.vm")
  <input id="dataLoader" type="submit" value="Refresh"/>
 </form>
 <table cellspacing="0">

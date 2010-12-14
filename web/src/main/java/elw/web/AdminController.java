@@ -24,8 +24,8 @@ import elw.dp.mips.MipsValidator;
 import elw.miniweb.Message;
 import elw.miniweb.ViewJackson;
 import elw.vo.*;
-import elw.vo.Class;
 import org.akraievoy.gear.G4Io;
+import org.akraievoy.gear.G4Parse;
 import org.akraievoy.gear.G4Str;
 import org.akraievoy.gear.G4mat;
 import org.apache.commons.fileupload.FileItemIterator;
@@ -447,6 +447,84 @@ public class AdminController extends MultiActionController implements WebSymbols
 		return new ModelAndView(ViewJackson.success(logData));
 	}
 
+	@RequestMapping(value = "rest/scoreLog", method = RequestMethod.GET)
+	public ModelAndView do_restScoreLog(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+		return handleWebMethodScore(req, resp, null, new WebMethodScore() {
+			public ModelAndView handleScore(
+					HttpServletRequest req, HttpServletResponse resp, Map<String, Object> model,
+					Ctx ctx, FileSlot slot, Entry<FileMeta> file, Stamp stamp
+			) {
+				final Format f = (Format) model.get(FormatTool.MODEL_KEY);
+				final VelocityUtils u = (VelocityUtils) model.get(VelocityUtils.MODEL_KEY);
+
+				final ScoreDao scoreDaoLocal = scoreDao;
+				final SortedMap<Stamp, Entry<Score>> allScores = scoreDaoLocal.findAllScoresAuto(ctx, slot, file);
+
+				final String mode = req.getParameter("f_mode");
+
+				final List<Object[]> logData = prepareScoreLogEntries(allScores, ctx, slot, file, f, u, mode, stamp);
+
+				return new ModelAndView(ViewJackson.success(logData));
+			}
+		});
+	}
+
+	protected List<Object[]> prepareScoreLogEntries(
+			SortedMap<Stamp, Entry<Score>> allScores, Ctx ctx, FileSlot slot, Entry<FileMeta> file,
+			Format f, VelocityUtils u, String mode, Stamp stamp
+	) {
+		final List<Object[]> logData = new ArrayList<Object[]>();
+
+		Score scoreBest = null;
+		double pointsBest = 0;
+		for (Stamp s : allScores.keySet()) {
+			final Score scoreCur = allScores.get(s).getMeta();
+			final double pointsCur = ctx.getIndexEntry().computePoints(scoreCur, slot);
+			if (scoreBest == null || pointsBest < pointsCur) {
+				scoreBest = scoreCur;
+				pointsBest = pointsCur;
+			}
+		}
+
+		for (Stamp s : allScores.keySet()) {
+			final Entry<Score> scoreEntry = allScores.get(s);
+			final Score score = scoreEntry.getMeta();
+
+			final Stamp createStamp = score.getCreateStamp();
+			final boolean selected = stamp == null ? createStamp == null : stamp.equals(createStamp);
+
+			final long time;
+			String approveUri = "approve?elw_ctx=" + ctx.toString() + "&sId=" + slot.getId() + "&fId=" + file.getMeta().getId();
+			if (createStamp == null) {
+				time = System.currentTimeMillis();
+			} else {
+				time = createStamp.getTime();
+				approveUri += "&stamp="+createStamp.toString();
+			}
+
+			final Map<String, String> status = u.status(f, mode, ctx, slot, file, score);
+			final Map<String, String> statusScoring = u.status(f, "s", ctx, slot, file, score);
+
+			final Object[] logRow = new Object[] {
+				/* 0 index - */ logData.size(),
+				/* 1 selected 0 */ selected ? "&gt;" : "",
+				/* 2 best 1 */ scoreBest == score ? "*" : "",
+				/* 3 score date millis - */ time,
+				/* 4 score date full - */ f.format(time, "EEE d HH:mm"),
+				/* 5 score date nice 2 */ f.format(time),
+				/* 6 status classes - */ status.get("classes"),
+
+				/* 7 status text 3 */ status.get("text"),
+				/* 8 scoring 4 */ statusScoring.get("text"),
+				/* 9 comment 5 */ score.getComment(),
+				/* 10 edit score 6 */ approveUri
+			};
+			logData.add(logRow);
+		}
+
+		return logData;
+	}
+
 	@RequestMapping(value = "rest/index", method = RequestMethod.GET)
 	public ModelAndView do_restIndex(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
 		final HashMap<String, Object> model = auth(req, resp, null);
@@ -486,158 +564,112 @@ public class AdminController extends MultiActionController implements WebSymbols
 
 	@RequestMapping(value = "approve", method = RequestMethod.GET)
 	public ModelAndView do_approve(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		final HashMap<String, Object> model = auth(req, resp, "");
-		if (model == null) {
-			return null;
-		}
+		return handleWebMethodScore(req, resp, "", new WebMethodScore() {
+			public ModelAndView handleScore(
+					HttpServletRequest req, HttpServletResponse resp, Map<String, Object> model,
+					Ctx ctx, FileSlot slot, Entry<FileMeta> file, Stamp stamp
+			) {
+				final SortedMap<Stamp, Entry<Score>> allScores = scoreDao.findAllScores(ctx, slot.getId(), file.getMeta().getId());
 
-		final Ctx ctx = (Ctx) model.get(R_CTX);
-		if (!ctx.resolved(Ctx.STATE_EGSCIV)) {
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Path problem, please check the logs");
-			return null;
-		}
+				final Entry<Score> lastScoreEntry = allScores.isEmpty() ? null : allScores.get(allScores.lastKey());
+				final Entry<Score> scoreEntry = stamp == null ? lastScoreEntry : allScores.get(stamp);
+				final Score score = ScoreDao.updateAutos(ctx, slot.getId(), file, scoreEntry == null ? null : scoreEntry.getMeta());
 
-		final String slotId = req.getParameter("sId");
-		if ((slotId == null || slotId.trim().length() == 0)) {
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "no slotId (sId) defined");
-			return null;
-		}
+				model.put("stamp", stamp);
+				model.put("score", score);
+				model.put("slot", slot);
+				model.put("file", file.getMeta());
 
-		final FileSlot slot = ctx.getAssType().findSlotById(slotId);
-		if (slot == null) {
-			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "slot for id " + slotId + " not found");
-			return null;
-		}
-
-		final String fileId = req.getParameter("fId");
-		if ((fileId == null || fileId.trim().length() == 0)) {
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "no fileId (fId) defined");
-			return null;
-		}
-
-		final Entry<FileMeta> file = fileDao.findFileFor(FileDao.SCOPE_STUD, ctx, slotId, fileId);
-		if (file == null) {
-			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "file for id " + fileId + " not found");
-			return null;
-		}
-
-		final SortedMap<Stamp, Entry<Score>> allScores = scoreDao.findAllScores(ctx, slotId, fileId);
-
-		final Stamp stamp = req.getParameter("stamp") != null ? Stamp.fromString(req.getParameter("stamp")) : null;
-		final Entry<Score> lastScoreEntry = allScores.isEmpty() ? null : allScores.get(allScores.lastKey());
-		final Entry<Score> scoreEntry = stamp == null ? lastScoreEntry : scoreDao.findScoreByStamp(ctx, stamp, slotId, fileId);
-		final Score score = W.updateAutos(ctx, slotId, file, scoreEntry == null ? null : scoreEntry.getMeta());
-
-		model.put("scores", allScores);
-		model.put("score", score);
-		model.put("slot", slot);
-
-		return new ModelAndView("a/approve", model);
+				return new ModelAndView("a/approve", model);
+			}
+		});
 	}
 
 	@RequestMapping(value = "approve", method = RequestMethod.POST)
 	public ModelAndView do_approvePost(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		final HashMap<String, Object> model = auth(req, resp, "");
-		if (model == null) {
-			return null;
-		}
+		return handleWebMethodScore(req, resp, "", new WebMethodScore() {
+			public ModelAndView handleScore(
+					HttpServletRequest req, HttpServletResponse resp, Map<String, Object> model,
+					Ctx ctx, FileSlot slot, Entry<FileMeta> file, Stamp stamp
+			) throws IOException {
+				final Score scoreByStamp;
+				final String fileId = file.getMeta().getId();
+				if (stamp == null) {
+					scoreByStamp = null;
+				} else {
+					scoreByStamp = scoreDao.findScoreByStamp(ctx, stamp, slot.getId(), fileId).getMeta();
+				}
+				final Score score = ScoreDao.updateAutos(ctx, slot.getId(), file, scoreByStamp);
 
-		final Ctx ctx = (Ctx) model.get(R_CTX);
-		if (!ctx.resolved(Ctx.STATE_EGSCIV)) {
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Path problem, please check the logs");
-			return null;
-		}
+				final String action = req.getParameter("action");
+				if ("next".equalsIgnoreCase(action) || "approve".equalsIgnoreCase(action) || "decline".equalsIgnoreCase(action)) {
+					if ("approve".equalsIgnoreCase(action) || "decline".equalsIgnoreCase(action)) {
+						score.setApproved("approve".equalsIgnoreCase(action));
 
-		final String codeStampStr = req.getParameter("codeStamp");
-		final Stamp codeStamp = Stamp.parse(codeStampStr, null);
+						final Criteria[] cris = slot.getCriterias();
+						for (Criteria cri : cris) {
+							final int powDef = score.getPow(slot, cri);
+							final double ratioDef = score.getRatio(slot, cri);
 
-		final String reportStampStr = req.getParameter("stamp");
-		final Stamp reportStamp = Stamp.parse(reportStampStr, null);
+							final String idFor = score.idFor(slot, cri);
+							final String powReq = req.getParameter(idFor);
+							final String ratioReq = req.getParameter(idFor+"--ratio");
 
-		final String refreshUri = "approve?elw_ctx=" + ctx + "&stamp=" + reportStampStr + "&codeStamp=" + codeStampStr;
-		if (codeStamp == null || reportStamp == null) {
-			Message.addWarn(req, "Missing either report or code stamp, approval NOT performed");
-			resp.sendRedirect(refreshUri);
-			return null;
-		}
+							score.getPows().put(idFor, G4Parse.parse(powReq, powDef));
+							score.getRatios().put(idFor, G4Parse.parse(ratioReq, ratioDef));
+						}
 
-/*
-		final ReportMeta reportMeta = reportDao.findByStamp(ctx, reportStamp).getMeta();
-		final CodeMeta codeMeta = codeDao.findMetaByStamp(ctx, codeStamp).getMeta();
+						score.setComment(req.getParameter("comment"));
+						scoreDao.createScore(ctx, slot.getId(), fileId, score);
+					}
 
-		if (reportMeta == null || codeMeta == null) {
-			Message.addWarn(req, "Missing either report or code metas, approval NOT performed");
-			resp.sendRedirect(refreshUri);
-			return null;
-		}
+					FileMeta epF = null;	//	earliest pending
+					Ctx epCtx = null;
 
-		if ("Decline".equals(req.getParameter("action"))) {
-			reportMeta.setScoreStamp(null);	//	FIXME decline stamp?!!
-			reportDao.updateMeta(ctx, reportMeta);
-			Message.addWarn(req, "Report declined");
-		} else {
-			final Score codeScore = computeCodeAuto(codeMeta, ctx);
-			final Score score = computeReportAuto(ctx, reportMeta, codeScore);
-			computeReportDefault(ctx, score);
+					final Ctx ctxEnr = Ctx.forEnr(ctx.getEnr()).resolve(enrollDao, groupDao,  courseDao);
+					//	LATER oh this pretty obviously looks like we REALLY need some rdbms from now on... :D
+					for (Student stud : ctx.getGroup().getStudents()) {
+						final Ctx ctxStud = ctxEnr.extendStudent(stud);
+						for (int index = 0; index < ctx.getEnr().getIndex().size(); index++) {
+							final Ctx ctxVer = ctxStud.extendIndex(index);
+							if (!ctxVer.getAssType().getId().equals(ctx.getAssType().getId())) {
+								continue;	//	other ass types out of scope
+							}
+							for (FileSlot s : ctxVer.getAssType().getFileSlots()) {
+								if (!s.getId().equals(slot.getId())) {
+									continue;	//	other slots out of scope
+								}
+								final Entry<FileMeta>[] uploads = fileDao.findFilesFor(FileDao.SCOPE_STUD, ctxVer, slot.getId());
+								if (uploads != null && uploads.length > 0) {
+									for (int i = uploads.length - 1; i >= 0; i--) {
+										final FileMeta f = uploads[i].getMeta();
+										if (f.getScore() == null) {
+											if ((epF == null || epF.getCreateStamp().getTime() > f.getCreateStamp().getTime())) {
+												epF = f;
+												epCtx = ctxVer;
+											}
+											break;	//	don't look into earlier pending versions before this one is approved
+										} else if (Boolean.TRUE.equals(f.getScore().getApproved())) {
+											break;	//	don't look into earlier pending versions before this one is approved
+										}
+									}
+								}
+							}
+						}
+					}
 
-			score.setCodeStamp(codeStamp);
-			score.setReportStamp(reportStamp);
+					if (epCtx != null) {
+						resp.sendRedirect("approve?elw_ctx=" + epCtx.toString() + "&sId=" + slot.getId() + "&fId=" + epF.getId());
+					} else {
+						resp.sendRedirect("log?elw_ctx=" + ctxEnr.toString() + "&f_slot=" + slot.getId());
+					}
+				} else {
+					resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Bad action: " + action);
+				}
 
-			final Criteria[] cris = ctx.getAssType().getScoring().getCriterias();
-			for (Criteria cri : cris) {
-				final int powDef = G4Parse.parse(cri.getPowDef(), 0);
-				final String powReq = req.getParameter("cri--" + cri.getId());
-				final int pow = G4Parse.parse(powReq, powDef);
-
-				score.getPows().put(cri.getId(), pow);
+				return null;
 			}
-
-			final Stamp scoreStamp = scoreDao.createScore(ctx, "FIXME:slotId", "FIXME:fileId", score);
-			reportMeta.setScoreStamp(scoreStamp);
-			reportDao.updateMeta(ctx, reportMeta);
-			Message.addInfo(req, "Report approved");
-		}
-*/
-
-//		final List<LogEntry> entries = prepareLogEntries(ctx, true, latest, null, studId);
-		Object[] nextEntry = null;
-/*
-		for (LogEntry entry : entries) {
-			if (entry.getMeta().getScore() == null) {
-				nextEntry = entry;
-				break;
-			}
-		}
-*/
-		if (nextEntry != null) {
-			final String nextUri = "approve?elw_ctx=" /*+ nextEntry.getCtx() + "&stamp=" + nextEntry.getMeta().getCreateStamp()*/;
-			resp.sendRedirect(nextUri);
-		} else {
-			resp.sendRedirect(refreshUri);
-		}
-		return null;
-	}
-
-	protected static Score computeCodeAuto(CodeMeta meta, Ctx ctx) {
-		final Class classCodeDue = ctx.getEnr().getClasses().get(ctx.getIndexEntry().getClassDue().get("code"));
-		final Criteria[] autos = ctx.getAssType().findSlotById("code").getCriterias();
-
-		if (meta.getValidatorStamp() <= 0) {
-			return null;
-		}
-
-		final int overdue = classCodeDue.computeDaysOverdue(meta.getCreateStamp());
-		final Map<String, Double> vars = new TreeMap<String, Double>();
-		vars.put("$passratio", meta.getPassRatio());
-		vars.put("$overdue", (double) overdue);
-
-		final Score score = new Score();
-		for (Criteria c : autos) {
-			score.getPows().put(c.getId(), c.resolvePowDef(vars));
-			score.getRatios().put(c.getId(), c.resolveRatio(vars));
-		}
-
-		return score;
+		});
 	}
 
 	@RequestMapping(value = "groups", method = RequestMethod.GET)
@@ -855,39 +887,61 @@ public class AdminController extends MultiActionController implements WebSymbols
 			return excluded(aTypeSlotFilter, typeId + "--" + slotId);
 		}
 
-		protected static Score updateAutos(Ctx ctx, final String slotId, Entry<FileMeta> file, final Score score) {
-			final Map<String, Integer> dueMap = ctx.getIndexEntry().getClassDue();
-			final Class classDue;
-			if (dueMap == null) {
-				classDue = ctx.getEnr().getClasses().get(ctx.getEnr().getClasses().size() - 1);
-			} else {
-				classDue = ctx.getEnr().getClasses().get(dueMap.get(slotId));
-			}
-			final FileSlot slot = ctx.getAssType().findSlotById(slotId);
-
-			final Map<String, Double> vars = new TreeMap<String, Double>();
-			vars.put("$overdue", (double) classDue.computeDaysOverdue(file.getMeta().getCreateStamp()));
-			if (slot.getValidator() != null && file.getMeta().isValidated()) {
-				vars.put("$passratio", (double) classDue.computeDaysOverdue(file.getMeta().getCreateStamp()));
-			}
-
-			final Score res = score == null ? new Score() : score.copy();
-			for (Criteria c : slot.getCriterias()) {
-				if (!c.isAuto()) {
-					continue;
-				}
-
-				final Double ratio = c.resolveRatio(vars);
-				final Integer powDef = c.resolvePowDef(vars);
-				if (ratio != null && powDef != null) {
-					final String id = res.idFor(slot, c);
-					res.getPows().put(id, powDef);
-					res.getRatios().put(id, ratio);
-				}
-			}
-
-			return res;
+		public static Stamp parseStamp(HttpServletRequest req, final String paramName) {
+			final String paramVal = req.getParameter(paramName);
+			return paramVal != null ? Stamp.fromString(paramVal) : null;
 		}
+	}
+
+	protected static interface WebMethodScore {
+		ModelAndView handleScore(
+				HttpServletRequest req, HttpServletResponse resp, Map<String, Object> model,
+				Ctx ctx, FileSlot slot, Entry<FileMeta> file, Stamp stamp
+		) throws IOException;
+	}
+
+	protected ModelAndView handleWebMethodScore(
+			HttpServletRequest req, HttpServletResponse resp,
+			final String pathToRoot, final WebMethodScore wm
+	) throws IOException {
+		final HashMap<String, Object> model = auth(req, resp, pathToRoot);
+		if (model == null) {
+			return null;
+		}
+
+		final Ctx ctx = (Ctx) model.get(R_CTX);
+		if (!ctx.resolved(Ctx.STATE_EGSCIV)) {
+			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Path problem, please check the logs");
+			return null;
+		}
+
+		final String slotId = req.getParameter("sId");
+		if ((slotId == null || slotId.trim().length() == 0)) {
+			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "no slotId (sId) defined");
+			return null;
+		}
+
+		final FileSlot slot = ctx.getAssType().findSlotById(slotId);
+		if (slot == null) {
+			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "slot for id " + slotId + " not found");
+			return null;
+		}
+
+		final String fileId = req.getParameter("fId");
+		if ((fileId == null || fileId.trim().length() == 0)) {
+			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "no fileId (fId) defined");
+			return null;
+		}
+
+		final Entry<FileMeta> file = fileDao.findFileFor(FileDao.SCOPE_STUD, ctx, slotId, fileId);
+		if (file == null) {
+			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "file for id " + fileId + " not found");
+			return null;
+		}
+
+		final Stamp stamp = W.parseStamp(req, "stamp");
+
+		return wm.handleScore(req, resp, model, ctx, slot, file, stamp);
 	}
 }
 

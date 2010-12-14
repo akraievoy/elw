@@ -216,12 +216,18 @@ public abstract class Dao<Meta extends Stamped> {
 	}
 
 	public Stamp create(Path p, Meta meta, BufferedInputStream binary, BufferedReader text) throws IOException {
-		final long createTime = genId();
-
-		final Stamp stamp = new Stamp(node, createTime);
+		final Stamp stamp = createStamp();
 		meta.setCreateStamp(stamp);
 
 		return locateAndWrite(p, meta, binary, text, false);
+	}
+
+	public Stamp createStamp() {
+		final long createTime = genId();
+
+		final Stamp stamp = new Stamp(node, createTime);
+
+		return stamp;
 	}
 
 	protected long genId() {

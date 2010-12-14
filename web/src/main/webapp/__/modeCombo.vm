@@ -1,0 +1,10 @@
+<select name="f_mode">
+ <option value="a">Approval</option>
+ <option value="d">Due</option>
+ <option value="dd">Due Diff</option>
+ <option value="p">Points</option>
+ <option value="s">Scoring</option>
+ <option value="dtu">Days to Upload</option>
+ <option value="dta">Days to Approve</option>
+ <option value="v">Version ID</option>
+</select>

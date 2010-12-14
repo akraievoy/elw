@@ -68,7 +68,7 @@ public class Version extends IdName {
 
 		boolean approved = false;
 		for (Entry<FileMeta> f : files) {
-			if (f.getMeta().getScore() != null && f.getMeta().getScore().isApproved()) {
+			if (f.getMeta().getScore() != null && Boolean.TRUE.equals(f.getMeta().getScore().getApproved())) {
 				approved = true;
 			}
 		}
@@ -86,7 +86,7 @@ public class Version extends IdName {
 		}
 
 		final Entry<FileMeta> f = files.get(files.size() - 1);
-		return f.getMeta().getScore() != null && !f.getMeta().getScore().isApproved();
+		return f.getMeta().getScore() != null && !Boolean.TRUE.equals(f.getMeta().getScore().getApproved());
 	}
 
 	public boolean isPendingLast(

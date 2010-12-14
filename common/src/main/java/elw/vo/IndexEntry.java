@@ -81,7 +81,7 @@ public class IndexEntry {
 				if (uploadMeta.getScore() == null) {
 					result.append("Pending");
 				} else {
-					if (uploadMeta.getScore().isApproved()) {
+					if (Boolean.TRUE.equals(uploadMeta.getScore().getApproved())) {
 						result.append("Approved");
 					} else {
 						result.append("Declined");
@@ -124,7 +124,7 @@ public class IndexEntry {
 				if (uploadMeta.getScore() == null) {
 					result.append(" elw_pending");
 				} else {
-					if (uploadMeta.getScore().isApproved()) {
+					if (Boolean.TRUE.equals(uploadMeta.getScore().getApproved())) {
 						result.append(" elw_approved");
 					} else {
 						result.append(" elw_declined");

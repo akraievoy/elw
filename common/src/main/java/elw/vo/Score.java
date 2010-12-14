@@ -19,10 +19,6 @@ public class Score implements Stamped {
 
 	protected boolean best;	//	transient
 
-	public Boolean isApproved() {
-		return approved;
-	}
-
 	public Boolean getApproved() {
 		return approved;
 	}
@@ -150,13 +146,17 @@ public class Score implements Stamped {
 		return contains(slot, c) ? getPows().get(idFor(slot, c)) : 0;
 	}
 
+	public double getRatio(FileSlot slot, Criteria c) {
+		return contains(slot, c) ? getRatios().get(idFor(slot, c)) : 1;
+	}
+
 	@JsonIgnore
 	public ScoreTerm[] getTerms(AssignmentType aType, final boolean includeIdentity) {
 		final List<ScoreTerm> scoreTerms = new ArrayList<ScoreTerm>();
 
 		for (FileSlot slot : aType.getFileSlots()) {
 			for (final Criteria c : slot.getCriterias()) {
-				final String id = slot.getId() + "." + c.getId();
+				final String id = idFor(slot, c);
 				if (contains(slot, c)) {
 					final Integer pow = pows.get(id);
 					final Double ratio = ratios.get(id);

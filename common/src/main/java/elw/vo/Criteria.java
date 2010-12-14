@@ -35,7 +35,7 @@ public class Criteria extends IdName {
 	}
 
 	public boolean isAuto() {
-		return auto;
+		return auto || (powDef != null && powDef.indexOf("$") >= 0) || (ratio != null && ratio.indexOf("$") >= 0);
 	}
 
 	public void setAuto(boolean auto) {

@@ -285,10 +285,10 @@ public class StudentController extends MultiActionController implements WebSymbo
 				final List<Entry<FileMeta>> filesForSlot = slotIdToFiles.get(slotId);
 				if (filesForSlot != null && !filesForSlot.isEmpty()) {
 					for (Entry<FileMeta> e : filesForSlot) {
-						if (e.getMeta().getScore() != null && e.getMeta().getScore().isApproved() != null) {
+						if (e.getMeta().getScore() != null && e.getMeta().getScore().getApproved() != null) {
 							continue;	//	don't alter any scores once they're approved
 						}
-						final Score autoScore = AdminController.W.updateAutos(
+						final Score autoScore = ScoreDao.updateAutos(
 								ctxVer, slotId, e, e.getMeta().getScore()
 						);
 						e.getMeta().setScore(autoScore);
@@ -308,7 +308,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 						final Score s = usedEntry.getMeta().getScore();
 						if (s != null) {
 							s.setBest(true);
-							if (Boolean.TRUE.equals(s.isApproved())) {
+							if (Boolean.TRUE.equals(s.getApproved())) {
 								gsFuzzy += maxScore;
 							}
 						}

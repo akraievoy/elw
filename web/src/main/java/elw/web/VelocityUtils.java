@@ -50,7 +50,17 @@ public class VelocityUtils {
 		return entries.get(entries.size() - 1);
 	}
 
-	public Map<String, String> status(FormatTool f, String mode, Ctx ctx, FileSlot slot, Entry<FileMeta> file) {
+	public Map<String, String> status(
+			FormatTool f, String mode,
+			Ctx ctx, FileSlot slot, Entry<FileMeta> file
+	) {
+		return status(f, mode, ctx, slot, file, file != null ? file.getMeta().getScore() : null);
+	}
+
+	public Map<String, String> status(
+			Format f, String mode,
+			Ctx ctx, FileSlot slot, Entry<FileMeta> file, Score score
+	) {
 		final StringBuilder text = new StringBuilder();
 		final StringBuilder cls = new StringBuilder();
 
@@ -71,10 +81,10 @@ public class VelocityUtils {
 			} else if (file == null) {
 				text.append("Open");
 				cls.append("elw_open");
-			} else if (file.getMeta().getScore() == null || file.getMeta().getScore().getApproved() == null) {
+			} else if (score == null || score.getApproved() == null) {
 				text.append("Pending");
 				cls.append("elw_pending");
-			} else if (file.getMeta().getScore().getApproved()) {
+			} else if (score.getApproved()) {
 				text.append("Approved");
 				cls.append("elw_approved");
 			} else {
@@ -107,8 +117,8 @@ public class VelocityUtils {
 			} else {
 				if (ctx.getIndexEntry().getScoreBudget() > 0) {
 					final double scoreStud;
-					if (file != null && file.getMeta().getScore() != null) {
-						scoreStud = ctx.getIndexEntry().computePoints(file.getMeta().getScore(), slot);
+					if (file != null && score != null) {
+						scoreStud = ctx.getIndexEntry().computePoints(score, slot);
 					} else {
 						scoreStud = 0;
 					}
@@ -118,9 +128,9 @@ public class VelocityUtils {
 
 				if (file == null) {
 					text.insert(0, "<span class=\"elw_open\">O</span> ");
-				} else if (file.getMeta().getScore() == null || file.getMeta().getScore().getApproved() == null) {
+				} else if (score == null || score.getApproved() == null) {
 					text.insert(0, "<span class=\"elw_pending\">P</span> ").append(" ?");
-				} else if (file.getMeta().getScore().getApproved()) {
+				} else if (score.getApproved()) {
 					text.insert(0, "<span class=\"elw_approved\">A</span> ");
 				} else {
 					text.insert(0, "<span class=\"elw_declined\">D</span> ").append(" !");
@@ -134,9 +144,9 @@ public class VelocityUtils {
 				if (ctx.getIndexEntry().getScoreBudget() > 0) {
 					final double scoreStud;
 					final ScoreTerm[] terms;
-					if (file != null && file.getMeta().getScore() != null) {
-						scoreStud = ctx.getIndexEntry().computePoints(file.getMeta().getScore(), slot);
-						terms = file.getMeta().getScore().getTerms(ctx.getAssType(), false);
+					if (file != null && score != null) {
+						scoreStud = ctx.getIndexEntry().computePoints(score, slot);
+						terms = score.getTerms(ctx.getAssType(), false);
 					} else {
 						scoreStud = 0;
 						terms = new ScoreTerm[0];
@@ -145,7 +155,7 @@ public class VelocityUtils {
 					if (terms.length > 0) {
 						text.append(":");
 						for (ScoreTerm term : terms) {
-							text.append(" <span class\"elw_").append(term.getRatio() < 1 ? "neg" : "pos")
+							text.append(" <span class=\"elw_").append(term.getRatio() < 1 ? "neg" : "pos")
 									.append("Term\" title=\"").append(f.esc(term.getCriteria().getName()))
 									.append(" x ").append(term.getPow()).append("\">")
 									.append(term.getNiceRatio()).append("</span>");
@@ -155,9 +165,9 @@ public class VelocityUtils {
 
 				if (file == null) {
 					text.insert(0, "<span class=\"elw_open\">O</span> ");
-				} else if (file.getMeta().getScore() == null || file.getMeta().getScore().getApproved() == null) {
+				} else if (score == null || score.getApproved() == null) {
 					text.insert(0, "<span class=\"elw_pending\">P</span> ").append(" ?");
-				} else if (file.getMeta().getScore().getApproved()) {
+				} else if (score.getApproved()) {
 					text.insert(0, "<span class=\"elw_approved\">A</span> ");
 				} else {
 					text.insert(0, "<span class=\"elw_declined\">D</span> ").append(" !");
@@ -172,10 +182,10 @@ public class VelocityUtils {
 				cls.append("elw_open");
 			} else {
 				final DateTime scoreStamp;
-				if (file.getMeta().getScore() == null || file.getMeta().getScore().getCreateStamp() == null) {
+				if (score == null || score.getCreateStamp() == null) {
 					scoreStamp = new DateTime();
 				} else {
-					scoreStamp = new DateTime(file.getMeta().getScore().getCreateStamp().getTime());
+					scoreStamp = new DateTime(score.getCreateStamp().getTime());
 				}
 				final int dta = classFrom.computeToDiff(scoreStamp) - classFrom.computeToDiffStamp(file.getMeta());
 				text.append(dta).append(" days");

@@ -1,8 +1,10 @@
 #* @vtlvariable name="f" type="elw.web.FormatTool" *#
-#* @vtlvariable name="scores" type="elw.vo.Score[]" *#
 #* @vtlvariable name="score" type="elw.vo.Score" *#
 #* @vtlvariable name="slot" type="elw.vo.FileSlot" *#
+#* @vtlvariable name="file" type="elw.vo.FileMeta" *#
 #* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
+#* @vtlvariable name="stamp" type="elw.vo.Stamp" *#
+
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta content="text/html; charset=UTF-8">
@@ -22,23 +24,41 @@
  #parse("/__/messages.vm")
 <div id=main>
 	<h3 id="title"></h3>
- <div class="formArea ui-widget-header ui-corner-all">
-  <form method="POST" action="approve">
-   <input type="hidden" name="elw_ctx" value=""/>
-   <input type="hidden" name="stamp" value=""/>
-   <div id="sliders"></div>
-   <div id="sliders_auto"></div>
-   <div class="formLabel" style="width:12em;">Comment</div>
-   <div class="formField" style="width:16em; height: 7em;"><textarea name="comment" cols="25" rows="5"></textarea></div>
-   <div class="formButtons">
-    <input type="submit" name="action" value="Decline"/>
-    &nbsp;&nbsp;&nbsp;
-    <input type="submit" name="action" value="Approve"/>
-   </div>
-  </form>
- </div>
  <div>
-</div>
+  <div style="float: left">
+   <div class="formArea ui-widget-header ui-corner-all">
+    <form method="POST" action="approve">
+     <input type="hidden" name="elw_ctx" value="$f.esc($elw_ctx.toString())"/>
+     <input type="hidden" name="sId" value="$f.esc($slot.id)"/>
+     <input type="hidden" name="fId" value="$f.esc($file.id)"/>
+     #if($stamp)
+      <input type="hidden" name="stamp" value="$f.esc($stamp.toString())"/>
+     #end
+     <div id="sliders"></div>
+     <div id="sliders_auto"></div>
+     <div class="formLabel" style="width:12em;"><label for="approve_comment">Comment</label></div>
+     <div class="formField" style="width:16em; height: 7em;"><textarea id="approve_comment" name="comment" cols="25" rows="5"></textarea></div>
+     <div class="formLabel" style="width:12em; margin-top: 1em;"><label for="approve_action">Action</label></div>
+     <div class="formField" style="width:16em; margin-top: 1em;"><select id="approve_action" name="action">
+      <option value="approve">Approve</option>
+      <option value="decline">Decline</option>
+      <option value="next">Defer, I am not sure yet</option>
+     </select></div>
+     <div class="formButtons">
+      <input type="submit" name="action" value="Submit"/>
+     </div>
+    </form>
+   </div>
+  </div>
+  <div style="float: right;">
+   <form style="text-align: center;">
+    #parse("/__/modeCombo.vm")
+    <label for="dataLoader"></label>
+    <input id="dataLoader" type="button" value="Refresh"/>
+   </form>
+   <table id="dataTable" cellspacing="0" cellpadding="1"></table>
+  </div>
+ </div>
 </body>
 <script type="text/javascript">
  jQuery(document).ready(function() {
@@ -66,6 +86,8 @@
           #foreach($pow in $cri.pows)
            .append(jQuery("<option/>").attr("value", $pow).text($pow))
           #end
+      ).append(
+        jQuery("<input type=\"hidden\" />").attr("name", criId + "--ratio").val($score.getRatio($slot, $cri))
       )
     );
 
@@ -84,69 +106,66 @@
    })();
   #end
 
-##  var dataTable = jQuery('#dataTable').dataTable({
-##   "sDom": 'lprf<"clear">ti',
-##   'aaData': [ ],
-##   'aoColumns': [
-##    #* 0 index *# {"bVisible": false, "bSortable": false},
-##    #* 1 upload millis *# {"bVisible": false, "bSortable": false},
-##    #* 2 upload date - full *# {"bVisible": false, "bSortable": false},
-##    #* 3 upload date - nice*# {'sTitle': 'Time', "iDataSort": 1, "sWidth": "7em"},
-##    #* 4 author.id *# {"bVisible": false, "bSortable": false},
-##    #* 5 author.name *# {'sTitle': 'Author', "iDataSort": 3, "sWidth": "13em"},
-##    #* 6 class.index *# {"bVisible": false, "bSortable": false},
-##    #* 7 class.name *# {'sTitle': 'Class', "iDataSort": 5, "sWidth": "11em"},
-##    #* 8 slot.id *# {"bVisible": false, "bSortable": false},
-##    #* 9 slot.name *# {'sTitle': 'Slot', "iDataSort": 7, "sWidth": "5em" },
-##    #* 10 comment *# {'sTitle': 'Comment', "sWidth": "21em" },
-##    #* 11 status text*# {'sTitle': 'Status', "sWidth": "7em" },
-##    #* 12 status classes *# {"bVisible": false, "bSortable": false},
-##    #* 13 approve *# {'sTitle': 'A', "sWidth": "1em", "bSortable": false },
-##    #* 14 download *# {'sTitle': 'D', "sWidth": "1em", "bSortable": false }
-##   ],
-##   "aaSorting": [ [3,'asc'] ],
-##   "aaSortingFixed": [ ],
-##   "fnRowCallback": function(node, data, dispIndex, dataIndex) {
-##    jQuery("td:eq(5)", node).toggleClass(data[12]);
-##    jQuery("td:eq(0)", node).attr("title", data[2]);
-##    return node;
-##   }
-##  });
+  var dataTable = jQuery('#dataTable').dataTable({
+   "sDom": 'lprf<"clear">ti',
+   'aaData': [ ],
+   'aoColumns': [
+    #* 0 index - *# {"bVisible": false, "bSortable": false, "sWidth": "2em"},
+    #* 1 selected 0 *# {'sTitle': '&gt;', "bSortable": false, "sWidth": "2em"},
+    #* 2 best 1 *# {'sTitle': '*', "bSortable": false},
+    #* 3 score date millis - *# {"bVisible": false, "bSortable": false},
+    #* 4 score date full - *# {"bVisible": false, "bSortable": false},
+    #* 5 score date nice 2 *# {'sTitle': 'Date', "iDataSort": 3, "sWidth": "7em"},
+    #* 6 status classes - *# {"bVisible": false, "bSortable": false},
+    #* 7 status text 3 *# {'sTitle': 'Status', "iDataSort": 5, "sWidth": "7em"},
+    #* 8 scoring 4 *# {'sTitle': 'Scoring', "sWidth": "11em"},
+    #* 9 comment 5 *# {'sTitle': 'Comment', "sWidth": "21em"},
+    #* 10 edit score 6 *# {'sTitle': 'A', "sWidth": "2em", "bSortable": false, "fnRender": elw_dt_url(10, 'A')}
+   ],
+   "aaSorting": [ [3,'asc'] ],
+   "aaSortingFixed": [ ],
+   "fnRowCallback": function(node, data, dispIndex, dataIndex) {
+    jQuery("td:eq(3)", node).toggleClass(data[6]);
+    jQuery("td:eq(2)", node).attr("title", data[4]);
+    return node;
+   }
+  });
 
-//  function loadData() {
-//   var f_data = {};
-//   f_data["elw_ctx"] = jQuery("input[name=elw_ctx]").val();
-//   f_data["f_studId"] = jQuery("select[name=f_studId]").val();
-//   f_data["f_slotId"] = jQuery("select[name=f_slotId]").val();
-//   f_data["f_nodues"] = jQuery("input[name=f_nodues]").attr("checked");
-//   f_data["f_latest"] = jQuery("input[name=f_latest]").attr("checked");
-//
-//
-//   jQuery.ajax({
-//    "type": "GET",
-//    "url": "rest/log",
-//    "data": f_data,
-//    "success": function(resp) {
-//     if (resp == null || !resp.success) {
-//      jQuery.jGrowl("Response error", {"header":"AJAX error", "theme": "ui-state-error"});
-//      return;
-//     }
-//
-//     dataTable.fnClearTable(resp.data.length == 0);
-//     dataTable.fnAddData(resp.data);
-//    },
-//    "error": function() {
-//     jQuery.jGrowl("General error", {"header":"AJAX error", "theme": "ui-state-error"});
-//    },
-//    "dataType": 'json'
-//   });
-//
-//   return false;
-//  }
+  function loadData() {
+   var f_data = {};
+   f_data["elw_ctx"] = $f.json($elw_ctx.toString());
+   f_data["fId"] = $f.json($file.id);
+   f_data["sId"] = $f.json($slot.id);
+   #if($stamp)
+    f_data["stamp"] = $f.json($stamp.toString());
+   #end
+   f_data["f_mode"] = jQuery("select[name=f_mode]").val();
 
-//  jQuery("#dataLoader").click(loadData);
+   jQuery.ajax({
+    "type": "GET",
+    "url": "rest/scoreLog",
+    "data": f_data,
+    "success": function(resp) {
+     if (resp == null || !resp.success) {
+      jQuery.jGrowl("Response error", {"header":"AJAX error", "theme": "ui-state-error"});
+      return;
+     }
 
-//  loadData();
+     dataTable.fnClearTable(resp.data.length == 0);
+     dataTable.fnAddData(resp.data);
+    },
+    "error": function() {
+     jQuery.jGrowl("General error", {"header":"AJAX error", "theme": "ui-state-error"});
+    },
+    "dataType": 'json'
+   });
+
+   return false;
+  }
+
+  jQuery("#dataLoader").click(loadData);
+
+  loadData();
  });
 </script>
  #parse("/__/ready.vm")

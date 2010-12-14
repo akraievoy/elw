@@ -170,14 +170,14 @@ public class Ctx {
 		if (course == null) {
 			throw new IllegalArgumentException("please provide the course for context");
 		}
-		return new Ctx().extendCourse(course);
+		return new Ctx(STATE_C, null, null, null, course.getId(), -1, null, null, null).extendCourse(course);
 	}
 
 	public static Ctx forEnr(final Enrollment enr) {
 		if (enr == null) {
 			throw new IllegalArgumentException("please provide the enr for context");
 		}
-		return new Ctx().extendEnr(enr);
+		return new Ctx("e", enr.getId(), null, null, null, -1, null, null, null).extendEnr(enr);
 	}
 
 	public static Ctx forAssType(final Course course, final AssignmentType assType) {
@@ -187,7 +187,7 @@ public class Ctx {
 		if (assType == null) {
 			throw new IllegalArgumentException("please provide assType for context");
 		}
-		return new Ctx().extendCourse(course).extendAssType(assType);
+		return new Ctx(STATE_CT, null, null, null, course.getId(), -1, assType.getId(), null, null).extendCourse(course).extendAssType(assType);
 	}
 
 	public static Ctx forAss(Course course, AssignmentType assType, Assignment ass) {
@@ -200,7 +200,7 @@ public class Ctx {
 		if (ass == null) {
 			throw new IllegalArgumentException("please provide ass for context");
 		}
-		return new Ctx().extendCourse(course).extendAssType(assType).extendAss(ass);
+		return new Ctx(STATE_CTA, null, null, null, course.getId(), -1, assType.getId(), ass.getId(), null).extendCourse(course).extendAssType(assType).extendAss(ass);
 	}
 
 	public Ctx resolve(EnrollDao enrDao, GroupDao groupDao, CourseDao courseDao) {
