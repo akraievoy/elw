@@ -1,0 +1,23 @@
+#* @vtlvariable name="__ctx" type="elw.dao.Ctx" *#
+#* @vtlvariable name="f" type="elw.web.FormatTool" *#
+#* @vtlvariable name="f_verId" type="java.lang.String" *#
+var f_verId = jQuery("select[name=f_verId]");
+#foreach($entry in $__ctx.enr.index)
+ #set($__idx = $velocityCount - 1)
+ #set($__ctx_ass = $__ctx.extendIndex($__idx))
+ f_verId.append(
+  jQuery("<option></option>")
+    .attr("value", $f.json($__ctx_ass.ass.id) + "--")
+    .text($f.json($__ctx_ass.ass.name))
+ );
+ #foreach($ver in $__ctx_ass.ass.versions)
+ f_verId.append(
+   jQuery("<option></option>")
+     .attr("value", $f.json($__ctx_ass.ass.id) + "--" + $f.json($ver.id) + "--")
+     .text($f.json($__ctx_ass.ass.name) + " - " + $f.json($ver.name))
+ );
+ #end
+#end
+#if($f_verId)
+ f_verId.val($f.json($f_verId));
+#end

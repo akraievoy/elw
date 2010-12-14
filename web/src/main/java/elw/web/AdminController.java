@@ -345,8 +345,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 
 	protected List<Object[]> prepareLogEntries(
 			Ctx ctx, Format format, VelocityUtils u,
-			boolean noDues, boolean latest, String slotId, String studId
-	) {
+			boolean noDues, boolean latest, String slotId, String studId, String verId) {
 		final List<Object[]> logData = new ArrayList<Object[]>();
 
 		for (Student stud : ctx.getGroup().getStudents()) {
@@ -357,6 +356,9 @@ public class AdminController extends MultiActionController implements WebSymbols
 			final Ctx ctxStud = ctx.extendStudent(stud);
 			for (int index = 0; index < ctx.getEnr().getIndex().size(); index++) {
 				final Ctx ctxVer = ctxStud.extendIndex(index);
+				if (W.excluded(verId, ctxVer.getAss().getId(), ctxVer.getVer().getId())) {
+					continue;
+				}
 				final AssignmentType aType = ctxVer.getAssType();
 				final FileSlot[] slots = aType.getFileSlots();
 
@@ -377,7 +379,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 								continue;
 							}
 
-							logData.add(createRowLog(ctx, format, u, logData, index, ctxVer, slot, uploads[i]));
+							logData.add(createRowLog(format, u, logData, index, ctxVer, slot, uploads[i]));
 						}
 					}
 				}
@@ -388,7 +390,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 	}
 
 	protected Object[] createRowLog(
-			Ctx ctx, Format format, VelocityUtils u, List<Object[]> data,
+			Format format, VelocityUtils u, List<Object[]> data,
 			int index, Ctx ctxVer, FileSlot slot, Entry<FileMeta> e
 	) {
 		final long time = e.getMeta().getCreateStamp().getTime();
@@ -439,11 +441,12 @@ public class AdminController extends MultiActionController implements WebSymbols
 		final boolean noDues = "true".equals(req.getParameter("f_nodues"));
 		final boolean latest = "true".equals(req.getParameter("f_latest"));
 		final String slotId = req.getParameter("f_slotId");
+		final String verId = req.getParameter("f_verId");
 		final String studId = req.getParameter("f_studId");
 
 		final List<Object[]> logData = prepareLogEntries(
 				ctx, format, u,
-				noDues, latest, slotId, studId
+				noDues, latest, slotId, studId, verId
 		);
 
 		return new ModelAndView(ViewJackson.success(logData));

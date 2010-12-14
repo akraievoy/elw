@@ -18,22 +18,24 @@
  <div id="header_hr"></div>
 </div>
  #parse("/__/messages.vm")
- <div style="float: left;">
+ <div style="">
   <form style="text-align: center;">
    <input type="hidden" name="elw_ctx" value="$elw_ctx.toString()"/>
-   <select name="f_studId"><option value="">Choose...</option></select>
-   <select name="f_slotId"><option value="">Choose...</option></select>
-   <input type="checkbox" name="f_nodues" value="true"/>No&nbsp;dues
-   <input type="checkbox" name="f_latest" value="true"/>Latest&nbsp;only
-   <input id="dataLoader" type="button" value="Refresh"/>
+   <select id="log_filter_stud" name="f_studId" style="width: 7em;"><option value="">Student...</option></select><label for="log_filter_stud"></label>
+   <select id="log_filter_slot" name="f_slotId" style="width: 11em;"><option value="">Slot...</option></select><label for="log_filter_slot"></label>
+   <select id="log_filter_ver" name="f_verId" style="width: 13em;"><option value="">Version...</option></select><label for="log_filter_ver"></label>
+   <input id="log_filter_nodues" type="checkbox" name="f_nodues" value="true"/><label for="log_filter_nodues">No&nbsp;dues</label>
+   <input id="log_filter_latest" type="checkbox" name="f_latest" value="true"/><label for="log_filter_latest">Latest&nbsp;only</label>
+   <label for="dataLoader"></label><input id="dataLoader" type="button" value="Refresh"/>
   </form>
-  <table id="dataTable" cellspacing="0"></table>
+  <table id="dataTable" cellspacing="0" width="92%" align="center"></table>
  </div>
 </body>
 <script type="text/javascript">
  jQuery(document).ready(function() {
   #parse("/__/studCombo.vm")
   #parse("/__/slotCombo.vm")
+  #set($__ctx = $elw_ctx) #parse("/__/versionCombo.vm")
 
   #if($f_noDues)
    jQuery("input[name=f_nodues]").attr("checked", $f_noDues);
@@ -49,18 +51,18 @@
     #* 0 index *# {"bVisible": false, "bSortable": false},
     #* 1 upload millis *# {"bVisible": false, "bSortable": false},
     #* 2 upload date - full *# {"bVisible": false, "bSortable": false},
-    #* 3 upload date - nice*# {'sTitle': 'Time', "iDataSort": 1, "sWidth": "7em"},
+    #* 3 upload date - nice*# {'sTitle': 'Time', "iDataSort": 1, "sWidth": "5em", "sClass": "text_align_right"},
     #* 4 author.id *# {"bVisible": false, "bSortable": false},
-    #* 5 author.name *# {'sTitle': 'Author', "iDataSort": 3, "sWidth": "13em"},
+    #* 5 author.name *# {'sTitle': 'Author', "iDataSort": 3, "sClass": "text_align_center"},
     #* 6 class.index *# {"bVisible": false, "bSortable": false},
-    #* 7 class.name *# {'sTitle': 'Class', "iDataSort": 5, "sWidth": "11em"},
+    #* 7 class.name *# {'sTitle': 'Class', "iDataSort": 5},
     #* 8 slot.id *# {"bVisible": false, "bSortable": false},
-    #* 9 slot.name *# {'sTitle': 'Slot', "iDataSort": 7, "sWidth": "5em" },
-    #* 10 comment *# {'sTitle': 'Comment', "sWidth": "21em" },
-    #* 11 status text*# {'sTitle': 'Status', "sWidth": "7em" },
+    #* 9 slot.name *# {'sTitle': 'Slot', "iDataSort": 7, "sClass": "text_align_center" },
+    #* 10 comment *# {'sTitle': 'Comment' },
+    #* 11 status text*# {'sTitle': 'Status', "sClass": "text_align_center" },
     #* 12 status classes *# {"bVisible": false, "bSortable": false},
-    #* 13 approve *# {'sTitle': 'A', "sWidth": "1em", "bSortable": false },
-    #* 14 download *# {'sTitle': 'D', "sWidth": "1em", "bSortable": false }
+    #* 13 approve *# {'sTitle': 'A', "sWidth": "1em", "bSortable": false, "sClass": "text_align_center" },
+    #* 14 download *# {'sTitle': 'D', "sWidth": "1em", "bSortable": false, "sClass": "text_align_center" }
    ],
    "aaSorting": [ [3,'asc'] ],
    "aaSortingFixed": [ ],
@@ -76,6 +78,7 @@
    f_data["elw_ctx"] = jQuery("input[name=elw_ctx]").val();
    f_data["f_studId"] = jQuery("select[name=f_studId]").val();
    f_data["f_slotId"] = jQuery("select[name=f_slotId]").val();
+   f_data["f_verId"] = jQuery("select[name=f_verId]").val();
    f_data["f_nodues"] = jQuery("input[name=f_nodues]").attr("checked");
    f_data["f_latest"] = jQuery("input[name=f_latest]").attr("checked");
 

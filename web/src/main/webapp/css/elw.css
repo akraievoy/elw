@@ -274,6 +274,19 @@ a.popupTrigger:hover {
 	border: #CCCCCC thin dashed; 
 }
 
+.text_align_center {
+ text-align: center;
+}
+
+.text_align_right {
+ text-align: right;
+}
+
+th.text_align_right {
+ text-align: center;
+ padding-right: 1em;
+}
+
 .elw_open {
 }
 .elw_closed {
