@@ -129,11 +129,12 @@ public class VelocityUtils {
 				if (file == null) {
 					text.insert(0, "<span class=\"elw_open\">O</span> ");
 				} else if (score == null || score.getApproved() == null) {
-					text.insert(0, "<span class=\"elw_pending\">P</span> ").append(" ?");
+					final String commentSafe = score == null ? "Preliminary": score.getComment();
+					text.insert(0, "<span class=\"elw_pending\" title=\""+f.esc(commentSafe)+"\">P</span> ");
 				} else if (score.getApproved()) {
-					text.insert(0, "<span class=\"elw_approved\">A</span> ");
+					text.insert(0, "<span class=\"elw_approved\" title=\""+f.esc(score.getComment())+"\">A</span> ");
 				} else {
-					text.insert(0, "<span class=\"elw_declined\">D</span> ").append(" !");
+					text.insert(0, "<span class=\"elw_declined\" title=\""+f.esc(score.getComment())+"\">D</span> ");
 				}
 			}
 		} else if ("s".equalsIgnoreCase(mode)) {
@@ -166,11 +167,12 @@ public class VelocityUtils {
 				if (file == null) {
 					text.insert(0, "<span class=\"elw_open\">O</span> ");
 				} else if (score == null || score.getApproved() == null) {
-					text.insert(0, "<span class=\"elw_pending\">P</span> ").append(" ?");
+					final String commentSafe = score == null ? "Preliminary": score.getComment();
+					text.insert(0, "<span class=\"elw_pending\" title=\""+f.esc(commentSafe)+"\">P</span> ");
 				} else if (score.getApproved()) {
-					text.insert(0, "<span class=\"elw_approved\">A</span> ");
+					text.insert(0, "<span class=\"elw_approved\" title=\""+f.esc(score.getComment())+"\">A</span> ");
 				} else {
-					text.insert(0, "<span class=\"elw_declined\">D</span> ").append(" !");
+					text.insert(0, "<span class=\"elw_declined\" title=\""+f.esc(score.getComment())+"\">D</span> ");
 				}
 			}
 		} else if ("dta".equalsIgnoreCase(mode)) {

@@ -317,11 +317,27 @@ public class FormatTool implements Format {
 		}
 	}
 
+	final String escSearches = "&\"\'><\r\n";
+	final String[] escReplaces = {"&amp;", "&quot;", "&#39;", "&gt;", "&lt;", "&#13;", "&#10;"};
+
+
 	public String esc(final String str) {
-		if (str == null || str.trim().length() == 0) {
+		if (str == null || str.length() == 0) {
 			return "";
 		}
-		return str.replaceAll("&", "&amp;").replaceAll("\"", "&quot;").replaceAll(">", "&gt;").replaceAll("<", "&lt;");
+
+		final StringBuilder res = new StringBuilder();
+		for (int pos = 0; pos < str.length(); pos++) {
+			final char strChr = str.charAt(pos);
+			final int chrIdx = escSearches.indexOf(strChr);
+			if (chrIdx < 0) {
+				res.append(strChr);
+			} else {
+				res.append(escReplaces[chrIdx]);
+			}
+		}
+
+		return res.toString();
 	}
 
 	public String lines(final String text) {

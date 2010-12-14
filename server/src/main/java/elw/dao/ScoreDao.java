@@ -92,6 +92,10 @@ public class ScoreDao extends Dao<Score> {
 			final Double ratio;
 			final Integer powDef;
 
+			if (res.contains(slot, c)) {
+				continue;
+			}
+
 			if (!c.isAuto()) {
 				ratio = G4Parse.parse(c.getRatio(), (Double) null);
 				powDef = G4Parse.parse(c.getPowDef(), 0);
