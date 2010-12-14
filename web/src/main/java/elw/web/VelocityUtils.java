@@ -212,6 +212,8 @@ public class VelocityUtils {
 			}
 		}
 
+		overdueClasses(file, classDue, cls);
+
 		final Map<String, String> res = new TreeMap<String, String>();
 		res.put("text", text.toString());
 		res.put("classes", cls.toString());

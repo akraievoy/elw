@@ -345,7 +345,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 
 	protected List<Object[]> prepareLogEntries(
 			Ctx ctx, Format format, VelocityUtils u,
-			boolean noDues, boolean latest, String slotId, String studId, String verId) {
+			boolean noDues, boolean latest, String slotId, String studId, String verId, final String mode) {
 		final List<Object[]> logData = new ArrayList<Object[]>();
 
 		for (Student stud : ctx.getGroup().getStudents()) {
@@ -379,7 +379,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 								continue;
 							}
 
-							logData.add(createRowLog(format, u, logData, index, ctxVer, slot, uploads[i]));
+							logData.add(createRowLog(format, u, mode, logData, index, ctxVer, slot, uploads[i]));
 						}
 					}
 				}
@@ -390,7 +390,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 	}
 
 	protected Object[] createRowLog(
-			Format format, VelocityUtils u, List<Object[]> data,
+			Format format, VelocityUtils u, final String mode, List<Object[]> data,
 			int index, Ctx ctxVer, FileSlot slot, Entry<FileMeta> e
 	) {
 		final long time = e.getMeta().getCreateStamp().getTime();
@@ -401,7 +401,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 				ctxVer.getVer(), slot, e.getMeta(), format
 		);
 		final String q = "?elw_ctx=" + ctxVer.toString() + "&s=s&sId=" + slot.getId() + "&fId=" + e.getMeta().getId();
-		final Map<String, String> status = u.status(format, "s", ctxVer, slot, e);
+		final Map<String, String> status = u.status(format, mode, ctxVer, slot, e);
 		final Object[] dataRow = {
 				/* 0 index */ data.size(),
 				/* 1 upload millis */ time,
@@ -443,10 +443,11 @@ public class AdminController extends MultiActionController implements WebSymbols
 		final String slotId = req.getParameter("f_slotId");
 		final String verId = req.getParameter("f_verId");
 		final String studId = req.getParameter("f_studId");
+		final String mode = req.getParameter("f_mode");
 
 		final List<Object[]> logData = prepareLogEntries(
 				ctx, format, u,
-				noDues, latest, slotId, studId, verId
+				noDues, latest, slotId, studId, verId, mode == null ? "s" : mode
 		);
 
 		return new ModelAndView(ViewJackson.success(logData));
