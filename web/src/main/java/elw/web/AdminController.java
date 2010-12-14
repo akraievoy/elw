@@ -886,7 +886,12 @@ public class AdminController extends MultiActionController implements WebSymbols
 		}
 
 		public static boolean excluded(String aTypeSlotFilter, String typeId, String slotId) {
-			return excluded(aTypeSlotFilter, typeId + "--" + slotId);
+			if (aTypeSlotFilter == null) {
+				return false;
+			}
+
+			final String typeSlotExpr = typeId + "--" + slotId + "--";
+			return !typeSlotExpr.startsWith(aTypeSlotFilter);
 		}
 
 		public static Stamp parseStamp(HttpServletRequest req, final String paramName) {

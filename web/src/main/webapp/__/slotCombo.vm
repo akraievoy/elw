@@ -3,12 +3,16 @@
 #* @vtlvariable name="f_slotId" type="java.lang.String" *#
 var f_slotId = jQuery("select[name=f_slotId]");
 #foreach($aType in $elw_ctx.course.assTypes)
+ f_slotId.append(
+  jQuery("<option></option>")
+    .attr("value", $f.json($aType.id) + "--")
+    .text($f.json($aType.name))
+ );
  #foreach($slot in $aType.fileSlots)
  f_slotId.append(
    jQuery("<option></option>")
-     .attr("value", $f.json($aType.id) + "--" + $f.json($slot.id))
-     .text($f.json($aType.name) + " - " + $f.json($slot.name)
-   )
+     .attr("value", $f.json($aType.id) + "--" + $f.json($slot.id) + "--")
+     .text($f.json($aType.name) + " - " + $f.json($slot.name))
  );
  #end
 #end
