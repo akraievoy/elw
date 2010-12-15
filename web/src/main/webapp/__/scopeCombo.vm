@@ -1,0 +1,13 @@
+<select name="f_scope">
+ <option value="s--">Any @ Stud </option>
+ <option value="s--o--">Open @ Stud</option>
+ <option value="s--p--">Pending @ Stud</option>
+ <option value="s--od--" selected="true">Open/Declined @ Stud</option>
+ <option value="s--opd--">Open/Pending/Declined @ Stud</option>
+ <option value="s--a--">Approved @ Stud</option>
+ <option value="s--d--">Declined @ Stud</option>
+ <option value="vt--f">File @ Version/Task</option>
+ <option value="v--f">File @ Version</option>
+ <option value="t--f">File @ Task</option>
+ <option value="t--o">Open @ Task</option>
+</select>

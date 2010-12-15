@@ -26,6 +26,7 @@
    <select id="log_filter_ver" name="f_verId" style="width: 13em;"><option value="">Version...</option></select><label for="log_filter_ver"></label>
    #parse("/__/dueCombo.vm")
    #parse("/__/modeCombo.vm")
+   #parse("/__/scopeCombo.vm")
    <input id="log_filter_latest" type="checkbox" name="f_latest" value="true"/><label for="log_filter_latest">Latest&nbsp;only</label>
    <label for="dataLoader"></label><input id="dataLoader" type="button" value="Refresh"/>
   </form>

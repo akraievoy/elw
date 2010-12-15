@@ -346,41 +346,41 @@ public class AdminController extends MultiActionController implements WebSymbols
 	}
 
 	protected List<Object[]> prepareLogEntries(
-			Ctx ctx, Format format, VelocityUtils u,
-			String due, boolean latest, String slotId, String studId, String verId, final String mode) {
+			Ctx ctx, Format format, VelocityUtils u, LogFilter logFilter
+	) {
 		final List<Object[]> logData = new ArrayList<Object[]>();
 
 		for (Student stud : ctx.getGroup().getStudents()) {
-			if (W.excluded(studId, stud.getId())) {
+			if (W.excluded(logFilter.getStudId(), stud.getId())) {
 				continue;
 			}
 
 			final Ctx ctxStud = ctx.extendStudent(stud);
 			for (int index = 0; index < ctx.getEnr().getIndex().size(); index++) {
 				final Ctx ctxVer = ctxStud.extendIndex(index);
-				if (W.excluded(verId, ctxVer.getAss().getId(), ctxVer.getVer().getId())) {
+				if (W.excluded(logFilter.getVerId(), ctxVer.getAss().getId(), ctxVer.getVer().getId())) {
 					continue;
 				}
 				final AssignmentType aType = ctxVer.getAssType();
 				final FileSlot[] slots = aType.getFileSlots();
 
 				for (FileSlot slot : slots) {
-					if (W.excluded(slotId, aType.getId(), slot.getId())) {
+					if (W.excluded(logFilter.getSlotId(), aType.getId(), slot.getId())) {
 						continue;
 					}
 
 					final Entry<FileMeta>[] uploads = fileDao.findFilesFor(FileDao.SCOPE_STUD, ctxVer, slot.getId());
-					if (W.excluded(due, ctxVer, slot, uploads)) {
+					if (W.excluded(logFilter.getDue(), ctxVer, slot, uploads)) {
 						continue;
 					}
 
 					for (int i = 0, uploadsLength = uploads.length; i < uploadsLength; i++) {
 						final boolean last = i + 1 == uploadsLength;
-						if (latest && !last) {
+						if (logFilter.isLatest() && !last) {
 							continue;
 						}
 
-						logData.add(createRowLog(format, u, mode, logData, index, ctxVer, slot, uploads[i]));
+						logData.add(createRowLog(format, u, logFilter.getMode(), logData, index, ctxVer, slot, uploads[i]));
 					}
 				}
 			}
@@ -438,16 +438,8 @@ public class AdminController extends MultiActionController implements WebSymbols
 		final Format format = (Format) model.get(FormatTool.MODEL_KEY);
 		final VelocityUtils u = (VelocityUtils) model.get(VelocityUtils.MODEL_KEY);
 
-		final String due = req.getParameter("f_due");
-		final boolean latest = "true".equals(req.getParameter("f_latest"));
-		final String slotId = req.getParameter("f_slotId");
-		final String verId = req.getParameter("f_verId");
-		final String studId = req.getParameter("f_studId");
-		final String mode = req.getParameter("f_mode");
-
 		final List<Object[]> logData = prepareLogEntries(
-				ctx, format, u,
-				due == null ? "any" : due, latest, slotId, studId, verId, mode == null ? "s" : mode
+				ctx, format, u, W.parseFilter(req)
 		);
 
 		return new ModelAndView(ViewJackson.success(logData));
@@ -941,6 +933,18 @@ public class AdminController extends MultiActionController implements WebSymbols
 
 			return false;
 		}
+
+		protected static LogFilter parseFilter(HttpServletRequest req) {
+			final String due = req.getParameter("f_due");
+			final boolean latest = "true".equals(req.getParameter("f_latest"));
+			final String slotId = req.getParameter("f_slotId");
+			final String verId = req.getParameter("f_verId");
+			final String studId = req.getParameter("f_studId");
+			final String mode = req.getParameter("f_mode");
+			final String scope = req.getParameter("f_scope");
+			final LogFilter logFilter = new LogFilter(slotId, studId, verId, due == null ? "any" : due, mode == null ? "s" : mode, scope == null ? "s--opd--" : scope, latest);
+			return logFilter;
+		}
 	}
 
 	protected static interface WebMethodScore {
@@ -992,6 +996,56 @@ public class AdminController extends MultiActionController implements WebSymbols
 		final Stamp stamp = W.parseStamp(req, "stamp");
 
 		return wm.handleScore(req, resp, model, ctx, slot, file, stamp);
+	}
+
+	static class LogFilter {
+		final String due;
+		final boolean latest;
+		final String slotId;
+		final String studId;
+		final String verId;
+		final String mode;
+		final String scope;
+
+		private LogFilter(
+				String slotId, String studId, String verId, String due, String mode, String scope, boolean latest
+		) {
+			this.due = due;
+			this.latest = latest;
+			this.slotId = slotId;
+			this.studId = studId;
+			this.verId = verId;
+			this.mode = mode;
+			this.scope = scope;
+		}
+
+		public String getDue() {
+			return due;
+		}
+
+		public boolean isLatest() {
+			return latest;
+		}
+
+		public String getSlotId() {
+			return slotId;
+		}
+
+		public String getStudId() {
+			return studId;
+		}
+
+		public String getVerId() {
+			return verId;
+		}
+
+		public String getMode() {
+			return mode;
+		}
+
+		public String getScope() {
+			return scope;
+		}
 	}
 }
 
