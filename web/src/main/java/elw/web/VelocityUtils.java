@@ -66,8 +66,8 @@ public class VelocityUtils {
 
 		final elw.vo.Class classFrom = ctx.getEnr().getClasses().get(ctx.getIndexEntry().getClassFrom());
 		final elw.vo.Class classDue;
-		if (ctx.getIndexEntry().getClassDue() != null) {
-			final Integer classDueIdx = ctx.getIndexEntry().getClassDue().get(slot.getId());
+		final Integer classDueIdx = ctx.getIndexEntry().getClassDue().get(slot.getId());
+		if (classDueIdx != null) {
 			classDue = ctx.getEnr().getClasses().get(classDueIdx);
 		} else {
 			classDue = null;

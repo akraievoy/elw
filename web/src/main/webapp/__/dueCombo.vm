@@ -1,0 +1,7 @@
+<select name="f_due">
+ <option value="any">Any</option>
+ <option value="none">No Due</option>
+ <option value="over">Overdue</option>
+ <option value="today">Due today</option>
+ <option value="twoweeks">Due within two weeks</option>
+</select>

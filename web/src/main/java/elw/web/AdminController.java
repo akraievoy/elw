@@ -1,4 +1,4 @@
-/*
+	/*
  * ELW : e-learning workspace
  * Copyright (C) 2010  Anton Kraievoy
  *
@@ -24,6 +24,7 @@ import elw.dp.mips.MipsValidator;
 import elw.miniweb.Message;
 import elw.miniweb.ViewJackson;
 import elw.vo.*;
+import elw.vo.Class;
 import org.akraievoy.gear.G4Io;
 import org.akraievoy.gear.G4Parse;
 import org.akraievoy.gear.G4Str;
@@ -34,6 +35,7 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -345,7 +347,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 
 	protected List<Object[]> prepareLogEntries(
 			Ctx ctx, Format format, VelocityUtils u,
-			boolean noDues, boolean latest, String slotId, String studId, String verId, final String mode) {
+			String due, boolean latest, String slotId, String studId, String verId, final String mode) {
 		final List<Object[]> logData = new ArrayList<Object[]>();
 
 		for (Student stud : ctx.getGroup().getStudents()) {
@@ -363,24 +365,22 @@ public class AdminController extends MultiActionController implements WebSymbols
 				final FileSlot[] slots = aType.getFileSlots();
 
 				for (FileSlot slot : slots) {
-					final Map<String, Integer> dueMap = ctxVer.getIndexEntry().getClassDue();
-					if (!noDues && (dueMap == null || dueMap.get(slot.getId()) == null)) {
-						continue;
-					}
 					if (W.excluded(slotId, aType.getId(), slot.getId())) {
 						continue;
 					}
 
 					final Entry<FileMeta>[] uploads = fileDao.findFilesFor(FileDao.SCOPE_STUD, ctxVer, slot.getId());
-					if (uploads != null) {
-						for (int i = 0, uploadsLength = uploads.length; i < uploadsLength; i++) {
-							final boolean last = i + 1 == uploadsLength;
-							if (latest && !last) {
-								continue;
-							}
+					if (W.excluded(due, ctxVer, slot, uploads)) {
+						continue;
+					}
 
-							logData.add(createRowLog(format, u, mode, logData, index, ctxVer, slot, uploads[i]));
+					for (int i = 0, uploadsLength = uploads.length; i < uploadsLength; i++) {
+						final boolean last = i + 1 == uploadsLength;
+						if (latest && !last) {
+							continue;
 						}
+
+						logData.add(createRowLog(format, u, mode, logData, index, ctxVer, slot, uploads[i]));
 					}
 				}
 			}
@@ -438,7 +438,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 		final Format format = (Format) model.get(FormatTool.MODEL_KEY);
 		final VelocityUtils u = (VelocityUtils) model.get(VelocityUtils.MODEL_KEY);
 
-		final boolean noDues = "true".equals(req.getParameter("f_nodues"));
+		final String due = req.getParameter("f_due");
 		final boolean latest = "true".equals(req.getParameter("f_latest"));
 		final String slotId = req.getParameter("f_slotId");
 		final String verId = req.getParameter("f_verId");
@@ -447,7 +447,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 
 		final List<Object[]> logData = prepareLogEntries(
 				ctx, format, u,
-				noDues, latest, slotId, studId, verId, mode == null ? "s" : mode
+				due == null ? "any" : due, latest, slotId, studId, verId, mode == null ? "s" : mode
 		);
 
 		return new ModelAndView(ViewJackson.success(logData));
@@ -901,6 +901,45 @@ public class AdminController extends MultiActionController implements WebSymbols
 		public static Stamp parseStamp(HttpServletRequest req, final String paramName) {
 			final String paramVal = req.getParameter(paramName);
 			return paramVal != null ? Stamp.fromString(paramVal) : null;
+		}
+
+		protected static boolean excluded(String due, Ctx ctxVer, FileSlot slot, Entry<FileMeta>[] uploads) {
+			if ("any".equalsIgnoreCase(due)) {
+				return false;
+			}
+
+			final Integer classDueIdx = ctxVer.getIndexEntry().getClassDue().get(slot.getId());
+			if ("none".equalsIgnoreCase(due)) {
+				return classDueIdx != null;
+			}
+			if (classDueIdx == null) {
+				return !"none".equalsIgnoreCase(due);
+			}
+
+			boolean hasFiles = false;
+			for (Entry<FileMeta> upload : uploads)  {
+				if (upload.getMeta().getScore() == null || !Boolean.FALSE.equals(upload.getMeta().getScore().getApproved())) {
+					hasFiles = true;
+					break;
+				}
+			}
+
+			final Class classDue = ctxVer.getEnr().getClasses().get(classDueIdx);
+			final int dayDiff = classDue.computeToDiff(new DateTime());
+
+			if ("over".equalsIgnoreCase(due)) {
+				return dayDiff <= 0 || hasFiles;
+			}
+
+			if ("today".equalsIgnoreCase(due)) {
+				return (dayDiff > 0 || hasFiles) && (dayDiff <= 0 || hasFiles);
+			}
+
+			if ("twoweeks".equalsIgnoreCase(due)) {
+				return ((dayDiff > 0 || dayDiff < -14) && hasFiles) && (dayDiff <= 0 || hasFiles);
+			}
+
+			return false;
 		}
 	}
 
