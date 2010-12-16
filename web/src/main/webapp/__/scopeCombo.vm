@@ -1,11 +1,11 @@
-<select name="f_scope">
- <option value="s--">Any @ Stud </option>
- <option value="s--o--">Open @ Stud</option>
- <option value="s--p--">Pending @ Stud</option>
- <option value="s--od--" selected="true">Open/Declined @ Stud</option>
- <option value="s--opd--">Open/Pending/Declined @ Stud</option>
- <option value="s--a--">Approved @ Stud</option>
- <option value="s--d--">Declined @ Stud</option>
+<select name="f_scope" style="width: 11em;">
+ <option value="s--">Any @ Student</option>
+ <option value="s--o--">Open @ Student</option>
+ <option value="s--p--">Pending @ Student</option>
+ <option value="s--od--" selected="true">Open/Declined @ Student</option>
+ <option value="s--opd--">Open/Pending/Declined @ Student</option>
+ <option value="s--a--">Approved @ Student</option>
+ <option value="s--d--">Declined @ Student</option>
  <option value="c--">Any @ Course</option>
  <option value="c--v--">Version @ Course</option>
  <option value="c--a--">Task @ Course</option>

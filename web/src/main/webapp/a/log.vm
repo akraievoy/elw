@@ -4,6 +4,8 @@
 #* @vtlvariable name="f_latest" type="java.lang.Boolean" *#
 #* @vtlvariable name="f_studId" type="java.lang.String" *#
 #* @vtlvariable name="f_slotId" type="java.lang.String" *#
+#* @vtlvariable name="f_mode" type="java.lang.String" *#
+#* @vtlvariable name="f_scope" type="java.lang.String" *#
 <html>
 <head>
  <meta content="text/html; charset=UTF-8">
@@ -22,8 +24,8 @@
   <form id="log_filter" style="text-align: center;">
    <input type="hidden" name="elw_ctx" value="$elw_ctx.toString()"/>
    <select id="log_filter_stud" name="f_studId" style="width: 7em;"><option value="">Student...</option></select><label for="log_filter_stud"></label>
-   <select id="log_filter_slot" name="f_slotId" style="width: 11em;"><option value="">Slot...</option></select><label for="log_filter_slot"></label>
-   <select id="log_filter_ver" name="f_verId" style="width: 13em;"><option value="">Version...</option></select><label for="log_filter_ver"></label>
+   <select id="log_filter_slot" name="f_slotId" style="width: 11em;"><option value="">Task Type / Slot...</option></select><label for="log_filter_slot"></label>
+   <select id="log_filter_ver" name="f_verId" style="width: 13em;"><option value="">Task / Version...</option></select><label for="log_filter_ver"></label>
    #parse("/__/dueCombo.vm")
    #parse("/__/modeCombo.vm")
    #parse("/__/scopeCombo.vm")
@@ -43,6 +45,12 @@
   #end
   #if($f_latest)
    jQuery("input[name=f_latest]").attr("checked", $f_latest);
+  #end
+  #if($f_mode)
+   jQuery("select[name=f_mode]").val($f_mode);
+  #end
+  #if($f_scope)
+   jQuery("select[name=f_mode]").val($f_scope);
   #end
 
   var dataTable = jQuery('#dataTable').dataTable({
