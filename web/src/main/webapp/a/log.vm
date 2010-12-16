@@ -19,7 +19,7 @@
 </div>
  #parse("/__/messages.vm")
  <div style="">
-  <form style="text-align: center;">
+  <form id="log_filter" style="text-align: center;">
    <input type="hidden" name="elw_ctx" value="$elw_ctx.toString()"/>
    <select id="log_filter_stud" name="f_studId" style="width: 7em;"><option value="">Student...</option></select><label for="log_filter_stud"></label>
    <select id="log_filter_slot" name="f_slotId" style="width: 11em;"><option value="">Slot...</option></select><label for="log_filter_slot"></label>
@@ -28,7 +28,6 @@
    #parse("/__/modeCombo.vm")
    #parse("/__/scopeCombo.vm")
    <input id="log_filter_latest" type="checkbox" name="f_latest" value="true"/><label for="log_filter_latest">Latest&nbsp;only</label>
-   <label for="dataLoader"></label><input id="dataLoader" type="button" value="Refresh"/>
   </form>
   <table id="dataTable" cellspacing="0" width="95%" align="center"></table>
  </div>
@@ -76,6 +75,11 @@
   });
 
   function loadData() {
+   var f_inputs = jQuery("form#log_filter input[name^=\"f_\"]:enabled");
+   var f_selects = jQuery("form#log_filter select[name^=\"f_\"]:enabled");
+   f_inputs.attr("disabled", "disabled");
+   f_selects.attr("disabled", "disabled");
+
    var f_data = {};
    f_data["elw_ctx"] = jQuery("input[name=elw_ctx]").val();
    f_data["f_studId"] = jQuery("select[name=f_studId]").val();
@@ -91,6 +95,8 @@
     "url": "rest/log",
     "data": f_data,
     "success": function(resp) {
+     f_inputs.attr("disabled", "");
+     f_selects.attr("disabled", "");
      if (resp == null || !resp.success) {
       jQuery.jGrowl("Response error", {"header":"AJAX error", "theme": "ui-state-error"});
       return;
@@ -100,6 +106,8 @@
      dataTable.fnAddData(resp.data);
     },
     "error": function() {
+     f_inputs.attr("disabled", "");
+     f_selects.attr("disabled", "");
      jQuery.jGrowl("General error", {"header":"AJAX error", "theme": "ui-state-error"});
     },
     "dataType": 'json'
@@ -108,7 +116,8 @@
    return false;
   }
 
-  jQuery("#dataLoader").click(loadData);
+  jQuery("form#log_filter input[name^=\"f_\"]").change(loadData);
+  jQuery("form#log_filter select[name^=\"f_\"]").change(loadData);
 
   loadData();
  });
