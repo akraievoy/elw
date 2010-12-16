@@ -22,6 +22,7 @@ import elw.dao.*;
 import elw.miniweb.Message;
 import elw.miniweb.ViewJackson;
 import elw.vo.*;
+import elw.web.core.W;
 import org.akraievoy.gear.G4Io;
 import org.apache.commons.fileupload.FileUploadException;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -278,7 +279,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 			}
 
 			for (String slotId : slotIdToFiles.keySet()) {
-				if (AdminController.W.excluded(aTypeSlotId, assType.getId(), slotId)) {
+				if (W.excluded(aTypeSlotId, assType.getId(), slotId)) {
 					continue;
 				}
 

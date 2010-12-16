@@ -6,8 +6,9 @@
  <option value="s--opd--">Open/Pending/Declined @ Stud</option>
  <option value="s--a--">Approved @ Stud</option>
  <option value="s--d--">Declined @ Stud</option>
- <option value="vt--f">File @ Version/Task</option>
- <option value="v--f">File @ Version</option>
- <option value="t--f">File @ Task</option>
- <option value="t--o">Open @ Task</option>
+ <option value="c--">Any @ Course</option>
+ <option value="c--v--">Version @ Course</option>
+ <option value="c--a--">Task @ Course</option>
+ <option value="c--av--">Version/Task @ Course</option>
+ <option value="c--o--">Open @ Course</option>
 </select>

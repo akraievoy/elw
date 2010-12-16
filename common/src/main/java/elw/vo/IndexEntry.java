@@ -65,7 +65,7 @@ public class IndexEntry {
 						   final FileSlot slot, final FileMeta meta, final Format format) {
 		try {
 			final String normName = enr.getName() + "-" + stud.getName() + "--" +
-					ass.getName() + "-" + ver.getName() + "--" +
+					ass.getName() + (ver == null ? "" : "-" + ver.getName()) + "--" +
 					slot.getName() + "-" + format.format(meta.getCreateStamp().getTime(), "MMdd-HHmm");
 
 			final String oriName = meta.getName();

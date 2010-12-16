@@ -55,13 +55,13 @@
     #* 2 upload date - full *# {"bVisible": false, "bSortable": false},
     #* 3 upload date - nice*# {'sTitle': 'Time', "iDataSort": 1, "sWidth": "5em", "sClass": "text_align_right"},
     #* 4 author.id *# {"bVisible": false, "bSortable": false},
-    #* 5 author.name *# {'sTitle': 'Author', "iDataSort": 3, "sClass": "text_align_center"},
+    #* 5 author.name *# {'sTitle': 'Author', "iDataSort": 3, "sWidth": "15%", "sClass": "text_align_center"},
     #* 6 class.index *# {"bVisible": false, "bSortable": false},
-    #* 7 class.name *# {'sTitle': 'Class', "iDataSort": 5},
+    #* 7 class.name *# {'sTitle': 'Class', "iDataSort": 5, "sWidth": "25%"},
     #* 8 slot.id *# {"bVisible": false, "bSortable": false},
-    #* 9 slot.name *# {'sTitle': 'Slot', "iDataSort": 7, "sClass": "text_align_center" },
-    #* 10 comment *# {'sTitle': 'Comment' },
-    #* 11 status text*# {'sTitle': 'Status', "sClass": "text_align_center" },
+    #* 9 slot.name *# {'sTitle': 'Version/Slot', "iDataSort": 7, "sClass": "text_align_center", "sWidth": "20%" },
+    #* 10 comment *# {'sTitle': 'Comment', "sWidth": "20%" },
+    #* 11 status text*# {'sTitle': 'Status', "sClass": "text_align_center", "sWidth": "7em" },
     #* 12 status classes *# {"bVisible": false, "bSortable": false},
     #* 13 approve *# {'sTitle': 'A', "sWidth": "1em", "bSortable": false, "sClass": "text_align_center" },
     #* 14 download *# {'sTitle': 'D', "sWidth": "1em", "bSortable": false, "sClass": "text_align_center" }
@@ -83,6 +83,7 @@
    f_data["f_verId"] = jQuery("select[name=f_verId]").val();
    f_data["f_mode"] = jQuery("select[name=f_mode]").val();
    f_data["f_due"] = jQuery("select[name=f_due]").val();
+   f_data["f_scope"] = jQuery("select[name=f_scope]").val();
    f_data["f_latest"] = jQuery("input[name=f_latest]").attr("checked");
 
    jQuery.ajax({

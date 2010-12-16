@@ -24,7 +24,8 @@ import elw.dp.mips.MipsValidator;
 import elw.miniweb.Message;
 import elw.miniweb.ViewJackson;
 import elw.vo.*;
-import elw.vo.Class;
+import elw.web.core.Core;
+import elw.web.core.W;
 import org.akraievoy.gear.G4Io;
 import org.akraievoy.gear.G4Parse;
 import org.akraievoy.gear.G4Str;
@@ -35,7 +36,6 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -57,8 +57,8 @@ import java.util.regex.Pattern;
 public class AdminController extends MultiActionController implements WebSymbols {
 	private static final Logger log = LoggerFactory.getLogger(AdminController.class);
 
-	protected static final int NONCE_TIMEOUT_MILLIS = 10000;
-	protected static final String PASSWORD = System.getProperty("elw.admin.password", "swordfish");
+	protected static final int NONCE_TIMEOUT_MILLIS = 60000;
+	protected static final String PASSWORD = System.getProperty("elw.admin.password", "NHTYLjutytHJNJH");
 
 	protected final CourseDao courseDao;
 	protected final GroupDao groupDao;
@@ -70,6 +70,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 	protected final long cacheBustingToken = System.currentTimeMillis();
 
 	protected final DiskFileItemFactory fileItemFactory;
+	protected final Core core;
 
 	public AdminController(
 			CourseDao courseDao, EnrollDao enrollDao, GroupDao groupDao, ScoreDao scoreDao, FileDao fileDao
@@ -79,6 +80,8 @@ public class AdminController extends MultiActionController implements WebSymbols
 		this.groupDao = groupDao;
 		this.scoreDao = scoreDao;
 		this.fileDao = fileDao;
+
+		core = new Core(courseDao, enrollDao, fileDao, groupDao, scoreDao);
 
 		fileItemFactory = new DiskFileItemFactory();
 		fileItemFactory.setRepository(new java.io.File(System.getProperty("java.io.tmpdir")));
@@ -345,83 +348,6 @@ public class AdminController extends MultiActionController implements WebSymbols
 		return new ModelAndView("a/log", model);
 	}
 
-	protected List<Object[]> prepareLogEntries(
-			Ctx ctx, Format format, VelocityUtils u, LogFilter logFilter
-	) {
-		final List<Object[]> logData = new ArrayList<Object[]>();
-
-		for (Student stud : ctx.getGroup().getStudents()) {
-			if (W.excluded(logFilter.getStudId(), stud.getId())) {
-				continue;
-			}
-
-			final Ctx ctxStud = ctx.extendStudent(stud);
-			for (int index = 0; index < ctx.getEnr().getIndex().size(); index++) {
-				final Ctx ctxVer = ctxStud.extendIndex(index);
-				if (W.excluded(logFilter.getVerId(), ctxVer.getAss().getId(), ctxVer.getVer().getId())) {
-					continue;
-				}
-				final AssignmentType aType = ctxVer.getAssType();
-				final FileSlot[] slots = aType.getFileSlots();
-
-				for (FileSlot slot : slots) {
-					if (W.excluded(logFilter.getSlotId(), aType.getId(), slot.getId())) {
-						continue;
-					}
-
-					final Entry<FileMeta>[] uploads = fileDao.findFilesFor(FileDao.SCOPE_STUD, ctxVer, slot.getId());
-					if (W.excluded(logFilter.getDue(), ctxVer, slot, uploads)) {
-						continue;
-					}
-
-					for (int i = 0, uploadsLength = uploads.length; i < uploadsLength; i++) {
-						final boolean last = i + 1 == uploadsLength;
-						if (logFilter.isLatest() && !last) {
-							continue;
-						}
-
-						logData.add(createRowLog(format, u, logFilter.getMode(), logData, index, ctxVer, slot, uploads[i]));
-					}
-				}
-			}
-		}
-
-		return logData;
-	}
-
-	protected Object[] createRowLog(
-			Format format, VelocityUtils u, final String mode, List<Object[]> data,
-			int index, Ctx ctxVer, FileSlot slot, Entry<FileMeta> e
-	) {
-		final long time = e.getMeta().getCreateStamp().getTime();
-
-		final IndexEntry iEntry = ctxVer.getIndexEntry();
-		final String nameNorm = iEntry.normName(
-				ctxVer.getEnr(), ctxVer.getStudent(), ctxVer.getAss(),
-				ctxVer.getVer(), slot, e.getMeta(), format
-		);
-		final String q = "?elw_ctx=" + ctxVer.toString() + "&s=s&sId=" + slot.getId() + "&fId=" + e.getMeta().getId();
-		final Map<String, String> status = u.status(format, mode, ctxVer, slot, e);
-		final Object[] dataRow = {
-				/* 0 index */ data.size(),
-				/* 1 upload millis */ time,
-				/* 2 nice date - full */ format.format(time, "EEE d HH:mm"),
-				/* 3 nice date - nice */ format.format(time),
-				/* 4 author.id */ ctxVer.getStudent().getId(),
-				/* 5 author.name */ ctxVer.getStudent().getName(),
-				/* 6 class.index */ index,
-				/* 7 class.name */ ctxVer.getAss().getName(),
-				/* 8 slot.id */ slot.getId(),
-				/* 9 slot.name */ slot.getName(),
-				/* 10 comment */ e.getMeta().getComment(),
-				/* 11 status text*/ status.get("text"),
-				/* 12 status classes */ status.get("classes"),
-				/* 13 approve */ "<a href=\"approve" + q + "\">A</a>",
-				/* 14 download */ "<a href=\"../s/dl/" + nameNorm + q + "\">D</a>"
-		};
-		return dataRow;
-	}
-
 	@RequestMapping(value = "rest/log", method = RequestMethod.GET)
 	public ModelAndView do_restLog(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
 		final HashMap<String, Object> model = auth(req, resp, null);
@@ -438,7 +364,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 		final Format format = (Format) model.get(FormatTool.MODEL_KEY);
 		final VelocityUtils u = (VelocityUtils) model.get(VelocityUtils.MODEL_KEY);
 
-		final List<Object[]> logData = prepareLogEntries(
+		final List<Object[]> logData = core.prepareLogEntries(
 				ctx, format, u, W.parseFilter(req)
 		);
 
@@ -500,8 +426,8 @@ public class AdminController extends MultiActionController implements WebSymbols
 				approveUri += "&stamp="+createStamp.toString();
 			}
 
-			final Map<String, String> status = u.status(f, mode, ctx, slot, file, score);
-			final Map<String, String> statusScoring = u.status(f, "s", ctx, slot, file, score);
+			final Map<String, String> status = u.status(f, mode, FileDao.SCOPE_STUD, ctx, slot, file, score);
+			final Map<String, String> statusScoring = u.status(f, "s", FileDao.SCOPE_STUD, ctx, slot, file, score);
 
 			final Object[] logRow = new Object[] {
 				/* 0 index - */ logData.size(),
@@ -843,110 +769,6 @@ public class AdminController extends MultiActionController implements WebSymbols
 		return null;
 	}
 
-	static class W {
-		protected static void storeFilter(HttpServletRequest req, HashMap<String, Object> model) {
-			final Map params = req.getParameterMap();
-			for (Object o : params.keySet()) {
-				String paramName = (String) o;
-				if (paramName.startsWith("f_")) {
-					final String value = req.getParameter(paramName);
-					if (value != null && value.length() > 0) {
-						model.put(paramName, value);
-					}
-				}
-			}
-		}
-
-		protected static String resolveRemoteAddress(HttpServletRequest req) {
-			final String remoteAddr = req.getRemoteAddr();
-
-			final String xff = req.getHeader("X-Forwarded-For");
-			if (xff != null && xff.trim().length() > 0) {
-				return xff.replaceAll("\\s+", "").split(",")[0];
-			}
-
-			return remoteAddr;
-		}
-
-		protected static boolean excluded(Object filterValue, String actualValue) {
-			if (!(filterValue instanceof String)) {
-				return false;
-			}
-			return ((String) filterValue).trim().length() > 0 && !filterValue.equals(actualValue);
-		}
-
-		protected static void filterDefault(HashMap<String, Object> model, String fKey, String fDefault) {
-			if (model.get(fKey) == null || model.get(fKey).toString().trim().length() == 0) {
-				model.put(fKey, fDefault);
-			}
-		}
-
-		public static boolean excluded(String aTypeSlotFilter, String typeId, String slotId) {
-			if (aTypeSlotFilter == null) {
-				return false;
-			}
-
-			final String typeSlotExpr = typeId + "--" + slotId + "--";
-			return !typeSlotExpr.startsWith(aTypeSlotFilter);
-		}
-
-		public static Stamp parseStamp(HttpServletRequest req, final String paramName) {
-			final String paramVal = req.getParameter(paramName);
-			return paramVal != null ? Stamp.fromString(paramVal) : null;
-		}
-
-		protected static boolean excluded(String due, Ctx ctxVer, FileSlot slot, Entry<FileMeta>[] uploads) {
-			if ("any".equalsIgnoreCase(due)) {
-				return false;
-			}
-
-			final Integer classDueIdx = ctxVer.getIndexEntry().getClassDue().get(slot.getId());
-			if ("none".equalsIgnoreCase(due)) {
-				return classDueIdx != null;
-			}
-			if (classDueIdx == null) {
-				return !"none".equalsIgnoreCase(due);
-			}
-
-			boolean hasFiles = false;
-			for (Entry<FileMeta> upload : uploads)  {
-				if (upload.getMeta().getScore() == null || !Boolean.FALSE.equals(upload.getMeta().getScore().getApproved())) {
-					hasFiles = true;
-					break;
-				}
-			}
-
-			final Class classDue = ctxVer.getEnr().getClasses().get(classDueIdx);
-			final int dayDiff = classDue.computeToDiff(new DateTime());
-
-			if ("over".equalsIgnoreCase(due)) {
-				return dayDiff <= 0 || hasFiles;
-			}
-
-			if ("today".equalsIgnoreCase(due)) {
-				return (dayDiff > 0 || hasFiles) && (dayDiff <= 0 || hasFiles);
-			}
-
-			if ("twoweeks".equalsIgnoreCase(due)) {
-				return ((dayDiff > 0 || dayDiff < -14) && hasFiles) && (dayDiff <= 0 || hasFiles);
-			}
-
-			return false;
-		}
-
-		protected static LogFilter parseFilter(HttpServletRequest req) {
-			final String due = req.getParameter("f_due");
-			final boolean latest = "true".equals(req.getParameter("f_latest"));
-			final String slotId = req.getParameter("f_slotId");
-			final String verId = req.getParameter("f_verId");
-			final String studId = req.getParameter("f_studId");
-			final String mode = req.getParameter("f_mode");
-			final String scope = req.getParameter("f_scope");
-			final LogFilter logFilter = new LogFilter(slotId, studId, verId, due == null ? "any" : due, mode == null ? "s" : mode, scope == null ? "s--opd--" : scope, latest);
-			return logFilter;
-		}
-	}
-
 	protected static interface WebMethodScore {
 		ModelAndView handleScore(
 				HttpServletRequest req, HttpServletResponse resp, Map<String, Object> model,
@@ -998,54 +820,5 @@ public class AdminController extends MultiActionController implements WebSymbols
 		return wm.handleScore(req, resp, model, ctx, slot, file, stamp);
 	}
 
-	static class LogFilter {
-		final String due;
-		final boolean latest;
-		final String slotId;
-		final String studId;
-		final String verId;
-		final String mode;
-		final String scope;
-
-		private LogFilter(
-				String slotId, String studId, String verId, String due, String mode, String scope, boolean latest
-		) {
-			this.due = due;
-			this.latest = latest;
-			this.slotId = slotId;
-			this.studId = studId;
-			this.verId = verId;
-			this.mode = mode;
-			this.scope = scope;
-		}
-
-		public String getDue() {
-			return due;
-		}
-
-		public boolean isLatest() {
-			return latest;
-		}
-
-		public String getSlotId() {
-			return slotId;
-		}
-
-		public String getStudId() {
-			return studId;
-		}
-
-		public String getVerId() {
-			return verId;
-		}
-
-		public String getMode() {
-			return mode;
-		}
-
-		public String getScope() {
-			return scope;
-		}
-	}
 }
 

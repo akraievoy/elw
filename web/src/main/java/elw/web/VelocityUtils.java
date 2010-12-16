@@ -19,6 +19,7 @@
 package elw.web;
 
 import elw.dao.Ctx;
+import elw.dao.FileDao;
 import elw.vo.*;
 import elw.vo.Class;
 import org.joda.time.DateTime;
@@ -52,14 +53,14 @@ public class VelocityUtils {
 
 	public Map<String, String> status(
 			Format f, String mode,
-			Ctx ctx, FileSlot slot, Entry<FileMeta> file
+			String scope, Ctx ctx, FileSlot slot, Entry<FileMeta> file
 	) {
-		return status(f, mode, ctx, slot, file, file != null ? file.getMeta().getScore() : null);
+		return status(f, mode, scope, ctx, slot, file, file != null ? file.getMeta().getScore() : null);
 	}
 
 	public Map<String, String> status(
 			Format f, String mode,
-			Ctx ctx, FileSlot slot, Entry<FileMeta> file, Score score
+			String scope, Ctx ctx, FileSlot slot, Entry<FileMeta> file, Score score
 	) {
 		final StringBuilder text = new StringBuilder();
 		final StringBuilder cls = new StringBuilder();
@@ -73,146 +74,158 @@ public class VelocityUtils {
 			classDue = null;
 		}
 
-		if ("a".equalsIgnoreCase(mode)) {
-			if (!classFrom.isStarted()) {
-				text.append("Closed");
-//				text.append("; Opens ").append(f.format(classFrom.getFromDateTime().getMillis()));
-				cls.append("elw_closed");
-			} else if (file == null) {
-				text.append("Open");
-				cls.append("elw_open");
-			} else if (score == null || score.getApproved() == null) {
-				text.append("Pending");
-				cls.append("elw_pending");
-			} else if (score.getApproved()) {
-				text.append("Approved");
-				cls.append("elw_approved");
-			} else {
-				text.append("Declined");
-				cls.append("elw_declined");
-			}
-		} else if ("d".equalsIgnoreCase(mode)) {
-			if (classDue == null) {
-				text.append("No Due Date");
-			} else {
-				text.append("Due ").append(f.format(classDue.getToDateTime().getMillis()));
-			}
-		} else if ("dd".equalsIgnoreCase(mode)) {
-			if (classDue == null) {
-				text.append("No Due Date");
-			} else {
-				int dueDiff = classDue.computeToDiffStamp(file == null ? null : file.getMeta());
-				if (dueDiff > 0) {
-					text.append(dueDiff).append("d overdue");
-				} else if (dueDiff == 0) {
-					text.append("Same day");
-				} else {
-					text.append(-dueDiff).append("d ahead");
-				}
-			}
-		} else if ("p".equalsIgnoreCase(mode)) {
-			if (!classFrom.isStarted()) {
-				text.append("Closed");
-				cls.append("elw_closed");
-			} else {
-				if (ctx.getIndexEntry().getScoreBudget() > 0) {
-					final double scoreStud;
-					if (file != null && score != null) {
-						scoreStud = ctx.getIndexEntry().computePoints(score, slot);
-					} else {
-						scoreStud = 0;
-					}
-					final double scoreSlot = ctx.getIndexEntry().computePoints(slot);
-					text.append(f.format2(scoreStud)).append(" of ").append(f.format2(scoreSlot));
-				}
-
-				if (file == null) {
-					text.insert(0, "<span class=\"elw_open\">O</span> ");
+		if (FileDao.SCOPE_STUD.equalsIgnoreCase(scope)) {
+			if ("a".equalsIgnoreCase(mode)) {
+				if (!classFrom.isStarted()) {
+					text.append("Closed");
+	//				text.append("; Opens ").append(f.format(classFrom.getFromDateTime().getMillis()));
+					cls.append("elw_closed");
+				} else if (file == null) {
+					text.append("Open");
+					cls.append("elw_open");
 				} else if (score == null || score.getApproved() == null) {
-					final String commentSafe = score == null ? "Preliminary": score.getComment();
-					text.insert(0, "<span class=\"elw_pending\" title=\""+f.esc(commentSafe)+"\">P</span> ");
+					text.append("Pending");
+					cls.append("elw_pending");
 				} else if (score.getApproved()) {
-					text.insert(0, "<span class=\"elw_approved\" title=\""+f.esc(score.getComment())+"\">A</span> ");
+					text.append("Approved");
+					cls.append("elw_approved");
 				} else {
-					text.insert(0, "<span class=\"elw_declined\" title=\""+f.esc(score.getComment())+"\">D</span> ");
+					text.append("Declined");
+					cls.append("elw_declined");
 				}
-			}
-		} else if ("s".equalsIgnoreCase(mode)) {
-			if (!classFrom.isStarted()) {
-				text.append("Closed");
-				cls.append("elw_closed");
-			} else {
-				if (ctx.getIndexEntry().getScoreBudget() > 0) {
-					final double scoreStud;
-					final ScoreTerm[] terms;
-					if (file != null && score != null) {
-						scoreStud = ctx.getIndexEntry().computePoints(score, slot);
-						terms = score.getTerms(ctx.getAssType(), false);
+			} else if ("d".equalsIgnoreCase(mode)) {
+				if (classDue == null) {
+					text.append("No Due Date");
+				} else {
+					text.append("Due ").append(f.format(classDue.getToDateTime().getMillis()));
+				}
+			} else if ("dd".equalsIgnoreCase(mode)) {
+				if (classDue == null) {
+					text.append("No Due Date");
+				} else {
+					int dueDiff = classDue.computeToDiffStamp(file == null ? null : file.getMeta());
+					if (dueDiff > 0) {
+						text.append(dueDiff).append("d overdue");
+					} else if (dueDiff == 0) {
+						text.append("Same day");
 					} else {
-						scoreStud = 0;
-						terms = new ScoreTerm[0];
+						text.append(-dueDiff).append("d ahead");
 					}
-					text.append(f.format2(scoreStud));
-					if (terms.length > 0) {
-						text.append(":");
-						for (ScoreTerm term : terms) {
-							text.append(" <span class=\"elw_").append(term.getRatio() < 1 ? "neg" : "pos")
-									.append("Term\" title=\"").append(f.esc(term.getCriteria().getName()))
-									.append(" x ").append(term.getPow()).append("\">")
-									.append(term.getNiceRatio()).append("</span>");
+				}
+			} else if ("p".equalsIgnoreCase(mode)) {
+				if (!classFrom.isStarted()) {
+					text.append("Closed");
+					cls.append("elw_closed");
+				} else {
+					if (ctx.getIndexEntry().getScoreBudget() > 0) {
+						final double scoreStud;
+						if (file != null && score != null) {
+							scoreStud = ctx.getIndexEntry().computePoints(score, slot);
+						} else {
+							scoreStud = 0;
+						}
+						final double scoreSlot = ctx.getIndexEntry().computePoints(slot);
+						text.append(f.format2(scoreStud)).append(" of ").append(f.format2(scoreSlot));
+					}
+
+					if (file == null) {
+						text.insert(0, "<span class=\"elw_open\">O</span> ");
+					} else if (score == null || score.getApproved() == null) {
+						final String commentSafe = score == null ? "Preliminary": score.getComment();
+						text.insert(0, "<span class=\"elw_pending\" title=\""+f.esc(commentSafe)+"\">P</span> ");
+					} else if (score.getApproved()) {
+						text.insert(0, "<span class=\"elw_approved\" title=\""+f.esc(score.getComment())+"\">A</span> ");
+					} else {
+						text.insert(0, "<span class=\"elw_declined\" title=\""+f.esc(score.getComment())+"\">D</span> ");
+					}
+				}
+			} else if ("s".equalsIgnoreCase(mode)) {
+				if (!classFrom.isStarted()) {
+					text.append("Closed");
+					cls.append("elw_closed");
+				} else {
+					if (ctx.getIndexEntry().getScoreBudget() > 0) {
+						final double scoreStud;
+						final ScoreTerm[] terms;
+						if (file != null && score != null) {
+							scoreStud = ctx.getIndexEntry().computePoints(score, slot);
+							terms = score.getTerms(ctx.getAssType(), false);
+						} else {
+							scoreStud = 0;
+							terms = new ScoreTerm[0];
+						}
+						text.append(f.format2(scoreStud));
+						if (terms.length > 0) {
+							text.append(":");
+							for (ScoreTerm term : terms) {
+								text.append(" <span class=\"elw_").append(term.getRatio() < 1 ? "neg" : "pos")
+										.append("Term\" title=\"").append(f.esc(term.getCriteria().getName()))
+										.append(" x ").append(term.getPow()).append("\">")
+										.append(term.getNiceRatio()).append("</span>");
+							}
 						}
 					}
-				}
 
-				if (file == null) {
-					text.insert(0, "<span class=\"elw_open\">O</span> ");
-				} else if (score == null || score.getApproved() == null) {
-					final String commentSafe = score == null ? "Preliminary": score.getComment();
-					text.insert(0, "<span class=\"elw_pending\" title=\""+f.esc(commentSafe)+"\">P</span> ");
-				} else if (score.getApproved()) {
-					text.insert(0, "<span class=\"elw_approved\" title=\""+f.esc(score.getComment())+"\">A</span> ");
+					if (file == null) {
+						text.insert(0, "<span class=\"elw_open\">O</span> ");
+					} else if (score == null || score.getApproved() == null) {
+						final String commentSafe = score == null ? "Preliminary": score.getComment();
+						text.insert(0, "<span class=\"elw_pending\" title=\""+f.esc(commentSafe)+"\">P</span> ");
+					} else if (score.getApproved()) {
+						text.insert(0, "<span class=\"elw_approved\" title=\""+f.esc(score.getComment())+"\">A</span> ");
+					} else {
+						text.insert(0, "<span class=\"elw_declined\" title=\""+f.esc(score.getComment())+"\">D</span> ");
+					}
+				}
+			} else if ("dta".equalsIgnoreCase(mode)) {
+				if (!classFrom.isStarted()) {
+					text.append("Closed");
+					cls.append("elw_closed");
+				} else if (file == null) {
+					text.append("Open");
+					cls.append("elw_open");
 				} else {
-					text.insert(0, "<span class=\"elw_declined\" title=\""+f.esc(score.getComment())+"\">D</span> ");
+					final DateTime scoreStamp;
+					if (score == null || score.getCreateStamp() == null) {
+						scoreStamp = new DateTime();
+					} else {
+						scoreStamp = new DateTime(score.getCreateStamp().getTime());
+					}
+					final int dta = classFrom.computeToDiff(scoreStamp) - classFrom.computeToDiffStamp(file.getMeta());
+					text.append(dta).append(" days");
+				}
+			} else if ("dtu".equalsIgnoreCase(mode)) {
+				if (!classFrom.isStarted()) {
+					text.append("Closed");
+					cls.append("elw_closed");
+				} else if (file == null) {
+					text.append("Open");
+					cls.append("elw_open");
+				} else {
+					final int dtu = classFrom.computeToDiffStamp(file.getMeta());
+					text.append(dtu).append(" days");
+				}
+			} else if ("v".equalsIgnoreCase(mode)) {
+				if (!classFrom.isStarted()) {
+					text.append("Closed");
+					cls.append("elw_closed");
+				} else {
+				  text.append("<span title=\"").append(ctx.getVer().getName()).append("\">").append(ctx.getVer().getId()).append("</span>");
 				}
 			}
-		} else if ("dta".equalsIgnoreCase(mode)) {
-			if (!classFrom.isStarted()) {
-				text.append("Closed");
-				cls.append("elw_closed");
-			} else if (file == null) {
-				text.append("Open");
-				cls.append("elw_open");
-			} else {
-				final DateTime scoreStamp;
-				if (score == null || score.getCreateStamp() == null) {
-					scoreStamp = new DateTime();
-				} else {
-					scoreStamp = new DateTime(score.getCreateStamp().getTime());
-				}
-				final int dta = classFrom.computeToDiff(scoreStamp) - classFrom.computeToDiffStamp(file.getMeta());
-				text.append(dta).append(" days");
-			}
-		} else if ("dtu".equalsIgnoreCase(mode)) {
-			if (!classFrom.isStarted()) {
-				text.append("Closed");
-				cls.append("elw_closed");
-			} else if (file == null) {
-				text.append("Open");
-				cls.append("elw_open");
-			} else {
-				final int dtu = classFrom.computeToDiffStamp(file.getMeta());
-				text.append(dtu).append(" days");
-			}
-		} else if ("v".equalsIgnoreCase(mode)) {
-			if (!classFrom.isStarted()) {
-				text.append("Closed");
-				cls.append("elw_closed");
-			} else {
-			  text.append("<span title=\"").append(ctx.getVer().getName()).append("\">").append(ctx.getVer().getId()).append("</span>");
+
+			overdueClasses(file, classDue, cls);
+		} else {
+			if (file == null) {
+				text.append("Open @ Course");
+			} else if (FileDao.SCOPE_ASS_TYPE.equalsIgnoreCase(scope)) {
+				text.append("Type @ Course");
+			} else if (FileDao.SCOPE_ASS.equalsIgnoreCase(scope)) {
+				text.append("Task @ Course");
+			} else if (FileDao.SCOPE_VER.equalsIgnoreCase(scope)) {
+				text.append("Ver @ Course");
 			}
 		}
-
-		overdueClasses(file, classDue, cls);
 
 		final Map<String, String> res = new TreeMap<String, String>();
 		res.put("text", text.toString());

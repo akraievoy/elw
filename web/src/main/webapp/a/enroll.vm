@@ -96,7 +96,7 @@
         #set($elw_ctx_ver = $elw_ctx_stud.extendIndex($idx))
         #set($filesStud = $fileMetas.get("$elw_ctx_ver.toString()").get($slot.id))
 
-        #set($__status = $u.status($f, $f_mode, $elw_ctx_ver, $slot, $u.bestOrLastOrNull($filesStud)))
+        #set($__status = $u.status($f, $f_mode, "s", $elw_ctx_ver, $slot, $u.bestOrLastOrNull($filesStud)))
         tp_status = tp_studRow.find(".te.te_status:first").clone().toggleClass("te")
          .html($f.json($__status.text))
          .toggleClass($f.json($__status.classes.trim()));

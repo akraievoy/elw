@@ -182,7 +182,7 @@
 
         tp_slot.find(".tp_slot_title").html($f.json(${slot.name})).attr("title", "${slot.id}");
         var tp_slot_due = tp_slot.find(".tp_slot_due");
-        #set($__status = $u.status($f, $f_mode, $elw_ctx_ver, $slot, $u.bestOrLastOrNull($filesStud)))
+        #set($__status = $u.status($f, $f_mode, "s", $elw_ctx_ver, $slot, $u.bestOrLastOrNull($filesStud)))
         tp_slot_due.html($f.json($__status.text));
         tp_slot_due.toggleClass($f.json($__status.classes.trim()));
         tp_timeline.append(tp_slot);
