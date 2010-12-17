@@ -6,6 +6,8 @@ import org.joda.time.Days;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+import java.util.regex.Pattern;
+
 public class Class {
 	private static final DateTimeFormatter FMT_DATE = DateTimeFormat.forPattern("yyyy-MM-dd");
 	private static final DateTimeFormatter FMT_DATE_NICE = DateTimeFormat.forPattern("EEE MMM dd");
@@ -14,6 +16,7 @@ public class Class {
 	protected String date;
 	protected String fromTime;
 	protected String toTime;
+	protected Pattern[] onSitePatterns;
 	protected String[] onSite;
 
 	@JsonIgnore
@@ -165,5 +168,33 @@ public class Class {
 			overdue = 0;
 		}
 		return overdue;
+	}
+
+	public boolean checkOnSite(String sourceAddress) {
+		synchronized (this) {
+			if (onSitePatterns == null) {
+				onSitePatterns = new Pattern[onSite.length];
+				for (int i = 0; i < onSite.length; i++) {
+					onSitePatterns[i] = Pattern.compile(onSite[i]);
+				}
+			}
+		}
+
+		for (Pattern onSitePattern : onSitePatterns) {
+			if (onSitePattern.matcher(sourceAddress).matches()) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	public boolean checkOnTime(Stamp createStamp) {
+		final long instant = createStamp.getTime();
+		final long min = getFromDateTime().getMillis();
+		final long max = getToDateTime().getMillis();
+		final int lateTolerance = 30 * 60 * 1000;
+
+		return min <= instant && instant <= max + lateTolerance;
 	}
 }

@@ -40,4 +40,14 @@ public class Enrollment extends IdNameStamped {
 	public void setIndex(List<IndexEntry> index) {
 		this.index = index;
 	}
+
+	public boolean checkOnTime(Stamp createStamp) {
+		for (Class aClass : classes) {
+			if (aClass.checkOnTime(createStamp)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 }

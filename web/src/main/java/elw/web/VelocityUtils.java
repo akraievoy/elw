@@ -64,6 +64,7 @@ public class VelocityUtils {
 	) {
 		final StringBuilder text = new StringBuilder();
 		final StringBuilder cls = new StringBuilder();
+		final StringBuilder sort = new StringBuilder();
 
 		final elw.vo.Class classFrom = ctx.getEnr().getClasses().get(ctx.getIndexEntry().getClassFrom());
 		final elw.vo.Class classDue;
@@ -80,28 +81,36 @@ public class VelocityUtils {
 					text.append("Closed");
 	//				text.append("; Opens ").append(f.format(classFrom.getFromDateTime().getMillis()));
 					cls.append("elw_closed");
+					sort.append(-1);
 				} else if (file == null) {
 					text.append("Open");
 					cls.append("elw_open");
+					sort.append(1);
 				} else if (score == null || score.getApproved() == null) {
 					text.append("Pending");
 					cls.append("elw_pending");
+					sort.append(0);
 				} else if (score.getApproved()) {
 					text.append("Approved");
 					cls.append("elw_approved");
+					sort.append(-2);
 				} else {
 					text.append("Declined");
 					cls.append("elw_declined");
+					sort.append(2);
 				}
 			} else if ("d".equalsIgnoreCase(mode)) {
 				if (classDue == null) {
 					text.append("No Due Date");
+					sort.append(0);
 				} else {
 					text.append("Due ").append(f.format(classDue.getToDateTime().getMillis()));
+					sort.append(classDue.getToDateTime().getMillis());
 				}
 			} else if ("dd".equalsIgnoreCase(mode)) {
 				if (classDue == null) {
 					text.append("No Due Date");
+					sort.append(0);
 				} else {
 					int dueDiff = classDue.computeToDiffStamp(file == null ? null : file.getMeta());
 					if (dueDiff > 0) {
@@ -111,11 +120,13 @@ public class VelocityUtils {
 					} else {
 						text.append(-dueDiff).append("d ahead");
 					}
+					sort.append(dueDiff);
 				}
 			} else if ("p".equalsIgnoreCase(mode)) {
 				if (!classFrom.isStarted()) {
 					text.append("Closed");
 					cls.append("elw_closed");
+					sort.append(0);
 				} else {
 					if (ctx.getIndexEntry().getScoreBudget() > 0) {
 						final double scoreStud;
@@ -126,6 +137,9 @@ public class VelocityUtils {
 						}
 						final double scoreSlot = ctx.getIndexEntry().computePoints(slot);
 						text.append(f.format2(scoreStud)).append(" of ").append(f.format2(scoreSlot));
+						sort.append(scoreStud);
+					} else {
+						sort.append(0);
 					}
 
 					if (file == null) {
@@ -143,6 +157,7 @@ public class VelocityUtils {
 				if (!classFrom.isStarted()) {
 					text.append("Closed");
 					cls.append("elw_closed");
+					sort.append(0);
 				} else {
 					if (ctx.getIndexEntry().getScoreBudget() > 0) {
 						final double scoreStud;
@@ -154,6 +169,7 @@ public class VelocityUtils {
 							scoreStud = 0;
 							terms = new ScoreTerm[0];
 						}
+						sort.append(scoreStud);
 						text.append(f.format2(scoreStud));
 						if (terms.length > 0) {
 							text.append(":");
@@ -164,6 +180,8 @@ public class VelocityUtils {
 										.append(term.getNiceRatio()).append("</span>");
 							}
 						}
+					} else {
+						sort.append(0);
 					}
 
 					if (file == null) {
@@ -181,9 +199,11 @@ public class VelocityUtils {
 				if (!classFrom.isStarted()) {
 					text.append("Closed");
 					cls.append("elw_closed");
+					sort.append(0);
 				} else if (file == null) {
 					text.append("Open");
 					cls.append("elw_open");
+					sort.append(0);
 				} else {
 					final DateTime scoreStamp;
 					if (score == null || score.getCreateStamp() == null) {
@@ -193,43 +213,73 @@ public class VelocityUtils {
 					}
 					final int dta = classFrom.computeToDiff(scoreStamp) - classFrom.computeToDiffStamp(file.getMeta());
 					text.append(dta).append(" days");
+					sort.append(dta);
 				}
 			} else if ("dtu".equalsIgnoreCase(mode)) {
 				if (!classFrom.isStarted()) {
 					text.append("Closed");
 					cls.append("elw_closed");
+					sort.append(0);
 				} else if (file == null) {
 					text.append("Open");
 					cls.append("elw_open");
+					sort.append(0);
 				} else {
 					final int dtu = classFrom.computeToDiffStamp(file.getMeta());
 					text.append(dtu).append(" days");
+					sort.append(dtu);
 				}
 			} else if ("v".equalsIgnoreCase(mode)) {
 				if (!classFrom.isStarted()) {
 					text.append("Closed");
 					cls.append("elw_closed");
+					sort.append(-1);
 				} else {
-				  text.append("<span title=\"").append(ctx.getVer().getName()).append("\">").append(ctx.getVer().getId()).append("</span>");
+					text.append("<span title=\"").append(ctx.getVer().getName()).append("\">").append(ctx.getVer().getId()).append("</span>");
+					sort.append(ctx.getVer().getId());
 				}
+			} else if ("ip".equalsIgnoreCase(mode)) {
+				int sortVal = -1;
+				if (file != null) {
+					sortVal++;
+					text.append(file.getMeta().getSourceAddress());
+					if (!classFrom.checkOnSite(file.getMeta().getSourceAddress())) {
+						sortVal+=4;
+						cls.append(" elw_offsite");
+					}
+					if (!ctx.getEnr().checkOnTime(file.getMeta().getCreateStamp())) {
+						sortVal+=2;
+						cls.append(" elw_offtime");
+					}
+					if (!classFrom.checkOnTime(file.getMeta().getCreateStamp())) {
+						sortVal++;
+						cls.append(" elw_rapid");
+					}
+				}
+				sort.append(sortVal);
 			}
 
 			overdueClasses(file, classDue, cls);
 		} else {
 			if (file == null) {
 				text.append("Open @ Course");
+				sort.append(-2);
 			} else if (FileDao.SCOPE_ASS_TYPE.equalsIgnoreCase(scope)) {
 				text.append("Type @ Course");
+				sort.append(-1);
 			} else if (FileDao.SCOPE_ASS.equalsIgnoreCase(scope)) {
 				text.append("Task @ Course");
+				sort.append(0);
 			} else if (FileDao.SCOPE_VER.equalsIgnoreCase(scope)) {
 				text.append("Ver @ Course");
+				sort.append(1);
 			}
 		}
 
 		final Map<String, String> res = new TreeMap<String, String>();
 		res.put("text", text.toString());
 		res.put("classes", cls.toString());
+		res.put("sort", sort.toString());
 		return res;
 	}
 

@@ -68,15 +68,19 @@
     #* 8 slot.id *# {"bVisible": false, "bSortable": false},
     #* 9 slot.name *# {'sTitle': 'Version / Slot', "iDataSort": 7, "sClass": "text_align_center", "sWidth": "20%" },
     #* 10 comment *# {'sTitle': 'Comment', "sWidth": "20%" },
-    #* 11 status text*# {'sTitle': 'Status', "sClass": "text_align_center", "sWidth": "7em" },
-    #* 12 status classes *# {"bVisible": false, "bSortable": false},
-    #* 13 approve *# {'sTitle': 'A', "sWidth": "1em", "bSortable": false, "sClass": "text_align_center" },
-    #* 14 download *# {'sTitle': 'D', "sWidth": "1em", "bSortable": false, "sClass": "text_align_center" }
+    #* 11 status sort*# {"bVisible": false, "bSortable": false },
+    #* 12 status text*# {'sTitle': 'Status', "sClass": "text_align_center", "iDataSort": 11, "sWidth": "7em" },
+    #* 13 status classes *# {"bVisible": false, "bSortable": false},
+    #* 14 source ip *# {"bVisible": false, "bSortable": false },
+    #* 15 size bytes *# {"bVisible": false, "bSortable": false},
+    #* 16 size *# {'sTitle': 'Size', "iDataSort": 15, "sWidth": "7em"},
+    #* 17 approve *# {'sTitle': 'A', "sWidth": "1em", "bSortable": false, "sClass": "text_align_center" },
+    #* 18 download *# {'sTitle': 'D', "sWidth": "1em", "bSortable": false, "sClass": "text_align_center" }
    ],
    "aaSorting": [ [3,'asc'] ],
    "aaSortingFixed": [ ],
    "fnRowCallback": function(node, data, dispIndex, dataIndex) {
-    jQuery("td:eq(5)", node).addClass(data[12]);
+    jQuery("td:eq(5)", node).addClass(data[13]);
     jQuery("td:eq(0)", node).attr("title", data[2]);
     return node;
    }

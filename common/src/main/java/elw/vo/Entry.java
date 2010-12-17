@@ -1,12 +1,9 @@
 package elw.vo;
 
-import org.akraievoy.gear.G4Io;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Entry<Meta> {
 	private static final Logger log = LoggerFactory.getLogger(Entry.class);
@@ -102,5 +99,12 @@ public class Entry<Meta> {
 				log.info("failed on close", e);
 			}
 		}
+	}
+
+	public long computeSize() {
+		final long binaryLen = fileBinary != null ? fileBinary.length() : 0;
+		final long textLen = fileText != null ? fileText.length() : 0;
+
+		return binaryLen + textLen;
 	}
 }

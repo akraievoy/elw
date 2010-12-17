@@ -199,10 +199,14 @@ public class Core {
 				/* 8 slot.id */ ctx.getAssType().getId() + "--" + slot.getId(),
 				/* 9 slot.name */ ctx.getVer() != null ? ctx.getVer().getName() + " / " + slot.getName() : slot.getName(),
 				/* 10 comment */ e  == null ? "" : e.getMeta().getComment(),
-				/* 11 status text*/ status.get("text"),
-				/* 12 status classes */ status.get("classes"),
-				/* 13 approve */ "<a href=\"approve" + q + "\">A</a>",
-				/* 14 download */ txRef
+				/* 11 status sort*/ status.get("sort"),
+				/* 12 status text*/ status.get("text"),
+				/* 13 status classes */ status.get("classes"),
+				/* 14 source ip */ e  == null ? "" : e.getMeta().getSourceAddress(),
+				/* 15 size bytes */ e  == null ? "" : e.computeSize(),
+				/* 16 size */ e  == null ? "" : f.formatSize(e.computeSize()),
+				/* 17 approve */ "<a href=\"approve" + q + "\">A</a>",
+				/* 18 download */ txRef
 		};
 		return dataRow;
 	}

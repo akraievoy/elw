@@ -330,6 +330,12 @@ th.text_align_right {
 .elw_open.elw_overdue {
  background-color: #FF9999 !important;
 }
+.elw_offsite {
+ text-decoration: underline;
+}
+.elw_offtime {
+ font-style: italic !important;
+}
 .elw_nodue {
  opacity: .25;
 }
