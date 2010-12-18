@@ -1,0 +1,14 @@
+#* @vtlvariable name="__qId" type="java.lang.String" *#
+
+#* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
+<form id="${__qId}_filter" style="text-align: center;">
+ <input type="hidden" name="elw_ctx" value="$elw_ctx.toString()"/>
+ <select id="${__qId}_filter_stud" name="f_studId" style="width: 7em;"><option value="">Student...</option></select><label for="${__qId}_filter_stud"></label>
+ <select id="${__qId}_filter_slot" name="f_slotId" style="width: 11em;"><option value="">Task Type / Slot...</option></select><label for="${__qId}_filter_slot"></label>
+ <select id="${__qId}_filter_ver" name="f_verId" style="width: 13em;"><option value="">Task / Version...</option></select><label for="${__qId}_filter_ver"></label>
+ #parse("/__/dueCombo.vm")
+ #parse("/__/modeCombo.vm")
+ #parse("/__/scopeCombo.vm")
+ <input id="${__qId}_filter_latest" type="checkbox" name="f_latest" value="true"/><label for="${__qId}_filter_latest">Latest&nbsp;only</label>
+</form>
+<table id="${__qId}_dataTable" cellspacing="0" width="95%" align="center"></table>

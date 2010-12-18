@@ -1,21 +1,21 @@
+#* @vtlvariable name="__qId" type="java.lang.String" *#
+
 #* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
 #* @vtlvariable name="f" type="elw.web.FormatTool" *#
 #* @vtlvariable name="f_slotId" type="java.lang.String" *#
-var f_slotId = jQuery("select[name=f_slotId]");
-#foreach($aType in $elw_ctx.course.assTypes)
- f_slotId.append(
-  jQuery("<option></option>")
-    .attr("value", $f.json($aType.id) + "--")
-    .text($f.json($aType.name))
- );
- #foreach($slot in $aType.fileSlots)
- f_slotId.append(
-   jQuery("<option></option>")
-     .attr("value", $f.json($aType.id) + "--" + $f.json($slot.id) + "--")
-     .text($f.json($aType.name) + " - " + $f.json($slot.name))
- );
+{
+ var f_slotId = jQuery("form#${__qId}_filter select[name=f_slotId]");
+ #foreach($aType in $elw_ctx.course.assTypes)
+  f_slotId.append(
+   jQuery("<option></option>").attr("value", $f.json($aType.id) + "--").text($f.json($aType.name))
+  );
+  #foreach($slot in $aType.fileSlots)
+  f_slotId.append(
+    jQuery("<option></option>").attr("value", $f.json($aType.id) + "--" + $f.json($slot.id) + "--").text($f.json($aType.name) + " - " + $f.json($slot.name))
+  );
+  #end
  #end
-#end
-#if($f_slotId)
- jQuery("select[name=f_slotId]").val($f.json($f_slotId));
-#end
+ #if($f_slotId)
+  f_slotId.val($f.json($f_slotId));
+ #end
+}

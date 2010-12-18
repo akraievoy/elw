@@ -22,7 +22,7 @@
  <div id="header_hr"></div>
 </div>
  #parse("/__/messages.vm")
-<form style="text-align: center;" action="enroll">
+<form style="text-align: center;" action="enroll" id="summary_filter">
  <input type="hidden" name="elw_ctx" value="$elw_ctx.toString()"/>
  <select name="f_studId"><option value="">Choose...</option></select>
  <select name="f_slotId"><option value="">Choose...</option></select>
@@ -53,7 +53,7 @@
 </body>
 <script type="text/javascript">
  jQuery(document).ready(function() {
-  jQuery("select[name=f_mode]").val($f.json($f_mode));
+  #set($__qId="summary") jQuery("select[name=f_mode]").val($f.json($f_mode));
   #parse("/__/studCombo.vm")
   #parse("/__/slotCombo.vm")
 
