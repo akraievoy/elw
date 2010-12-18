@@ -470,6 +470,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 		final Group group = groupDao.findGroup(enr.getGroupId());
 		final Course course = courseDao.findCourse(enr.getCourseId());
 
+		final String uploadsBase = "log?elw_ctx=e--" + enr.getId();
 		final Object[] arr = {
 				/* 0 index - */ indexData.size(),
 				/* 1 enr.id - */ enr.getId(),
@@ -479,9 +480,11 @@ public class AdminController extends MultiActionController implements WebSymbols
 				/* 5 course.name 1 */ course.getName(),
 				/* 6 summary ref 2 */ "enroll?elw_ctx=e--"+enr.getId(),
 				/* 7 assignments ref 3 */ "#",
-				/* 8 uploads ref 4 */ "log?elw_ctx=e--"+enr.getId(),
-				/* 9 classes ref 5 */ "#",
-				/* 10 students ref 6 */ "#"
+				/* 8 uploads ref 4 */ uploadsBase +"&f_scope=s--p--&f_due=today&f_mode=dd",
+				/* 9 uploads-open ref 5 */ uploadsBase + "&f_scope=s--o--&f_due=twoweeks&f_mode=dd",
+				/* 10 uploads-course 6 */ uploadsBase + "&f_scope=c--av--&f_due=any",
+				/* 11 classes ref 7 */ "#",
+				/* 12 students ref 8 */ "#"
 		};
 		return arr;
 	}

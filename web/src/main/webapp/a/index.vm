@@ -34,11 +34,13 @@
     #* 3 group.name 0*# {'sTitle': 'Group', "sWidth": "7em"},
     #* 4 course.id - *# {"bVisible": false, "bSortable": false},
     #* 5 course.name 1 *# {'sTitle': 'Course', "sWidth": "23em"},
-    #* 6 summary ref 2 *# {'sTitle': '<span title="Summary">S</span>', "bSortable": false, "sWidth": "2em", "fnRender": elw_dt_url(6, 'S')},
+    #* 6 summary ref 2 *# {'sTitle': 'Summary', "bSortable": false, "sWidth": "2em", "fnRender": elw_dt_url(6, 'Summary')},
     #* 7 assignments ref 3 *# {'sTitle': '<span title="Assignments">A</span>', "bSortable": false, "sWidth": "2em", "fnRender": elw_dt_url(7, 'A')},
-    #* 8 uploads ref 4 *# {'sTitle': '<span title="Uploads">U</span>', "bSortable": false, "sWidth": "2em", "fnRender": elw_dt_url(8, 'U')},
-    #* 9 classes ref 5 *# {'sTitle': '<span title="Classes">C</span>', "bSortable": false, "sWidth": "2em", "fnRender": elw_dt_url(9, 'C')},
-    #* 10 students ref 6 *# {'sTitle': '<span title="Students">St</span>', "bSortable": false, "sWidth": "2em", "fnRender": elw_dt_url(10, 'St')}
+    #* 8 uploads ref 4 *# {'sTitle': 'Pending', "bSortable": false, "sWidth": "2em", "fnRender": elw_dt_url(8, 'Pending')},
+    #* 9 uploads-open ref 5 *# {'sTitle': 'Open', "bSortable": false, "sWidth": "2em", "fnRender": elw_dt_url(9, 'Open')},
+    #* 10 uploads-course ref 6 *# {'sTitle': 'Course', "bSortable": false, "sWidth": "2em", "fnRender": elw_dt_url(10, 'Course')},
+    #* 11 classes ref 7 *# {'sTitle': '<span title="Classes">C</span>', "bSortable": false, "sWidth": "2em", "fnRender": elw_dt_url(11, 'C')},
+    #* 12 students ref 8 *# {'sTitle': '<span title="Students">St</span>', "bSortable": false, "sWidth": "2em", "fnRender": elw_dt_url(12, 'St')}
    ],
    "aaSorting": [ [5,'asc'], [3,'asc'] ],
    "aaSortingFixed": [ ],

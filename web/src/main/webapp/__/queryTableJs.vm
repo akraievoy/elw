@@ -15,16 +15,16 @@
   #parse("/__/versionCombo.vm")
 
   #if($f_due)
-   jQuery("form#${__qId}_filter input[name=f_due]").val($f_due);
+   jQuery("form#${__qId}_filter input[name=f_due]").val($f.json($f_due));
   #end
   #if($f_latest)
-   jQuery("form#${__qId}_filter input[name=f_latest]").attr("checked", $f_latest);
+   jQuery("form#${__qId}_filter input[name=f_latest]").attr("checked", $f.json($f_latest));
   #end
   #if($f_mode)
-   jQuery("form#${__qId}_filter select[name=f_mode]").val($f_mode);
+   jQuery("form#${__qId}_filter select[name=f_mode]").val($f.json($f_mode));
   #end
   #if($f_scope)
-   jQuery("form#${__qId}_filter select[name=f_scope]").val($f_scope);
+   jQuery("form#${__qId}_filter select[name=f_scope]").val($f.json($f_scope));
   #end
 
   var dataTable = jQuery('#${__qId}_dataTable').dataTable({
