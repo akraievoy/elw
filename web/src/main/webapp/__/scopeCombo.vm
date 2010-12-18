@@ -4,6 +4,7 @@
  <option value="s--p--">Pending @ Student</option>
  <option value="s--od--" selected="true">Open/Declined @ Student</option>
  <option value="s--opd--">Open/Pending/Declined @ Student</option>
+ <option value="s--pad--">Pending/Approved/Declined @ Student</option>
  <option value="s--a--">Approved @ Student</option>
  <option value="s--d--">Declined @ Student</option>
  <option value="c--">Any @ Course</option>

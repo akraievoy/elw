@@ -5,6 +5,13 @@
 #* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
 #* @vtlvariable name="stamp" type="elw.vo.Stamp" *#
 
+#* @vtlvariable name="f_due" type="java.lang.Boolean" *#
+#* @vtlvariable name="f_latest" type="java.lang.Boolean" *#
+#* @vtlvariable name="f_studId" type="java.lang.String" *#
+#* @vtlvariable name="f_slotId" type="java.lang.String" *#
+#* @vtlvariable name="f_mode" type="java.lang.String" *#
+#* @vtlvariable name="f_scope" type="java.lang.String" *#
+#* @vtlvariable name="f_verId" type="java.lang.String" *#
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta content="text/html; charset=UTF-8">
@@ -25,8 +32,8 @@
 <div id=main>
 	<h3 id="title"></h3>
  <div>
-  <div style="float: left">
-   <div class="formArea ui-widget-header ui-corner-all">
+  <div style="float: left; width: 35%; overflow-x: auto;">
+   <div class="formArea ui-widget-header ui-corner-all" style="width: auto;">
     <form method="POST" action="approve">
      <input type="hidden" name="elw_ctx" value="$f.esc($elw_ctx.toString())"/>
      <input type="hidden" name="sId" value="$f.esc($slot.id)"/>
@@ -50,13 +57,14 @@
     </form>
    </div>
   </div>
-  <div style="float: right;">
+  <div style="float: right; width: 65%; overflow-x: auto;">
    <form style="text-align: center;">
     #parse("/__/modeCombo.vm")
     <label for="dataLoader"></label>
     <input id="dataLoader" type="button" value="Refresh"/>
    </form>
-   <table id="dataTable" cellspacing="0" cellpadding="1"></table>
+   <table id="dataTable" cellspacing="0" cellpadding="1" align="center" width="95%"></table>
+   #set($__qId = "log") #parse("/__/queryTableLog.vm")
   </div>
  </div>
 </body>
@@ -110,16 +118,16 @@
    "sDom": 'lprf<"clear">ti',
    'aaData': [ ],
    'aoColumns': [
-    #* 0 index - *# {"bVisible": false, "bSortable": false, "sWidth": "2em"},
+    #* 0 index - *# {"bVisible": false, "bSortable": false},
     #* 1 selected 0 *# {'sTitle': '&gt;', "bSortable": false, "sWidth": "2em"},
-    #* 2 best 1 *# {'sTitle': '*', "bSortable": false},
+    #* 2 best 1 *# {'sTitle': '*', "bSortable": false, "sWidth": "2em"},
     #* 3 score date millis - *# {"bVisible": false, "bSortable": false},
     #* 4 score date full - *# {"bVisible": false, "bSortable": false},
     #* 5 score date nice 2 *# {'sTitle': 'Date', "iDataSort": 3, "sWidth": "7em"},
     #* 6 status classes - *# {"bVisible": false, "bSortable": false},
     #* 7 status text 3 *# {'sTitle': 'Status', "iDataSort": 5, "sWidth": "7em"},
-    #* 8 scoring 4 *# {'sTitle': 'Scoring', "sWidth": "11em"},
-    #* 9 comment 5 *# {'sTitle': 'Comment', "sWidth": "21em"},
+    #* 8 scoring 4 *# {'sTitle': 'Scoring', "sWidth": "40%"},
+    #* 9 comment 5 *# {'sTitle': 'Comment', "sWidth": "40%"},
     #* 10 edit score 6 *# {'sTitle': 'A', "sWidth": "2em", "bSortable": false, "fnRender": elw_dt_url(10, 'A')}
    ],
    "aaSorting": [ [3,'asc'] ],
@@ -168,5 +176,12 @@
   loadData();
  });
 </script>
+ #if(!$f_verId) #set($f_verId = "${elw_ctx.ass.id}--${elw_ctx.ver.id}--") #end 
+ #if(!$f_slotId) #set($f_slotId = "${elw_ctx.assType.id}--${slot.id}--") #end
+ #if(!$f_scope) #set($f_scope = "s--pad--") #end
+ #if(!$f_due) #set($f_due = "any") #end
+ #if(!$f_mode) #set($f_mode = "s") #end
+ #if(!$f_latest) #set($f_latest = "true") #end
+ #set($__qId = "log") #parse("/__/queryJsLog.vm")
  #parse("/__/ready.vm")
 </html>

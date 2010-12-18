@@ -84,22 +84,23 @@ table.display thead th div.DataTables_sort_wrapper span {
 }
 
 .dataTables_length {
- padding: 0 0.5em;
+ margin: 0 0.5em 0 2em;
 	float: left;
 }
 
 .dataTables_filter {
+ margin: 0 2em 0 0.5em;
 	float: right;
 	text-align: right;
 }
 
 .dataTables_info {
- padding: 0 0.5em;
+ margin: 0 0.5em 0 2em;
 	float: left;
 }
 
 .dataTables_paginate {
- padding: 0 1em;
+ margin: 0 1em;
 	float: left;
 	text-align: right;
 }

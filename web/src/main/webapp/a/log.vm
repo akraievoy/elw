@@ -1,4 +1,12 @@
 #* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
+#* @vtlvariable name="f" type="elw.web.FormatTool" *#
+#* @vtlvariable name="f_due" type="java.lang.Boolean" *#
+#* @vtlvariable name="f_latest" type="java.lang.Boolean" *#
+#* @vtlvariable name="f_studId" type="java.lang.String" *#
+#* @vtlvariable name="f_slotId" type="java.lang.String" *#
+#* @vtlvariable name="f_mode" type="java.lang.String" *#
+#* @vtlvariable name="f_scope" type="java.lang.String" *#
+#* @vtlvariable name="f_verId" type="java.lang.String" *#
 <html>
 <head>
  <meta content="text/html; charset=UTF-8">
@@ -17,6 +25,6 @@
   #set($__qId = "log") #parse("/__/queryTableLog.vm")
  </div>
 </body>
- #set($__qId = "log") #parse("/__/queryTableJs.vm")
+ #set($__qId = "log") #parse("/__/queryJsLog.vm")
  #parse("/__/ready.vm")
 </html>
