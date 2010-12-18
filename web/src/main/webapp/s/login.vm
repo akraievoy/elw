@@ -13,7 +13,7 @@
 <body>
 <div class="ui-widget-header ui-corner-all" id="elw_header">
 	<div id="nav"><span style="font-weight: bold">Login</span></div>
-	#elw_cred_stud($elw_ctx)
+ #parse("/__/credStud.vm")
 	<div id="header_hr"> </div>
 </div>
  #parse("/__/messages.vm")

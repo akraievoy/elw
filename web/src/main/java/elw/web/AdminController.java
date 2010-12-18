@@ -57,14 +57,16 @@ import java.util.regex.Pattern;
 public class AdminController extends MultiActionController implements WebSymbols {
 	private static final Logger log = LoggerFactory.getLogger(AdminController.class);
 
-	protected static final int NONCE_TIMEOUT_MILLIS = 60000;
-	protected static final String PASSWORD = System.getProperty("elw.admin.password", "NHTYLjutytHJNJH");
+
 
 	protected final CourseDao courseDao;
 	protected final GroupDao groupDao;
 	protected final EnrollDao enrollDao;
 	protected final ScoreDao scoreDao;
 	protected final FileDao fileDao;
+
+	protected final AdminDao adminDao;
+	protected final SortedSet<String> validNonces = new TreeSet<String>();
 
 	protected final ObjectMapper mapper = new ObjectMapper();
 	protected final long cacheBustingToken = System.currentTimeMillis();
@@ -73,7 +75,9 @@ public class AdminController extends MultiActionController implements WebSymbols
 	protected final Core core;
 
 	public AdminController(
-			CourseDao courseDao, EnrollDao enrollDao, GroupDao groupDao, ScoreDao scoreDao, FileDao fileDao
+			CourseDao courseDao, EnrollDao enrollDao, GroupDao groupDao, ScoreDao scoreDao, FileDao fileDao,
+			AdminDao adminDao,
+			Core core
 	) {
 		this.courseDao = courseDao;
 		this.enrollDao = enrollDao;
@@ -81,7 +85,9 @@ public class AdminController extends MultiActionController implements WebSymbols
 		this.scoreDao = scoreDao;
 		this.fileDao = fileDao;
 
-		core = new Core(courseDao, enrollDao, fileDao, groupDao, scoreDao);
+		this.adminDao = adminDao;
+
+		this.core = core;
 
 		fileItemFactory = new DiskFileItemFactory();
 		fileItemFactory.setRepository(new java.io.File(System.getProperty("java.io.tmpdir")));
@@ -90,9 +96,9 @@ public class AdminController extends MultiActionController implements WebSymbols
 
 	protected HashMap<String, Object> auth(final HttpServletRequest req, final HttpServletResponse resp, final String pathToRoot) throws IOException {
 		final HttpSession session = req.getSession(true);
-		final Boolean admin = (Boolean) session.getAttribute(S_ADMIN);
+		final Admin admin = (Admin) session.getAttribute(S_ADMIN);
 
-		if (!Boolean.TRUE.equals(admin)) {
+		if (admin == null) {
 			if (pathToRoot != null) {
 				Message.addWarn(req, "Admin authentication required");
 				if (req.getQueryString() != null) {
@@ -111,7 +117,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 		session.removeAttribute("loginTo");	//	LATER extract constant
 
 		final HashMap<String, Object> model = prepareDefaultModel(req);
-		model.put("auth", req.getSession(true).getAttribute(S_ADMIN));
+		model.put(S_ADMIN, admin);
 		model.put(R_CTX, Ctx.fromString(req.getParameter(R_CTX)).resolve(enrollDao, groupDao, courseDao));
 
 		return model;
@@ -132,29 +138,46 @@ public class AdminController extends MultiActionController implements WebSymbols
 	public ModelAndView do_login(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
 		final HashMap<String, Object> model = prepareDefaultModel(req);
 
-		model.put("nonce", Long.toString(System.currentTimeMillis(), 36));
+		final String nonce = Long.toString(System.currentTimeMillis(), 36);
+		synchronized (validNonces) {
+			validNonces.add(nonce);
+		}
+		model.put("nonce", nonce);
 
 		return new ModelAndView("a/login", model);
 	}
 
 	@RequestMapping(value = "loginPost", method = RequestMethod.POST)
 	public ModelAndView do_loginPost(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+		final String login = req.getParameter("login");
 		final String nonce = req.getParameter("nonce");
 		final String hash = req.getParameter("hash");
 
 		final HttpSession session = req.getSession(true);
 		if (
-				nonce == null || hash == null ||
-						nonce.trim().length() == 0 || hash.trim().length() == 0
-				) {
+				nonce == null || nonce.trim().length() == 0 ||
+				hash == null || hash.trim().length() == 0 ||
+				login == null || login.trim().length() == 0
+		) {
 			Message.addWarn(req, "nonce/hash parameters NOT set");
 		} else {
-			long nonceStamp = Long.valueOf(nonce, 36);
-			if (System.currentTimeMillis() - nonceStamp < NONCE_TIMEOUT_MILLIS) {
-				final String hashExpected = Ctx.digest(nonce + "-->" + PASSWORD);
+			boolean nonceValid;
+			synchronized (validNonces) {
+				nonceValid = validNonces.remove(nonce);
+				validNonces.headSet(nonce).clear();
+			}
 
-				if (hashExpected.equalsIgnoreCase(hash)) {
-					session.setAttribute(S_ADMIN, Boolean.TRUE);
+			if (nonceValid) {
+				final Admin admin = adminDao.findAdminById(login);
+				final String hashExpected;
+				if (admin != null) {
+					hashExpected = Ctx.digest(nonce + "-->" + login + "-->" + admin.getPassword());
+				} else {
+					hashExpected = null;
+				}
+
+				if (hashExpected != null && hashExpected.equalsIgnoreCase(hash)) {
+					session.setAttribute(S_ADMIN, admin);
 					session.setMaxInactiveInterval(300);
 					Message.addInfo(req, "Admin area : logged on");
 					final Object loginToAttr = session.getAttribute("loginTo");
@@ -166,7 +189,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 					}
 					return null;
 				} else {
-					Message.addWarn(req, "something went terribly wrong with your password, please retry authentication");
+					Message.addWarn(req, "terribly wrong login/password, please retry");
 				}
 			} else {
 				Message.addWarn(req, "nonce expired, please retry authentication");
@@ -458,35 +481,9 @@ public class AdminController extends MultiActionController implements WebSymbols
 
 		final Enrollment[] enrolls = enrollDao.findAllEnrollments();
 
-		final List<Object[]> indexData = new ArrayList<Object[]>();
-		for (Enrollment enr : enrolls) {
-			indexData.add(createRowIndex(indexData, enr));
-		}
+		final List<Object[]> indexData = core.prepareIndexData(enrolls);
 
 		return new ModelAndView(ViewJackson.success(indexData));
-	}
-
-	protected Object[] createRowIndex(List<Object[]> indexData, Enrollment enr) {
-		final Group group = groupDao.findGroup(enr.getGroupId());
-		final Course course = courseDao.findCourse(enr.getCourseId());
-
-		final String uploadsBase = "log?elw_ctx=e--" + enr.getId();
-		final Object[] arr = {
-				/* 0 index - */ indexData.size(),
-				/* 1 enr.id - */ enr.getId(),
-				/* 2 group.id - */ group.getId(),
-				/* 3 group.name 0*/ group.getName(),
-				/* 4 course.id - */ course.getId(),
-				/* 5 course.name 1 */ course.getName(),
-				/* 6 summary ref 2 */ "enroll?elw_ctx=e--"+enr.getId(),
-				/* 7 assignments ref 3 */ "#",
-				/* 8 uploads ref 4 */ uploadsBase +"&f_scope=s--p--&f_due=today&f_mode=dd",
-				/* 9 uploads-open ref 5 */ uploadsBase + "&f_scope=s--o--&f_due=twoweeks&f_mode=dd",
-				/* 10 uploads-course 6 */ uploadsBase + "&f_scope=c--av--&f_due=any",
-				/* 11 classes ref 7 */ "#",
-				/* 12 students ref 8 */ "#"
-		};
-		return arr;
 	}
 
 	@RequestMapping(value = "approve", method = RequestMethod.GET)

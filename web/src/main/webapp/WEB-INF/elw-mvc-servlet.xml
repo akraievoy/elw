@@ -25,7 +25,7 @@
 			   "http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-2.0.4.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd"
 	   default-init-method="start"
 	   default-destroy-method="stop"
-	default-autowire="constructor">
+	   default-autowire="constructor">
 
 	<context:annotation-config/>
 
@@ -39,6 +39,9 @@
 
 	<bean id="mapper" class="elw.dao.MapperFactory" factory-method="createMapper"/>
 
+	<bean id="adminDao" class="elw.dao.AdminDao">
+		<property name="metaClass" value="elw.vo.Admin"/>
+	</bean>
 	<bean id="fileDao" class="elw.dao.FileDao">
 		<property name="metaClass" value="elw.vo.FileMeta"/>
 	</bean>
@@ -58,6 +61,14 @@
 		<property name="metaClass" value="elw.vo.Score"/>
 	</bean>
 
+	<bean id="core" class="elw.web.core.Core">
+		<constructor-arg type="elw.dao.CourseDao" ref="courseDao"/>
+		<constructor-arg type="elw.dao.EnrollDao" ref="enrollmentDao"/>
+		<constructor-arg type="elw.dao.FileDao" ref="fileDao"/>
+		<constructor-arg type="elw.dao.GroupDao" ref="groupDao"/>
+		<constructor-arg type="elw.dao.ScoreDao" ref="scoreDao"/>
+	</bean>
+
 	<bean class="elw.dao.RunnablePollInboxes">
 		<property name="daos">
 			<list>
@@ -65,7 +76,7 @@
 				<ref bean="courseDao"/>
 				<ref bean="groupDao"/>
 				<ref bean="enrollmentDao"/>
-				<ref bean="scoreDao"/>
+				<ref bean="adminDao"/>
 			</list>
 		</property>
 	</bean>
@@ -98,7 +109,8 @@
 			<map>
 				<entry key="input.encoding" value="UTF-8"/>
 				<entry key="output.encoding" value="UTF-8"/>
-				<entry key="velocimacro.library" value="t/elw.vm"/>
+				<!--Idea won't resolve macroses, so I've chosen the #parse includes and seem to be quite correct-->
+				<!--<entry key="velocimacro.library" value="t/elw.vm"/>-->
 				<entry key="velocimacro.library.autoreload" value="true"/>
 				<entry key="file.resource.loader.cache" value="false"/>
 			</map>

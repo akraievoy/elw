@@ -1,0 +1,4 @@
+#* @vtlvariable name="__qId" type="java.lang.String" *#
+<div>
+ <table id="${__qId}_dataTable" cellspacing="0" cellpadding="1" align="center" width="95%"></table>
+</div>

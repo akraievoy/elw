@@ -21,7 +21,9 @@
 	<form method="POST" action="loginPost" id="elw_formLoginPost">
 		<input type="hidden" value="$nonce" name="nonce" id="elw_inputNonce"/>
 		<input type="hidden" value="" name="hash" id="elw_inputHash"/>
-		<div class="formLabel">Password:</div>
+		<div class="formLabel"><label for="elw_inputLogin">Login:</label></div>
+		<div class="formField"><input type="text" name="login" value="" id="elw_inputLogin"/></div>
+		<div class="formLabel"><label for="elw_inputPassword">Password:</label></div>
 		<div class="formField"><input type="password" value="" id="elw_inputPassword"/></div>
 		<div class="formButtons"><input type="submit" value="Go" id="elw_buttonGo"/></div>
 	</form>
@@ -32,13 +34,13 @@
   jQuery(document).ready(function() {
 		jQuery("#elw_formLoginPost").submit(function(evt) {
 			jQuery("#elw_inputHash").val(
-				jQuery.sha1(jQuery("#elw_inputNonce").val() + "-->" + jQuery("#elw_inputPassword").val())
+				jQuery.sha1(jQuery("#elw_inputNonce").val() + "-->" + jQuery("#elw_inputLogin").val() + "-->" + jQuery("#elw_inputPassword").val())
 			);
 			//	just in case some lame browser would still submit cleartext password field despite it has no name at all
 			jQuery("#elw_inputPassword").val("");
 		});
 
-		jQuery("#elw_inputPassword").focus();
+		jQuery("#elw_inputLogin").focus();
 	});
 </script>
  #parse("/__/ready.vm")

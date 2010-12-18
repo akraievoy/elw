@@ -22,6 +22,7 @@ import elw.dao.*;
 import elw.miniweb.Message;
 import elw.miniweb.ViewJackson;
 import elw.vo.*;
+import elw.web.core.Core;
 import elw.web.core.W;
 import org.akraievoy.gear.G4Io;
 import org.apache.commons.fileupload.FileUploadException;
@@ -53,7 +54,8 @@ public class StudentController extends MultiActionController implements WebSymbo
 	protected final EnrollDao enrollDao;
 	protected final ScoreDao scoreDao;
 	protected final FileDao fileDao;
-	private final AdminController adminController;
+	protected final AdminController adminController;
+	protected final Core core;
 
 	protected final ObjectMapper mapper = new ObjectMapper();
 	protected final long cacheBustingToken = System.currentTimeMillis();
@@ -61,7 +63,8 @@ public class StudentController extends MultiActionController implements WebSymbo
 	public StudentController(
 			CourseDao courseDao, GroupDao groupDao, EnrollDao enrollDao,
 			ScoreDao scoreDao, FileDao fileDao,
-			AdminController adminController
+			AdminController adminController,
+			Core core
 	) {
 		this.courseDao = courseDao;
 		this.groupDao = groupDao;
@@ -69,6 +72,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 		this.scoreDao = scoreDao;
 		this.fileDao = fileDao;
 		this.adminController = adminController;
+		this.core = core;
 	}
 
 	protected HashMap<String, Object> auth(final HttpServletRequest req, final HttpServletResponse resp, final String pathToRoot) throws IOException {
@@ -76,8 +80,8 @@ public class StudentController extends MultiActionController implements WebSymbo
 		Ctx ctx = Ctx.fromString(req.getParameter(R_CTX));
 
 		//	admin impersonation
-		final Boolean admin = (Boolean) session.getAttribute(S_ADMIN);
-		if (Boolean.TRUE.equals(admin)) {
+		final Admin admin = (Admin) session.getAttribute(S_ADMIN);
+		if (admin != null) {
 			if (!ctx.resolve(enrollDao, groupDao, courseDao).resolved(Ctx.STATE_GS)) {
 				resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "context path problem, please check the logs");
 				return null;
@@ -357,6 +361,20 @@ public class StudentController extends MultiActionController implements WebSymbo
 		viewToExpandTriggers.put(viewNameEff, postBody);
 
 		return new ModelAndView(ViewJackson.success("success"));
+	}
+
+	@RequestMapping(value = "rest/index", method = RequestMethod.GET)
+	public ModelAndView do_restIndex(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+		final HashMap<String, Object> model = auth(req, resp, null);
+		if (model == null) {
+			return null;
+		}
+
+		final Ctx ctx = (Ctx) model.get(R_CTX);
+		final Enrollment[] enrolls = enrollDao.findEnrollmentsForGroupId(ctx.getGroup().getId());
+		final List<Object[]> indexData = core.prepareIndexData(enrolls);
+
+		return new ModelAndView(ViewJackson.success(indexData));
 	}
 
 	@RequestMapping(value = "dl/*.*", method = RequestMethod.GET)

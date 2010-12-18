@@ -1,7 +1,7 @@
-#* @vtlvariable name="auth" type="java.lang.Boolean" *#
+#* @vtlvariable name="elw_admin" type="elw.vo.Admin" *#
 <div id="cred">
- #if($auth)
-  [&nbsp;Admin&nbsp;]&nbsp;
+ #if($elw_admin)
+  [&nbsp;$elw_admin.name&nbsp;]&nbsp;
   <form method="GET" style="display:inline; margin: 0 0.25em; padding: 0;" action="logout">
    <input type="Submit" value="Log Out" class="elw_button_logout"/>
   </form>

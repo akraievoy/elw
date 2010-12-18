@@ -213,4 +213,35 @@ public class Core {
 		};
 		return dataRow;
 	}
+
+	public List<Object[]> prepareIndexData(Enrollment[] enrolls) {
+		final List<Object[]> indexData = new ArrayList<Object[]>();
+		for (Enrollment enr : enrolls) {
+			indexData.add(createRowIndex(indexData, enr));
+		}
+		return indexData;
+	}
+
+	protected Object[] createRowIndex(List<Object[]> indexData, Enrollment enr) {
+		final Group group = groupDao.findGroup(enr.getGroupId());
+		final Course course = courseDao.findCourse(enr.getCourseId());
+
+		final String uploadsBase = "log?elw_ctx=e--" + enr.getId();
+		final Object[] arr = {
+				/* 0 index - */ indexData.size(),
+				/* 1 enr.id - */ enr.getId(),
+				/* 2 group.id - */ group.getId(),
+				/* 3 group.name 0*/ group.getName(),
+				/* 4 course.id - */ course.getId(),
+				/* 5 course.name 1 */ course.getName(),
+				/* 6 summary ref 2 */ "enroll?elw_ctx=e--"+enr.getId(),
+				/* 7 students ref 3 */ "#",
+				/* 8 tasks ref 4 */ "#",
+				/* 9 classes ref 5 */ "#",
+				/* 10 uploads ref 6 */ uploadsBase +"&f_scope=s--p--&f_due=today&f_mode=dd",
+				/* 11 uploads-open ref 7 */ uploadsBase + "&f_scope=s--o--&f_due=twoweeks&f_mode=dd",
+				/* 12 uploads-course ref 8 */ uploadsBase + "&f_scope=c--av--&f_due=any",
+		};
+		return arr;
+	}
 }

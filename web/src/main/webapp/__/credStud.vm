@@ -1,7 +1,6 @@
-#macro (elw_cred_stud $elw_ctx)
-#if($elw_ctx.group)#if($elw_ctx.student)#set($auth="true") #end #end
+#* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
 <div id="cred">
-	#if($auth)
+	#if($elw_ctx.group && $elw_ctx.student)
 		<span style="font-size: 1.3em">[&nbsp;$elw_ctx.group.name&nbsp;$elw_ctx.student.name&nbsp;]</span>&nbsp;
 		<form method="GET" style="display:inline; margin: 0 0.25em; padding: 0;" action="logout">
 			<button type="submit" class="elw_button_logout">Log Out</button>
@@ -10,4 +9,3 @@
 		<span style="font-size: 1.3em">[&nbsp;Anonymous&nbsp;]</span>
 	#end
 </div>
-#end
