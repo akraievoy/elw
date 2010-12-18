@@ -1,7 +1,6 @@
 #* @vtlvariable name="elw_student" type="elw.vo.Student" *#
 #* @vtlvariable name="elw_group" type="elw.vo.Group" *#
-#* @vtlvariable name="groupName" type="java.lang.String" *#
-#* @vtlvariable name="studentName" type="java.lang.String" *#
+#* @vtlvariable name="nonce" type="java.lang.String" *#
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta content="text/html; charset=UTF-8">
@@ -17,7 +16,7 @@
 </div>
  #parse("/__/messages.vm")
 <div id=main>
-<div class="formArea ui-widget-header ui-corner-all" style="height: 5em;">
+<div class="formArea ui-widget-header ui-corner-all">
 	<form method="POST" action="loginPost" id="elw_formLoginPost">
 		<input type="hidden" value="$nonce" name="nonce" id="elw_inputNonce"/>
 		<input type="hidden" value="" name="hash" id="elw_inputHash"/>
