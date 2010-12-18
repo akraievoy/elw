@@ -103,7 +103,10 @@ function elw_ajaxStart(myAjaxStamp) {
 }
 
 function elw_dt_url(idx, inner) {
- return function(oObj) { return '<a href="'+oObj.aData[idx]+'">'+inner+'</a>'; };
+ return function(oObj) {
+  var d = oObj.aData[idx];
+  return d != null && ("" + d).length > 0 ? '<a href="' + d + '">' + inner + '</a>' : "";
+ };
 }
 
 jQuery(document).ready(function() {

@@ -1,5 +1,6 @@
 #* @vtlvariable name="__qId" type="java.lang.String" *#
 
+#* @vtlvariable name="elw_admin" type="elw.vo.Admin" *#
 #* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
 #* @vtlvariable name="f" type="elw.web.FormatTool" *#
 #* @vtlvariable name="f_verId" type="java.lang.String" *#
@@ -8,17 +9,21 @@
  #foreach($entry in $elw_ctx.enr.index)
   #set($__idx = $velocityCount - 1)
   #set($__ctx_ass = $elw_ctx.extendIndex($__idx))
-  f_verId.append(
-   jQuery("<option></option>")
-     .attr("value", $f.json($__ctx_ass.ass.id) + "--")
-     .text($f.json($__ctx_ass.ass.name))
-  );
-  #foreach($ver in $__ctx_ass.ass.versions)
-  f_verId.append(
+  #if($elw_admin || $__ctx_ass.cFrom().started)
+   f_verId.append(
     jQuery("<option></option>")
-      .attr("value", $f.json($__ctx_ass.ass.id) + "--" + $f.json($ver.id) + "--")
-      .text($f.json($__ctx_ass.ass.name) + " - " + $f.json($ver.name))
-  );
+      .attr("value", $f.json($__ctx_ass.ass.id) + "--")
+      .text($f.json($__ctx_ass.ass.name))
+   );
+   #foreach($ver in $__ctx_ass.ass.versions)
+    #if($elw_admin || $__ctx_ass.ver.id == $ver.id)
+     f_verId.append(
+       jQuery("<option></option>")
+         .attr("value", $f.json($__ctx_ass.ass.id) + "--" + $f.json($ver.id) + "--")
+         .text($f.json($__ctx_ass.ass.name) + " - " + $f.json($ver.name))
+     );
+    #end
+   #end
   #end
  #end
  #if($f_verId)

@@ -72,13 +72,7 @@ public class ScoreDao extends Dao<Score> {
 	}
 
 	public static Score updateAutos(Ctx ctx, final String slotId, Entry<FileMeta> file, final Score score) {
-		final Integer classDueIdx = ctx.getIndexEntry().getClassDue().get(slotId);
-		final Class classDue;
-		if (classDueIdx == null) {
-			classDue = ctx.getEnr().getClasses().get(ctx.getEnr().getClasses().size() - 1);
-		} else {
-			classDue = ctx.getEnr().getClasses().get(classDueIdx);
-		}
+		final Class classDue = ctx.cDue(slotId);
 		final FileSlot slot = ctx.getAssType().findSlotById(slotId);
 
 		final Map<String, Double> vars = new TreeMap<String, Double>();

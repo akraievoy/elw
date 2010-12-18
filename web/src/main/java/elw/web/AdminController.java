@@ -387,8 +387,8 @@ public class AdminController extends MultiActionController implements WebSymbols
 		final Format format = (Format) model.get(FormatTool.MODEL_KEY);
 		final VelocityUtils u = (VelocityUtils) model.get(VelocityUtils.MODEL_KEY);
 
-		final List<Object[]> logData = core.prepareLogEntries(
-				ctx, format, u, W.parseFilter(req)
+		final List<Object[]> logData = core.log(
+				ctx, format, u, W.parseFilter(req), true
 		);
 
 		return new ModelAndView(ViewJackson.success(logData));
@@ -481,7 +481,7 @@ public class AdminController extends MultiActionController implements WebSymbols
 
 		final Enrollment[] enrolls = enrollDao.findAllEnrollments();
 
-		final List<Object[]> indexData = core.prepareIndexData(enrolls);
+		final List<Object[]> indexData = core.index(enrolls);
 
 		return new ModelAndView(ViewJackson.success(indexData));
 	}

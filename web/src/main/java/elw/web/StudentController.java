@@ -372,9 +372,50 @@ public class StudentController extends MultiActionController implements WebSymbo
 
 		final Ctx ctx = (Ctx) model.get(R_CTX);
 		final Enrollment[] enrolls = enrollDao.findEnrollmentsForGroupId(ctx.getGroup().getId());
-		final List<Object[]> indexData = core.prepareIndexData(enrolls);
+		final List<Object[]> indexData = core.index(enrolls);
 
 		return new ModelAndView(ViewJackson.success(indexData));
+	}
+
+	@RequestMapping(value = "log", method = RequestMethod.GET)
+	public ModelAndView do_log(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+		final HashMap<String, Object> model = auth(req, resp, "");
+		if (model == null) {
+			return null;
+		}
+
+		final Ctx ctx = (Ctx) model.get(R_CTX);
+		if (!ctx.resolved(Ctx.STATE_ECG)) {
+			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Path problem, please check the logs");
+			return null;
+		}
+
+		W.storeFilter(req, model);
+
+		return new ModelAndView("s/log", model);
+	}
+
+	@RequestMapping(value = "rest/log", method = RequestMethod.GET)
+	public ModelAndView do_restLog(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+		final HashMap<String, Object> model = auth(req, resp, null);
+		if (model == null) {
+			return null;
+		}
+
+		final Ctx ctx = (Ctx) model.get(R_CTX);
+		if (!ctx.resolved(Ctx.STATE_ECG)) {
+			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Path problem, please check the logs");
+			return null;
+		}
+
+		final Format format = (Format) model.get(FormatTool.MODEL_KEY);
+		final VelocityUtils u = (VelocityUtils) model.get(VelocityUtils.MODEL_KEY);
+
+		final List<Object[]> logData = core.log(
+				ctx, format, u, W.parseFilter(req), false
+		);
+
+		return new ModelAndView(ViewJackson.success(logData));
 	}
 
 	@RequestMapping(value = "dl/*.*", method = RequestMethod.GET)

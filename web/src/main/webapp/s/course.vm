@@ -142,16 +142,14 @@
   #foreach($entry in $elw_ctx.enr.index)
    #set($idx = $velocityCount - 1)
    #set($elw_ctx_ver = $elw_ctx.extendIndex($idx))
-   #set($started = $elw_ctx.enr.classes.get($elw_ctx_ver.indexEntry.classFrom).started)
-   #set($taskOpens = $f.format($elw_ctx.enr.classes.get($elw_ctx_ver.indexEntry.classFrom).fromDateTime.millis))
    {
     var tp_task = te_task.clone();
 
     tp_task.toggleClass("te");
     tp_task.find(".tp_task_title").html($f.json($elw_ctx_ver.ass.name)).attr("title", "${elw_ctx_ver.ass.id}");
     tp_task.find(".tp_task_score").html("$elw_ctx_ver.indexEntry.scoreBudget");
-    #if($started)
-     tp_task.find(".tp_task_opens").html("Opened " + $f.json($taskOpens));
+    #if($elw_ctx_ver.cFrom().started)
+     tp_task.find(".tp_task_opens").html("Opened " + $f.json($f.format($elw_ctx_ver.cFrom()).fromDateTime.millis));
      tp_task.find(".expandTrigger").attr("id", "index-$idx");
      tp_timeline.append(tp_task);
 
@@ -176,8 +174,8 @@
      #set($filesStud = $fileMetas.get("$elw_ctx_ver.toString()"))
      #foreach($slot in $elw_ctx_ver.assType.fileSlots)
       {
-       #if($elw_ctx_ver.indexEntry.classDue.get($slot.id))
-        #set($classDue = $elw_ctx.enr.classes.get($elw_ctx_ver.indexEntry.classDue.get($slot.id)))
+       #set($classDue = $elw_ctx_ver.cDue($slot.id))
+       #if($classDue)
         var tp_slot = te_slot.clone().toggleClass("te").toggleClass("index-$idx");
 
         tp_slot.find(".tp_slot_title").html($f.json(${slot.name})).attr("title", "${slot.id}");
@@ -290,7 +288,7 @@
      tp_tabs.tabs({ cookie: { expires: 3, name: ".index-${idx}--slotedit-tab" } });
     #else
      tp_task.find(".expandTrigger").remove();
-     tp_task.find(".tp_task_opens").html("Opens " + $f.json($taskOpens));
+     tp_task.find(".tp_task_opens").html("Opens " + $f.json($f.format($elw_ctx_ver.cFrom()).fromDateTime.millis));
      tp_timeline.append(tp_task);
     #end
    }

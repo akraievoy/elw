@@ -41,21 +41,24 @@ public class Core {
 		this.scoreDao = scoreDao;
 	}
 
-	public List<Object[]> prepareLogEntries(
-			Ctx ctx, Format format, VelocityUtils u, LogFilter logFilter
+	public List<Object[]> log(
+			Ctx ctx, Format format, VelocityUtils u, LogFilter logFilter, final boolean adm
 	) {
 		final List<Object[]> logData = new ArrayList<Object[]>();
 
 		if ("s".equalsIgnoreCase(logFilter.getScopePath()[0])) {
-			prepareLogEntriesStud(ctx, format, u, logFilter, logData);
+			logStud(ctx, format, u, logFilter, logData, adm);
 		} else if ("c".equalsIgnoreCase(logFilter.getScopePath()[0])) {
-			prepareLogEntriesAdm(ctx, format, u, logFilter, logData);
+			logCourse(ctx, format, u, logFilter, logData, adm);
 		}
 
 		return logData;
 	}
 
-	private void prepareLogEntriesAdm(Ctx ctx, Format format, VelocityUtils u, LogFilter lf, List<Object[]> logData) {
+	protected void logCourse(
+			Ctx ctx, Format format, VelocityUtils u, LogFilter lf,
+			List<Object[]> logData, final boolean adm
+	) {
 		for (int i = 0; i < ctx.getEnr().getIndex().size(); i++) {
 			final Ctx ctxAss = ctx.extendIndex(i);
 
@@ -68,64 +71,84 @@ public class Core {
 				if (!lf.cDue(ctxAss, slot)) {
 					continue;
 				}
+				if (!adm && !ctxAss.cFrom().isStarted()) {
+					continue;
+				}
 
 				final Entry<FileMeta>[] uploadsAss = fileDao.findFilesFor(FileDao.SCOPE_ASS, ctxAss, slot.getId());
 				int total = uploadsAss.length;
 				if (lf.cScopeOne('a') && lf.cVer(ctxAss)) {
-					addRows(format, u, lf, logData, i, ctxAss, slot, uploadsAss, FileDao.SCOPE_ASS);
+					logRows(format, u, lf, logData, i, ctxAss, slot, uploadsAss, FileDao.SCOPE_ASS, adm);
 				}
 
-				for (Version ver : ctxAss.getAss().getVersions()) {
+				final Version[] versions = adm ? ctxAss.getAss().getVersions() : new Version[] {ctxAss.getVer()};
+				for (Version ver : versions) {
 					final Ctx ctxVer = ctxAss.extendVer(ver);
 					final Entry<FileMeta>[] uploadsVer = fileDao.findFilesFor(FileDao.SCOPE_VER, ctxVer, slot.getId());
 					total += uploadsVer.length;
 					if (lf.cScopeOne('v') && lf.cVer(ctxVer)) {
-						addRows(format, u, lf, logData, i, ctxVer, slot, uploadsVer, FileDao.SCOPE_VER);
+						logRows(format, u, lf, logData, i, ctxVer, slot, uploadsVer, FileDao.SCOPE_VER, adm);
 					}
 				}
 
 				if (lf.cScopeOpen() && lf.cVer(ctxAss) && total == 0) {
-					logData.add(createRowLog(format, u, lf.getMode(), logData, i, ctxAss, slot, null, FileDao.SCOPE_ASS));
+					logData.add(logRow(format, u, lf.getMode(), logData, i, ctxAss, slot, null, FileDao.SCOPE_ASS, adm));
 				}
 			}
 		}
 	}
 
-	protected void prepareLogEntriesStud(Ctx ctx, Format f, VelocityUtils u, LogFilter lf, List<Object[]> logData) {
-		for (Student stud : ctx.getGroup().getStudents()) {
-			if (W.excluded(lf.getStudId(), stud.getId())) {
-				continue;
-			}
-
-			final Ctx ctxStud = ctx.extendStudent(stud);
-			for (int index = 0; index < ctx.getEnr().getIndex().size(); index++) {
-				final Ctx ctxVer = ctxStud.extendIndex(index);
-				if (!lf.cVer(ctxVer)) {
+	protected void logStud(Ctx ctx, Format f, VelocityUtils u, LogFilter lf, List<Object[]> logData, boolean adm) {
+		if (adm) {
+			for (Student stud : ctx.getGroup().getStudents()) {
+				if (W.excluded(lf.getStudId(), stud.getId())) {
 					continue;
 				}
-				final AssignmentType aType = ctxVer.getAssType();
-				final FileSlot[] slots = aType.getFileSlots();
 
-				for (FileSlot slot : slots) {
-					if (W.excluded(lf.getSlotId(), aType.getId(), slot.getId())) {
-						continue;
-					}
+				final Ctx ctxStud = ctx.extendStudent(stud);
+				logStudForStud(ctx, f, u, lf, logData, ctxStud, adm);
+			}
+		} else {
+			if (ctx.getStudent() != null) {
+				logStudForStud(ctx, f, u, lf, logData, ctx, adm);
+			}
+		}
+	}
 
-					final Entry<FileMeta>[] uploads = fileDao.findFilesFor(FileDao.SCOPE_STUD, ctxVer, slot.getId());
-					if (!lf.cDue(ctxVer, slot)) {
-						continue;
-					}
+	protected void logStudForStud(
+			Ctx ctx, Format f, VelocityUtils u,
+			LogFilter lf, List<Object[]> logData, Ctx ctxStud,
+			boolean adm) {
+		for (int index = 0; index < ctx.getEnr().getIndex().size(); index++) {
+			final Ctx ctxVer = ctxStud.extendIndex(index);
+			if (!adm && !ctxVer.cFrom().isStarted()) {
+				continue;
+			}
+			if (!lf.cVer(ctxVer)) {
+				continue;
+			}
+			final AssignmentType aType = ctxVer.getAssType();
+			final FileSlot[] slots = aType.getFileSlots();
 
-					addRows(f, u, lf, logData, index, ctxVer, slot, uploads, FileDao.SCOPE_STUD);
-					if (uploads.length == 0 && lf.cScopeStud(slot, null)) {
-						logData.add(createRowLog(f, u, lf.getMode(), logData, index, ctxVer, slot, null, FileDao.SCOPE_STUD));
-					}
+			for (FileSlot slot : slots) {
+				if (W.excluded(lf.getSlotId(), aType.getId(), slot.getId())) {
+					continue;
+				}
+
+				final Entry<FileMeta>[] uploads = fileDao.findFilesFor(FileDao.SCOPE_STUD, ctxVer, slot.getId());
+				if (!lf.cDue(ctxVer, slot)) {
+					continue;
+				}
+
+				logRows(f, u, lf, logData, index, ctxVer, slot, uploads, FileDao.SCOPE_STUD, adm);
+				if (uploads.length == 0 && lf.cScopeStud(slot, null)) {
+					logData.add(logRow(f, u, lf.getMode(), logData, index, ctxVer, slot, null, FileDao.SCOPE_STUD, adm));
 				}
 			}
 		}
 	}
 
-	protected int addRows(Format format, VelocityUtils u, LogFilter logFilter, List<Object[]> logData, int index, Ctx ctxVer, FileSlot slot, Entry<FileMeta>[] uploads, String scope) {
+	protected int logRows(Format format, VelocityUtils u, LogFilter logFilter, List<Object[]> logData, int index, Ctx ctxVer, FileSlot slot, Entry<FileMeta>[] uploads, String scope, boolean adm) {
 		int shown = 0;
 		for (int i = 0, uploadsLength = uploads.length; i < uploadsLength; i++) {
 			final boolean last = i + 1 == uploadsLength;
@@ -137,15 +160,15 @@ public class Core {
 				continue;
 			}
 			shown += 1;
-			logData.add(createRowLog(format, u, logFilter.getMode(), logData, index, ctxVer, slot, e, scope));
+			logData.add(logRow(format, u, logFilter.getMode(), logData, index, ctxVer, slot, e, scope, adm));
 		}
 		return shown;
 	}
 
-	protected Object[] createRowLog(
+	protected Object[] logRow(
 			Format f, VelocityUtils u, final String mode, List<Object[]> data,
-			int index, Ctx ctx, FileSlot slot, Entry<FileMeta> e, String scope
-	) {
+			int index, Ctx ctx, FileSlot slot, Entry<FileMeta> e, String scope,
+			boolean adm) {
 		final long time = e == null ? System.currentTimeMillis() : e.getMeta().getCreateStamp().getTime();
 
 		final IndexEntry iEntry = ctx.getIndexEntry();
@@ -169,12 +192,27 @@ public class Core {
 			q.append("&fId=").append(e.getMeta().getId());
 		}
 
-		final String txRef;
+		final String dlRef;
 		if (e != null) {
-			txRef = "<a href=\"../s/dl/" + nameNorm + q + "\">DL</a>";
+			dlRef = (adm ? "../s/" : "") + "dl/" + nameNorm + q;
 		} else {
-			//	FIXME proper UL URI here
-			txRef = "<a href=\"../a/ul" + q + "\">UL</a>";
+			dlRef = null;
+		}
+
+		//	FIXME proper UL URI here
+		final String ulRef;
+		if (adm) {
+			if (!FileDao.SCOPE_STUD.equals(scope)) {
+				ulRef = "ul" + q;
+			} else {
+				ulRef = null;
+			}
+		} else {
+			if (FileDao.SCOPE_STUD.equals(scope) && ctx.getVer().checkWrite(ctx.getAssType(), ctx.getAss(), slot.getId(), fileDao.loadFilesStud(ctx))) {
+				ulRef = "ul" + q;
+			} else {
+				ulRef = null;
+			}
 		}
 
 		final String authorName;
@@ -208,21 +246,23 @@ public class Core {
 				/* 14 source ip */ e  == null ? "" : e.getMeta().getSourceAddress(),
 				/* 15 size bytes */ e  == null ? "" : e.computeSize(),
 				/* 16 size */ e  == null ? "" : f.formatSize(e.computeSize()),
-				/* 17 approve */ "<a href=\"approve" + q + "\">A</a>",
-				/* 18 download */ txRef
+				/* 17 approve ref */ "approve" + q,
+				/* 18 dl ref */ dlRef,
+				/* 19 ul ref */ ulRef,
+				/* 20 comment ref */ adm ? null : "#"	//	TODO comment edit url/page/method
 		};
 		return dataRow;
 	}
 
-	public List<Object[]> prepareIndexData(Enrollment[] enrolls) {
+	public List<Object[]> index(Enrollment[] enrolls) {
 		final List<Object[]> indexData = new ArrayList<Object[]>();
 		for (Enrollment enr : enrolls) {
-			indexData.add(createRowIndex(indexData, enr));
+			indexData.add(indexRow(indexData, enr));
 		}
 		return indexData;
 	}
 
-	protected Object[] createRowIndex(List<Object[]> indexData, Enrollment enr) {
+	protected Object[] indexRow(List<Object[]> indexData, Enrollment enr) {
 		final Group group = groupDao.findGroup(enr.getGroupId());
 		final Course course = courseDao.findCourse(enr.getCourseId());
 

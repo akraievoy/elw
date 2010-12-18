@@ -1,6 +1,7 @@
 package elw.dao;
 
 import elw.vo.*;
+import elw.vo.Class;
 import org.akraievoy.gear.G4Parse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -722,6 +723,43 @@ public class Ctx {
 
 	public static String norm(final String state) {
 		return removeRedundant(reorder(state));
+	}
+
+	public Class cFrom() {
+		if (!resolved("eci")) {
+			throw new IllegalStateException(this.toString());
+		}
+
+		final int classFrom = getIndexEntry().getClassFrom();
+		if (classFrom < 0) {
+			log.warn("referencing non-existent opening class: ctx=" + this.toString());
+			return getEnr().getClasses().get(0);
+		} else if (classFrom < getEnr().getClasses().size()) {
+			return getEnr().getClasses().get(classFrom);
+		} else {
+			log.warn("referencing non-existent opening class: ctx=" + this.toString());
+			return getEnr().getClasses().get(getEnr().getClasses().size() - 1);
+		}
+	}
+
+	public Class cDue(final String slotId) {
+		if (!resolved("eci")) {
+			throw new IllegalStateException(this.toString());
+		}
+
+		final Map<String, Integer> due = getIndexEntry().getClassDue();
+		final Integer dueIdx = due == null ? null : due.get(slotId);
+		if (dueIdx == null) {
+			return null;
+		} if (dueIdx < 0) {
+			log.warn("referencing non-existent due class: ctx=" + this.toString() + " slotId=" + slotId);
+			return getEnr().getClasses().get(0);
+		} else if (dueIdx < getEnr().getClasses().size()) {
+			return getEnr().getClasses().get(dueIdx);
+		} else {
+			log.warn("referencing non-existent opening class: ctx=" + this.toString() + " slotId=" + slotId);
+			return getEnr().getClasses().get(getEnr().getClasses().size() - 1);
+		}
 	}
 
 	@Override

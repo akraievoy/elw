@@ -117,18 +117,17 @@ public class LogFilter {
 			return true;
 		}
 
-		final Integer classDueIdx = ctxAss.getIndexEntry().getClassDue().get(slot.getId());
+		final elw.vo.Class classDue = ctxAss.cDue(slot.getId());
 		if ("none".equalsIgnoreCase(due)) {
-			return classDueIdx == null;
+			return classDue == null;
 		}
 		if ("set".equalsIgnoreCase(due)) {
-			return classDueIdx != null;
+			return classDue != null;
 		}
-		if (classDueIdx == null) {
-			return "none".equalsIgnoreCase(due);	//	which always evaluates to false AFAICS
+		if (classDue == null) {
+			return false;
 		}
 
-		final elw.vo.Class classDue = ctxAss.getEnr().getClasses().get(classDueIdx);
 		final int dayDiff = classDue.computeToDiff(new DateTime());
 
 		if ("over".equalsIgnoreCase(due)) {

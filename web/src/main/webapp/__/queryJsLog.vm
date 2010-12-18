@@ -1,5 +1,6 @@
 #* @vtlvariable name="__qId" type="java.lang.String" *#
 
+#* @vtlvariable name="elw_admin" type="elw.vo.Admin" *#
 #* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
 #* @vtlvariable name="f" type="elw.web.FormatTool" *#
 #* @vtlvariable name="f_due" type="java.lang.Boolean" *#
@@ -11,12 +12,14 @@
 #* @vtlvariable name="f_scope" type="java.lang.String" *#
 <script type="text/javascript">
  jQuery(document).ready(function() {
-  #parse("/__/studCombo.vm")
+  #if($elw_admin)
+   #parse("/__/studCombo.vm")
+  #end
   #parse("/__/slotCombo.vm")
   #parse("/__/versionCombo.vm")
 
   #if($f_due)
-   jQuery("form#${__qId}_filter input[name=f_due]").val($f.json($f_due));
+   jQuery("form#${__qId}_filter select[name=f_due]").val($f.json($f_due));
   #end
   #if($f_latest)
    jQuery("form#${__qId}_filter input[name=f_latest]").attr("checked", $f.json($f_latest));
@@ -49,8 +52,14 @@
     #* 14 source ip *# {"bVisible": false, "bSortable": false },
     #* 15 size bytes *# {"bVisible": false, "bSortable": false},
     #* 16 size *# {'sTitle': 'Size', "iDataSort": 15, "sWidth": "7em"},
-    #* 17 approve *# {'sTitle': 'A', "sWidth": "1em", "bSortable": false, "sClass": "text_align_center" },
-    #* 18 download *# {'sTitle': 'D', "sWidth": "1em", "bSortable": false, "sClass": "text_align_center" }
+     #if($elw_admin)
+      #* 17 approve ref *# {'sTitle': '<span title="Approve">A</span>', "sWidth": "1em", "bSortable": false, "sClass": "text_align_center", "fnRender": elw_dt_url(17, 'A') },
+     #else
+      #* 17 approve ref *# {"bVisible": false, "bSortable": false},
+     #end
+    #* 18 dl ref *# {'sTitle': '<span title="Download">DL</span>', "sWidth": "1em", "bSortable": false, "sClass": "text_align_center", "fnRender": elw_dt_url(18, 'DL') },
+    #* 19 ul ref *# {'sTitle': '<span title="Upload">UL</span>', "sWidth": "1em", "bSortable": false, "sClass": "text_align_center", "fnRender": elw_dt_url(19, 'UL') },
+    #* 20 comment ref *# {'sTitle': '<span title="Edit Comment">EC</span>', "sWidth": "1em", "bSortable": false, "sClass": "text_align_center", "fnRender": elw_dt_url(20, 'EC') }
    ],
    "aaSorting": [ [3,'asc'] ],
    "aaSortingFixed": [ ],

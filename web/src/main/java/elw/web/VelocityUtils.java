@@ -66,14 +66,8 @@ public class VelocityUtils {
 		final StringBuilder cls = new StringBuilder();
 		final StringBuilder sort = new StringBuilder();
 
-		final elw.vo.Class classFrom = ctx.getEnr().getClasses().get(ctx.getIndexEntry().getClassFrom());
-		final elw.vo.Class classDue;
-		final Integer classDueIdx = ctx.getIndexEntry().getClassDue().get(slot.getId());
-		if (classDueIdx != null) {
-			classDue = ctx.getEnr().getClasses().get(classDueIdx);
-		} else {
-			classDue = null;
-		}
+		final elw.vo.Class classFrom = ctx.cFrom();
+		final elw.vo.Class classDue = ctx.cDue(slot.getId());
 
 		if (FileDao.SCOPE_STUD.equalsIgnoreCase(scope)) {
 			if ("a".equalsIgnoreCase(mode)) {

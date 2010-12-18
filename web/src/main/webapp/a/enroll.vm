@@ -72,7 +72,7 @@
 
    #set($tp_taskHeader_colspan = 0)
    #foreach($slot in $elw_ctx_ass.assType.fileSlots)
-    #if($elw_ctx_ass.indexEntry.classDue.get($slot.id))
+    #if($elw_ctx_ass.cDue($slot.id))
      #set($z = "--") #* idea yells at me if I do this directly*#
      #set($z = "${elw_ctx_ass.assType.id}${z}${slot.id}")
      #if(!$f_slotId || $f_slotId == $z)

@@ -1,0 +1,30 @@
+#* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
+#* @vtlvariable name="f" type="elw.web.FormatTool" *#
+#* @vtlvariable name="f_due" type="java.lang.Boolean" *#
+#* @vtlvariable name="f_latest" type="java.lang.Boolean" *#
+#* @vtlvariable name="f_studId" type="java.lang.String" *#
+#* @vtlvariable name="f_slotId" type="java.lang.String" *#
+#* @vtlvariable name="f_mode" type="java.lang.String" *#
+#* @vtlvariable name="f_scope" type="java.lang.String" *#
+#* @vtlvariable name="f_verId" type="java.lang.String" *#
+<html>
+<head>
+ <meta content="text/html; charset=UTF-8">
+ <title>${elw_ctx.course.name} Files</title>
+ #parse("/__/imports.vm")
+</head>
+<body style="text-align: left;">
+<div class="ui-widget-header ui-corner-all" id="elw_header">
+ <div id="nav"><a href="courses">My Courses</a> &gt; <span style="font-weight: bold">${elw_ctx.course.name}</span>
+	</div>
+ #parse("/__/credStud.vm")
+ <div id="header_hr"></div>
+</div>
+ #parse("/__/messages.vm")
+ <div style="">
+  #set($__qId = "log") #parse("/__/queryTableLog.vm")
+ </div>
+</body>
+ #set($__qId = "log") #parse("/__/queryJsLog.vm")
+ #parse("/__/ready.vm")
+</html>
