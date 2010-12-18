@@ -112,12 +112,12 @@ public class LogFilter {
 		return !isLatest() || last;
 	}
 
-	public boolean cDue(Ctx ctxVer, FileSlot slot, Entry<FileMeta>[] uploads) {
+	public boolean cDue(Ctx ctxAss, FileSlot slot) {
 		if ("any".equalsIgnoreCase(due)) {
 			return true;
 		}
 
-		final Integer classDueIdx = ctxVer.getIndexEntry().getClassDue().get(slot.getId());
+		final Integer classDueIdx = ctxAss.getIndexEntry().getClassDue().get(slot.getId());
 		if ("none".equalsIgnoreCase(due)) {
 			return classDueIdx == null;
 		}
@@ -128,7 +128,7 @@ public class LogFilter {
 			return "none".equalsIgnoreCase(due);	//	which always evaluates to false AFAICS
 		}
 
-		final elw.vo.Class classDue = ctxVer.getEnr().getClasses().get(classDueIdx);
+		final elw.vo.Class classDue = ctxAss.getEnr().getClasses().get(classDueIdx);
 		final int dayDiff = classDue.computeToDiff(new DateTime());
 
 		if ("over".equalsIgnoreCase(due)) {

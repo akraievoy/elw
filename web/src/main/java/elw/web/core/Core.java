@@ -65,6 +65,9 @@ public class Core {
 				if (W.excluded(lf.getSlotId(), aType.getId(), slot.getId())) {
 					continue;
 				}
+				if (!lf.cDue(ctxAss, slot)) {
+					continue;
+				}
 
 				final Entry<FileMeta>[] uploadsAss = fileDao.findFilesFor(FileDao.SCOPE_ASS, ctxAss, slot.getId());
 				int total = uploadsAss.length;
@@ -109,7 +112,7 @@ public class Core {
 					}
 
 					final Entry<FileMeta>[] uploads = fileDao.findFilesFor(FileDao.SCOPE_STUD, ctxVer, slot.getId());
-					if (!lf.cDue(ctxVer, slot, uploads)) {
+					if (!lf.cDue(ctxVer, slot)) {
 						continue;
 					}
 
@@ -176,7 +179,7 @@ public class Core {
 
 		final String authorName;
 		if (e == null) {
-			if (ctx.getStudent() != null) {
+			if (FileDao.SCOPE_STUD.equalsIgnoreCase(scope)) {
 				authorName = ctx.getStudent().getName();
 			} else {
 				authorName = "Admin";
