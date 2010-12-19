@@ -632,4 +632,53 @@ public class Core {
 
 		return usedEntry;
 	}
+	
+	public String cmpForwardToEarliestPendingSince(Ctx ctx, FileSlot slot, Stamp since) {
+		FileMeta epF = null;	//	earliest pending
+		Ctx epCtx = null;
+
+		final Ctx ctxEnr = Ctx.forEnr(ctx.getEnr()).resolve(enrollDao, groupDao,  courseDao);
+		//	LATER oh this pretty obviously looks like we REALLY need some rdbms from now on... :D
+		for (Student stud : ctx.getGroup().getStudents()) {
+			final Ctx ctxStud = ctxEnr.extendStudent(stud);
+			for (int index = 0; index < ctx.getEnr().getIndex().size(); index++) {
+				final Ctx ctxVer = ctxStud.extendIndex(index);
+				if (!ctxVer.getAssType().getId().equals(ctx.getAssType().getId())) {
+					continue;	//	other ass types out of scope
+				}
+				for (FileSlot s : ctxVer.getAssType().getFileSlots()) {
+					if (!s.getId().equals(slot.getId())) {
+						continue;	//	other slots out of scope
+					}
+					final Entry<FileMeta>[] uploads = fileDao.findFilesFor(FileDao.SCOPE_STUD, ctxVer, slot.getId());
+					if (uploads != null && uploads.length > 0) {
+						for (int i = uploads.length - 1; i >= 0; i--) {
+							final FileMeta f = uploads[i].getMeta();
+							if (since != null && f.getCreateStamp().compareTo(since) < 0) {
+								break;	//	oh this is overly stale
+							}
+
+							if (f.getScore() == null) {
+								if ((epF == null || epF.getCreateStamp().getTime() > f.getCreateStamp().getTime())) {
+									epF = f;
+									epCtx = ctxVer;
+								}
+								break;	//	don't look into earlier pending versions before this one is approved
+							} else if (Boolean.TRUE.equals(f.getScore().getApproved())) {
+								break;	//	don't look into earlier pending versions after this one is approved
+							}
+						}
+					}
+				}
+			}
+		}
+
+		final String forward;
+		if (epCtx != null) {
+			forward = "approve?elw_ctx=" + epCtx.toString() + "&sId=" + slot.getId() + "&fId=" + epF.getId();
+		} else {
+			forward = "log?elw_ctx=" + ctxEnr.toString() + "&f_slot=" + slot.getId();
+		}
+		return forward;
+	}
 }

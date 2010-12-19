@@ -18,9 +18,7 @@
 
 package elw.web;
 
-import base.pattern.Result;
 import elw.dao.*;
-import elw.dp.mips.MipsValidator;
 import elw.miniweb.Message;
 import elw.miniweb.ViewJackson;
 import elw.vo.*;
@@ -202,99 +200,16 @@ public class AdminController extends ControllerElw {
 		return new ModelAndView("a/index", model);
 	}
 
-	@RequestMapping(value = "courses", method = RequestMethod.GET)
-	public ModelAndView do_courses(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		final HashMap<String, Object> model = auth(req, resp, "");
-		if (model == null) {
-			return null;
-		}
-
-		model.put("courses", courseDao.findAllCourses());
-
-		return new ModelAndView("a/courses", model);
-	}
-
-	@RequestMapping(value = "course", method = RequestMethod.GET)
-	public ModelAndView do_course(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		final HashMap<String, Object> model = auth(req, resp, "");
-		if (model == null) {
-			return null;
-		}
-
-		final Ctx ctx = (Ctx) model.get(R_CTX);
-		if (!ctx.resolved(Ctx.STATE_C)) {
-			Message.addWarn(req, "Course not found");
-			resp.sendRedirect("courses");
-			return null;
-		}
-
-		if ("true".equalsIgnoreCase(req.getParameter("test"))) {
-			final HashMap<String, Result> testResults = new HashMap<String, Result>();
-			final MipsValidator validator = new MipsValidator();
-			for (AssignmentType assType : ctx.getCourse().getAssTypes()) {
-				for (Assignment ass : assType.getAssignments()) {
-					for (Version ver : ass.getVersions()) {
-						final Result[] resRef = {new Result("unknown", false)};
-/*
-						validator.batch(resRef, ver, ver.getSolution(), null);
-*/
-						testResults.put(
-								ctx.extendTAV(assType, ass, ver).toString(),
-								resRef[0]
-						);
-					}
-				}
-			}
-
-			model.put("testResults", testResults);
-		}
-
-		return new ModelAndView("a/course", model);
-	}
-
-	@RequestMapping(value = "launch", method = RequestMethod.GET)
-	public ModelAndView do_launch(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		final HashMap<String, Object> model = auth(req, resp, "");
-		if (model == null) {
-			return null;
-		}
-
-		final Ctx ctx = (Ctx) model.get(R_CTX);
-		if (!ctx.resolved(Ctx.STATE_CIV)) {
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "context path problem, please check the logs");
-			return null;
-		}
-
-		final StringWriter verSw = new StringWriter();
-		mapper.writeValue(verSw, ctx.getVer());
-
-		//	LATER use HTTP instead of applet parameter for passing the problem/code to applet
-		model.put("verJson", verSw.toString().replaceAll("&", "&amp;").replaceAll("\"", "&quot;"));
-		model.put("upHeader", "JSESSIONID=" + req.getSession(true).getId());
-		model.put("cacheBustingToken", cacheBustingToken);
-
-		return new ModelAndView("a/launch", model);
-	}
-
-	@RequestMapping(value = "enrolls", method = RequestMethod.GET)
-	public ModelAndView do_enrolls(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		final HashMap<String, Object> model = auth(req, resp, "");
+	@RequestMapping(value = "rest/index", method = RequestMethod.GET)
+	public ModelAndView do_restIndex(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+		final HashMap<String, Object> model = auth(req, resp, null);
 		if (model == null) {
 			return null;
 		}
 
 		final Enrollment[] enrolls = enrollDao.findAllEnrollments();
-		final Map<String, Group> groups = new HashMap<String, Group>();
-		final Map<String, Course> courses = new HashMap<String, Course>();
-		for (Enrollment enr : enrolls) {
-			groups.put(enr.getGroupId(), groupDao.findGroup(enr.getGroupId()));
-			courses.put(enr.getCourseId(), courseDao.findCourse(enr.getCourseId()));
-		}
-		model.put("enrolls", enrolls);
-		model.put("groups", groups);
-		model.put("courses", courses);
-
-		return new ModelAndView("a/enrolls", model);
+		final List<Object[]> indexData = core.index(enrolls);
+		return new ModelAndView(ViewJackson.success(indexData));
 	}
 
 	@RequestMapping(value = "summary", method = RequestMethod.GET)
@@ -321,42 +236,26 @@ public class AdminController extends ControllerElw {
 
 	@RequestMapping(value = "log", method = RequestMethod.GET)
 	public ModelAndView do_log(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		final HashMap<String, Object> model = auth(req, resp, "");
-		if (model == null) {
-			return null;
-		}
-
-		final Ctx ctx = (Ctx) model.get(R_CTX);
-		if (!ctx.resolved(Ctx.STATE_ECG)) {
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Path problem, please check the logs");
-			return null;
-		}
-
-		W.storeFilter(req, model);
-
-		return new ModelAndView("a/log", model);
+		return wmECG(req, resp, null, new WebMethodCtx() {
+			public ModelAndView handleCtx() throws IOException {
+				W.storeFilter(req, model);
+				return new ModelAndView("a/log", model);
+			}
+		});
 	}
 
 	@RequestMapping(value = "rest/log", method = RequestMethod.GET)
 	public ModelAndView do_restLog(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		final HashMap<String, Object> model = auth(req, resp, null);
-		if (model == null) {
-			return null;
-		}
+		return wmECG(req, resp, null, new WebMethodCtx() {
+			public ModelAndView handleCtx() throws IOException {
+				final Format format = (Format) model.get(FormatTool.MODEL_KEY);
+				final List<Object[]> logData = core.log(
+						ctx, format, W.parseFilter(req), true
+				);
 
-		final Ctx ctx = (Ctx) model.get(R_CTX);
-		if (!ctx.resolved(Ctx.STATE_ECG)) {
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Path problem, please check the logs");
-			return null;
-		}
-
-		final Format format = (Format) model.get(FormatTool.MODEL_KEY);
-
-		final List<Object[]> logData = core.log(
-				ctx, format, W.parseFilter(req), true
-		);
-
-		return new ModelAndView(ViewJackson.success(logData));
+				return new ModelAndView(ViewJackson.success(logData));
+			}
+		});
 	}
 
 	@RequestMapping(value = "tasks", method = RequestMethod.GET)
@@ -384,40 +283,6 @@ public class AdminController extends ControllerElw {
 		});
 	}
 
-	@RequestMapping(value = "rest/scoreLog", method = RequestMethod.GET)
-	public ModelAndView do_restScoreLog(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		return wmScore(req, resp, null, new WebMethodScore() {
-			public ModelAndView handleScore(
-					HttpServletRequest req, HttpServletResponse resp, Ctx ctx, FileSlot slot, Entry<FileMeta> file, Stamp stamp, Map<String, Object> model
-			) {
-				final Format f = (Format) model.get(FormatTool.MODEL_KEY);
-
-				final ScoreDao scoreDaoLocal = scoreDao;
-				final SortedMap<Stamp, Entry<Score>> allScores = scoreDaoLocal.findAllScoresAuto(ctx, slot, file);
-
-				final String mode = req.getParameter("f_mode");
-
-				final List<Object[]> logData = core.logScore(allScores, ctx, slot, file, f, mode, stamp);
-
-				return new ModelAndView(ViewJackson.success(logData));
-			}
-		});
-	}
-
-	@RequestMapping(value = "rest/index", method = RequestMethod.GET)
-	public ModelAndView do_restIndex(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		final HashMap<String, Object> model = auth(req, resp, null);
-		if (model == null) {
-			return null;
-		}
-
-		final Enrollment[] enrolls = enrollDao.findAllEnrollments();
-
-		final List<Object[]> indexData = core.index(enrolls);
-
-		return new ModelAndView(ViewJackson.success(indexData));
-	}
-
 	@RequestMapping(value = "approve", method = RequestMethod.GET)
 	public ModelAndView do_approve(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
 		return wmScore(req, resp, "", new WebMethodScore() {
@@ -436,6 +301,26 @@ public class AdminController extends ControllerElw {
 				model.put("file", file.getMeta());
 
 				return new ModelAndView("a/approve", model);
+			}
+		});
+	}
+
+	@RequestMapping(value = "rest/scoreLog", method = RequestMethod.GET)
+	public ModelAndView do_restScoreLog(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+		return wmScore(req, resp, null, new WebMethodScore() {
+			public ModelAndView handleScore(
+					HttpServletRequest req, HttpServletResponse resp, Ctx ctx, FileSlot slot, Entry<FileMeta> file, Stamp stamp, Map<String, Object> model
+			) {
+				final Format f = (Format) model.get(FormatTool.MODEL_KEY);
+
+				final ScoreDao scoreDaoLocal = scoreDao;
+				final SortedMap<Stamp, Entry<Score>> allScores = scoreDaoLocal.findAllScoresAuto(ctx, slot, file);
+
+				final String mode = req.getParameter("f_mode");
+
+				final List<Object[]> logData = core.logScore(allScores, ctx, slot, file, f, mode, stamp);
+
+				return new ModelAndView(ViewJackson.success(logData));
 			}
 		});
 	}
@@ -477,46 +362,7 @@ public class AdminController extends ControllerElw {
 						scoreDao.createScore(ctx, slot.getId(), fileId, score);
 					}
 
-					FileMeta epF = null;	//	earliest pending
-					Ctx epCtx = null;
-
-					final Ctx ctxEnr = Ctx.forEnr(ctx.getEnr()).resolve(enrollDao, groupDao,  courseDao);
-					//	LATER oh this pretty obviously looks like we REALLY need some rdbms from now on... :D
-					for (Student stud : ctx.getGroup().getStudents()) {
-						final Ctx ctxStud = ctxEnr.extendStudent(stud);
-						for (int index = 0; index < ctx.getEnr().getIndex().size(); index++) {
-							final Ctx ctxVer = ctxStud.extendIndex(index);
-							if (!ctxVer.getAssType().getId().equals(ctx.getAssType().getId())) {
-								continue;	//	other ass types out of scope
-							}
-							for (FileSlot s : ctxVer.getAssType().getFileSlots()) {
-								if (!s.getId().equals(slot.getId())) {
-									continue;	//	other slots out of scope
-								}
-								final Entry<FileMeta>[] uploads = fileDao.findFilesFor(FileDao.SCOPE_STUD, ctxVer, slot.getId());
-								if (uploads != null && uploads.length > 0) {
-									for (int i = uploads.length - 1; i >= 0; i--) {
-										final FileMeta f = uploads[i].getMeta();
-										if (f.getScore() == null) {
-											if ((epF == null || epF.getCreateStamp().getTime() > f.getCreateStamp().getTime())) {
-												epF = f;
-												epCtx = ctxVer;
-											}
-											break;	//	don't look into earlier pending versions before this one is approved
-										} else if (Boolean.TRUE.equals(f.getScore().getApproved())) {
-											break;	//	don't look into earlier pending versions before this one is approved
-										}
-									}
-								}
-							}
-						}
-					}
-
-					if (epCtx != null) {
-						resp.sendRedirect("approve?elw_ctx=" + epCtx.toString() + "&sId=" + slot.getId() + "&fId=" + epF.getId());
-					} else {
-						resp.sendRedirect("log?elw_ctx=" + ctxEnr.toString() + "&f_slot=" + slot.getId());
-					}
+					resp.sendRedirect(core.cmpForwardToEarliestPendingSince(ctx, slot, file.getMeta().getCreateStamp()));
 				} else {
 					resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Bad action: " + action);
 				}
