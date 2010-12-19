@@ -25,7 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class W {
-	public static void storeFilter(HttpServletRequest req, HashMap<String, Object> model) {
+	public static void storeFilter(HttpServletRequest req, Map<String, Object> model) {
 		final Map params = req.getParameterMap();
 		for (Object o : params.keySet()) {
 			String paramName = (String) o;

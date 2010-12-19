@@ -45,13 +45,13 @@
     #* 7 class.name *# {'sTitle': 'Class', "iDataSort": 6, "sWidth": "25%"},
     #* 8 slot.id *# {"bVisible": false, "bSortable": false},
     #* 9 slot.name *# {'sTitle': 'Version / Slot', "iDataSort": 7, "sClass": "text_align_center", "sWidth": "20%" },
-    #* 10 comment *# {'sTitle': 'Comment', "sWidth": "20%" },
+    #* 10 comment *# {'sTitle': 'File / Comment', "sWidth": "15%" },
     #* 11 status sort*# {"bVisible": false, "bSortable": false },
-    #* 12 status text*# {'sTitle': 'Status', "sClass": "text_align_center", "iDataSort": 11, "sWidth": "7em" },
+    #* 12 status text*# {'sTitle': 'Status', "sClass": "text_align_center", "iDataSort": 11, "sWidth": "11em" },
     #* 13 status classes *# {"bVisible": false, "bSortable": false},
     #* 14 source ip *# {"bVisible": false, "bSortable": false },
     #* 15 size bytes *# {"bVisible": false, "bSortable": false},
-    #* 16 size *# {'sTitle': 'Size', "iDataSort": 15, "sWidth": "7em"},
+    #* 16 size *# {'sTitle': 'Size', "iDataSort": 15, "sWidth": "9em"},
      #if($elw_admin)
       #* 17 approve ref *# {'sTitle': '<span title="Approve">A</span>', "sWidth": "1em", "bSortable": false, "sClass": "text_align_center", "fnRender": elw_dt_url(17, 'A') },
      #else

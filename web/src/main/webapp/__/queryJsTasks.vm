@@ -1,0 +1,83 @@
+#* @vtlvariable name="__qId" type="java.lang.String" *#
+
+#* @vtlvariable name="elw_admin" type="elw.vo.Admin" *#
+#* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
+#* @vtlvariable name="f" type="elw.web.FormatTool" *#
+#* @vtlvariable name="f_studId" type="java.lang.String" *#
+<script type="text/javascript">
+ jQuery(document).ready(function() {
+  #if($elw_admin)
+   #parse("/__/studCombo.vm")
+  #end
+
+  var dataTable = jQuery('#${__qId}_dataTable').dataTable({
+   "sDom": 'lprf<"clear">ti',
+   'aaData': [ ],
+   'aoColumns': [
+    #* 0 index - *# {"bVisible": false, "bSortable": false},
+    #* 1 date millis - *# {"bVisible": false, "bSortable": false},
+    #* 2 date full - *# {"bVisible": false, "bSortable": false},
+    #* 3 date nice 0*# {'sTitle': 'Opens', "iDataSort": 1, "sWidth": "5em", "sClass": "text_align_right"},
+    #* 4 tType.id - *# {"bVisible": false, "bSortable": false},
+    #* 5 tType.name 1 *# {'sTitle': 'Task Type', "iDataSort": 4, "sWidth": "15%", "sClass": "text_align_center"},
+    #* 6 task.id ref - *# {"bVisible": false, "bSortable": false},
+    #* 7 task.name ref 2 *# {'sTitle': 'Task Name', "iDataSort": 6, "sWidth": "20%", "sClass": "text_align_center"},
+    #* 8 summary status sort - *# {"bVisible": false, "bSortable": false},
+    #* 9 summary status classes - *# {"bVisible": false, "bSortable": false},
+    #* 10 summary status text 3 *# {'sTitle': 'Status', "sClass": "text_align_center", "iDataSort": 8, "sWidth": "9em" },
+    #* 11 summary due millis - *# {"bVisible": false, "bSortable": false},
+    #* 12 summary due full - *# {"bVisible": false, "bSortable": false},
+    #* 13 summary due nice 4 *# {'sTitle': 'Action', "iDataSort": 11, "sWidth": "5em", "sClass": "text_align_right"},
+    #* 14 score sort *# {"bVisible": false, "bSortable": false},
+    #* 15 score nice 5 *# {'sTitle': 'Score', "sClass": "text_align_center", "iDataSort": 14, "sWidth": "10%" },
+    #* 16 uploads ref 6 *# {'sTitle': '<span title="Pending">Pending</span>', "sWidth": "10%", "bSortable": false, "sClass": "text_align_center", "fnRender": elw_dt_url(16, 'Pending') },
+    #* 17 uploads-open ref 7 *# {'sTitle': '<span title="Open">Open</span>', "sWidth": "10%", "bSortable": false, "sClass": "text_align_center", "fnRender": elw_dt_url(17, 'Open') },
+    #* 18 uploads-course ref 8 *# {'sTitle': '<span title="Course">Course</span>', "sWidth": "10%", "bSortable": false, "sClass": "text_align_center", "fnRender": elw_dt_url(18, 'Course') }
+   ],
+   "aaSorting": [ [3,'asc'] ],
+   "aaSortingFixed": [ ],
+   "fnRowCallback": function(node, data, dispIndex, dataIndex) {
+    jQuery("td:eq(0)", node).attr("title", data[2]);
+    jQuery("td:eq(3)", node).addClass(data[10]);
+    jQuery("td:eq(4)", node).attr("title", data[12]);
+    return node;
+   }
+  });
+
+  function loadData() {
+   var f_selects = jQuery("form#${__qId}_filter  select[name^=\"f_\"]:enabled");
+   f_selects.attr("disabled", "disabled");
+
+   var f_data = {};
+   f_data["elw_ctx"] = jQuery("form#${__qId}_filter input[name=elw_ctx]").val();
+   f_data["f_studId"] = jQuery("form#${__qId}_filter select[name=f_studId]").val();
+
+   jQuery.ajax({
+    "type": "GET",
+    "url": "rest/tasks",
+    "data": f_data,
+    "success": function(resp) {
+     f_selects.attr("disabled", "");
+     if (resp == null || !resp.success) {
+      jQuery.jGrowl("Response error", {"header":"AJAX error", "theme": "ui-state-error"});
+      return;
+     }
+
+     dataTable.fnClearTable(resp.data.length == 0);
+     dataTable.fnAddData(resp.data);
+    },
+    "error": function() {
+     f_selects.attr("disabled", "");
+     jQuery.jGrowl("General error", {"header":"AJAX error", "theme": "ui-state-error"});
+    },
+    "dataType": 'json'
+   });
+
+   return false;
+  }
+
+  jQuery("form#${__qId}_filter  select[name^=\"f_\"]").change(loadData);
+
+  loadData();
+ });
+</script>

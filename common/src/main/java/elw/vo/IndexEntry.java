@@ -85,6 +85,9 @@ public class IndexEntry {
 
 	@JsonIgnore
 	public double computePoints(Score score, final FileSlot slot) {
+		if (Boolean.FALSE.equals(score.getApproved())) {
+			return 0.0;
+		}
 		return getScoreBudget() * slot.getScoreWeight() * score.computeRatio(slot);
 	}
 
@@ -98,7 +101,7 @@ public class IndexEntry {
 		double result = 0.0;
 
 		for (FileSlot slot : aType.getFileSlots()) {
-			if ("report".equals(slot.getId()) && score.getCreateStamp() == null) {
+			if (!Boolean.TRUE.equals(score.getApproved())) {
 				continue;
 			}
 

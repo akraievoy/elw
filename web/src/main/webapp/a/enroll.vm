@@ -2,7 +2,7 @@
 #* @vtlvariable name="fileMetas" type="java.util.Map<java.lang.String,java.util.Map<java.lang.String,java.util.List<elw.vo.Entry<elw.vo.FileMeta>>>>" *#
 #* @vtlvariable name="grossScores" type="java.util.Map<java.lang.String,java.lang.Integer>" *#
 #* @vtlvariable name="f" type="elw.web.FormatTool" *#
-#* @vtlvariable name="u" type="elw.web.VelocityUtils" *#
+#* @vtlvariable name="elw_vt" type="elw.web.VelocityTemplates" *#
 #* @vtlvariable name="studRowsCreated" type="java.lang.Boolean" *#
 
 #* @vtlvariable name="f_mode" type="java.lang.String" *#
@@ -96,7 +96,7 @@
         #set($elw_ctx_ver = $elw_ctx_stud.extendIndex($idx))
         #set($filesStud = $fileMetas.get("$elw_ctx_ver.toString()").get($slot.id))
 
-        #set($__status = $u.status($f, $f_mode, "s", $elw_ctx_ver, $slot, $u.bestOrLastOrNull($filesStud)))
+        #set($__status = $elw_vt.status($f, $f_mode, "s", $elw_ctx_ver, $slot, $elw_vt.bestOrLastOrNull($filesStud)))
         tp_status = tp_studRow.find(".te.te_status:first").clone().toggleClass("te")
          .html($f.json($__status.text))
          .toggleClass($f.json($__status.classes.trim()));

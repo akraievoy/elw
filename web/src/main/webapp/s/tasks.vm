@@ -1,0 +1,23 @@
+#* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
+#* @vtlvariable name="f" type="elw.web.FormatTool" *#
+<html>
+<head>
+ <meta content="text/html; charset=UTF-8">
+ <title>${elw_ctx.course.name} Course</title>
+ #parse("/__/imports.vm")
+</head>
+<body style="text-align: left;">
+<div class="ui-widget-header ui-corner-all" id="elw_header">
+ <div id="nav"><a href="courses">My Courses</a> &gt; <span style="font-weight: bold">${elw_ctx.course.name}</span>
+	</div>
+ #parse("/__/credStud.vm")
+ <div id="header_hr"></div>
+</div>
+ #parse("/__/messages.vm")
+ <div style="">
+  #set($__qId = "tasks") #parse("/__/queryTableTasks.vm")
+ </div>
+</body>
+ #set($__qId = "tasks") #parse("/__/queryJsTasks.vm")
+ #parse("/__/ready.vm")
+</html>

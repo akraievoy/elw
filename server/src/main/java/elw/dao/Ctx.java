@@ -204,6 +204,10 @@ public class Ctx {
 		return new Ctx(STATE_CTA, null, null, null, course.getId(), -1, assType.getId(), ass.getId(), null).extendCourse(course).extendAssType(assType).extendAss(ass);
 	}
 
+	public String ei() {
+		return norm("ecgi") + SEP + getEnr().getId() + SEP + getIndex();
+	}
+
 	public Ctx resolve(EnrollDao enrDao, GroupDao groupDao, CourseDao courseDao) {
 		final StringBuilder resolved = new StringBuilder();
 

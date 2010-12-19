@@ -48,7 +48,11 @@ public class ScoreTerm {
 	}
 
 	public String getNiceRatio() {
-		if (isIdentity()) {
+		return getNiceRatio(ratio);
+	}
+
+	public static String getNiceRatio(final double ratio) {
+		if (Math.abs(ratio - 1) < 1e-2) {
 			return "";
 		}
 

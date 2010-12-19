@@ -23,17 +23,17 @@ import elw.miniweb.Message;
 import elw.miniweb.ViewJackson;
 import elw.vo.*;
 import elw.web.core.Core;
+import elw.web.core.LogFilter;
+import elw.web.core.Summary;
 import elw.web.core.W;
 import org.akraievoy.gear.G4Io;
 import org.apache.commons.fileupload.FileUploadException;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
 import javax.servlet.ServletOutputStream;
@@ -46,7 +46,7 @@ import java.util.*;
 
 @Controller
 @RequestMapping("/s/**/*")
-public class StudentController extends MultiActionController implements WebSymbols {
+public class StudentController extends ControllerElw {
 	private static final Logger log = LoggerFactory.getLogger(StudentController.class);
 
 	protected final CourseDao courseDao;
@@ -55,9 +55,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 	protected final ScoreDao scoreDao;
 	protected final FileDao fileDao;
 	protected final AdminController adminController;
-	protected final Core core;
 
-	protected final ObjectMapper mapper = new ObjectMapper();
 	protected final long cacheBustingToken = System.currentTimeMillis();
 
 	public StudentController(
@@ -66,13 +64,13 @@ public class StudentController extends MultiActionController implements WebSymbo
 			AdminController adminController,
 			Core core
 	) {
+		super(core);
 		this.courseDao = courseDao;
 		this.groupDao = groupDao;
 		this.enrollDao = enrollDao;
 		this.scoreDao = scoreDao;
 		this.fileDao = fileDao;
 		this.adminController = adminController;
-		this.core = core;
 	}
 
 	protected HashMap<String, Object> auth(final HttpServletRequest req, final HttpServletResponse resp, final String pathToRoot) throws IOException {
@@ -138,7 +136,7 @@ public class StudentController extends MultiActionController implements WebSymbo
 
 		model.put(S_MESSAGES, Message.drainMessages(req));
 		model.put(FormatTool.MODEL_KEY, FormatTool.forLocale(RequestContextUtils.getLocale(req)));
-		model.put(VelocityUtils.MODEL_KEY, VelocityUtils.INSTANCE);
+		model.put(VelocityTemplates.MODEL_KEY, VelocityTemplates.INSTANCE);
 		model.put("expandTriggers", req.getSession().getAttribute("viewToExpandTriggers"));
 
 		return model;
@@ -234,95 +232,27 @@ public class StudentController extends MultiActionController implements WebSymbo
 		return new ModelAndView("s/courses", model);
 	}
 
-	@RequestMapping(value = "course", method = RequestMethod.GET)
-	public ModelAndView do_course(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		final HashMap<String, Object> model = auth(req, resp, "");
-		if (model == null) {
-			return null;
-		}
-
-		final Ctx ctx = (Ctx) model.get(R_CTX);
-		if (!ctx.resolved(Ctx.STATE_ECGS)) {
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "context path problem, please check the logs");
-			return null;
-		}
-
-		final HashMap<String, CodeMeta> codeMetas = new HashMap<String, CodeMeta>();
-		final HashMap<String, ReportMeta> reportMetas = new HashMap<String, ReportMeta>();
-		final HashMap<String, Score> scores = new HashMap<String, Score>();
-		final TreeMap<String, Map<String, List<Entry<FileMeta>>>> fileMetas =
-				new TreeMap<String, Map<String, List<Entry<FileMeta>>>>();
-		final int[] grossScore = new int[1];
-		storeMetas(ctx, null, fileDao, fileMetas, grossScore);
-		model.put("fileMetas", fileMetas);
-		model.put("codeMetas", codeMetas);
-		model.put("reportMetas", reportMetas);
-		model.put("scores", scores);
-		model.put("grossScore", grossScore[0]);
-
-		return new ModelAndView("s/course", model);
+	@RequestMapping(value = "tasks", method = RequestMethod.GET)
+	public ModelAndView do_tasks(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+		return wmECG(req, resp, "", new WebMethodCtx() {
+			public ModelAndView handleCtx() throws IOException {
+				W.storeFilter(req, model);
+				return new ModelAndView("s/tasks", model);
+			}
+		});
 	}
 
-	public static void storeMetas(
-			Ctx ctx, String aTypeSlotId,
-			FileDao fileDao,
-			Map<String, Map<String, List<Entry<FileMeta>>>> fileMetas,
-			int[] grossScore
-	) {
-		double gsFuzzy = 0;
+	@RequestMapping(value = "rest/tasks", method = RequestMethod.GET)
+	public ModelAndView do_restTasks(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+		return wmECG(req, resp, null, new WebMethodCtx() {
+			public ModelAndView handleCtx() throws IOException {
+				final Format format = (Format) model.get(FormatTool.MODEL_KEY);
 
-		for (int index = 0; index < ctx.getEnr().getIndex().size(); index++) {
-			final Ctx ctxVer = ctx.extendIndex(index);
-			final AssignmentType assType = ctxVer.getAssType();
-			final String assPath = ctxVer.toString();
+				final List<Object[]> logData = core.tasks(ctx, new LogFilter(), format, false);
 
-			final SortedMap<String, List<Entry<FileMeta>>> slotIdToFiles = fileDao.loadFilesStud(ctxVer);
-
-			if (fileMetas != null) {
-				fileMetas.put(assPath, slotIdToFiles);
+				return new ModelAndView(ViewJackson.success(logData));
 			}
-
-			for (String slotId : slotIdToFiles.keySet()) {
-				if (W.excluded(aTypeSlotId, assType.getId(), slotId)) {
-					continue;
-				}
-
-				final List<Entry<FileMeta>> filesForSlot = slotIdToFiles.get(slotId);
-				if (filesForSlot != null && !filesForSlot.isEmpty()) {
-					for (Entry<FileMeta> e : filesForSlot) {
-						if (e.getMeta().getScore() != null && e.getMeta().getScore().getApproved() != null) {
-							continue;	//	don't alter any scores once they're approved
-						}
-						final Score autoScore = ScoreDao.updateAutos(
-								ctxVer, slotId, e, e.getMeta().getScore()
-						);
-						e.getMeta().setScore(autoScore);
-					}
-
-					Entry<FileMeta> usedEntry = null;
-					double maxScore = 0;
-					for (Entry<FileMeta> e : filesForSlot) {
-						final double eScore = ctxVer.getIndexEntry().getTotal(ctxVer.getAssType(), e.getMeta().getScore());
-						if (usedEntry == null || maxScore < eScore) {
-							maxScore = eScore;
-							usedEntry = e;
-						}
-					}
-
-					if (usedEntry != null) {
-						final Score s = usedEntry.getMeta().getScore();
-						if (s != null) {
-							s.setBest(true);
-							if (Boolean.TRUE.equals(s.getApproved())) {
-								gsFuzzy += maxScore;
-							}
-						}
-					}
-				}
-			}
-		}
-
-		grossScore[0] = (int) Math.floor(gsFuzzy + 0.1);
+		});
 	}
 
 	@RequestMapping(value = "ul", method = {RequestMethod.POST, RequestMethod.PUT})
@@ -409,10 +339,9 @@ public class StudentController extends MultiActionController implements WebSymbo
 		}
 
 		final Format format = (Format) model.get(FormatTool.MODEL_KEY);
-		final VelocityUtils u = (VelocityUtils) model.get(VelocityUtils.MODEL_KEY);
 
 		final List<Object[]> logData = core.log(
-				ctx, format, u, W.parseFilter(req), false
+				ctx, format, W.parseFilter(req), false
 		);
 
 		return new ModelAndView(ViewJackson.success(logData));

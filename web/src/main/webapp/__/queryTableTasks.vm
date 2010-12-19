@@ -1,0 +1,13 @@
+#* @vtlvariable name="__qId" type="java.lang.String" *#
+
+#* @vtlvariable name="elw_admin" type="elw.vo.Admin" *#
+#* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
+
+#* @vtlvariable name="f_studId" type="java.lang.String" *#
+<form id="${__qId}_filter" style="text-align: center;">
+ <input type="hidden" name="elw_ctx" value="$elw_ctx.toString()"/>
+ #if($elw_admin)
+  <select id="${__qId}_filter_stud" name="f_studId" style="width: 7em;"><option value="">Student...</option></select><label for="${__qId}_filter_stud"></label>
+ #end
+</form>
+<table id="${__qId}_dataTable" cellspacing="0" width="95%" align="center"></table>

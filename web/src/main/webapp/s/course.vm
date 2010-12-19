@@ -1,6 +1,6 @@
 #* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
 #* @vtlvariable name="f" type="elw.web.FormatTool" *#
-#* @vtlvariable name="u" type="elw.web.VelocityUtils" *#
+#* @vtlvariable name="elw_vt" type="elw.web.VelocityTemplates" *#
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta content="text/html; charset=UTF-8">
@@ -180,7 +180,7 @@
 
         tp_slot.find(".tp_slot_title").html($f.json(${slot.name})).attr("title", "${slot.id}");
         var tp_slot_due = tp_slot.find(".tp_slot_due");
-        #set($__status = $u.status($f, $f_mode, "s", $elw_ctx_ver, $slot, $u.bestOrLastOrNull($filesStud)))
+        #set($__status = $elw_vt.status($f, $f_mode, "s", $elw_ctx_ver, $slot, $elw_vt.bestOrLastOrNull($filesStud)))
         tp_slot_due.html($f.json($__status.text));
         tp_slot_due.toggleClass($f.json($__status.classes.trim()));
         tp_timeline.append(tp_slot);

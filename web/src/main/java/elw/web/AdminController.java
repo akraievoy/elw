@@ -25,6 +25,8 @@ import elw.miniweb.Message;
 import elw.miniweb.ViewJackson;
 import elw.vo.*;
 import elw.web.core.Core;
+import elw.web.core.LogFilter;
+import elw.web.core.Summary;
 import elw.web.core.W;
 import org.akraievoy.gear.G4Io;
 import org.akraievoy.gear.G4Parse;
@@ -42,8 +44,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
-import org.springframework.web.servlet.support.RequestContextUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -54,11 +54,9 @@ import java.util.regex.Pattern;
 
 @Controller
 @RequestMapping("/a/**/*")
-public class AdminController extends MultiActionController implements WebSymbols {
+public class AdminController extends ControllerElw {
 	private static final Logger log = LoggerFactory.getLogger(AdminController.class);
-
-
-
+	
 	protected final CourseDao courseDao;
 	protected final GroupDao groupDao;
 	protected final EnrollDao enrollDao;
@@ -72,13 +70,14 @@ public class AdminController extends MultiActionController implements WebSymbols
 	protected final long cacheBustingToken = System.currentTimeMillis();
 
 	protected final DiskFileItemFactory fileItemFactory;
-	protected final Core core;
 
 	public AdminController(
 			CourseDao courseDao, EnrollDao enrollDao, GroupDao groupDao, ScoreDao scoreDao, FileDao fileDao,
 			AdminDao adminDao,
 			Core core
 	) {
+		super(core);
+
 		this.courseDao = courseDao;
 		this.enrollDao = enrollDao;
 		this.groupDao = groupDao;
@@ -86,8 +85,6 @@ public class AdminController extends MultiActionController implements WebSymbols
 		this.fileDao = fileDao;
 
 		this.adminDao = adminDao;
-
-		this.core = core;
 
 		fileItemFactory = new DiskFileItemFactory();
 		fileItemFactory.setRepository(new java.io.File(System.getProperty("java.io.tmpdir")));
@@ -119,17 +116,6 @@ public class AdminController extends MultiActionController implements WebSymbols
 		final HashMap<String, Object> model = prepareDefaultModel(req);
 		model.put(S_ADMIN, admin);
 		model.put(R_CTX, Ctx.fromString(req.getParameter(R_CTX)).resolve(enrollDao, groupDao, courseDao));
-
-		return model;
-	}
-
-	protected HashMap<String, Object> prepareDefaultModel(HttpServletRequest req) {
-		final HashMap<String, Object> model = new HashMap<String, Object>();
-
-		model.put(S_MESSAGES, Message.drainMessages(req));
-		model.put(FormatTool.MODEL_KEY, FormatTool.forLocale(RequestContextUtils.getLocale(req)));
-		model.put(VelocityUtils.MODEL_KEY, VelocityUtils.INSTANCE);
-		model.put("expandTriggers", req.getSession().getAttribute("viewToExpandTriggers"));
 
 		return model;
 	}
@@ -327,28 +313,24 @@ public class AdminController extends MultiActionController implements WebSymbols
 
 		W.storeFilter(req, model);
 		W.filterDefault(model, "f_mode", "a");
+		final LogFilter filter = W.parseFilter(req);
 
-		final TreeMap<String, Map<String, List<Entry<FileMeta>>>> fileMetas = new TreeMap<String, Map<String, List<Entry<FileMeta>>>>();
-		final HashMap<String, Integer> grossScores = new HashMap<String, Integer>();
+		final SortedMap<String, Map<String, List<Entry<FileMeta>>>> fileMetas = new TreeMap<String, Map<String, List<Entry<FileMeta>>>>();
+		final Map<String, Double> scores = new HashMap<String, Double>();
+		final Map<String, Double> scoresNorm = new HashMap<String, Double>();
 
-		final int[] grossScore = new int[1];
 		for (Student stud : ctx.getGroup().getStudents()) {
 			if (W.excluded(model.get("f_studId"), stud.getId())) {
 				continue;
 			}
 			final Ctx studCtx = ctx.extendStudent(stud);
 
-			StudentController.storeMetas(
-					studCtx, (String) model.get("f_slotId"),
-					fileDao,
-					fileMetas, grossScore
-			);
-
-			grossScores.put(studCtx.toString(), grossScore[0]);
+			core.tasksData(studCtx, filter, true, fileMetas, scores, new TreeMap<String, Summary>());
 		}
 
 		model.put("fileMetas", fileMetas);
-		model.put("grossScores", grossScores);
+		model.put("scores", scores);
+		model.put("scoreNorm", scoresNorm);
 
 		return new ModelAndView("a/enroll", model);
 	}
@@ -385,91 +367,57 @@ public class AdminController extends MultiActionController implements WebSymbols
 		}
 
 		final Format format = (Format) model.get(FormatTool.MODEL_KEY);
-		final VelocityUtils u = (VelocityUtils) model.get(VelocityUtils.MODEL_KEY);
 
 		final List<Object[]> logData = core.log(
-				ctx, format, u, W.parseFilter(req), true
+				ctx, format, W.parseFilter(req), true
 		);
 
 		return new ModelAndView(ViewJackson.success(logData));
 	}
 
-	@RequestMapping(value = "rest/scoreLog", method = RequestMethod.GET)
-	public ModelAndView do_restScoreLog(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		return handleWebMethodScore(req, resp, null, new WebMethodScore() {
-			public ModelAndView handleScore(
-					HttpServletRequest req, HttpServletResponse resp, Map<String, Object> model,
-					Ctx ctx, FileSlot slot, Entry<FileMeta> file, Stamp stamp
-			) {
-				final Format f = (Format) model.get(FormatTool.MODEL_KEY);
-				final VelocityUtils u = (VelocityUtils) model.get(VelocityUtils.MODEL_KEY);
+	@RequestMapping(value = "tasks", method = RequestMethod.GET)
+	public ModelAndView do_tasks(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+		return wmECG(req, resp, "", new WebMethodCtx() {
+			public ModelAndView handleCtx() throws IOException {
+				W.storeFilter(req, model);
+				return new ModelAndView("a/tasks", model);
+			}
+		});
+	}
 
-				final ScoreDao scoreDaoLocal = scoreDao;
-				final SortedMap<Stamp, Entry<Score>> allScores = scoreDaoLocal.findAllScoresAuto(ctx, slot, file);
+	@RequestMapping(value = "rest/tasks", method = RequestMethod.GET)
+	public ModelAndView do_restTasks(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+		return wmECG(req, resp, null, new WebMethodCtx() {
+			public ModelAndView handleCtx() throws IOException {
+				final Format format = (Format) model.get(FormatTool.MODEL_KEY);
 
-				final String mode = req.getParameter("f_mode");
-
-				final List<Object[]> logData = prepareScoreLogEntries(allScores, ctx, slot, file, f, u, mode, stamp);
+				final List<Object[]> logData = core.tasks(
+						ctx, W.parseFilter(req), format, true
+				);
 
 				return new ModelAndView(ViewJackson.success(logData));
 			}
 		});
 	}
 
-	protected List<Object[]> prepareScoreLogEntries(
-			SortedMap<Stamp, Entry<Score>> allScores, Ctx ctx, FileSlot slot, Entry<FileMeta> file,
-			Format f, VelocityUtils u, String mode, Stamp stamp
-	) {
-		final List<Object[]> logData = new ArrayList<Object[]>();
+	@RequestMapping(value = "rest/scoreLog", method = RequestMethod.GET)
+	public ModelAndView do_restScoreLog(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+		return wmScore(req, resp, null, new WebMethodScore() {
+			public ModelAndView handleScore(
+					HttpServletRequest req, HttpServletResponse resp, Ctx ctx, FileSlot slot, Entry<FileMeta> file, Stamp stamp, Map<String, Object> model
+			) {
+				final Format f = (Format) model.get(FormatTool.MODEL_KEY);
 
-		Score scoreBest = null;
-		double pointsBest = 0;
-		for (Stamp s : allScores.keySet()) {
-			final Score scoreCur = allScores.get(s).getMeta();
-			final double pointsCur = ctx.getIndexEntry().computePoints(scoreCur, slot);
-			if (scoreBest == null || pointsBest < pointsCur) {
-				scoreBest = scoreCur;
-				pointsBest = pointsCur;
+				final ScoreDao scoreDaoLocal = scoreDao;
+				final SortedMap<Stamp, Entry<Score>> allScores = scoreDaoLocal.findAllScoresAuto(ctx, slot, file);
+
+				final String mode = req.getParameter("f_mode");
+
+				final List<Object[]> logData = core.logScore(allScores, ctx, slot, file, f, mode, stamp);
+
+				return new ModelAndView(ViewJackson.success(logData));
 			}
-		}
-
-		for (Stamp s : allScores.keySet()) {
-			final Entry<Score> scoreEntry = allScores.get(s);
-			final Score score = scoreEntry.getMeta();
-
-			final Stamp createStamp = score.getCreateStamp();
-			final boolean selected = stamp == null ? createStamp == null : stamp.equals(createStamp);
-
-			final long time;
-			String approveUri = "approve?elw_ctx=" + ctx.toString() + "&sId=" + slot.getId() + "&fId=" + file.getMeta().getId();
-			if (createStamp == null) {
-				time = System.currentTimeMillis();
-			} else {
-				time = createStamp.getTime();
-				approveUri += "&stamp="+createStamp.toString();
-			}
-
-			final Map<String, String> status = u.status(f, mode, FileDao.SCOPE_STUD, ctx, slot, file, score);
-			final Map<String, String> statusScoring = u.status(f, "s", FileDao.SCOPE_STUD, ctx, slot, file, score);
-
-			final Object[] logRow = new Object[] {
-				/* 0 index - */ logData.size(),
-				/* 1 selected 0 */ selected ? "&gt;" : "",
-				/* 2 best 1 */ scoreBest == score ? "*" : "",
-				/* 3 score date millis - */ time,
-				/* 4 score date full - */ f.format(time, "EEE d HH:mm"),
-				/* 5 score date nice 2 */ f.format(time),
-				/* 6 status classes - */ status.get("classes"),
-
-				/* 7 status text 3 */ status.get("text"),
-				/* 8 scoring 4 */ statusScoring.get("text"),
-				/* 9 comment 5 */ score.getComment(),
-				/* 10 edit score 6 */ approveUri
-			};
-			logData.add(logRow);
-		}
-
-		return logData;
+		});
 	}
 
 	@RequestMapping(value = "rest/index", method = RequestMethod.GET)
@@ -488,10 +436,9 @@ public class AdminController extends MultiActionController implements WebSymbols
 
 	@RequestMapping(value = "approve", method = RequestMethod.GET)
 	public ModelAndView do_approve(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		return handleWebMethodScore(req, resp, "", new WebMethodScore() {
+		return wmScore(req, resp, "", new WebMethodScore() {
 			public ModelAndView handleScore(
-					HttpServletRequest req, HttpServletResponse resp, Map<String, Object> model,
-					Ctx ctx, FileSlot slot, Entry<FileMeta> file, Stamp stamp
+					HttpServletRequest req, HttpServletResponse resp, Ctx ctx, FileSlot slot, Entry<FileMeta> file, Stamp stamp, Map<String, Object> model
 			) {
 				final SortedMap<Stamp, Entry<Score>> allScores = scoreDao.findAllScores(ctx, slot.getId(), file.getMeta().getId());
 
@@ -511,10 +458,9 @@ public class AdminController extends MultiActionController implements WebSymbols
 
 	@RequestMapping(value = "approve", method = RequestMethod.POST)
 	public ModelAndView do_approvePost(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		return handleWebMethodScore(req, resp, "", new WebMethodScore() {
+		return wmScore(req, resp, "", new WebMethodScore() {
 			public ModelAndView handleScore(
-					HttpServletRequest req, HttpServletResponse resp, Map<String, Object> model,
-					Ctx ctx, FileSlot slot, Entry<FileMeta> file, Stamp stamp
+					HttpServletRequest req, HttpServletResponse resp, Ctx ctx, FileSlot slot, Entry<FileMeta> file, Stamp stamp, Map<String, Object> model
 			) throws IOException {
 				final Score scoreByStamp;
 				final String fileId = file.getMeta().getId();
@@ -767,57 +713,6 @@ public class AdminController extends MultiActionController implements WebSymbols
 		}
 
 		return null;
-	}
-
-	protected static interface WebMethodScore {
-		ModelAndView handleScore(
-				HttpServletRequest req, HttpServletResponse resp, Map<String, Object> model,
-				Ctx ctx, FileSlot slot, Entry<FileMeta> file, Stamp stamp
-		) throws IOException;
-	}
-
-	protected ModelAndView handleWebMethodScore(
-			HttpServletRequest req, HttpServletResponse resp,
-			final String pathToRoot, final WebMethodScore wm
-	) throws IOException {
-		final HashMap<String, Object> model = auth(req, resp, pathToRoot);
-		if (model == null) {
-			return null;
-		}
-
-		final Ctx ctx = (Ctx) model.get(R_CTX);
-		if (!ctx.resolved(Ctx.STATE_EGSCIV)) {
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Path problem, please check the logs");
-			return null;
-		}
-
-		final String slotId = req.getParameter("sId");
-		if ((slotId == null || slotId.trim().length() == 0)) {
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "no slotId (sId) defined");
-			return null;
-		}
-
-		final FileSlot slot = ctx.getAssType().findSlotById(slotId);
-		if (slot == null) {
-			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "slot for id " + slotId + " not found");
-			return null;
-		}
-
-		final String fileId = req.getParameter("fId");
-		if ((fileId == null || fileId.trim().length() == 0)) {
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "no fileId (fId) defined");
-			return null;
-		}
-
-		final Entry<FileMeta> file = fileDao.findFileFor(FileDao.SCOPE_STUD, ctx, slotId, fileId);
-		if (file == null) {
-			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "file for id " + fileId + " not found");
-			return null;
-		}
-
-		final Stamp stamp = W.parseStamp(req, "stamp");
-
-		return wm.handleScore(req, resp, model, ctx, slot, file, stamp);
 	}
 
 }

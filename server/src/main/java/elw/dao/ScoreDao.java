@@ -76,9 +76,9 @@ public class ScoreDao extends Dao<Score> {
 		final FileSlot slot = ctx.getAssType().findSlotById(slotId);
 
 		final Map<String, Double> vars = new TreeMap<String, Double>();
-		vars.put("$overdue", (double) classDue.computeDaysOverdue(file.getMeta().getCreateStamp()));
+		vars.put("$overdue", classDue == null ? 0.0 : (double) classDue.computeDaysOverdue(file.getMeta().getCreateStamp()));
 		if (slot.getValidator() != null && file.getMeta().isValidated()) {
-			vars.put("$passratio", (double) classDue.computeDaysOverdue(file.getMeta().getCreateStamp()));
+			vars.put("$passratio", (double) file.getMeta().getPassRatio());
 		}
 
 		final Score res = score == null ? new Score() : score.copy();

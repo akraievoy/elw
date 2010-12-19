@@ -1,0 +1,24 @@
+#* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
+#* @vtlvariable name="f" type="elw.web.FormatTool" *#
+#* @vtlvariable name="f_studId" type="java.lang.String" *#
+<html>
+<head>
+ <meta content="text/html; charset=UTF-8">
+ <title>Group $elw_ctx.group.name Report Uploads : ELW Admin</title>
+ #parse("/__/imports.vm")
+</head>
+<body style="text-align: left;">
+<div class="ui-widget-header ui-corner-all" id="elw_header">
+ <div id="nav"><a href="index">Index</a> &gt; <a href="enrolls">Enrollments</a> &gt; <span style="font-weight: bold">Group $elw_ctx.group.name
+  Uploads</span></div>
+ #parse("/__/credAdm.vm")
+ <div id="header_hr"></div>
+</div>
+ #parse("/__/messages.vm")
+ <div style="">
+  #set($__qId = "tasks") #parse("/__/queryTableTasks.vm")
+ </div>
+</body>
+ #set($__qId = "tasks") #parse("/__/queryJsTasks.vm")
+ #parse("/__/ready.vm")
+</html>

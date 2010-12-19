@@ -22,16 +22,17 @@ import elw.dao.Ctx;
 import elw.dao.FileDao;
 import elw.vo.*;
 import elw.vo.Class;
+import elw.web.core.Summary;
+import org.akraievoy.gear.G4mat;
 import org.joda.time.DateTime;
 
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.SortedMap;
 
-public class VelocityUtils {
-	public static final VelocityUtils INSTANCE = new VelocityUtils();
+public class VelocityTemplates {
+	public static final VelocityTemplates INSTANCE = new VelocityTemplates();
 
-	public static final String MODEL_KEY = "u";
+	public static final String MODEL_KEY = "elw_vt";
 
 	public <E> Ref<E> ref(E e) {
 		return new Ref<E>(e);
@@ -51,14 +52,14 @@ public class VelocityUtils {
 		return entries.get(entries.size() - 1);
 	}
 
-	public Map<String, String> status(
+	public VtTuple status(
 			Format f, String mode,
 			String scope, Ctx ctx, FileSlot slot, Entry<FileMeta> file
 	) {
 		return status(f, mode, scope, ctx, slot, file, file != null ? file.getMeta().getScore() : null);
 	}
 
-	public Map<String, String> status(
+	public VtTuple status(
 			Format f, String mode,
 			String scope, Ctx ctx, FileSlot slot, Entry<FileMeta> file, Score score
 	) {
@@ -168,10 +169,7 @@ public class VelocityUtils {
 						if (terms.length > 0) {
 							text.append(":");
 							for (ScoreTerm term : terms) {
-								text.append(" <span class=\"elw_").append(term.getRatio() < 1 ? "neg" : "pos")
-										.append("Term\" title=\"").append(f.esc(term.getCriteria().getName()))
-										.append(" x ").append(term.getPow()).append("\">")
-										.append(term.getNiceRatio()).append("</span>");
+								niceRatio(f, term.getRatio(), term.getCriteria().getName() + " x " + term.getPow(), text);
 							}
 						}
 					} else {
@@ -270,11 +268,7 @@ public class VelocityUtils {
 			}
 		}
 
-		final Map<String, String> res = new TreeMap<String, String>();
-		res.put("text", text.toString());
-		res.put("classes", cls.toString());
-		res.put("sort", sort.toString());
-		return res;
+		return new VtTuple(text.toString(), cls.toString(), sort.toString());
 	}
 
 	protected static void overdueClasses(Entry<FileMeta> file, Class classDue, StringBuilder cls) {
@@ -290,4 +284,56 @@ public class VelocityUtils {
 			cls.append(" elw_nodue");
 		}
 	}
+
+	public void niceRatio(Format f, final double ratio, final String title, final StringBuilder sb) {
+		if (Math.abs(ratio - 1) < 1e-2) {
+			return;
+		}
+
+		final double percentage = Math.round(ratio * 1000) / 10.0;
+
+		final String niceRatio;
+		if (percentage < 100) {
+			niceRatio = "-" + f.format2(100 - percentage) + "%";
+		} else {
+			niceRatio = "+" + f.format2(percentage - 100) + "%";
+		}
+
+		sb.append(" <span class=\"elw_").append(ratio < 1 ? "neg" : "pos")
+				.append("Term\" title=\"").append(f.esc(title)).append("\">")
+				.append(niceRatio).append("</span>");
+	}
+
+	public String niceRatio(Format f, double ratio, String title) {
+		final StringBuilder builder = new StringBuilder();
+		niceRatio(f, ratio, title, builder);
+		return builder.toString();
+	}
+
+	public VtTuple summary(Ctx ctxAss, SortedMap<String, Summary> ctxEsToSummary, int studNum) {
+		final Summary s = ctxEsToSummary.get(ctxAss.ei());
+
+		final StringBuffer text = new StringBuffer();
+		if (ctxAss.cFrom().isStarted()) {
+			if (s.getDeclinedNum() > 0) {
+				text.append("<span class=\"elw_declined\" title=\"Declined\">").append(s.getDeclinedNum()).append(" D;</span>");
+			}
+			if (s.getOpenNum() > 0) {
+				text.append("<span class=\"elw_open\" title=\"Open\">").append(s.getOpenNum()).append(" O;</span>");
+			}
+			if (s.getPendingNum() > 0) {
+				text.append("<span class=\"elw_pending\" title=\"Pending\">").append(s.getPendingNum()).append(" P;</span>");
+			}
+			if (s.getApprovedNum() > 0) {
+				text.append("<span class=\"elw_approved\" title=\"Approved\">").append(s.getApprovedNum()).append(" A;</span>");
+			}
+		} else {
+			text.append("<span class=\"elw_closed\" title=\"Closed\">").append(s.getDeclinedNum()).append("Closed;</span>");
+		}
+
+		final long sort = 5 * s.getOpenNum() + 25 * s.getDeclinedNum() - s.getApprovedNum();
+
+		return new VtTuple(text.toString(), "", String.valueOf(sort));
+	}
+
 }

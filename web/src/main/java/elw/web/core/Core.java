@@ -20,11 +20,12 @@ package elw.web.core;
 
 import elw.dao.*;
 import elw.vo.*;
-import elw.web.VelocityUtils;
+import elw.vo.Class;
+import elw.web.ElwUri;
+import elw.web.VelocityTemplates;
+import elw.web.VtTuple;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Core {
 	protected final CourseDao courseDao;
@@ -32,6 +33,9 @@ public class Core {
 	protected final EnrollDao enrollDao;
 	protected final ScoreDao scoreDao;
 	protected final FileDao fileDao;
+
+	protected final VelocityTemplates vt = VelocityTemplates.INSTANCE;
+	protected final ElwUri uri = new ElwUri();
 
 	public Core(CourseDao courseDao, EnrollDao enrollDao, FileDao fileDao, GroupDao groupDao, ScoreDao scoreDao) {
 		this.courseDao = courseDao;
@@ -41,22 +45,34 @@ public class Core {
 		this.scoreDao = scoreDao;
 	}
 
+	public VelocityTemplates getTemplates() {
+		return vt;
+	}
+
+	public ElwUri getUri() {
+		return uri;
+	}
+
+	public FileDao getFileDao() {
+		return fileDao;
+	}
+
 	public List<Object[]> log(
-			Ctx ctx, Format format, VelocityUtils u, LogFilter logFilter, final boolean adm
+			Ctx ctx, Format format, LogFilter logFilter, final boolean adm
 	) {
 		final List<Object[]> logData = new ArrayList<Object[]>();
 
 		if ("s".equalsIgnoreCase(logFilter.getScopePath()[0])) {
-			logStud(ctx, format, u, logFilter, logData, adm);
+			logStud(ctx, format, logFilter, logData, adm);
 		} else if ("c".equalsIgnoreCase(logFilter.getScopePath()[0])) {
-			logCourse(ctx, format, u, logFilter, logData, adm);
+			logCourse(ctx, format, logFilter, logData, adm);
 		}
 
 		return logData;
 	}
 
 	protected void logCourse(
-			Ctx ctx, Format format, VelocityUtils u, LogFilter lf,
+			Ctx ctx, Format format, LogFilter lf,
 			List<Object[]> logData, final boolean adm
 	) {
 		for (int i = 0; i < ctx.getEnr().getIndex().size(); i++) {
@@ -78,7 +94,7 @@ public class Core {
 				final Entry<FileMeta>[] uploadsAss = fileDao.findFilesFor(FileDao.SCOPE_ASS, ctxAss, slot.getId());
 				int total = uploadsAss.length;
 				if (lf.cScopeOne('a') && lf.cVer(ctxAss)) {
-					logRows(format, u, lf, logData, i, ctxAss, slot, uploadsAss, FileDao.SCOPE_ASS, adm);
+					logRows(format, lf, logData, i, ctxAss, slot, uploadsAss, FileDao.SCOPE_ASS, adm);
 				}
 
 				final Version[] versions = adm ? ctxAss.getAss().getVersions() : new Version[] {ctxAss.getVer()};
@@ -87,18 +103,18 @@ public class Core {
 					final Entry<FileMeta>[] uploadsVer = fileDao.findFilesFor(FileDao.SCOPE_VER, ctxVer, slot.getId());
 					total += uploadsVer.length;
 					if (lf.cScopeOne('v') && lf.cVer(ctxVer)) {
-						logRows(format, u, lf, logData, i, ctxVer, slot, uploadsVer, FileDao.SCOPE_VER, adm);
+						logRows(format, lf, logData, i, ctxVer, slot, uploadsVer, FileDao.SCOPE_VER, adm);
 					}
 				}
 
 				if (lf.cScopeOpen() && lf.cVer(ctxAss) && total == 0) {
-					logData.add(logRow(format, u, lf.getMode(), logData, i, ctxAss, slot, null, FileDao.SCOPE_ASS, adm));
+					logData.add(logRow(format, lf.getMode(), logData, i, ctxAss, slot, null, FileDao.SCOPE_ASS, adm));
 				}
 			}
 		}
 	}
 
-	protected void logStud(Ctx ctx, Format f, VelocityUtils u, LogFilter lf, List<Object[]> logData, boolean adm) {
+	protected void logStud(Ctx ctx, Format f, LogFilter lf, List<Object[]> logData, boolean adm) {
 		if (adm) {
 			for (Student stud : ctx.getGroup().getStudents()) {
 				if (W.excluded(lf.getStudId(), stud.getId())) {
@@ -106,17 +122,17 @@ public class Core {
 				}
 
 				final Ctx ctxStud = ctx.extendStudent(stud);
-				logStudForStud(ctx, f, u, lf, logData, ctxStud, adm);
+				logStudForStud(ctx, f, lf, logData, ctxStud, adm);
 			}
 		} else {
 			if (ctx.getStudent() != null) {
-				logStudForStud(ctx, f, u, lf, logData, ctx, adm);
+				logStudForStud(ctx, f, lf, logData, ctx, adm);
 			}
 		}
 	}
 
 	protected void logStudForStud(
-			Ctx ctx, Format f, VelocityUtils u,
+			Ctx ctx, Format f,
 			LogFilter lf, List<Object[]> logData, Ctx ctxStud,
 			boolean adm) {
 		for (int index = 0; index < ctx.getEnr().getIndex().size(); index++) {
@@ -140,15 +156,15 @@ public class Core {
 					continue;
 				}
 
-				logRows(f, u, lf, logData, index, ctxVer, slot, uploads, FileDao.SCOPE_STUD, adm);
+				logRows(f, lf, logData, index, ctxVer, slot, uploads, FileDao.SCOPE_STUD, adm);
 				if (uploads.length == 0 && lf.cScopeStud(slot, null)) {
-					logData.add(logRow(f, u, lf.getMode(), logData, index, ctxVer, slot, null, FileDao.SCOPE_STUD, adm));
+					logData.add(logRow(f, lf.getMode(), logData, index, ctxVer, slot, null, FileDao.SCOPE_STUD, adm));
 				}
 			}
 		}
 	}
 
-	protected int logRows(Format format, VelocityUtils u, LogFilter logFilter, List<Object[]> logData, int index, Ctx ctxVer, FileSlot slot, Entry<FileMeta>[] uploads, String scope, boolean adm) {
+	protected int logRows(Format format, LogFilter logFilter, List<Object[]> logData, int index, Ctx ctxVer, FileSlot slot, Entry<FileMeta>[] uploads, String scope, boolean adm) {
 		int shown = 0;
 		for (int i = 0, uploadsLength = uploads.length; i < uploadsLength; i++) {
 			final boolean last = i + 1 == uploadsLength;
@@ -160,13 +176,13 @@ public class Core {
 				continue;
 			}
 			shown += 1;
-			logData.add(logRow(format, u, logFilter.getMode(), logData, index, ctxVer, slot, e, scope, adm));
+			logData.add(logRow(format, logFilter.getMode(), logData, index, ctxVer, slot, e, scope, adm));
 		}
 		return shown;
 	}
 
 	protected Object[] logRow(
-			Format f, VelocityUtils u, final String mode, List<Object[]> data,
+			Format f, final String mode, List<Object[]> data,
 			int index, Ctx ctx, FileSlot slot, Entry<FileMeta> e, String scope,
 			boolean adm) {
 		final long time = e == null ? System.currentTimeMillis() : e.getMeta().getCreateStamp().getTime();
@@ -199,7 +215,7 @@ public class Core {
 			dlRef = null;
 		}
 
-		//	FIXME proper UL URI here
+		//	FIXME proper UL ElwUri here
 		final String ulRef;
 		if (adm) {
 			if (!FileDao.SCOPE_STUD.equals(scope)) {
@@ -227,7 +243,19 @@ public class Core {
 		}
 
 
-		final Map<String, String> status = u.status(f, mode, scope, ctx, slot, e);
+		final VtTuple status = vt.status(f, mode, scope, ctx, slot, e);
+
+		final String nameComment;
+		if (e == null) {
+			nameComment = "";
+		} else {
+			if (e.getMeta().getComment() != null && e.getMeta().getComment().trim().length() > 0) {
+				nameComment = e.getMeta().getName() + " / " + e.getMeta().getComment();
+			} else {
+				nameComment = e.getMeta().getName();
+			}
+		}
+
 		final Object[] dataRow = {
 				/* 0 index */ data.size(),
 				/* 1 upload millis */ time,
@@ -239,10 +267,10 @@ public class Core {
 				/* 7 class.name */ ctx.getAss().getName(),
 				/* 8 slot.id */ ctx.getAssType().getId() + "--" + slot.getId(),
 				/* 9 slot.name */ ctx.getVer() != null ? ctx.getVer().getName() + " / " + slot.getName() : slot.getName(),
-				/* 10 comment */ e  == null ? "" : e.getMeta().getComment(),
-				/* 11 status sort*/ status.get("sort"),
-				/* 12 status text*/ status.get("text"),
-				/* 13 status classes */ status.get("classes"),
+				/* 10 comment */ nameComment,
+				/* 11 status sort*/ status.getSort(),
+				/* 12 status text*/ status.getText(),
+				/* 13 status classes */ status.getClasses(),
 				/* 14 source ip */ e  == null ? "" : e.getMeta().getSourceAddress(),
 				/* 15 size bytes */ e  == null ? "" : e.computeSize(),
 				/* 16 size */ e  == null ? "" : f.formatSize(e.computeSize()),
@@ -266,7 +294,6 @@ public class Core {
 		final Group group = groupDao.findGroup(enr.getGroupId());
 		final Course course = courseDao.findCourse(enr.getCourseId());
 
-		final String uploadsBase = "log?elw_ctx=e--" + enr.getId();
 		final Object[] arr = {
 				/* 0 index - */ indexData.size(),
 				/* 1 enr.id - */ enr.getId(),
@@ -274,14 +301,297 @@ public class Core {
 				/* 3 group.name 0*/ group.getName(),
 				/* 4 course.id - */ course.getId(),
 				/* 5 course.name 1 */ course.getName(),
-				/* 6 summary ref 2 */ "enroll?elw_ctx=e--"+enr.getId(),
+				/* 6 summary ref 2 */ uri.summary(enr.getId()),
 				/* 7 students ref 3 */ "#",
-				/* 8 tasks ref 4 */ "#",
+				/* 8 tasks ref 4 */ uri.tasks(enr.getId()),
 				/* 9 classes ref 5 */ "#",
-				/* 10 uploads ref 6 */ uploadsBase +"&f_scope=s--p--&f_due=today&f_mode=dd",
-				/* 11 uploads-open ref 7 */ uploadsBase + "&f_scope=s--o--&f_due=twoweeks&f_mode=dd",
-				/* 12 uploads-course ref 8 */ uploadsBase + "&f_scope=c--av--&f_due=any",
+				/* 10 uploads ref 6 */ uri.logPending(enr.getId()),
+				/* 11 uploads-open ref 7 */ uri.logOpen(enr.getId()),
+				/* 12 uploads-course ref 8 */ uri.logCourse(enr.getId()),
 		};
 		return arr;
+	}
+
+	public List<Object[]> logScore(
+			SortedMap<Stamp, Entry<Score>> allScores, Ctx ctx, FileSlot slot, Entry<FileMeta> file,
+			Format f, String mode, Stamp stamp
+	) {
+		final List<Object[]> logData = new ArrayList<Object[]>();
+
+		final Score scoreBest = chooseBestScore(allScores, ctx, slot);
+
+		for (Stamp s : allScores.keySet()) {
+			final Entry<Score> scoreEntry = allScores.get(s);
+			final Score score = scoreEntry.getMeta();
+
+			final Stamp createStamp = score.getCreateStamp();
+			final boolean selected = stamp == null ? createStamp == null : stamp.equals(createStamp);
+
+			final long time;
+			String approveUri = "approve?elw_ctx=" + ctx.toString() + "&sId=" + slot.getId() + "&fId=" + file.getMeta().getId();
+			if (createStamp == null) {
+				time = System.currentTimeMillis();
+			} else {
+				time = createStamp.getTime();
+				approveUri += "&stamp="+createStamp.toString();
+			}
+
+			final VtTuple status = vt.status(f, mode, FileDao.SCOPE_STUD, ctx, slot, file, score);
+			final VtTuple statusScoring = vt.status(f, "s", FileDao.SCOPE_STUD, ctx, slot, file, score);
+
+			final Object[] logRow = new Object[] {
+				/* 0 index - */ logData.size(),
+				/* 1 selected 0 */ selected ? "&gt;" : "",
+				/* 2 best 1 */ scoreBest == score ? "*" : "",
+				/* 3 score date millis - */ time,
+				/* 4 score date full - */ f.format(time, "EEE d HH:mm"),
+				/* 5 score date nice 2 */ f.format(time),
+				/* 6 status classes - */ status.getClasses(),
+				/* 7 status text 3 */ status.getText(),
+				/* 8 scoring 4 */ statusScoring.getText(),
+				/* 9 comment 5 */ score.getComment(),
+				/* 10 edit score 6 */ approveUri
+			};
+			logData.add(logRow);
+		}
+
+		return logData;
+	}
+
+	protected Score chooseBestScore(SortedMap<Stamp, Entry<Score>> allScores, Ctx ctx, FileSlot slot) {
+		Score scoreBest = null;
+		double pointsBest = 0;
+		for (Stamp s : allScores.keySet()) {
+			final Score scoreCur = allScores.get(s).getMeta();
+			final double pointsCur = ctx.getIndexEntry().computePoints(scoreCur, slot);
+			if (scoreBest == null || pointsBest < pointsCur) {
+				scoreBest = scoreCur;
+				pointsBest = pointsCur;
+			}
+		}
+		return scoreBest;
+	}
+
+	public List<Object[]> tasks(Ctx ctx, final LogFilter filter, Format f, boolean adm) {
+		final List<Object[]> indexData = new ArrayList<Object[]>();
+
+		final TreeMap<String, Map<String, List<Entry<FileMeta>>>> ctxVerToSlotToFiles =
+				new TreeMap<String, Map<String, List<Entry<FileMeta>>>>();
+		final TreeMap<String, Double> ctxEsToScore = new TreeMap<String, Double>();
+		final TreeMap<String, Summary> ctxEsToSummary = new TreeMap<String, Summary>();
+
+		final int studCount = tasksData(ctx, filter, adm, ctxVerToSlotToFiles, ctxEsToScore, ctxEsToSummary);
+
+		for (int i = 0; i < ctx.getEnr().getIndex().size(); i++) {
+			final Ctx ctxAss = ctx.extendIndex(i);
+			indexData.add(tasksRow(f, indexData, ctxAss, adm, ctxEsToScore, ctxEsToSummary, studCount));
+		}
+
+		return indexData;
+	}
+
+	protected Object[] tasksRow(
+			Format f, List<Object[]> indexData, Ctx ctxAss, boolean adm,
+			TreeMap<String, Double> ctxEsToScore, TreeMap<String, Summary> ctxEsToSummary, int studCount
+	) {
+		final Class classFrom = ctxAss.cFrom();
+
+		final VtTuple summary = vt.summary(ctxAss, ctxEsToSummary, studCount);
+		final Summary summ = ctxEsToSummary.get(ctxAss.ei());
+
+		final String dueNice;
+		final String dueFull;
+		final long dueSort;
+		if (classFrom.isStarted()) {
+			if (summ.getEarliestDue() == null) {
+				dueNice = "None";
+				dueFull = "";
+				dueSort = System.currentTimeMillis();
+			} else {
+				dueNice = "Due " + f.format(summ.getEarliestDue());
+				dueFull = f.format(summ.getEarliestDue(), "EEE d HH:mm");
+				dueSort = summ.getEarliestDue();
+			}
+		} else {
+			dueNice = "Opens " + f.format(classFrom.getFromDateTime().getMillis());
+			dueFull = f.format(classFrom.getFromDateTime().getMillis(), "EEE d HH:mm");
+			dueSort = classFrom.getFromDateTime().getMillis();
+		}
+
+		final String scoreNice;
+		final double scoreSort;
+		if (ctxEsToScore.get(ctxAss.ei()) != null) {
+			final int budget = ctxAss.getIndexEntry().getScoreBudget();
+			if (budget > 0) {
+				final double score = ctxEsToScore.get(ctxAss.ei()) / studCount;
+				scoreNice = f.format2(score) + " of " + budget + ": " + vt.niceRatio(f, score / budget, "");
+				scoreSort = score;
+			} else {
+				scoreSort = -1;
+				scoreNice = "";
+			}
+		} else {
+			scoreNice = "?";
+			scoreSort = -2;
+		}
+
+		final Object[] arr = {
+				/* 0 index - */ indexData.size(),
+				/* 1 date millis - */ classFrom.getFromDateTime().getMillis(),
+				/* 2 date full - */ f.format(classFrom.getFromDateTime().getMillis(), "EEE d HH:mm"),
+				/* 3 date nice 0*/ f.format(classFrom.getFromDateTime().getMillis()),
+				/* 4 tType.id - */ ctxAss.getAssType().getId(),
+				/* 5 tType.name 1 */ ctxAss.getAssType().getName(),
+				/* 6 task.id ref - */ ctxAss.getAss().getId(),
+				/* 7 task.name ref 2 */ ctxAss.getAss().getName(),
+				/* 8 summary status sort - */ summary.getSort(),
+				/* 9 summary status text - */ summary.getClasses(),
+				/* 10 summary status text 3 */ summary.getText(),
+				/* 11 summary due millis - */ dueSort,
+				/* 12 summary due full - */ dueFull,
+				/* 13 summary due nice 4 */ dueNice,
+				/* 14 score sort */ scoreSort,
+				/* 15 score nice 5 */ scoreNice,
+				/* 16 uploads ref 6 */ adm || classFrom.isStarted() ? uri.logPending(ctxAss.getEnr().getId(), ctxAss.getAss().getId()) : null,
+				/* 17 uploads-open ref 7 */ adm || classFrom.isStarted() ? uri.logOpen(ctxAss.getEnr().getId(), ctxAss.getAss().getId()) : null,
+				/* 18 uploads-course ref 8 */ adm || classFrom.isStarted() ? uri.logCourse(ctxAss.getEnr().getId(), ctxAss.getAss().getId()) : null
+		};
+
+		return arr;
+	}
+
+	/**
+	 * Generate per-task data score summaries
+	 *
+	 * @param ctxEnr context with a student set (non-adm) or only enrollment set (adm)
+	 * @param filter to filter tasks and/or students
+	 * @param adm whether this is an admin report or not
+	 * @param fileMetas to store per slot file meta listings
+	 * @param ctxEsToScore to store totals per task
+	 * @param ctxEsToSummary to handle open/pending/approved stats
+	 *
+	 * @return number of students processed in this report
+	 */
+	public int tasksData(
+			Ctx ctxEnr, LogFilter filter, boolean adm,
+			Map<String, Map<String, List<Entry<FileMeta>>>> fileMetas,
+			Map<String, Double> ctxEsToScore,
+			Map<String, Summary> ctxEsToSummary
+	) {
+		int students = 0;
+		if (adm) {
+			for (Student stud : ctxEnr.getGroup().getStudents()) {
+				if (W.excluded(filter.getStudId(), stud.getId())) {
+					continue;
+				}
+				students += 1;
+				storeTasksData(ctxEnr.extendStudent(stud), filter, fileMetas, ctxEsToScore, ctxEsToSummary);
+			}
+		} else {
+			//	let's hope that student id is already present here...
+			students += 1;
+			storeTasksData(ctxEnr, filter, fileMetas, ctxEsToScore, ctxEsToSummary);
+		}
+
+		return students;
+	}
+
+	protected void storeTasksData(
+			Ctx ctxStud, LogFilter filter,
+			Map<String, Map<String, List<Entry<FileMeta>>>> fileMetas,
+			Map<String, Double> ctxEsToScore,
+			Map<String, Summary> ctxEsToSummary
+	) {
+		for (int i = 0; i < ctxStud.getEnr().getIndex().size(); i++) {
+			storeTaskData(ctxStud.extendIndex(i), filter, fileMetas, ctxEsToScore, ctxEsToSummary);
+		}
+	}
+
+	protected void storeTaskData(
+			Ctx ctxVer, LogFilter filter,
+			Map<String, Map<String, List<Entry<FileMeta>>>> fileMetas,
+			Map<String, Double> ctxEsToScore,
+			Map<String, Summary> ctxEsToSummary
+	) {
+		final String assPath = ctxVer.toString();
+		final AssignmentType assType = ctxVer.getAssType();
+
+		final SortedMap<String, List<Entry<FileMeta>>> slotIdToFiles = fileDao.loadFilesStud(ctxVer);
+		if (fileMetas != null) {
+			fileMetas.put(assPath, slotIdToFiles);
+		}
+
+		for (FileSlot slot : assType.getFileSlots()) {
+			if (W.excluded(filter.getSlotId(), assType.getId(), slot.getId())) {
+				continue;
+			}
+
+			final Class classDue = ctxVer.cDue(slot.getId());
+			final Long classDueStamp = classDue != null ? classDue.getFromDateTime().getMillis() : null;
+			final List<Entry<FileMeta>> filesForSlot = slotIdToFiles.get(slot.getId());
+			final Entry<FileMeta> bestFile = selectBestFile(ctxVer, slot.getId(), filesForSlot, slot);
+
+			final double scoreForIdx;
+			final Summary sum;
+			if (bestFile != null) {
+				final Score score = bestFile.getMeta().getScore();
+
+				scoreForIdx = ctxVer.getIndexEntry().computePoints(score, slot);
+				sum = Summary.forScore(classDueStamp, score == null ? null : score.getApproved());
+			} else {
+				scoreForIdx = 0;
+				if (classDue == null) {
+					sum = new Summary(0,0,0,0, null);
+				} else if (filesForSlot == null || filesForSlot.isEmpty()) {
+					sum = new Summary(0,0,1,0, classDueStamp);
+				} else {
+					final Entry<FileMeta> lastFile = filesForSlot.get(filesForSlot.size() - 1);
+					final Score score = lastFile.getMeta().getScore();
+
+					sum = Summary.forScore(classDueStamp, score == null ? null : score.getApproved());
+				}
+			}
+
+			ctxEsToScore.put(ctxVer.toString(), scoreForIdx);
+			Summary.increment(ctxEsToScore, ctxVer.ei(), scoreForIdx);
+			Summary.increment(ctxEsToSummary, ctxVer.ei(), sum);
+		}
+	}
+
+	protected Entry<FileMeta> selectBestFile(Ctx ctxVer, String slotId, List<Entry<FileMeta>> filesForSlot, final FileSlot slot) {
+		if (filesForSlot == null || filesForSlot.isEmpty()) {
+			return null;
+		}
+
+		for (Entry<FileMeta> e : filesForSlot) {
+			if (e.getMeta().getScore() != null && e.getMeta().getScore().getApproved() != null) {
+				continue;	//	don't alter any scores once they're approved
+			}
+			final Score autoScore = ScoreDao.updateAutos(
+					ctxVer, slotId, e, e.getMeta().getScore()
+			);
+			e.getMeta().setScore(autoScore);
+		}
+
+		Entry<FileMeta> usedEntry = null;
+		double maxScore = 0;
+		for (Entry<FileMeta> e : filesForSlot) {
+			final Score score = e.getMeta().getScore();
+			final double eScore = ctxVer.getIndexEntry().computePoints(score, slot);
+
+			if (!Boolean.FALSE.equals(score.getApproved()) && (usedEntry == null || maxScore < eScore)) {
+				maxScore = eScore;
+				usedEntry = e;
+			}
+		}
+
+		if (usedEntry != null) {
+			final Score s = usedEntry.getMeta().getScore();
+			if (s != null) {
+				s.setBest(true);
+			}
+		}
+
+		return usedEntry;
 	}
 }

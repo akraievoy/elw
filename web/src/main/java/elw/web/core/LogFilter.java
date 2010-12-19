@@ -35,6 +35,10 @@ public class LogFilter {
 	final String scope;
 	final String[] scopePath;
 
+	public LogFilter() {
+		this(null, null, null, "any", "a", "", false);
+	}
+
 	public LogFilter(
 			String slotId, String studId, String verId, String due, String mode, String scope, boolean latest
 	) {
