@@ -1,6 +1,8 @@
 #* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
 #* @vtlvariable name="fileMetas" type="java.util.Map<java.lang.String,java.util.Map<java.lang.String,java.util.List<elw.vo.Entry<elw.vo.FileMeta>>>>" *#
 #* @vtlvariable name="ctxToScore" type="java.util.Map<java.lang.String,java.lang.Double>" *#
+#* @vtlvariable name="totalBudget" type="java.lang.Integer" *#
+
 #* @vtlvariable name="f" type="elw.web.FormatTool" *#
 #* @vtlvariable name="elw_vt" type="elw.web.VelocityTemplates" *#
 #* @vtlvariable name="studRowsCreated" type="java.lang.Boolean" *#
@@ -88,7 +90,9 @@
         #else
          tp_studRow = tp_studRows[$f.json($stud.id)] = te_studRow.clone().toggleClass("te");
          tp_studRow.find(".tp_name").html($f.json($stud.name));
-         tp_studRow.find(".tp_score").html($f.json($f.format2($ctxToScore.get($elw_ctx_stud.es()))));
+         #set($totalScore = $ctxToScore.get($elw_ctx_stud.es()))
+         #set($totalRatio = $totalScore / $totalBudget)
+         tp_studRow.find(".tp_score").html($f.format2($totalScore) + " of " + $totalBudget + ": " + $f.json($elw_vt.niceRatio($f, $totalRatio, "")));
          tp_studRow.attr("id", "#studRow--$stud.id");
 
          te_studRow.parent().append(tp_studRow);

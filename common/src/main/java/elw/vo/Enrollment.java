@@ -50,4 +50,12 @@ public class Enrollment extends IdNameStamped {
 
 		return false;
 	}
+
+	public int cmpTotalBudget() {
+		int totalBudget = 0;
+		for (IndexEntry ie : getIndex()) {
+			totalBudget += ie.getScoreBudget();
+		}
+		return totalBudget;
+	}
 }
