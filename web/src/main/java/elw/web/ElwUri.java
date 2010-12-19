@@ -50,6 +50,6 @@ public class ElwUri {
 	}
 
 	public String summary(final String enrId) {
-		return "enroll?elw_ctx=e--"+ enrId;
+		return "summary?elw_ctx=e--"+ enrId;
 	}
 }

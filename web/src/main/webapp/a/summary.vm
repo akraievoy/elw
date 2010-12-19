@@ -1,6 +1,6 @@
 #* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
 #* @vtlvariable name="fileMetas" type="java.util.Map<java.lang.String,java.util.Map<java.lang.String,java.util.List<elw.vo.Entry<elw.vo.FileMeta>>>>" *#
-#* @vtlvariable name="grossScores" type="java.util.Map<java.lang.String,java.lang.Integer>" *#
+#* @vtlvariable name="ctxToScore" type="java.util.Map<java.lang.String,java.lang.Double>" *#
 #* @vtlvariable name="f" type="elw.web.FormatTool" *#
 #* @vtlvariable name="elw_vt" type="elw.web.VelocityTemplates" *#
 #* @vtlvariable name="studRowsCreated" type="java.lang.Boolean" *#
@@ -22,7 +22,7 @@
  <div id="header_hr"></div>
 </div>
  #parse("/__/messages.vm")
-<form style="text-align: center;" action="enroll" id="summary_filter">
+<form style="text-align: center;" action="summary" id="summary_filter">
  <input type="hidden" name="elw_ctx" value="$elw_ctx.toString()"/>
  <select name="f_studId"><option value="">Choose...</option></select>
  <select name="f_slotId"><option value="">Choose...</option></select>
@@ -74,8 +74,8 @@
    #foreach($slot in $elw_ctx_ass.assType.fileSlots)
     #if($elw_ctx_ass.cDue($slot.id))
      #set($z = "--") #* idea yells at me if I do this directly*#
-     #set($z = "${elw_ctx_ass.assType.id}${z}${slot.id}")
-     #if(!$f_slotId || $f_slotId == $z)
+     #set($z = "${elw_ctx_ass.assType.id}${z}${slot.id}${z}")
+     #if(!$f_slotId || $z.startsWith($f_slotId))
       tp_slotHeader = te_slotHeader.clone().toggleClass("te").html($f.json($slot.name));
       te_slotHeader.parent().append(tp_slotHeader);
       #set($tp_taskHeader_colspan = $tp_taskHeader_colspan + 1)
@@ -88,7 +88,7 @@
         #else
          tp_studRow = tp_studRows[$f.json($stud.id)] = te_studRow.clone().toggleClass("te");
          tp_studRow.find(".tp_name").html($f.json($stud.name));
-         tp_studRow.find(".tp_score").html($f.json($grossScores.get($elw_ctx_stud.toString())));
+         tp_studRow.find(".tp_score").html($f.json($f.format2($ctxToScore.get($elw_ctx_stud.es()))));
          tp_studRow.attr("id", "#studRow--$stud.id");
 
          te_studRow.parent().append(tp_studRow);

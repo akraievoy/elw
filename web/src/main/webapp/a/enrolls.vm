@@ -16,11 +16,11 @@
 <table cellspacing=0 cellpadding=0><tbody>
 #foreach($enr in $enrolls)
 	<tr class="elw_header_row">
-		<td style="padding-left: 1em; padding-right: 0.25em;"><a href="enroll?elw_ctx=e--$enr.id" title="id : ${enr.id}">${enr.name}</a></td>
+		<td style="padding-left: 1em; padding-right: 0.25em;"><a href="summary?elw_ctx=e--$enr.id" title="id : ${enr.id}">${enr.name}</a></td>
 		<td style="padding-left: 0.25em; padding-right: 0.25em;"><a href="groups#$enr.groupId" title="(id : $enr.groupId)">$groups.get($enr.groupId).name</a></td>
 		<td style="padding-left: 0.25em; padding-right: 0.25em;"><a href="course?elw_ctx=c--$enr.courseId" title="(id : $enr.courseId)">$courses.get($enr.courseId).name</a></td>
 		<td style="padding-left: 0.25em; padding-right: 0.25em;">
-			<form action="enroll" method="get" style="margin: 0; display: inline;">
+			<form action="summary" method="get" style="margin: 0; display: inline;">
 				<input type="hidden" name="elw_ctx" value="e--$enr.id"/>
 				<input type="submit" value="Summary"/>
 			</form>

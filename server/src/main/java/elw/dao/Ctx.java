@@ -207,6 +207,9 @@ public class Ctx {
 	public String ei() {
 		return norm("ecgi") + SEP + getEnr().getId() + SEP + getIndex();
 	}
+	public String es() {
+		return norm("ecgs") + SEP + getEnr().getId() + SEP + getStudent().getId();
+	}
 
 	public Ctx resolve(EnrollDao enrDao, GroupDao groupDao, CourseDao courseDao) {
 		final StringBuilder resolved = new StringBuilder();

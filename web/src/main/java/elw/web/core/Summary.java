@@ -82,6 +82,10 @@ public class Summary {
 	}
 
 	public static void increment(final Map<String, Summary> summaryMap, final String path, final Summary sum) {
+		if (summaryMap == null) {
+			return;
+		}
+
 		if (summaryMap.get(path) == null) {
 			summaryMap.put(path, sum);
 		} else  {

@@ -56,7 +56,7 @@ public class W {
 		return ((String) filterValue).trim().length() > 0 && !filterValue.equals(actualValue);
 	}
 
-	public static void filterDefault(HashMap<String, Object> model, String fKey, String fDefault) {
+	public static void filterDefault(Map<String, Object> model, String fKey, String fDefault) {
 		if (model.get(fKey) == null || model.get(fKey).toString().trim().length() == 0) {
 			model.put(fKey, fDefault);
 		}

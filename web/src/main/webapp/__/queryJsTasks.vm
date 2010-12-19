@@ -32,14 +32,17 @@
     #* 15 score nice 5 *# {'sTitle': 'Score', "sClass": "text_align_center", "iDataSort": 14, "sWidth": "10%" },
     #* 16 uploads ref 6 *# {'sTitle': '<span title="Pending">Pending</span>', "sWidth": "10%", "bSortable": false, "sClass": "text_align_center", "fnRender": elw_dt_url(16, 'Pending') },
     #* 17 uploads-open ref 7 *# {'sTitle': '<span title="Open">Open</span>', "sWidth": "10%", "bSortable": false, "sClass": "text_align_center", "fnRender": elw_dt_url(17, 'Open') },
-    #* 18 uploads-course ref 8 *# {'sTitle': '<span title="Course">Course</span>', "sWidth": "10%", "bSortable": false, "sClass": "text_align_center", "fnRender": elw_dt_url(18, 'Course') }
+    #* 18 uploads-course ref 8 *# {'sTitle': '<span title="Course">Course</span>', "sWidth": "10%", "bSortable": false, "sClass": "text_align_center", "fnRender": elw_dt_url(18, 'Course') },
+    #* 19 task-total sort - *# {"bVisible": false}
    ],
    "aaSorting": [ [3,'asc'] ],
-   "aaSortingFixed": [ ],
+   "aaSortingFixed": [ [19,'asc'] ],
    "fnRowCallback": function(node, data, dispIndex, dataIndex) {
-    jQuery("td:eq(0)", node).attr("title", data[2]);
-    jQuery("td:eq(3)", node).addClass(data[10]);
-    jQuery("td:eq(4)", node).attr("title", data[12]);
+    if (data[19] == 0) {
+     jQuery("td:eq(0)", node).attr("title", data[2]);
+     jQuery("td:eq(3)", node).addClass(data[10]);
+     jQuery("td:eq(4)", node).attr("title", data[12]);
+    }
     return node;
    }
   });

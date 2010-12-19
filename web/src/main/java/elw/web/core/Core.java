@@ -36,6 +36,7 @@ public class Core {
 
 	protected final VelocityTemplates vt = VelocityTemplates.INSTANCE;
 	protected final ElwUri uri = new ElwUri();
+	protected static final String CTX_TO_SCORE_TOTAL = "--total";
 
 	public Core(CourseDao courseDao, EnrollDao enrollDao, FileDao fileDao, GroupDao groupDao, ScoreDao scoreDao) {
 		this.courseDao = courseDao;
@@ -382,9 +383,39 @@ public class Core {
 
 		final int studCount = tasksData(ctx, filter, adm, ctxVerToSlotToFiles, ctxEsToScore, ctxEsToSummary);
 
+		int totalBudget = 0;
 		for (int i = 0; i < ctx.getEnr().getIndex().size(); i++) {
 			final Ctx ctxAss = ctx.extendIndex(i);
 			indexData.add(tasksRow(f, indexData, ctxAss, adm, ctxEsToScore, ctxEsToSummary, studCount));
+			totalBudget += ctxAss.getIndexEntry().getScoreBudget();
+		}
+
+		final Double totalScore = ctxEsToScore.get(CTX_TO_SCORE_TOTAL);
+		if (totalBudget > 0 && studCount > 0 && totalScore != null) {
+			final double avgScore = totalScore / studCount;
+			final String score = f.format2(avgScore) + " of " + totalBudget + ": " + vt.niceRatio(f, avgScore / totalBudget, "");
+			indexData.add(new Object[]{
+					/* 0 index - */ indexData.size(),
+					/* 1 date millis - */ 0,
+					/* 2 date full - */ "",
+					/* 3 date nice 0*/ "",
+					/* 4 tType.id - */ "",
+					/* 5 tType.name 1 */ "",
+					/* 6 task.id ref - */ "",
+					/* 7 task.name ref 2 */ "",
+					/* 8 summary status sort - */ 0,
+					/* 9 summary status text - */ "",
+					/* 10 summary status text 3 */ "",
+					/* 11 summary due millis - */ 0,
+					/* 12 summary due full - */ "",
+					/* 13 summary due nice 4 */ "<b>Total:</b>",
+					/* 14 score sort */ 0,
+					/* 15 score nice 5 */ score,
+					/* 16 uploads ref 6 */ null,
+					/* 17 uploads-open ref 7 */ null,
+					/* 18 uploads-course ref 8 */ null,
+					/* 19 task-total sort - */ 1
+			});
 		}
 
 		return indexData;
@@ -454,7 +485,8 @@ public class Core {
 				/* 15 score nice 5 */ scoreNice,
 				/* 16 uploads ref 6 */ adm || classFrom.isStarted() ? uri.logPending(ctxAss.getEnr().getId(), ctxAss.getAss().getId()) : null,
 				/* 17 uploads-open ref 7 */ adm || classFrom.isStarted() ? uri.logOpen(ctxAss.getEnr().getId(), ctxAss.getAss().getId()) : null,
-				/* 18 uploads-course ref 8 */ adm || classFrom.isStarted() ? uri.logCourse(ctxAss.getEnr().getId(), ctxAss.getAss().getId()) : null
+				/* 18 uploads-course ref 8 */ adm || classFrom.isStarted() ? uri.logCourse(ctxAss.getEnr().getId(), ctxAss.getAss().getId()) : null,
+				/* 19 task-total sort - */ 0
 		};
 
 		return arr;
@@ -467,16 +499,16 @@ public class Core {
 	 * @param filter to filter tasks and/or students
 	 * @param adm whether this is an admin report or not
 	 * @param fileMetas to store per slot file meta listings
-	 * @param ctxEsToScore to store totals per task
-	 * @param ctxEsToSummary to handle open/pending/approved stats
+	 * @param ctxToScore to store totals per task
+	 * @param ctxToSummary to handle open/pending/approved stats
 	 *
 	 * @return number of students processed in this report
 	 */
 	public int tasksData(
 			Ctx ctxEnr, LogFilter filter, boolean adm,
 			Map<String, Map<String, List<Entry<FileMeta>>>> fileMetas,
-			Map<String, Double> ctxEsToScore,
-			Map<String, Summary> ctxEsToSummary
+			Map<String, Double> ctxToScore,
+			Map<String, Summary> ctxToSummary
 	) {
 		int students = 0;
 		if (adm) {
@@ -485,12 +517,12 @@ public class Core {
 					continue;
 				}
 				students += 1;
-				storeTasksData(ctxEnr.extendStudent(stud), filter, fileMetas, ctxEsToScore, ctxEsToSummary);
+				storeTasksData(ctxEnr.extendStudent(stud), filter, fileMetas, ctxToScore, ctxToSummary);
 			}
 		} else {
 			//	let's hope that student id is already present here...
 			students += 1;
-			storeTasksData(ctxEnr, filter, fileMetas, ctxEsToScore, ctxEsToSummary);
+			storeTasksData(ctxEnr, filter, fileMetas, ctxToScore, ctxToSummary);
 		}
 
 		return students;
@@ -499,19 +531,19 @@ public class Core {
 	protected void storeTasksData(
 			Ctx ctxStud, LogFilter filter,
 			Map<String, Map<String, List<Entry<FileMeta>>>> fileMetas,
-			Map<String, Double> ctxEsToScore,
-			Map<String, Summary> ctxEsToSummary
+			Map<String, Double> ctxToScore,
+			Map<String, Summary> ctxToSummary
 	) {
 		for (int i = 0; i < ctxStud.getEnr().getIndex().size(); i++) {
-			storeTaskData(ctxStud.extendIndex(i), filter, fileMetas, ctxEsToScore, ctxEsToSummary);
+			storeTaskData(ctxStud.extendIndex(i), filter, fileMetas, ctxToScore, ctxToSummary);
 		}
 	}
 
 	protected void storeTaskData(
 			Ctx ctxVer, LogFilter filter,
 			Map<String, Map<String, List<Entry<FileMeta>>>> fileMetas,
-			Map<String, Double> ctxEsToScore,
-			Map<String, Summary> ctxEsToSummary
+			Map<String, Double> ctxToScore,
+			Map<String, Summary> ctxToSummary
 	) {
 		final String assPath = ctxVer.toString();
 		final AssignmentType assType = ctxVer.getAssType();
@@ -536,7 +568,11 @@ public class Core {
 			if (bestFile != null) {
 				final Score score = bestFile.getMeta().getScore();
 
-				scoreForIdx = ctxVer.getIndexEntry().computePoints(score, slot);
+				if (score != null && Boolean.TRUE.equals(score.getApproved())) {
+					scoreForIdx = ctxVer.getIndexEntry().computePoints(score, slot);
+				} else {
+					scoreForIdx = 0;
+				}
 				sum = Summary.forScore(classDueStamp, score == null ? null : score.getApproved());
 			} else {
 				scoreForIdx = 0;
@@ -552,9 +588,11 @@ public class Core {
 				}
 			}
 
-			ctxEsToScore.put(ctxVer.toString(), scoreForIdx);
-			Summary.increment(ctxEsToScore, ctxVer.ei(), scoreForIdx);
-			Summary.increment(ctxEsToSummary, ctxVer.ei(), sum);
+			ctxToScore.put(ctxVer.toString(), scoreForIdx);
+			Summary.increment(ctxToScore, ctxVer.ei(), scoreForIdx);
+			Summary.increment(ctxToScore, ctxVer.es(), scoreForIdx);
+			Summary.increment(ctxToScore, CTX_TO_SCORE_TOTAL, scoreForIdx);
+			Summary.increment(ctxToSummary, ctxVer.ei(), sum);
 		}
 	}
 

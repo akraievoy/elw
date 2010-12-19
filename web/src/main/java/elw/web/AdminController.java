@@ -298,41 +298,25 @@ public class AdminController extends ControllerElw {
 		return new ModelAndView("a/enrolls", model);
 	}
 
-	@RequestMapping(value = "enroll", method = RequestMethod.GET)
-	public ModelAndView do_enroll(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		final HashMap<String, Object> model = auth(req, resp, "");
-		if (model == null) {
-			return null;
-		}
+	@RequestMapping(value = "summary", method = RequestMethod.GET)
+	public ModelAndView do_summary(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+		return wmECG(req, resp, "", new WebMethodCtx() {
+			@Override public ModelAndView handleCtx() throws IOException {
+				W.storeFilter(req, model);
+				W.filterDefault(model, "f_mode", "a");
+				final LogFilter filter = W.parseFilter(req);
 
-		final Ctx ctx = (Ctx) model.get(R_CTX);
-		if (!ctx.resolved(Ctx.STATE_ECG)) {
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Path problem, please check the logs");
-			return null;
-		}
+				final SortedMap<String, Map<String, List<Entry<FileMeta>>>> fileMetas = new TreeMap<String, Map<String, List<Entry<FileMeta>>>>();
+				final Map<String, Double> ctxToScore = new HashMap<String, Double>();
 
-		W.storeFilter(req, model);
-		W.filterDefault(model, "f_mode", "a");
-		final LogFilter filter = W.parseFilter(req);
+				core.tasksData(ctx, filter, true, fileMetas, ctxToScore, null);
 
-		final SortedMap<String, Map<String, List<Entry<FileMeta>>>> fileMetas = new TreeMap<String, Map<String, List<Entry<FileMeta>>>>();
-		final Map<String, Double> scores = new HashMap<String, Double>();
-		final Map<String, Double> scoresNorm = new HashMap<String, Double>();
+				model.put("fileMetas", fileMetas);
+				model.put("ctxToScore", ctxToScore);
 
-		for (Student stud : ctx.getGroup().getStudents()) {
-			if (W.excluded(model.get("f_studId"), stud.getId())) {
-				continue;
+				return new ModelAndView("a/summary", model);
 			}
-			final Ctx studCtx = ctx.extendStudent(stud);
-
-			core.tasksData(studCtx, filter, true, fileMetas, scores, new TreeMap<String, Summary>());
-		}
-
-		model.put("fileMetas", fileMetas);
-		model.put("scores", scores);
-		model.put("scoreNorm", scoresNorm);
-
-		return new ModelAndView("a/enroll", model);
+		});
 	}
 
 	@RequestMapping(value = "log", method = RequestMethod.GET)
