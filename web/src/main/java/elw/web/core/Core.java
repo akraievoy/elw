@@ -202,28 +202,21 @@ public class Core {
 				nameNorm = e.getMeta().getName();
 			}
 		}
-		final StringBuilder q = new StringBuilder(
-				uri.fileQuery(ctx, scope, slot.getId(), e == null ? null : e.getMeta())
-		);
 
-		final String dlRef;
-		if (e != null) {
-			dlRef = (adm ? "../s/" : "") + "dl/" + nameNorm + q;
-		} else {
-			dlRef = null;
-		}
-
-		//	FIXME proper UL ElwUri here
 		final String ulRef;
 		if (adm) {
 			if (!FileDao.SCOPE_STUD.equals(scope)) {
-				ulRef = "ul" + q;
+				ulRef = uri.upload(ctx, scope, slot.getId(), null);	//	FIXME context/scope here is not set properly
 			} else {
 				ulRef = null;
 			}
 		} else {
-			if (FileDao.SCOPE_STUD.equals(scope) && ctx.getVer().checkWrite(ctx.getAssType(), ctx.getAss(), slot.getId(), fileDao.loadFilesStud(ctx))) {
-				ulRef = "ul" + q;
+			if (
+					FileDao.SCOPE_STUD.equals(scope) &&
+					//	LATER rescope Ver.checkWrite() to Ctx?
+					ctx.getVer().checkWrite(ctx.getAssType(), ctx.getAss(), slot.getId(), fileDao.loadFilesStud(ctx))
+			) {
+				ulRef = uri.upload(ctx, scope, slot.getId(), null);
 			} else {
 				ulRef = null;
 			}
@@ -239,7 +232,6 @@ public class Core {
 		} else {
 			authorName = e.getMeta().getAuthor();
 		}
-
 
 		final VtTuple status = vt.status(f, mode, scope, ctx, slot, e);
 
@@ -272,8 +264,8 @@ public class Core {
 				/* 14 source ip */ e  == null ? "" : e.getMeta().getSourceAddress(),
 				/* 15 size bytes */ e  == null ? "" : e.computeSize(),
 				/* 16 size */ e  == null ? "" : f.formatSize(e.computeSize()),
-				/* 17 approve ref */ "approve" + q,
-				/* 18 dl ref */ dlRef,
+				/* 17 approve ref */ adm && FileDao.SCOPE_STUD.equals(scope) ? uri.approve(ctx, scope, slot.getId(), e) : null,
+				/* 18 dl ref */ uri.download(ctx, scope, slot.getId(), e),
 				/* 19 ul ref */ ulRef,
 				/* 20 comment ref */ adm ? null : "#"	//	TODO comment edit url/page/method
 		};

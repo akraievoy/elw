@@ -34,7 +34,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -53,8 +52,6 @@ public class StudentController extends ControllerElw {
 	protected final ScoreDao scoreDao;
 	protected final FileDao fileDao;
 	protected final AdminController adminController;
-
-	protected final long cacheBustingToken = System.currentTimeMillis();
 
 	public StudentController(
 			CourseDao courseDao, GroupDao groupDao, EnrollDao enrollDao,
@@ -216,18 +213,22 @@ public class StudentController extends ControllerElw {
 		}
 
 		final Ctx ctx = (Ctx) model.get(R_CTX);
-		final Enrollment[] enrollments = enrollDao.findEnrollmentsForGroupId(ctx.getGroup().getId());
-
-		final Map<String, Course> courses = new TreeMap<String, Course>();
-		for (Enrollment enrollment : enrollments) {
-			final String courseId = enrollment.getCourseId();
-			courses.put(courseId, courseDao.findCourse(courseId));
-		}
-
-		model.put("enrolls", enrollments);
-		model.put("courses", courses);
 
 		return new ModelAndView("s/index", model);
+	}
+
+	@RequestMapping(value = "rest/index", method = RequestMethod.GET)
+	public ModelAndView do_restIndex(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+		final HashMap<String, Object> model = auth(req, resp, null);
+		if (model == null) {
+			return null;
+		}
+
+		final Ctx ctx = (Ctx) model.get(R_CTX);
+		final Enrollment[] enrolls = enrollDao.findEnrollmentsForGroupId(ctx.getGroup().getId());
+		final List<Object[]> indexData = core.index(enrolls);
+
+		return new ModelAndView(ViewJackson.success(indexData));
 	}
 
 	@RequestMapping(value = "tasks", method = RequestMethod.GET)
@@ -251,46 +252,6 @@ public class StudentController extends ControllerElw {
 				return new ModelAndView(ViewJackson.success(logData));
 			}
 		});
-	}
-
-	@RequestMapping(value = "ul", method = {RequestMethod.GET})
-	public ModelAndView do_ul(final HttpServletRequest req, final HttpServletResponse resp) throws IOException, FileUploadException {
-		return wmFile(req, resp, "", FileDao.SCOPE_STUD, new WebMethodFile() {
-			@Override
-			protected ModelAndView handleFile(String scope, FileSlot slot) throws IOException {
-				model.put("slot", slot);
-				return new ModelAndView("s/ul", model); 
-			}
-		});
-	}
-
-	@RequestMapping(value = "ul", method = {RequestMethod.POST, RequestMethod.PUT})
-	public ModelAndView do_ulPost(final HttpServletRequest req, final HttpServletResponse resp) throws IOException, FileUploadException {
-		final HashMap<String, Object> model = auth(req, resp, "");
-		if (model == null) {
-			return null;
-		}
-
-		final Ctx ctx = (Ctx) model.get(R_CTX);
-		final String refreshUri = core.getUri().logPendingEAV(ctx);
-		return adminController.processUpload(
-				req, resp, FileDao.SCOPE_STUD,
-				model, refreshUri, ctx.getStudent().getName()
-		);
-	}
-
-	@RequestMapping(value = "rest/index", method = RequestMethod.GET)
-	public ModelAndView do_restIndex(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		final HashMap<String, Object> model = auth(req, resp, null);
-		if (model == null) {
-			return null;
-		}
-
-		final Ctx ctx = (Ctx) model.get(R_CTX);
-		final Enrollment[] enrolls = enrollDao.findEnrollmentsForGroupId(ctx.getGroup().getId());
-		final List<Object[]> indexData = core.index(enrolls);
-
-		return new ModelAndView(ViewJackson.success(indexData));
 	}
 
 	@RequestMapping(value = "log", method = RequestMethod.GET)
@@ -333,9 +294,9 @@ public class StudentController extends ControllerElw {
 		return new ModelAndView(ViewJackson.success(logData));
 	}
 
-	@RequestMapping(value = "dl/*.*", method = RequestMethod.GET)
-	public ModelAndView do_dl(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		final HashMap<String, Object> model = auth(req, resp, "../");
+	@RequestMapping(value = "list", method = RequestMethod.GET)
+	public ModelAndView do_list(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+		final HashMap<String, Object> model = auth(req, resp, "");
 		if (model == null) {
 			return null;
 		}
@@ -346,78 +307,53 @@ public class StudentController extends ControllerElw {
 			return null;
 		}
 
-		final String scope = req.getParameter("s");
-		if (scope == null || scope.trim().length() == 0) {
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "no scope (s) defined");
-			return null;
-		}
+		final Map<String, Map<String, String[]>> slotToScopeToFileId =
+				new HashMap<String, Map<String, String[]>>();
 
-		final String slotId = req.getParameter("sId");
-		if (slotId == null || slotId.trim().length() == 0) {
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "no slotId (sId) defined");
-			return null;
-		}
+		for (FileSlot slot : ctx.getAssType().getFileSlots()) {
+			final HashMap<String, String[]> scopeToFileId = new HashMap<String, String[]>();
+			slotToScopeToFileId.put(slot.getId(), scopeToFileId);
 
-		final String fileId = req.getParameter("fId");
-		if (fileId == null || fileId.trim().length() == 0) {
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "no fileId (fId) defined");
-			return null;
-		}
+			for (String scope : FileDao.SCOPES) {
+				final Entry<FileMeta>[] fileEntries = fileDao.findFilesFor(scope, ctx, slot.getId());
+				final String[] fileIds = new String[fileEntries.length];
 
-		final Entry<FileMeta> entry = fileDao.findFileFor(scope, ctx, slotId, fileId);
-		if (entry == null) {
-			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "no file found");
-			return null;
-		}
-
-		final SortedMap<String, List<Entry<FileMeta>>> filesStud = fileDao.loadFilesStud(ctx);
-		if (slotId != null && !ctx.getVer().checkRead(ctx.getAssType(), ctx.getAss(), slotId, filesStud)) {
-			resp.sendError(HttpServletResponse.SC_FORBIDDEN, "not readable yet");
-			return null;
-		}
-
-		boolean binary;
-		if (slotId != null) {
-			binary = ctx.getAssType().findSlotById(slotId).isBinary();
-		} else {
-			binary = entry.getFileBinary() != null;
-		}
-
-		try {
-			if (binary) {
-				resp.setContentType(entry.getMeta().getContentType());
-				resp.setContentLength((int) (binary ? entry.getFileBinary() : entry.getFileText()).length());
-				resp.setHeader("Content-Disposition", "attachment;");
-
-				final BufferedInputStream bis = entry.openBinaryStream();
-				final ServletOutputStream os = resp.getOutputStream();
-
-				final byte[] buf = new byte[32768];
-				int numRead;
-				while ((numRead = bis.read(buf, 0, buf.length)) > 0) {
-					os.write(buf, 0, numRead);
+				for (int i = 0, filesLength = fileEntries.length; i < filesLength; i++) {
+					fileIds[i] = fileEntries[i].getMeta().getId();
 				}
-			} else {
-				resp.setCharacterEncoding("UTF-8");
-				resp.setContentType(entry.getMeta().getContentType()+ "; charset=UTF-8");
-				resp.setContentLength((int) (binary ? entry.getFileBinary() : entry.getFileText()).length());
-				resp.setHeader("Content-Disposition", "attachment;");
 
-				//	copy the data with the original line breaks (we've set the content-length header)
-				final BufferedReader reader = entry.openTextReader();
-				final PrintWriter writer = resp.getWriter();
-
-				final char[] buf = new char[16384];
-				int numRead;
-				while ((numRead = reader.read(buf, 0, buf.length)) > 0) {
-					writer.write(buf, 0, numRead);
-				}
+				scopeToFileId.put(scope, fileIds);
 			}
-		} finally {
-			entry.closeStreams();
 		}
+		return new ModelAndView(ViewJackson.success(slotToScopeToFileId));
+	}
 
-		return null;
+	@RequestMapping(value = "dl/*.*", method = RequestMethod.GET)
+	public ModelAndView do_dl(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+		return wmFile(req, resp, "../", null, new WebMethodFile() {
+			@Override
+			protected ModelAndView handleFile(String scope, FileSlot slot) throws IOException {
+				if (accessDenied(resp, ctx, scope, slot, false)) {
+					return null;
+				}
+
+				final String fileId = req.getParameter("fId");
+				if (fileId == null || fileId.trim().length() == 0) {
+					resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "no fileId (fId) defined");
+					return null;
+				}
+
+				final Entry<FileMeta> entry = fileDao.findFileFor(scope, ctx, slot.getId(), fileId);
+				if (entry == null) {
+					resp.sendError(HttpServletResponse.SC_NOT_FOUND, "no file found");
+					return null;
+				}
+
+				retrieveFile(slot, entry);
+
+				return null;
+			}
+		});
 	}
 
 	@RequestMapping(value = "edit", method = RequestMethod.GET)
@@ -425,9 +361,7 @@ public class StudentController extends ControllerElw {
 		return wmFile(req, resp, "", FileDao.SCOPE_STUD, new WebMethodFile() {
 			@Override
 			protected ModelAndView handleFile(String scope, FileSlot slot) throws IOException {
-				final SortedMap<String, List<Entry<FileMeta>>> filesStud = fileDao.loadFilesStud(ctx);
-				if (!ctx.getVer().checkRead(ctx.getAssType(), ctx.getAss(), slot.getId(), filesStud)) {
-					resp.sendError(HttpServletResponse.SC_FORBIDDEN, "not readable yet");
+				if (accessDenied(resp, ctx, scope, slot, true)) {
 					return null;
 				}
 
@@ -462,37 +396,53 @@ public class StudentController extends ControllerElw {
 		});
 	}
 
-	@RequestMapping(value = "list", method = RequestMethod.GET)
-	public ModelAndView do_list(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		final HashMap<String, Object> model = auth(req, resp, "");
-		if (model == null) {
-			return null;
-		}
+	@RequestMapping(value = "ul", method = {RequestMethod.GET})
+	public ModelAndView do_ul(final HttpServletRequest req, final HttpServletResponse resp) throws IOException, FileUploadException {
+		return wmFile(req, resp, "", FileDao.SCOPE_STUD, new WebMethodFile() {
+			@Override
+			protected ModelAndView handleFile(String scope, FileSlot slot) throws IOException {
+				model.put("slot", slot);
+				return new ModelAndView("s/ul", model);
+			}
+		});
+	}
 
-		final Ctx ctx = (Ctx) model.get(R_CTX);
-		if (!ctx.resolved(Ctx.STATE_EGSCIV)) {
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "context path problem, please check the logs");
-			return null;
-		}
+	@RequestMapping(value = "ul", method = {RequestMethod.POST, RequestMethod.PUT})
+	public ModelAndView do_ulPost(final HttpServletRequest req, final HttpServletResponse resp) throws IOException, FileUploadException {
+		return wmFile(req, resp, "", FileDao.SCOPE_STUD, new WebMethodFile() {
+			@Override
+			protected ModelAndView handleFile(String scope, FileSlot slot) throws IOException {
+				final String refreshUri = core.getUri().logPendingEAV(ctx);
 
-		final Map<String, Map<String, String[]>> slotToScopeToFileId =
-				new HashMap<String, Map<String, String[]>>();
-
-		for (FileSlot slot : ctx.getAssType().getFileSlots()) {
-			final HashMap<String, String[]> scopeToFileId = new HashMap<String, String[]>();
-			slotToScopeToFileId.put(slot.getId(), scopeToFileId);
-
-			for (String scope : FileDao.SCOPES) {
-				final Entry<FileMeta>[] fileEntries = fileDao.findFilesFor(scope, ctx, slot.getId());
-				final String[] fileIds = new String[fileEntries.length];
-
-				for (int i = 0, filesLength = fileEntries.length; i < filesLength; i++) {
-					fileIds[i] = fileEntries[i].getMeta().getId();
+				if (accessDenied(resp, ctx, scope, slot, true)) {
+					return null;
 				}
 
-				scopeToFileId.put(scope, fileIds);
+				return storeFile(scope, slot, refreshUri, ctx.getStudent().getName(), core.getFileDao());
+			}
+		});
+	}
+
+	protected boolean accessDenied(
+			HttpServletResponse resp, Ctx ctx, String scope, FileSlot slot, boolean checkWrite
+	) throws IOException {
+		if (!ctx.cFrom().isStarted()) {
+			resp.sendError(HttpServletResponse.SC_FORBIDDEN, "task not yet open");
+			return true;
+		}
+
+		if (FileDao.SCOPE_STUD.equals(scope)) {
+			final SortedMap<String, List<Entry<FileMeta>>> filesStud = fileDao.loadFilesStud(ctx);
+			if (!ctx.getVer().checkRead(ctx.getAssType(), ctx.getAss(), slot.getId(), filesStud)) {
+				resp.sendError(HttpServletResponse.SC_FORBIDDEN, "not readable yet");
+				return true;
+			}
+			if (checkWrite && !ctx.getVer().checkWrite(ctx.getAssType(), ctx.getAss(), slot.getId(), filesStud)) {
+				resp.sendError(HttpServletResponse.SC_FORBIDDEN, "not writable yet");
+				return true;
 			}
 		}
-		return new ModelAndView(ViewJackson.success(slotToScopeToFileId));
+
+		return false;
 	}
 }

@@ -63,11 +63,6 @@ public class AdminController extends ControllerElw {
 	protected final AdminDao adminDao;
 	protected final SortedSet<String> validNonces = new TreeSet<String>();
 
-	protected final ObjectMapper mapper = new ObjectMapper();
-	protected final long cacheBustingToken = System.currentTimeMillis();
-
-	protected final DiskFileItemFactory fileItemFactory;
-
 	public AdminController(
 			CourseDao courseDao, EnrollDao enrollDao, GroupDao groupDao, ScoreDao scoreDao, FileDao fileDao,
 			AdminDao adminDao,
@@ -82,10 +77,6 @@ public class AdminController extends ControllerElw {
 		this.fileDao = fileDao;
 
 		this.adminDao = adminDao;
-
-		fileItemFactory = new DiskFileItemFactory();
-		fileItemFactory.setRepository(new java.io.File(System.getProperty("java.io.tmpdir")));
-		fileItemFactory.setSizeThreshold(2 * 1024 * 1024);
 	}
 
 	protected HashMap<String, Object> auth(final HttpServletRequest req, final HttpServletResponse resp, final String pathToRoot) throws IOException {
@@ -386,164 +377,52 @@ public class AdminController extends ControllerElw {
 		return new ModelAndView("a/groups", model);
 	}
 
-	@RequestMapping(value = "ul", method = RequestMethod.POST)
+	@RequestMapping(value = "ul", method = {RequestMethod.GET})
 	public ModelAndView do_ul(final HttpServletRequest req, final HttpServletResponse resp) throws IOException, FileUploadException {
-		final HashMap<String, Object> model = auth(req, resp, "");
-		if (model == null) {
-			return null;
-		}
-
-		final Ctx ctx = (Ctx) model.get(R_CTX);
-		final String refreshUri = "course?" + WebSymbols.R_CTX + "=" + Ctx.forCourse(ctx.getCourse()).toString();
-
-		return processUpload(req, resp, null, model, refreshUri, "akraievoy");
+		return wmFile(req, resp, "", null, new WebMethodFile() {
+			@Override
+			protected ModelAndView handleFile(String scope, FileSlot slot) throws IOException {
+				model.put("slot", slot);
+				return new ModelAndView("a/ul", model);
+			}
+		});
 	}
 
-	public ModelAndView processUpload(
-			HttpServletRequest req, HttpServletResponse resp, String scopeForced,
-			HashMap<String, Object> model, String refreshUri, String authorName
-	) throws IOException, FileUploadException {
-		final String scope = scopeForced == null ? req.getParameter("s") : scopeForced;
-		if (scope == null) {
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "scope not set");
-			return null;
-		}
+	@RequestMapping(value = "ul", method = RequestMethod.POST)
+	public ModelAndView do_ulPost(final HttpServletRequest req, final HttpServletResponse resp) throws IOException, FileUploadException {
+		return wmFile(req, resp, "", null, new WebMethodFile() {
+			@Override
+			protected ModelAndView handleFile(String scope, FileSlot slot) throws IOException {
+				final String refreshUri = core.getUri().logCourseE(ctx.getEnr().getId());
+				final String authorName = ((Admin)model.get(S_ADMIN)).getName();
 
-		final Ctx ctx = (Ctx) model.get(R_CTX);
-		if (
-				FileDao.SCOPE_ASS_TYPE.equals(scope) && !ctx.resolved(Ctx.STATE_CT) ||
-				FileDao.SCOPE_ASS.equals(scope) && !ctx.resolved(Ctx.STATE_CTA) ||
-				FileDao.SCOPE_VER.equals(scope) && !ctx.resolved(Ctx.STATE_CTAV) ||
-				FileDao.SCOPE_STUD.equals(scope) && !ctx.resolved(Ctx.STATE_EGSCIV)
-		) {
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "context path problem, please check the logs");
-			return null;
-		}
-
-		final String slotId = req.getParameter("sId");
-		if ((slotId == null || slotId.trim().length() == 0)) {
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "no slotId (sId) defined");
-			return null;
-		}
-
-		final FileSlot slot = ctx.getAssType().findSlotById(slotId);
-		if (slot == null) {
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "slot '" + slotId + "' not found");
-			return null;
-		}
-
-		final boolean put = "PUT".equalsIgnoreCase(req.getMethod());
-		if (req.getContentLength() == -1) {
-			if (!put) {
-				Message.addWarn(req, "upload size not reported");
-				resp.sendRedirect(refreshUri);
-			} else {
-				resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "upload size not reported");
+				return storeFile(scope, slot, refreshUri, authorName, core.getFileDao());
 			}
-			return null;
-		}
-
-		if (req.getContentLength() > slot.getLengthLimit()) {
-			final String message = "upload exceeds " + G4mat.formatMem(slot.getLengthLimit());
-			if (!put) {
-				Message.addWarn(req, message);
-				resp.sendRedirect(refreshUri);
-			} else {
-				resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
-			}
-			return null;
-		}
-
-		final boolean binary = slot.isBinary() ;
-		if (put) {
-			//	LATER add some sensible defaults to the FileSlot entity
-			final String name = "upload" + (binary ? ".bin" : ".txt");
-			final FileMeta fileMeta = new FileMeta(
-					name,
-					name,
-					binary ? "application/octet-stream" : "text/plain",
-					authorName,
-					W.resolveRemoteAddress(req)
-			);
-
-			fileDao.createFileFor(
-					scope,
-					ctx,
-					slot.getId(),
-					fileMeta,
-					binary ? new BufferedInputStream(req.getInputStream()) : null,
-					binary ? null : new BufferedReader(new InputStreamReader(req.getInputStream(), "UTF-8"))
-			);
-
-			return null;
-		}
-
-		final ServletFileUpload sfu = new ServletFileUpload(fileItemFactory);
-		final FileItemIterator fii = sfu.getItemIterator(req);
-		int fileCount = 0;
-		String comment = null;
-		while (fii.hasNext()) {
-			final FileItemStream item = fii.next();
-			if (item.isFormField()) {
-				if ("comment".equals(item.getFieldName())) {
-					comment = G4Io.dumpToString(item.openStream());
-				}
-				if ("expandTriggers".equals(item.getFieldName())) {	//	FIXME review
-					req.getSession().setAttribute("course.expandTriggers", G4Io.dumpToString(item.openStream()));
-				}
-				continue;
-			}
-
-			if (fileCount > 0) {
-				Message.addWarn(req, "one file per upload, please");
-				resp.sendRedirect(refreshUri);
-				return null;
-			}
-
-			final String fName = FileMeta.extractNameFromPath(item.getName());
-			if (!Pattern.compile(slot.getNameRegex()).matcher(fName.toLowerCase()).matches()) {
-				Message.addWarn(req, "check the file name: regex check failed");
-				resp.sendRedirect(refreshUri);
-				return null;
-			}
-
-			final String contentType = item.getContentType();
-			if (G4Str.indexOf(contentType, slot.getContentTypes()) < 0) {
-				Message.addWarn(req, "contentType '" + contentType + "': not listed in the slot");
-			}
-
-			final FileMeta fileMeta = new FileMeta(
-					fName,
-					fName,
-					contentType,
-					authorName,
-					W.resolveRemoteAddress(req)
-			);
-			if (comment != null) {
-				fileMeta.setComment(comment);
-			}
-
-			fileDao.createFileFor(
-					scope,
-					ctx,
-					slot.getId(),
-					fileMeta,
-					binary ? new BufferedInputStream(item.openStream()) : null,
-					binary ? null : new BufferedReader(new InputStreamReader(item.openStream(), "UTF-8"))
-			);
-			fileCount++;
-		}
-
-		if (fileCount == 1) {
-			Message.addInfo(req, "Your upload has succeeded");
-			resp.sendRedirect(refreshUri);
-		} else {
-			Message.addWarn(req, "Multiple uploads not allowed");
-			resp.sendRedirect(refreshUri);
-		}
-
-		return null;
+		});
 	}
 
+	@RequestMapping(value = "dl/*.*", method = RequestMethod.GET)
+	public ModelAndView do_dl(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+		return wmFile(req, resp, "../", null, new WebMethodFile() {
+			@Override
+			protected ModelAndView handleFile(String scope, FileSlot slot) throws IOException {
+				final String fileId = req.getParameter("fId");
+				if (fileId == null || fileId.trim().length() == 0) {
+					resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "no fileId (fId) defined");
+					return null;
+				}
+
+				final Entry<FileMeta> entry = fileDao.findFileFor(scope, ctx, slot.getId(), fileId);
+				if (entry == null) {
+					resp.sendError(HttpServletResponse.SC_NOT_FOUND, "no file found");
+					return null;
+				}
+
+				retrieveFile(slot, entry);
+
+				return null;
+			}
+		});
+	}
 }
 

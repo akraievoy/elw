@@ -19,6 +19,7 @@
 package elw.web;
 
 import elw.dao.Ctx;
+import elw.vo.Entry;
 import elw.vo.FileMeta;
 
 public class ElwUri {
@@ -75,5 +76,23 @@ public class ElwUri {
 			return xferQuery + "&fId=" + file.getId();
 		}
 		return xferQuery;
+	}
+
+	public String upload(final Ctx ctx, final String scope, final String slotId, Entry<FileMeta> e) {
+		return "ul" + fileQuery(ctx, scope, slotId, e == null ? null : e.getMeta());
+	}
+
+	public String download(final Ctx ctx, final String scope, final String slotId, Entry<FileMeta> e) {
+		if (e == null) {
+			return null;
+		}
+		return "dl" + fileQuery(ctx, scope, slotId, e == null ? null : e.getMeta());
+	}
+
+	public String approve(final Ctx ctx, final String scope, final String slotId, Entry<FileMeta> e) {
+		if (e == null) {
+			return null;
+		}
+		return "approve" + fileQuery(ctx, scope, slotId, e.getMeta());
 	}
 }
