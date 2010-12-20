@@ -82,11 +82,13 @@ public class ElwUri {
 		return "ul" + fileQuery(ctx, scope, slotId, e == null ? null : e.getMeta());
 	}
 
-	public String download(final Ctx ctx, final String scope, final String slotId, Entry<FileMeta> e) {
+	public String download(final Ctx ctx, final String scope, final String slotId, Entry<FileMeta> e, String nameNorm) {
 		if (e == null) {
 			return null;
 		}
-		return "dl" + fileQuery(ctx, scope, slotId, e == null ? null : e.getMeta());
+
+		final String name = nameNorm == null ? e.getMeta().getName() : nameNorm;
+		return "dl/" + name + fileQuery(ctx, scope, slotId, e.getMeta());
 	}
 
 	public String approve(final Ctx ctx, final String scope, final String slotId, Entry<FileMeta> e) {
@@ -94,5 +96,9 @@ public class ElwUri {
 			return null;
 		}
 		return "approve" + fileQuery(ctx, scope, slotId, e.getMeta());
+	}
+
+	public String edit(final Ctx ctxVer, final String scope, final String slotId, final String fileId) {
+		return "edit?elw_ctx=" + ctxVer.toString() + "&s=" + scope + "&sId=" + slotId + "&fId" + fileId;
 	}
 }

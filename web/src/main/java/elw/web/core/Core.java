@@ -203,6 +203,10 @@ public class Core {
 			}
 		}
 
+		final boolean studEditable =
+				FileDao.SCOPE_STUD.equals(scope) &&
+				ctx.getVer().checkWrite(ctx.getAssType(), ctx.getAss(), slot.getId(), fileDao.loadFilesStud(ctx));
+
 		final String ulRef;
 		if (adm) {
 			if (!FileDao.SCOPE_STUD.equals(scope)) {
@@ -211,17 +215,19 @@ public class Core {
 				ulRef = null;
 			}
 		} else {
-			if (
-					FileDao.SCOPE_STUD.equals(scope) &&
-					//	LATER rescope Ver.checkWrite() to Ctx?
-					ctx.getVer().checkWrite(ctx.getAssType(), ctx.getAss(), slot.getId(), fileDao.loadFilesStud(ctx))
-			) {
+			if (studEditable) {
 				ulRef = uri.upload(ctx, scope, slot.getId(), null);
 			} else {
 				ulRef = null;
 			}
 		}
 
+		String editRef = null;
+		if (slot.getEditor() != null && slot.getEditor().trim().length() > 0) {
+			if (adm || studEditable) {
+				editRef = uri.edit(ctx, scope, slot.getId(), e == null ? null : e.getMeta().getId());
+			}
+		}
 		final String authorName;
 		if (e == null) {
 			if (FileDao.SCOPE_STUD.equalsIgnoreCase(scope)) {
@@ -265,9 +271,10 @@ public class Core {
 				/* 15 size bytes */ e  == null ? "" : e.computeSize(),
 				/* 16 size */ e  == null ? "" : f.formatSize(e.computeSize()),
 				/* 17 approve ref */ adm && FileDao.SCOPE_STUD.equals(scope) ? uri.approve(ctx, scope, slot.getId(), e) : null,
-				/* 18 dl ref */ uri.download(ctx, scope, slot.getId(), e),
+				/* 18 dl ref */ uri.download(ctx, scope, slot.getId(), e, nameNorm),
 				/* 19 ul ref */ ulRef,
-				/* 20 comment ref */ adm ? null : "#"	//	TODO comment edit url/page/method
+				/* 20 edit ref */ editRef,
+				/* 21 comment ref */ adm ? null : "#"	//	TODO comment edit url/page/method
 		};
 		return dataRow;
 	}

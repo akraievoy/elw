@@ -59,7 +59,8 @@
      #end
     #* 18 dl ref *# {'sTitle': '<span title="Download">DL</span>', "sWidth": "1em", "bSortable": false, "sClass": "text_align_center", "fnRender": elw_dt_url(18, 'DL') },
     #* 19 ul ref *# {'sTitle': '<span title="Upload">UL</span>', "sWidth": "1em", "bSortable": false, "sClass": "text_align_center", "fnRender": elw_dt_url(19, 'UL') },
-    #* 20 comment ref *# {'sTitle': '<span title="Edit Comment">EC</span>', "sWidth": "1em", "bSortable": false, "sClass": "text_align_center", "fnRender": elw_dt_url(20, 'EC') }
+    #* 20 edit ref *# {'sTitle': '<span title="Edit">E</span>', "sWidth": "1em", "bSortable": false, "sClass": "text_align_center", "fnRender": elw_dt_url(20, 'E') },
+    #* 21 comment ref *# {'sTitle': '<span title="Edit Comment">EC</span>', "sWidth": "1em", "bSortable": false, "sClass": "text_align_center", "fnRender": elw_dt_url(21, 'EC') }
    ],
    "aaSorting": [ [3,'asc'] ],
    "aaSortingFixed": [ ],
