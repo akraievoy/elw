@@ -654,11 +654,11 @@ public class Core {
 					if (uploads != null && uploads.length > 0) {
 						for (int i = uploads.length - 1; i >= 0; i--) {
 							final FileMeta f = uploads[i].getMeta();
-							if (since != null && f.getCreateStamp().compareTo(since) < 0) {
+							if (since != null && f.getCreateStamp().compareTo(since) <= 0) {
 								break;	//	oh this is overly stale
 							}
 
-							if (f.getScore() == null) {
+							if (f.getScore() == null || f.getScore().getApproved() == null) {
 								if ((epF == null || epF.getCreateStamp().getTime() > f.getCreateStamp().getTime())) {
 									epF = f;
 									epCtx = ctxVer;
@@ -677,7 +677,7 @@ public class Core {
 		if (epCtx != null) {
 			forward = "approve?elw_ctx=" + epCtx.toString() + "&sId=" + slot.getId() + "&fId=" + epF.getId();
 		} else {
-			forward = "log?elw_ctx=" + ctxEnr.toString() + "&f_slot=" + slot.getId();
+			forward = "log?elw_ctx=" + ctxEnr.toString() + "&f_slot=" + slot.getId() + "&f_scope=s--p--";
 		}
 		return forward;
 	}
