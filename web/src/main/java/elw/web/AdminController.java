@@ -227,7 +227,7 @@ public class AdminController extends ControllerElw {
 
 	@RequestMapping(value = "log", method = RequestMethod.GET)
 	public ModelAndView do_log(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		return wmECG(req, resp, null, new WebMethodCtx() {
+		return wmECG(req, resp, "", new WebMethodCtx() {
 			public ModelAndView handleCtx() throws IOException {
 				W.storeFilter(req, model);
 				return new ModelAndView("a/log", model);

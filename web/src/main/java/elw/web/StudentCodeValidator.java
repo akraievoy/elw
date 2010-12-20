@@ -18,14 +18,17 @@
 
 package elw.web;
 
+import base.pattern.Result;
 import elw.dao.*;
 import elw.dp.mips.MipsValidator;
+import elw.dp.mips.TaskBean;
 import elw.vo.*;
 import org.akraievoy.gear.G4Run;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -77,52 +80,61 @@ public class StudentCodeValidator extends G4Run.Task {
 				ctxEnr = Ctx.forEnr(enr).extendCourse(course).extendGroup(group);
 			}
 
+			if (!ctxEnr.getCourse().getId().contains("aos")) {
+				continue;
+			}
+
 			final Student[] students = ctxEnr.getGroup().getStudents();
 			for (Student student : students) {
 				final Ctx ctxStud = ctxEnr.extendStudent(student);
 				for (int index = 0; index < enr.getIndex().size(); index++) {
 					final Ctx ctxVer = ctxStud.extendIndex(index);
-					final Map<Stamp, Entry<CodeMeta>> metas = /*codeDao.findAllMetas(ctxVer)*/ Collections.emptyMap();
-					final Set<Stamp> stamps = metas.keySet();
-					for (Stamp stamp : stamps) {
-						final Entry<CodeMeta> entry = metas.get(stamp);
-						final CodeMeta meta = entry.getMeta();
-						boolean update = false;
-						final CodeMeta metaSafe;
-						if (meta == null) {	//	FIXME now meta should be always defined!
-							metaSafe = new CodeMeta();
-							metaSafe.setUpdateStamp(stamp);
-							update = true;
-						} else {
-							metaSafe = meta;
+					if (!"lr".equals(ctxVer.getAssType().getId())) {
+						continue;
+					}
+
+					final String slotId = "code";
+					final Entry<FileMeta>[] files = fileDao.findFilesFor(FileDao.SCOPE_STUD, ctxVer, slotId);
+					for (Entry<FileMeta> f : files) {
+						if (f.getMeta().getValidatorStamp() > 0 && f.getMeta().getScore() != null) {
+							continue;
 						}
 
-						if (metaSafe.getValidatorStamp() <= 0) {
-							update = true;
-/*
-							try {
-								final Result[] resRef = {new Result("unknown", false)};
-								final int[] passFailCounts = new int[2];
-								validator.batch(resRef, ctxVer.getVer(), entry.dumpText(), passFailCounts);
-								metaSafe.setTestsFailed(passFailCounts[1]);
-								metaSafe.setTestsPassed(passFailCounts[0]);
-							} catch (Throwable t) {
-								log.warn("exception while validating {} / {}", ctxVer, stamp);
-							} finally {
-								metaSafe.setValidatorStamp(System.currentTimeMillis());
-								entry.closeStreams();
+						Score score = null;
+						try {
+							final Result[] resRef = {new Result("unknown", false)};
+							final int[] passFailCounts = new int[2];
+							final Entry<FileMeta>[] allStatements = fileDao.findFilesFor(FileDao.SCOPE_VER, ctxVer, "statement");
+							final Entry<FileMeta>[] allTests = fileDao.findFilesFor(FileDao.SCOPE_VER, ctxVer, "test");
+							final String[] allTestsStr = new String[allTests.length];
+							for (int i = 0; i < allTestsStr.length; i++) {
+								allTestsStr[i] = allTests[i].getText();
 							}
-*/
+							final TaskBean taskBean = new TaskBean(
+									allStatements[allStatements.length - 1].getText(),
+									Arrays.asList(allTestsStr),
+									""
+							);
+							validator.batch(resRef, taskBean, f.getText().split("\r\n|\r|\n"), passFailCounts);
+							f.getMeta().setTestsFailed(passFailCounts[1]);
+							f.getMeta().setTestsPassed(passFailCounts[0]);
+
+							score = ScoreDao.updateAutos(ctxVer, slotId, f, null);
+							score.setApproved(passFailCounts[1] == 0 && passFailCounts[0] > 0);
+						} catch (Throwable t) {
+							log.warn("exception while validating {} / {}", ctxVer, f.getMeta().getCreateStamp());
+						} finally {
+							f.getMeta().setValidatorStamp(System.currentTimeMillis());
+							f.closeStreams();
 						}
 
-						if (update) {
-/*
+						if (score != null) {
 							try {
-								codeDao.updateMeta(ctxVer, stamp, metaSafe);
+								fileDao.update(new Path(f.getMeta().getPath()), f.getMeta(), null, null);
+								scoreDao.createScore(ctxVer, slotId, f.getMeta().getId(), score);
 							} catch (IOException t) {
-								log.warn("exception while storing update {} / {}", ctxVer, stamp);
+								log.warn("exception while storing update {} / {}", ctxVer, f.getMeta().getCreateStamp());
 							}
-*/
 						}
 					}
 				}
