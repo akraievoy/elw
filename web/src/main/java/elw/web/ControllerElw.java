@@ -163,4 +163,79 @@ public abstract class ControllerElw extends MultiActionController implements Web
 		wm.init(req, resp, ctx, model);
 		return wm.handleCtx();
 	}
+
+
+	protected ModelAndView wmFile(
+			HttpServletRequest req, HttpServletResponse resp, final String pathToRoot,
+			final String scopeForced, final WebMethodFile wm
+	) throws IOException {
+		final HashMap<String, Object> model = auth(req, resp, pathToRoot);
+		if (model == null) {
+			return null;
+		}
+
+		final Ctx ctx = (Ctx) model.get(R_CTX);
+
+		wm.init(req, resp, ctx, model);
+		wm.setScopeForced(scopeForced);
+
+		return wm.handleCtx();
+	}
+
+	protected static abstract class WebMethodFile extends WebMethodCtx {
+		protected String scopeForced = null;
+
+		public void setScopeForced(String scopeForced) {
+			this.scopeForced = scopeForced;
+		}
+
+		public ModelAndView handleCtx() throws IOException {
+			final String scope = scopeForced == null ? req.getParameter("s") : scopeForced;
+			if (scope == null) {
+				resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "scope not set");
+				return null;
+			}
+
+			if (FileDao.SCOPE_ASS_TYPE.equals(scope)) {
+				if (!ctx.resolved(Ctx.STATE_CT)) {
+					resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "context path problem, please check the logs");
+					return null;
+				}
+			} else if (FileDao.SCOPE_ASS.equals(scope)) {
+				if (!ctx.resolved(Ctx.STATE_CTA)) {
+					resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "context path problem, please check the logs");
+					return null;
+				}
+			} else if (FileDao.SCOPE_VER.equals(scope)) {
+				if (!ctx.resolved(Ctx.STATE_CTAV)) {
+					resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "context path problem, please check the logs");
+					return null;
+				}
+			} else if (FileDao.SCOPE_STUD.equals(scope)) {
+				if (!ctx.resolved(Ctx.STATE_EGSCIV)) {
+					resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "context path problem, please check the logs");
+					return null;
+				}
+			} else {
+				resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "bad scope: " + scope);
+				return null;
+			}
+
+			final String slotId = req.getParameter("sId");
+			if (slotId == null || slotId.trim().length() == 0) {
+				resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "no slotId (sId) defined");
+				return null;
+			}
+
+			final FileSlot slot = ctx.getAssType().findSlotById(slotId);
+			if (slot == null) {
+				resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "slot '" + slotId + "' not found");
+				return null;
+			}
+
+			return handleFile(scope, slot);
+		}
+
+		protected abstract ModelAndView handleFile(String scope, FileSlot slot) throws IOException;
+	}
 }

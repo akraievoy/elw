@@ -2,12 +2,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta content="text/html; charset=UTF-8">
-	<title>My Courses</title>
+	<title>Index</title>
  #parse("/__/imports.vm")
 </head>
 <body>
 <div class="ui-widget-header ui-corner-all" id="elw_header">
-	<div id="nav"><span style="font-weight: bold">My Courses</span></div>
+	<div id="nav"><span style="font-weight: bold">Index</span></div>
  #parse("/__/credStud.vm")
 	<div id="header_hr"> </div>
 </div>

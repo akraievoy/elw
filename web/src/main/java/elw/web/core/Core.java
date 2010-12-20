@@ -193,7 +193,7 @@ public class Core {
 		if (e == null) {
 			nameNorm = "";
 		} else {
-			if (FileDao.SCOPE_STUD.equalsIgnoreCase(scope)) {
+			if (adm && FileDao.SCOPE_STUD.equalsIgnoreCase(scope)) {
 				nameNorm = iEntry.normName(
 						ctx.getEnr(), ctx.getStudent(), ctx.getAss(),
 						ctx.getVer(), slot, e.getMeta(), f
@@ -203,11 +203,8 @@ public class Core {
 			}
 		}
 		final StringBuilder q = new StringBuilder(
-				"?elw_ctx=" + ctx.toString() + "&s=" + scope + "&sId=" + slot.getId()
+				uri.fileQuery(ctx, scope, slot.getId(), e == null ? null : e.getMeta())
 		);
-		if (e != null) {
-			q.append("&fId=").append(e.getMeta().getId());
-		}
 
 		final String dlRef;
 		if (e != null) {
@@ -306,9 +303,9 @@ public class Core {
 				/* 7 students ref 3 */ "#",
 				/* 8 tasks ref 4 */ uri.tasks(enr.getId()),
 				/* 9 classes ref 5 */ "#",
-				/* 10 uploads ref 6 */ uri.logPending(enr.getId()),
-				/* 11 uploads-open ref 7 */ uri.logOpen(enr.getId()),
-				/* 12 uploads-course ref 8 */ uri.logCourse(enr.getId()),
+				/* 10 uploads ref 6 */ uri.logPendingE(enr.getId()),
+				/* 11 uploads-open ref 7 */ uri.logOpenE(enr.getId()),
+				/* 12 uploads-course ref 8 */ uri.logCourseE(enr.getId()),
 		};
 		return arr;
 	}
@@ -483,9 +480,9 @@ public class Core {
 				/* 13 summary due nice 4 */ dueNice,
 				/* 14 score sort */ scoreSort,
 				/* 15 score nice 5 */ scoreNice,
-				/* 16 uploads ref 6 */ adm || classFrom.isStarted() ? uri.logPending(ctxAss.getEnr().getId(), ctxAss.getAss().getId()) : null,
-				/* 17 uploads-open ref 7 */ adm || classFrom.isStarted() ? uri.logOpen(ctxAss.getEnr().getId(), ctxAss.getAss().getId()) : null,
-				/* 18 uploads-course ref 8 */ adm || classFrom.isStarted() ? uri.logCourse(ctxAss.getEnr().getId(), ctxAss.getAss().getId()) : null,
+				/* 16 uploads ref 6 */ adm ? uri.logPendingEA(ctxAss) : classFrom.isStarted() ? uri.logPendingEAV(ctxAss) : null,
+				/* 17 uploads-open ref 7 */ adm ? uri.logOpenEA(ctxAss) : classFrom.isStarted() ? uri.logOpenEAV(ctxAss) : null,
+				/* 18 uploads-course ref 8 */ adm ? uri.logCourseEA(ctxAss) : classFrom.isStarted() ? uri.logCourseEAV(ctxAss): null,
 				/* 19 task-total sort - */ 0
 		};
 

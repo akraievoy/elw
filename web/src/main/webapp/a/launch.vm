@@ -9,8 +9,6 @@
 <div class="ui-widget-header ui-corner-all" id="elw_header">
 	<div id="nav">
 		<a href="index">Index</a> &gt;
-		<a href="courses">Courses</a> &gt;
-		<a href="course?elw_ctx=c--${elw_ctx.course.id}">${elw_ctx.course.name}</a> &gt;
 		<span style="font-weight: bold;">$elw_ctx.ver.name - Code</span>
 	</div>
  #parse("/__/credAdm.vm")

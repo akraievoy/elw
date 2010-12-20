@@ -15,7 +15,7 @@
 </head>
 <body style="text-align: left;">
 <div class="ui-widget-header ui-corner-all" id="elw_header">
- <div id="nav"><a href="courses">My Courses</a> &gt; <span style="font-weight: bold">${elw_ctx.course.name}</span>
+ <div id="nav"><a href="Index">Index</a> &gt; <span style="font-weight: bold">${elw_ctx.course.name}</span>
 	</div>
  #parse("/__/credStud.vm")
  <div id="header_hr"></div>

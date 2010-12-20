@@ -1,0 +1,38 @@
+#* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
+#* @vtlvariable name="slot" type="elw.vo.FileSlot" *#
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+ <meta content="text/html; charset=UTF-8">
+ <title>$elw_ctx.ass.name - $elw_ctx.ver.name - $slot.name</title>
+ #parse("/__/imports.vm")
+</head>
+<body>
+<div class="ui-widget-header ui-corner-all" id="elw_header">
+ <div id="nav">
+  <a href="Index">Index</a> &gt;
+  <a href="log?elw_ctx=e--${elw_ctx.enr.id}">${elw_ctx.course.name}</a> &gt;
+  <span style="font-weight: bold">$elw_ctx.ass.name - $elw_ctx.ver.name - $slot.name</span></div>
+ #parse("/__/credStud.vm")
+ <div id="header_hr"></div>
+</div>
+ #parse("/__/messages.vm")
+<div id=main>
+ <div style="text-align:center;">
+  <div class="formArea ui-widget-header ui-corner-all">
+   <form method="POST" enctype="multipart/form-data" action="ul?elw_ctx=$elw_ctx&sId=$slot.id">
+    <div class="formLabel" style="height: 7em;"><label for="ul_comment">Comment:</label></div>
+    <div class="formField" style="height: 7em;"><textarea id="ul_comment" name="comment" title="Add a note" rows="5" cols="35"></textarea></div>
+    <div class="formLabel"><label for="ul_file">File:</label></div>
+    <div class="formField"><input id="ul_file" type="file" name="file" title="Select a file..."/></div>
+    <div class="formButtons">
+     <button type="submit" class="elw_button_upload">Upload</button>
+    </div>
+   </form>
+  </div>
+ </div>
+</div>
+</body>
+ #parse("/__/ready.vm")
+</html>
+
+

@@ -18,18 +18,21 @@
 
 package elw.web;
 
+import elw.dao.Ctx;
+import elw.vo.FileMeta;
+
 public class ElwUri {
 	public static final String MODEL_KEY = "elw_uri";
 
-	public String logPending(final String enrId) {
-		return "log?elw_ctx=e--" + enrId + "&f_scope=s--p--&f_due=today&f_mode=dd";
+	public String logPendingE(final String enrId) {
+		return "log?elw_ctx=e--" + enrId + "&f_scope=s--p--&f_due=twoweeks&f_mode=dd";
 	}
 
-	public String logOpen(final String enrId) {
+	public String logOpenE(final String enrId) {
 		return "log?elw_ctx=e--" + enrId + "&f_scope=s--o--&f_due=twoweeks&f_mode=dd";
 	}
 
-	public String logCourse(final String enrId) {
+	public String logCourseE(final String enrId) {
 		return "log?elw_ctx=e--" + enrId + "&f_scope=c--av--&f_due=any";
 	}
 
@@ -37,19 +40,40 @@ public class ElwUri {
 		return "tasks?elw_ctx=e--" + enrId;
 	}
 
-	public String logPending(final String enrId, final String assId) {
-		return "log?elw_ctx=e--" + enrId + "&f_verId=" + assId + "--&f_scope=s--p--&f_due=today&f_mode=dd";
+	public String logPendingEA(final Ctx ctx) {
+		return "log?elw_ctx=e--" + ctx.getEnr().getId() + "&f_verId=" + ctx.getAss().getId() + "--&f_scope=s--p--&f_due=twoweeks&f_mode=dd";
 	}
 
-	public String logOpen(final String enrId, final String assId) {
-		return "log?elw_ctx=e--" + enrId + "&f_verId=" + assId + "--&f_scope=s--o--&f_due=twoweeks&f_mode=dd";
+	public String logOpenEA(final Ctx ctx) {
+		return "log?elw_ctx=e--" + ctx.getEnr().getId() + "&f_verId=" + ctx.getAss().getId() + "--&f_scope=s--o--&f_due=twoweeks&f_mode=dd";
 	}
 
-	public String logCourse(final String enrId, final String assId) {
-		return "log?elw_ctx=e--" + enrId + "&f_verId=" + assId + "--&f_scope=c--av--&f_due=any";
+	public String logCourseEA(final Ctx ctx) {
+		return "log?elw_ctx=e--" + ctx.getEnr().getId() + "&f_verId=" + ctx.getAss().getId() + "--&f_scope=c--av--&f_due=any";
+	}
+
+	public String logPendingEAV(final Ctx ctx) {
+		return "log?elw_ctx=e--" + ctx.getEnr().getId() + "&f_verId=" + ctx.getAss().getId() + "--" + ctx.getVer().getId() + "--&f_scope=s--p--&f_due=twoweeks&f_mode=dd";
+	}
+
+	public String logOpenEAV(final Ctx ctx) {
+		return "log?elw_ctx=e--" + ctx.getEnr().getId() + "&f_verId=" + ctx.getAss().getId() + "--" + ctx.getVer().getId() + "--&f_scope=s--o--&f_due=twoweeks&f_mode=dd";
+	}
+
+	public String logCourseEAV(final Ctx ctx) {
+		return "log?elw_ctx=e--" + ctx.getEnr().getId() + "&f_verId=" + ctx.getAss().getId() + "--" + ctx.getVer().getId() + "--&f_scope=c--av--&f_due=any";
 	}
 
 	public String summary(final String enrId) {
-		return "summary?elw_ctx=e--"+ enrId;
+		return "summary?elw_ctx=e--" + enrId;
+	}
+
+	public String fileQuery(final Ctx ctx, final String scope, final String slotId, FileMeta file) {
+		final String xferQuery = "?elw_ctx=" + ctx.toString() + "&s=" + scope + "&sId=" + slotId;
+
+		if (file != null) {
+			return xferQuery + "&fId=" + file.getId();
+		}
+		return xferQuery;
 	}
 }

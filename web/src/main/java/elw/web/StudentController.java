@@ -24,9 +24,7 @@ import elw.miniweb.ViewJackson;
 import elw.vo.*;
 import elw.web.core.Core;
 import elw.web.core.LogFilter;
-import elw.web.core.Summary;
 import elw.web.core.W;
-import org.akraievoy.gear.G4Io;
 import org.apache.commons.fileupload.FileUploadException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -183,9 +181,9 @@ public class StudentController extends ControllerElw {
 
 					Enrollment[] enrs = enrollDao.findEnrollmentsForGroupId(group.getId());
 					if (enrs.length == 1) {
-						resp.sendRedirect("course?elw_ctx=e--" + enrs[0].getId());
+						resp.sendRedirect("tasks?elw_ctx=e--" + enrs[0].getId());
 					} else {
-						resp.sendRedirect("courses");
+						resp.sendRedirect("index");
 					}
 					return null;
 				} else {
@@ -206,12 +204,12 @@ public class StudentController extends ControllerElw {
 	@RequestMapping(value = "logout", method = RequestMethod.GET)
 	public ModelAndView do_logout(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
 		req.getSession(true).invalidate();
-		resp.sendRedirect("courses");
+		resp.sendRedirect("index");
 		return null;
 	}
 
-	@RequestMapping(value = "courses", method = RequestMethod.GET)
-	public ModelAndView do_courses(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+	@RequestMapping(value = "index", method = RequestMethod.GET)
+	public ModelAndView do_index(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
 		final HashMap<String, Object> model = auth(req, resp, "");
 		if (model == null) {
 			return null;
@@ -229,7 +227,7 @@ public class StudentController extends ControllerElw {
 		model.put("enrolls", enrollments);
 		model.put("courses", courses);
 
-		return new ModelAndView("s/courses", model);
+		return new ModelAndView("s/index", model);
 	}
 
 	@RequestMapping(value = "tasks", method = RequestMethod.GET)
@@ -255,42 +253,30 @@ public class StudentController extends ControllerElw {
 		});
 	}
 
-	@RequestMapping(value = "ul", method = {RequestMethod.POST, RequestMethod.PUT})
+	@RequestMapping(value = "ul", method = {RequestMethod.GET})
 	public ModelAndView do_ul(final HttpServletRequest req, final HttpServletResponse resp) throws IOException, FileUploadException {
+		return wmFile(req, resp, "", FileDao.SCOPE_STUD, new WebMethodFile() {
+			@Override
+			protected ModelAndView handleFile(String scope, FileSlot slot) throws IOException {
+				model.put("slot", slot);
+				return new ModelAndView("s/ul", model); 
+			}
+		});
+	}
+
+	@RequestMapping(value = "ul", method = {RequestMethod.POST, RequestMethod.PUT})
+	public ModelAndView do_ulPost(final HttpServletRequest req, final HttpServletResponse resp) throws IOException, FileUploadException {
 		final HashMap<String, Object> model = auth(req, resp, "");
 		if (model == null) {
 			return null;
 		}
 
 		final Ctx ctx = (Ctx) model.get(R_CTX);
-		final String refreshUri = "course?" + WebSymbols.R_CTX + "=" + Ctx.forEnr(ctx.getEnr()).toString();
+		final String refreshUri = core.getUri().logPendingEAV(ctx);
 		return adminController.processUpload(
 				req, resp, FileDao.SCOPE_STUD,
 				model, refreshUri, ctx.getStudent().getName()
 		);
-	}
-
-	@RequestMapping(value = "updateExpandTriggers", method = RequestMethod.POST)
-	public ModelAndView do_updateExpandTriggers(
-			final HttpServletRequest req, final HttpServletResponse resp
-	) throws IOException {
-		final HttpSession session = req.getSession();
-		@SuppressWarnings({"unchecked"})
-		Map<String, String> viewToExpandTriggers = (Map<String, String>) session.getAttribute("viewToExpandTriggers");
-		//noinspection SynchronizationOnLocalVariableOrMethodParameter
-		synchronized(session) {
-			if (viewToExpandTriggers == null) {
-				viewToExpandTriggers = Collections.synchronizedMap(new TreeMap<String, String>());
-				session.setAttribute("viewToExpandTriggers", viewToExpandTriggers);
-			}
-		}
-
-		final String postBody = G4Io.dumpToString(req.getInputStream(), "UTF-8");
-		final String viewName = req.getParameter("view");
-		final String viewNameEff = viewName == null ? "" : viewName;
-		viewToExpandTriggers.put(viewNameEff, postBody);
-
-		return new ModelAndView(ViewJackson.success("success"));
 	}
 
 	@RequestMapping(value = "rest/index", method = RequestMethod.GET)
@@ -436,58 +422,44 @@ public class StudentController extends ControllerElw {
 
 	@RequestMapping(value = "edit", method = RequestMethod.GET)
 	public ModelAndView do_edit(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		final HashMap<String, Object> model = auth(req, resp, "");
-		if (model == null) {
-			return null;
-		}
+		return wmFile(req, resp, "", FileDao.SCOPE_STUD, new WebMethodFile() {
+			@Override
+			protected ModelAndView handleFile(String scope, FileSlot slot) throws IOException {
+				final SortedMap<String, List<Entry<FileMeta>>> filesStud = fileDao.loadFilesStud(ctx);
+				if (!ctx.getVer().checkRead(ctx.getAssType(), ctx.getAss(), slot.getId(), filesStud)) {
+					resp.sendError(HttpServletResponse.SC_FORBIDDEN, "not readable yet");
+					return null;
+				}
 
-		final Ctx ctx = (Ctx) model.get(R_CTX);
-		if (!ctx.resolved(Ctx.STATE_EGSCIV)) {
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "context path problem, please check the logs");
-			return null;
-		}
+				final String customEditName = slot.getEditor();
+				if (customEditName == null || customEditName.trim().length() == 0) {
+					resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "editor not set for slot " + slot.getId());
+					return null;
+				}
 
-		final String slotId = req.getParameter("sId");
-		if (slotId == null || slotId.trim().length() == 0) {
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "no slotId (sId) defined");
-			return null;
-		}
+				Editor editor;
+				try {
+					editor = (Editor) Class.forName(customEditName).newInstance();
+				} catch (InstantiationException e) {
+					log.error("failed for ctx " + ctx + " and slotId " + slot.getId(), e);
+					resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, String.valueOf(e));
+					return null;
+				} catch (IllegalAccessException e) {
+					log.error("failed for ctx " + ctx + " and slotId " + slot.getId(), e);
+					resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, String.valueOf(e));
+					return null;
+				} catch (ClassNotFoundException e) {
+					log.error("failed for ctx " + ctx + " and slotId " + slot, e);
+					resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, String.valueOf(e));
+					return null;
+				}
 
-		final FileSlot slot = ctx.getAssType().findSlotById(slotId);
+				model.put("slot", slot);
+				model.put("editor", editor.render(req, resp, ctx, slot));
 
-		final SortedMap<String, List<Entry<FileMeta>>> filesStud = fileDao.loadFilesStud(ctx);
-		if (!ctx.getVer().checkRead(ctx.getAssType(), ctx.getAss(), slotId, filesStud)) {
-			resp.sendError(HttpServletResponse.SC_FORBIDDEN, "not readable yet");
-			return null;
-		}
-
-		final String customEditName = slot.getEditor();
-		if (customEditName == null || customEditName.trim().length() == 0) {
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "editor not set for slot " + slot.getId());
-			return null;
-		}
-
-		Editor editor;
-		try {
-			editor = (Editor) Class.forName(customEditName).newInstance();
-		} catch (InstantiationException e) {
-			log.error("failed for ctx " + ctx + " and slotId " + slot.getId(), e);
-			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, String.valueOf(e));
-			return null;
-		} catch (IllegalAccessException e) {
-			log.error("failed for ctx " + ctx + " and slotId " + slot.getId(), e);
-			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, String.valueOf(e));
-			return null;
-		} catch (ClassNotFoundException e) {
-			log.error("failed for ctx " + ctx + " and slotId " + slot, e);
-			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, String.valueOf(e));
-			return null;
-		}
-
-		model.put("slot", slot);
-		model.put("editor", editor.render(req, resp, ctx, slot));
-
-		return new ModelAndView("s/edit", model);
+				return new ModelAndView("s/edit", model);
+			}
+		});
 	}
 
 	@RequestMapping(value = "list", method = RequestMethod.GET)
