@@ -30,17 +30,36 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.List;
 
 @Controller
 @RequestMapping("/err/**")
 public class ErrController {
 	private static final Logger log = LoggerFactory.getLogger(ErrController.class);
 
+	@SuppressWarnings({"RedundantArrayCreation"})
+	final List<String> ignoredUris = Arrays.asList(new String[]{
+			"/s/elw.dp.ui.Applet",
+			"/s/META-INF/services/javax.xml.parsers.DocumentBuilderFactory",
+			"/s/org/apache/log4j/PatternLayoutBeanInfo.class",
+			"/s/org/apache/log4j/LayoutBeanInfo.class",
+			"/s/java/lang/ObjectBeanInfo.class",
+			"/s/com/ibm/uvm/tools/DebugSupport.class"
+	});
+
 	@RequestMapping(value = "*")
 	public ModelAndView do_handle(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+		final String url = (String) req.getAttribute("javax.servlet.error.request_uri");
+		final Integer statusCode = (Integer) req.getAttribute("javax.servlet.error.status_code");
+
+		if (statusCode != null && 404 == statusCode && ignoredUris.contains(url)) {
+			resp.sendError(410, "ignored");
+			return null;
+		}
+
 		try {
-			final Integer statusCode = (Integer) req.getAttribute("javax.servlet.error.status_code");
 			final String message = (String) req.getAttribute("javax.servlet.error.message");
 			final Throwable throwable = (Throwable) req.getAttribute("javax.servlet.error.exception");
 			final String eventId = Long.toString(System.currentTimeMillis(), 36);
@@ -50,7 +69,7 @@ public class ErrController {
 			final HttpSession session = req.getSession(false);
 
 			logOut.println("web error: eventId="+eventId+" status=" + statusCode + " message='" + message + "'");
-			logOut.println("url: " + req.getAttribute("javax.servlet.error.request_uri"));
+			logOut.println("url: " + url);
 			logOut.print("attributes: ");
 			final Enumeration reqAttrNames = req.getAttributeNames();
 			while (reqAttrNames.hasMoreElements()) {
