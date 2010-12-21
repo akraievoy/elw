@@ -188,16 +188,12 @@ public class Core {
 			boolean adm) {
 		final long time = e == null ? System.currentTimeMillis() : e.getMeta().getCreateStamp().getTime();
 
-		final IndexEntry iEntry = ctx.getIndexEntry();
 		final String nameNorm;
 		if (e == null) {
 			nameNorm = "";
 		} else {
 			if (adm && FileDao.SCOPE_STUD.equalsIgnoreCase(scope)) {
-				nameNorm = iEntry.normName(
-						ctx.getEnr(), ctx.getStudent(), ctx.getAss(),
-						ctx.getVer(), slot, e.getMeta(), f
-				);
+				nameNorm = ctx.cmpNameNorm(f, slot, e);
 			} else {
 				nameNorm = e.getMeta().getName();
 			}

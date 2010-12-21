@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
@@ -820,5 +821,31 @@ public class Ctx {
 		} catch (UnsupportedEncodingException e) {
 			throw new IllegalStateException(e);
 		}
+	}
+
+	public String cmpNameNorm(Format f, FileSlot slot, Entry<FileMeta> e) {
+		final Version ver = getVer();
+		final FileMeta meta = e.getMeta();
+		String result;
+		try {
+			final String normName = getEnr().getName() + "-" + getStudent().getName() + "--" +
+					getAss().getName() + (ver == null ? "" : "-" + ver.getName()) + "--" +
+					slot.getName() + "-" + f.format(meta.getCreateStamp().getTime(), "MMdd-HHmm");
+
+			final String oriName = meta.getName();
+			final int oriLastDot = oriName.lastIndexOf(".");
+			final String oriExt = oriLastDot < 0 ? "" : oriName.substring(oriLastDot);
+
+			final String normNameNoWs = normName.replaceAll("[\\s\\\\/]+", "_") + oriExt;
+
+			result = URLEncoder.encode(
+					normNameNoWs,
+					"UTF-8"
+			);
+		} catch (UnsupportedEncodingException e1) {
+			throw new IllegalStateException("UTF-8 is NOT supported?!");
+		}
+
+		return result;
 	}
 }

@@ -58,11 +58,9 @@ h3 {
 }
 
 #elw_header {
-	border-bottom: #339933 1px dashed;
 	text-align: center;
-	font-size: 1.05em;
-	padding-top: 2px;
-	padding-bottom: 2px;
+	margin-top: 4px;
+	margin-bottom: 2px;
 }
 
 #header_hr {
@@ -70,14 +68,14 @@ h3 {
 }
 
 #nav {
-	margin-top: 2px;
-	margin-left: 2px;
+	margin-top: 6px;
+	margin-left: 4px;
 	float: left;
 }
 
 #cred {
 	margin-top: 2px;
-	margin-right: 2px;
+	margin-right: 4px;
 	float: right;
 }
 
@@ -88,18 +86,6 @@ h3 {
 
 #messages div {
 	text-align: center;
-}
-
-#messages .warn {
-	color: #999900;
-}
-
-#messages .err {
-	color: #990000;
-}
-
-#messages .info {
-	color: #009900;
 }
 
 div.formArea {
@@ -139,113 +125,6 @@ div.formButtons {
 .extra {
 	font-size: smaller;
 	color: #333333;
-}
-
-tr.elw_header_row td {
-	border-bottom: #CCCCCC dotted 1px;
-	background-color: #EEEEEE;
-}
-
-tr.elw_header_row th {
-	border-bottom: #CCCCCC dotted 1px;
-	background-color: #EEEEEE;
-}
-
-td.elw_cell_data {
-	border-right: #999999 dashed 1px;
-}
-
-td.elw_cell_trig {
-	text-align: center;
-}
-
-td.elw_cell_num {
-	text-align: right;
-}
-
-tr.elw_row td {
-	padding-left: 0.25em;
-	padding-right: 0.25em;
-}
-
-tr.elw_row_l0 > td:first-child {
-	padding-left: 0.25em;
-	padding-right: 0.25em;
-}
-
-tr.elw_row_l0 > td {
-	border-bottom: #EEEEEE dotted 1px;
-	background-color: #FFFFFF;
-}
-
-tr.elw_row_l1 > td:first-child {
-	padding-left: 0.75em;
-	padding-right: 0.25em;
-}
-
-tr.elw_row_l1 > td {
-	border-bottom: #DDDDDD dotted 1px;
-	background-color: #EEEEEE;
-}
-
-tr.elw_row_l2 > td:first-child {
-	padding-left: 1.5em;
-	padding-right: 0.25em;
-}
-
-tr.elw_row_l2 > td {
-	border-bottom: #CCCCCC dotted 1px;
-	background-color: #DDDDDD;
-}
-
-tr.elw_row_l3 > td:first-child {
-	padding-left: 2.25em;
-	padding-right: 0.25em;
-}
-
-tr.elw_row_l3 > td {
-	border-bottom: #BBBBBB dotted 1px;
-	background-color: #CCCCCC;
-}
-
-tr.elw_row_l4 > td:first-child {
-	padding-left: 3em;
-	padding-right: 0.25em;
-}
-
-tr.elw_row_l4 > td {
-	border-bottom: #AAAAAA dotted 1px;
-	background-color: #BBBBBB;
-}
-
-tr.elw_row_l5 > td:first-child {
-	padding-left: 3.75em;
-	padding-right: 0.25em;
-}
-
-tr.elw_row_l5 > td {
-	border-bottom: #999999 dotted 1px;
-	background-color: #AAAAAA;
-}
-
-tr.elw_row_l6 > td:first-child {
-	padding-left: 4.5em;
-	padding-right: 0.25em;
-}
-
-tr.elw_row_l6 > td {
-	border-bottom: #888888 dotted 1px;
-	background-color: #999999;
-}
-
-tr.elw_row_l7 > td:first-child {
-	padding-left: 5.25em;
-	padding-right: 0.25em;
-}
-
-tr.elw_row_l7 > td {
-	border-bottom: #777777 dotted 1px;
-	background-color: #888888;
 }
 
 .expandTrigger {
@@ -296,39 +175,40 @@ th.text_align_right {
  padding-right: 1em;
 }
 
-.elw_open {
-}
 .elw_closed {
  color: #CCCCCC;
  font-style: italic;
 }
+.elw_open {
+}
 .elw_pending {
- color: #333333;
+ color: #336633;
 }
 
 .elw_negTerm {
- color: #FF6666;
+ color: #993333;
+ font-size: 0.6em;
 }
 .elw_posTerm {
- color: #66FF66;
+ color: #339933;
+ font-size: 0.6em;
 }
-
 .elw_approved {
  font-weight: bold;
- color: #00FF00;
+ color: #009900;
 }
 .elw_declined {
  font-weight: bold;
- color: #FF0000;
+ color: #990000;
 }
 .elw_due_passed {
  font-weight: bold;
 }
 .elw_overdue {
- background-color: #FFCCCC !important;
+ border: 1px dotted #FFCCCC;
 }
 .elw_open.elw_overdue {
- background-color: #FF9999 !important;
+ border: 1px dashed #FF6666;
 }
 .elw_offsite {
  text-decoration: underline;

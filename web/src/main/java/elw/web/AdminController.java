@@ -289,7 +289,7 @@ public class AdminController extends ControllerElw {
 				model.put("stamp", stamp);
 				model.put("score", score);
 				model.put("slot", slot);
-				model.put("file", file.getMeta());
+				model.put("file", file);
 
 				return new ModelAndView("a/approve", model);
 			}

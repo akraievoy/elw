@@ -169,7 +169,11 @@ public class VelocityTemplates {
 						if (terms.length > 0) {
 							text.append(":");
 							for (ScoreTerm term : terms) {
-								niceRatio(f, term.getRatio(), term.getCriteria().getName() + " x " + term.getPow(), text);
+								if (term.getPow() > 1) {
+									niceRatio(f, term.getRatio(), term.getCriteria().getName() + " x " + term.getPow(), text);
+								} else {
+									niceRatio(f, term.getRatio(), term.getCriteria().getName(), text);
+								}
 							}
 						}
 					} else {
@@ -294,14 +298,18 @@ public class VelocityTemplates {
 
 		final String niceRatio;
 		if (percentage < 100) {
-			niceRatio = "-" + f.format2(100 - percentage) + "%";
+			niceRatio = f.format2(100 - percentage) + "%";
 		} else {
-			niceRatio = "+" + f.format2(percentage - 100) + "%";
+			niceRatio = f.format2(percentage - 100) + "%";
 		}
 
-		sb.append(" <span class=\"elw_").append(ratio < 1 ? "neg" : "pos")
-				.append("Term\" title=\"").append(f.esc(title)).append("\">")
-				.append(niceRatio).append("</span>");
+		sb.append(" <span class=\"elw_").append(ratio < 1 ? "neg" : "pos").append("Term\"");
+
+		if (title != null && title.trim().length() >= 0) {
+			sb.append(" title=\"").append(f.esc(title)).append("\"");
+		}
+
+		sb.append(">").append(niceRatio).append("</span>");
 	}
 
 	public String niceRatio(Format f, double ratio, String title) {

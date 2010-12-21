@@ -120,7 +120,10 @@ public class StudentCodeValidator extends G4Run.Task {
 							f.getMeta().setTestsPassed(passFailCounts[0]);
 
 							score = ScoreDao.updateAutos(ctxVer, slotId, f, null);
-							score.setApproved(passFailCounts[1] == 0 && passFailCounts[0] > 0);
+							final boolean passed = passFailCounts[1] == 0 && passFailCounts[0] > 0;
+							if (passed) {
+								score.setApproved(passed);
+							}
 						} catch (Throwable t) {
 							log.warn("exception while validating {} / {}", ctxVer, f.getMeta().getCreateStamp());
 						} finally {

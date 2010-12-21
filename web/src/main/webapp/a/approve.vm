@@ -1,8 +1,9 @@
 #* @vtlvariable name="f" type="elw.web.FormatTool" *#
 #* @vtlvariable name="score" type="elw.vo.Score" *#
 #* @vtlvariable name="slot" type="elw.vo.FileSlot" *#
-#* @vtlvariable name="file" type="elw.vo.FileMeta" *#
+#* @vtlvariable name="file" type="elw.vo.Entry<elw.vo.FileMeta>" *#
 #* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
+#* @vtlvariable name="elw_uri" type="elw.web.ElwUri" *#
 #* @vtlvariable name="stamp" type="elw.vo.Stamp" *#
 
 #* @vtlvariable name="f_due" type="java.lang.Boolean" *#
@@ -12,18 +13,21 @@
 #* @vtlvariable name="f_mode" type="java.lang.String" *#
 #* @vtlvariable name="f_scope" type="java.lang.String" *#
 #* @vtlvariable name="f_verId" type="java.lang.String" *#
+#set($downloadUri = $elw_uri.download($elw_ctx, "s", $slot.id, $file, $elw_ctx.cmpNameNorm($f, $slot, $file)))
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta content="text/html; charset=UTF-8">
+ <META HTTP-EQUIV=Refresh CONTENT="1; URL=${downloadUri}"/>
 	<title>Approval</title>
  #parse("/__/imports.vm")
 </head>
 <body>
 <div class="ui-widget-header ui-corner-all" id="elw_header">
 	<div id="nav">
-		<a href="index">Index</a> &gt; <a href="enrolls">Enrollments</a> &gt;
-		<a href="log?elw_ctx=e--$elw_ctx.enr.id">Group $elw_ctx.group.name Reports</a> &gt;
-		<span style="font-weight: bold">Approval</span>
+  <a href="index">Index</a> &gt;
+  <a href="tasks?elw_ctx=e--$elw_ctx.enr.id">$elw_ctx.group.name Tasks</a> &gt;
+  <a href="log?elw_ctx=e--$elw_ctx.enr.id">$elw_ctx.group.name Uploads</a> &gt;
+  <span style="font-weight: bold">Approval</span>
 	</div>
  #parse("/__/credAdm.vm")
 	<div id="header_hr"> </div>
@@ -37,7 +41,7 @@
     <form method="POST" action="approve">
      <input type="hidden" name="elw_ctx" value="$f.esc($elw_ctx.toString())"/>
      <input type="hidden" name="sId" value="$f.esc($slot.id)"/>
-     <input type="hidden" name="fId" value="$f.esc($file.id)"/>
+     <input type="hidden" name="fId" value="$f.esc($file.meta.id)"/>
      #if($stamp)
       <input type="hidden" name="stamp" value="$f.esc($stamp.toString())"/>
      #end
@@ -58,15 +62,17 @@
    </div>
   </div>
   <div style="float: right; width: 65%; overflow-x: auto;">
+   #set($__qId = "log") #parse("/__/queryTableLog.vm")
+   <div style="clear: both; margin-top: 1em;"
    <form style="text-align: center;">
     #parse("/__/modeCombo.vm")
     <label for="dataLoader"></label>
     <input id="dataLoader" type="button" value="Refresh"/>
    </form>
    <table id="dataTable" cellspacing="0" cellpadding="1" align="center" width="95%"></table>
-   #set($__qId = "log") #parse("/__/queryTableLog.vm")
   </div>
  </div>
+</div>
 </body>
 <script type="text/javascript">
  jQuery(document).ready(function() {
@@ -75,7 +81,9 @@
     .append(jQuery("<span/>").text(" "))
     .append(jQuery("<span/>").text($f.json($elw_ctx.ass.name)).attr("title", $f.json($elw_ctx.ass.id)))
     .append(jQuery("<span/>").text(" "))
-    .append(jQuery("<span/>").text($f.json($elw_ctx.ver.name)).attr("title", $f.json($elw_ctx.ver.id)));
+    .append(jQuery("<span/>").text($f.json($elw_ctx.ver.name)).attr("title", $f.json($elw_ctx.ver.id)))
+    .append(jQuery("<span/>").text(" "))
+    .append(jQuery("<a/>").text("Download").attr("href", $f.json($downloadUri)));
 
   var sliders = jQuery("#sliders");
   var sliders_auto = jQuery("#sliders_auto");
@@ -142,7 +150,7 @@
   function loadData() {
    var f_data = {};
    f_data["elw_ctx"] = $f.json($elw_ctx.toString());
-   f_data["fId"] = $f.json($file.id);
+   f_data["fId"] = $f.json($file.meta.id);
    f_data["sId"] = $f.json($slot.id);
    #if($stamp)
     f_data["stamp"] = $f.json($stamp.toString());
@@ -182,6 +190,7 @@
  #if(!$f_due) #set($f_due = "any") #end
  #if(!$f_mode) #set($f_mode = "s") #end
  #if(!$f_latest) #set($f_latest = "true") #end
+ #set($__highlight = $file.meta.id)
  #set($__qId = "log") #parse("/__/queryJsLog.vm")
  #parse("/__/ready.vm")
 </html>

@@ -1,4 +1,5 @@
 #* @vtlvariable name="__qId" type="java.lang.String" *#
+#* @vtlvariable name="__highlight" type="java.lang.String" *#
 
 #* @vtlvariable name="elw_admin" type="elw.vo.Admin" *#
 #* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
@@ -67,6 +68,11 @@
    "fnRowCallback": function(node, data, dispIndex, dataIndex) {
     jQuery("td:eq(5)", node).addClass(data[13]);
     jQuery("td:eq(0)", node).attr("title", data[2]);
+    #if($__highlight)
+     if (data[17] != null && data[17].length > 0 && data[17].indexOf($f.json($__highlight)) > 0) {
+      jQuery("td", node).css({"font-weight": "bold"}); 
+     }
+    #end
     return node;
    }
   });

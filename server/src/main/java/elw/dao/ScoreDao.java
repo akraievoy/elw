@@ -87,7 +87,8 @@ public class ScoreDao extends Dao<Score> {
 		vars.put("$offsite", 1 - onSite);
 		vars.put("$rapid", ctx.cFrom().checkOnTime(createStamp) ? 1.0 : 0.0);
 
-		if (slot.getValidator() != null && file.getMeta().isValidated()) {
+		//	LATER the validator has to be wired via classname, not directly in spring context
+		if (file.getMeta().getTotalTests() > 0 || (slot.getValidator() != null && file.getMeta().isValidated())) {
 			vars.put("$passratio", file.getMeta().getPassRatio());
 		}
 

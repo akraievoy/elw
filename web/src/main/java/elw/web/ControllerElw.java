@@ -86,7 +86,9 @@ public abstract class ControllerElw extends MultiActionController implements Web
 
 	protected static interface WebMethodScore {
 		ModelAndView handleScore(
-				HttpServletRequest req, HttpServletResponse resp, Ctx ctx, FileSlot slot, Entry<FileMeta> file, Stamp stamp, Map<String, Object> model
+				HttpServletRequest req, HttpServletResponse resp,
+				Ctx ctx, FileSlot slot, Entry<FileMeta> file, Stamp stamp,
+				Map<String, Object> model
 		) throws IOException;
 	}
 
