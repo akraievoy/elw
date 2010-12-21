@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta content="text/html; charset=UTF-8">
-	<title>Login : ELW Admin</title>
+	<title>Login</title>
  #parse("/__/imports.vm")
 	<script type="text/javascript" src="../js/jquery.sha1.js"></script>
 </head>

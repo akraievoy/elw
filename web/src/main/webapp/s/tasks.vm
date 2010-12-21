@@ -3,13 +3,15 @@
 <html>
 <head>
  <meta content="text/html; charset=UTF-8">
- <title>${elw_ctx.course.name} Course</title>
+ <title>${elw_ctx.course.name} : Tasks - $elw_ctx.student.name</title>
  #parse("/__/imports.vm")
 </head>
 <body style="text-align: left;">
 <div class="ui-widget-header ui-corner-all" id="elw_header">
- <div id="nav"><a href="Index">Index</a> &gt; <span style="font-weight: bold">${elw_ctx.course.name}</span>
-	</div>
+ <div id="nav">
+  <a href="Index">Index</a> &gt;
+  <span style="font-weight: bold">${elw_ctx.course.name} : Tasks</span>
+ </div>
  #parse("/__/credStud.vm")
  <div id="header_hr"></div>
 </div>

@@ -13,13 +13,15 @@
 <html>
 <head>
  <meta content="text/html; charset=UTF-8">
- <title>Group $elw_ctx.group.name Status : ELW Admin</title>
+ <title>$elw_ctx.group.name : Summary - $elw_admin.name</title>
  #parse("/__/imports.vm")
 </head>
 <body style="text-align: left;">
 <div class="ui-widget-header ui-corner-all" id="elw_header">
- <div id="nav"><a href="index">Index</a> &gt; <a href="enrolls">Enrollments</a> &gt; <span style="font-weight: bold">Group $elw_ctx.group.name
-  Status</span></div>
+ <div id="nav">
+  <a href="index">Index</a> &gt;
+  <span style="font-weight: bold">$elw_ctx.group.name : Summary</span>
+ </div>
  #parse("/__/credAdm.vm")
  <div id="header_hr"></div>
 </div>

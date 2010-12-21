@@ -137,6 +137,21 @@ public class StudentController extends ControllerElw {
 		return model;
 	}
 
+	@RequestMapping(value = "Index", method= RequestMethod.GET)
+	public void do_Index(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+		resp.sendRedirect("index");
+	}
+
+	@RequestMapping(value = "courses", method= RequestMethod.GET)
+	public void do_courses(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+		resp.sendRedirect("index");
+	}
+
+	@RequestMapping(value = "course", method= RequestMethod.GET)
+	public void do_course(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+		resp.sendRedirect("course");
+	}
+
 	@RequestMapping(value = "login", method = RequestMethod.GET)
 	public ModelAndView do_login(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
 		final HashMap<String, Object> model = prepareDefaultModel(req);

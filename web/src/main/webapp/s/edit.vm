@@ -4,15 +4,17 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
  <meta content="text/html; charset=UTF-8">
- <title>$elw_ctx.ver.name - Code</title>
+ <title>$elw_ctx.ass.name $elw_ctx.ver.name $slot.name : Edit - $elw_ctx.student.name</title>
  #parse("/__/imports.vm")
 </head>
 <body>
 <div class="ui-widget-header ui-corner-all" id="elw_header">
  <div id="nav">
-  <a href="index">My Courses</a> &gt;
-  <a href="log?elw_ctx=e--${elw_ctx.enr.id}">${elw_ctx.course.name}</a> &gt;
-  <span style="font-weight: bold">$elw_ctx.ver.name - $slot.name</span></div>
+  <a href="Index">Index</a> &gt;
+  <a href="tasks?elw_ctx=e--$elw_ctx.enr.id">${elw_ctx.course.name} : Tasks</a> &gt;
+  <a href="log?elw_ctx=e--${elw_ctx.enr.id}">${elw_ctx.course.name} : Files</a> &gt;
+  <span style="font-weight: bold">$elw_ctx.ass.name $elw_ctx.ver.name $slot.name : Edit</span>
+ </div>
  #parse("/__/credStud.vm")
  <div id="header_hr"></div>
 </div>
