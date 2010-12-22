@@ -609,10 +609,17 @@ public class Core {
 			final Score score = e.getMeta().getScore();
 			final double eScore = ctxVer.getIndexEntry().computePoints(score, slot);
 
-			if (!Boolean.FALSE.equals(score.getApproved()) && (usedEntry == null || maxScore < eScore)) {
-				maxScore = eScore;
-				usedEntry = e;
+			if (Boolean.FALSE.equals(score.getApproved())) {
+				continue;
 			}
+
+			final boolean firstScore = usedEntry == null;
+			final boolean betterScore = maxScore < eScore;
+			final boolean sameButApproved = maxScore == eScore && Boolean.TRUE.equals(score.getApproved());
+			if ((firstScore || betterScore || sameButApproved)) {
+					maxScore = eScore;
+					usedEntry = e;
+				}
 		}
 
 		if (usedEntry != null) {
