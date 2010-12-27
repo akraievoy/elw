@@ -109,6 +109,13 @@ function elw_dt_url(idx, inner) {
  };
 }
 
+function elw_dt_urlb(idx, inner) {
+ return function(oObj) {
+  var d = oObj.aData[idx];
+  return d != null && ("" + d).length > 0 ? '<a href="' + d + '" target="_blank">' + inner + '</a>' : "";
+ };
+}
+
 jQuery(document).ready(function() {
 	jQuery(".elw_button").button();
 	jQuery(".elw_button_info").button({

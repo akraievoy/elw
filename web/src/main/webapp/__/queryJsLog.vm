@@ -54,7 +54,7 @@
     #* 15 size bytes *# {"bVisible": false, "bSortable": false},
     #* 16 size *# {'sTitle': 'Size', "iDataSort": 15, "sWidth": "9em"},
      #if($elw_admin)
-      #* 17 approve ref *# {'sTitle': '<span title="Approve">A</span>', "sWidth": "1em", "bSortable": false, "sClass": "text_align_center", "fnRender": elw_dt_url(17, 'A') },
+      #* 17 approve ref *# {'sTitle': '<span title="Approve">A</span>', "sWidth": "1em", "bSortable": false, "sClass": "text_align_center", "fnRender": elw_dt_urlb(17, 'A') },
      #else
       #* 17 approve ref *# {"bVisible": false, "bSortable": false},
      #end
