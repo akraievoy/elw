@@ -21,11 +21,11 @@ package elw.web.core;
 import java.util.Map;
 
 public class Summary {
-	protected final int openNum;
-	protected final int pendingNum;
-	protected final int approvedNum;
-	protected final int declinedNum;
-	protected final Long earliestDue;
+	private final int openNum;
+	private final int pendingNum;
+	private final int approvedNum;
+	private final int declinedNum;
+	private final Long earliestDue;
 
 	public Summary(int approvedNum, int declinedNum, int openNum, int pendingNum, Long earliestDue) {
 		this.approvedNum = approvedNum;
@@ -55,7 +55,7 @@ public class Summary {
 		return earliestDue;
 	}
 
-	public Summary inc(Summary d) {
+	private Summary inc(Summary d) {
 		return new Summary(
 				this.approvedNum + d.approvedNum,
 				this.declinedNum + d.declinedNum,
@@ -65,7 +65,7 @@ public class Summary {
 		);
 	}
 
-	protected Long minDue(final Long thisDue, Summary thatDue) {
+	private Long minDue(final Long thisDue, Summary thatDue) {
 		if (thisDue != null && thatDue.earliestDue != null) {
 			return Math.min(thisDue, thatDue.earliestDue);
 		}

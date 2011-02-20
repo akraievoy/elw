@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class RendererFactory {
-	protected final Map<JTable, Integer> accColCache = new HashMap<JTable, Integer>();
+	private final Map<JTable, Integer> accColCache = new HashMap<JTable, Integer>();
 
 	protected int lookupAccessColumn(JTable table) {
 		if (accColCache.get(table) != null) {
@@ -24,7 +24,7 @@ public class RendererFactory {
 		return accColIndex;
 	}
 
-	public int findColIndexByName(JTable table, String colName) {
+	private int findColIndexByName(JTable table, String colName) {
 		final TableModel model = table.getModel();
 
 		int accColIndex = -1;

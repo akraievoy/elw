@@ -15,15 +15,15 @@ import java.util.List;
 public class MipsValidator {
 	private static final Logger log = LoggerFactory.getLogger(MipsValidator.class);
 
-	protected final MipsAssembler assembler = new MipsAssembler();
-	protected final DataPath dataPath = new DataPath();
+	private final MipsAssembler assembler = new MipsAssembler();
+	private final DataPath dataPath = new DataPath();
 
-	protected final HashMap<String,Integer> labelIndex = new HashMap<String, Integer>();
-	protected Instruction[] instructions = null;
-	protected TIntIntHashMap[] regs = null;
-	protected TIntIntHashMap[] data = null;
+	private final HashMap<String,Integer> labelIndex = new HashMap<String, Integer>();
+	private Instruction[] instructions = null;
+	private TIntIntHashMap[] regs = null;
+	private TIntIntHashMap[] data = null;
 	//	static setup, may be spring-injected at some time
-	protected int runSteps = 16384;
+	private int runSteps = 16384;
 
 	public DataPath getDataPath() {
 		return dataPath;
@@ -113,7 +113,7 @@ public class MipsValidator {
 		return false;
 	}
 
-	public void verifyMem(Result[] resRef) {
+	private void verifyMem(Result[] resRef) {
 		final Memory memory = dataPath.getMemory();
 		final TIntIntHashMap expectedMemMap = data[1];
 		final int[] expectedAddrs = expectedMemMap.keys();
@@ -152,7 +152,7 @@ public class MipsValidator {
 		Result.success(log, resRef, "Test Passed Memory Spec");
 	}
 
-	public void verifyRegs(Result[] resRef) {
+	private void verifyRegs(Result[] resRef) {
 		final Reg[] setupRegs = dataPath.getRegisters().getSetupRegs();
 		final TIntIntHashMap expectedRegMap = regs[1];
 		final Reg[] expectedRegs = Reg.values(expectedRegMap.keys());

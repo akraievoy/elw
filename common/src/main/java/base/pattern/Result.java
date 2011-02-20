@@ -3,8 +3,8 @@ package base.pattern;
 import org.slf4j.Logger;
 
 public class Result {
-	protected final boolean success;
-	protected final String message;
+	private final boolean success;
+	private final String message;
 
 	public Result(String message, boolean success) {
 		this.message = message;
@@ -19,7 +19,7 @@ public class Result {
 		resultRef[0] = new Result(message, true);
 	}
 
-	public static void failure(Result[] resultRef, final String message) {
+	private static void failure(Result[] resultRef, final String message) {
 		if (resultRef == null || resultRef.length < 1) {
 			return;
 		}

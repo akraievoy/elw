@@ -11,14 +11,20 @@ import java.awt.*;
 import java.util.Arrays;
 
 class Registers extends RegMem implements RegistersModel {
-	final int[] registers = new int[REGS];
+	private final int[] registers = new int[REGS];
 
-	DataLine control, readData1, readData2, readRegister1;
-	DataLine readRegister2, writeRegister, writeData;
+	private DataLine control;
+	private DataLine readData1;
+	private DataLine readData2;
+	private DataLine readRegister1;
+	private DataLine readRegister2;
+	private DataLine writeRegister;
+	private DataLine writeData;
 	DataPathPanel parent;
-	int read1RegisterIndex, read2RegisterIndex;
-	protected RegistersTableModel registersTableModel;
-	protected int writeRegisterIndex;
+	private int read1RegisterIndex;
+	private int read2RegisterIndex;
+	private RegistersTableModel registersTableModel;
+	private int writeRegisterIndex;
 
 	public Registers(double x1, double y1, double width, double height, Color color, String label1, String label2, String name, DataLine control, DataLine readRegister1,
 					 DataLine readRegister2, DataLine writeRegister, DataLine writeData, DataLine readData1, DataLine readData2, DataPathPanel parent) {
@@ -119,7 +125,7 @@ class Registers extends RegMem implements RegistersModel {
 		protected final String[] columns = new String[]{COL_NUMBER, COL_NAME, COL_HEX, COL_DEC, COL_ACC};
 		protected final RegistersModel registers;
 
-		public RegistersTableModel(RegistersModel registers) {
+		private RegistersTableModel(RegistersModel registers) {
 			this.registers = registers;
 		}
 

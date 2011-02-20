@@ -52,14 +52,14 @@ import java.util.regex.Pattern;
 public abstract class ControllerElw extends MultiActionController implements WebSymbols {
 	private static final Logger log = LoggerFactory.getLogger(ControllerElw.class);
 
-	protected static final DiskFileItemFactory fileItemFactory = createFileItemFactory();
+	private static final DiskFileItemFactory fileItemFactory = createFileItemFactory();
 	protected final Core core;
 
-	public ControllerElw(Core core) {
+	protected ControllerElw(Core core) {
 		this.core = core;
 	}
 
-	protected static DiskFileItemFactory createFileItemFactory() {
+	private static DiskFileItemFactory createFileItemFactory() {
 		DiskFileItemFactory fileItemFactory = new DiskFileItemFactory();
 		fileItemFactory.setRepository(new java.io.File(System.getProperty("java.io.tmpdir")));
 		fileItemFactory.setSizeThreshold(2 * 1024 * 1024);
@@ -166,7 +166,7 @@ public abstract class ControllerElw extends MultiActionController implements Web
 		return wm(req, resp, pathToRoot, Ctx.STATE_ECG, wm);
 	}
 
-	protected ModelAndView wm(
+	private ModelAndView wm(
 			HttpServletRequest req, HttpServletResponse resp,
 			final String pathToRoot, final String ctxResolveState, final WebMethodCtx wm
 	) throws IOException {
@@ -205,7 +205,7 @@ public abstract class ControllerElw extends MultiActionController implements Web
 	protected static abstract class WebMethodFile extends WebMethodCtx {
 		protected String scopeForced = null;
 
-		public void setScopeForced(String scopeForced) {
+		private void setScopeForced(String scopeForced) {
 			this.scopeForced = scopeForced;
 		}
 

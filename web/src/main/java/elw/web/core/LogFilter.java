@@ -26,14 +26,14 @@ import elw.vo.Score;
 import org.joda.time.DateTime;
 
 public class LogFilter {
-	final String due;
-	final boolean latest;
-	final String slotId;
-	final String studId;
-	final String verId;
-	final String mode;
-	final String scope;
-	final String[] scopePath;
+	private final String due;
+	private final boolean latest;
+	private final String slotId;
+	private final String studId;
+	private final String verId;
+	private final String mode;
+	private final String scope;
+	private final String[] scopePath;
 
 	public LogFilter() {
 		this(null, null, null, "any", "a", "", false);
@@ -61,7 +61,7 @@ public class LogFilter {
 		return due;
 	}
 
-	public boolean isLatest() {
+	private boolean isLatest() {
 		return latest;
 	}
 
@@ -73,7 +73,7 @@ public class LogFilter {
 		return studId;
 	}
 
-	public String getVerId() {
+	private String getVerId() {
 		return verId;
 	}
 

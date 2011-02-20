@@ -8,11 +8,16 @@ import java.awt.*;
 
 abstract class UtilityUnit extends Device {
 
-	protected double x1, y1, width, height;
-	protected Color color;
-	protected String label1, label2, name;
+	private double x1;
+	private double y1;
+	private double width;
+	private double height;
+	private Color color;
+	private String label1;
+	private String label2;
+	private String name;
 
-	public UtilityUnit(double x, double y, double w, double h, Color c, String label1, String label2, String name) {
+	protected UtilityUnit(double x, double y, double w, double h, Color c, String label1, String label2, String name) {
 		x1 = x;
 		y1 = y;
 		width = w;

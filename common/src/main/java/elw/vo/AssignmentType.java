@@ -5,11 +5,11 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 import java.util.*;
 
 public class AssignmentType extends IdName {
-	protected final List<Assignment> assignments = new ArrayList<Assignment>();
-	protected final List<FileSlot> fileSlots = new ArrayList<FileSlot>();
-	protected Map<String, List<Entry<FileMeta>>> files = new TreeMap<String, List<Entry<FileMeta>>>();
+	private final List<Assignment> assignments = new ArrayList<Assignment>();
+	private final List<FileSlot> fileSlots = new ArrayList<FileSlot>();
+	private Map<String, List<Entry<FileMeta>>> files = new TreeMap<String, List<Entry<FileMeta>>>();
 
-	protected AssignmentSetup setup = null;
+	private AssignmentSetup setup = null;
 
 	@JsonIgnore
 	public Assignment[] getAssignments() {

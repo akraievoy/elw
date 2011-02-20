@@ -6,14 +6,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class DataPath {
-	protected final Instructions instructions = new Instructions();
-	protected final Memory memory = new Memory();
-	protected final Registers registers = new Registers();
+	private final Instructions instructions = new Instructions();
+	private final Memory memory = new Memory();
+	private final Registers registers = new Registers();
 
-	protected final Alu alu = new Alu();
+	private final Alu alu = new Alu();
 
-	protected final InstructionContext ctx;
-	int stepsToWipeHiLo = -1;
+	private final InstructionContext ctx;
+	private int stepsToWipeHiLo = -1;
 
 	public DataPath() {
 		ctx = new InstructionContext(instructions, memory, registers);

@@ -19,7 +19,7 @@
 package elw.vo;
 
 public class Admin extends IdNameStamped {
-	protected String password;
+	private String password;
 
 	public String getPassword() {
 		return password;

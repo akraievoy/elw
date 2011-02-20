@@ -11,7 +11,7 @@ import java.awt.*;
 public class Applet extends JApplet{
 	private static final Logger log = LoggerFactory.getLogger(Applet.class);
 
-	protected Controller instance;
+	private Controller instance;
 
 	public void init() {
 		try {

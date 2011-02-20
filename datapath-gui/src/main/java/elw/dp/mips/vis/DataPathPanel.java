@@ -324,7 +324,7 @@ public class DataPathPanel extends JPanel
 		}
 	}
 
-	public Device findDevice(String name) {
+	private Device findDevice(String name) {
 		int deviceIndex = 0;
 		boolean found = false;
 		do {
@@ -369,7 +369,7 @@ public class DataPathPanel extends JPanel
 		executeOneInstruction();
 	}
 
-	public void executeOneInstruction() {
+	private void executeOneInstruction() {
 		findDevice("pc").execute();
 		findDevice("aluPC").executeAdd();
 		findDevice("instructionMemory").execute();

@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 public class EnrollDao extends Dao<Enrollment> {
 	private static final Logger log = LoggerFactory.getLogger(EnrollDao.class);
 
-	protected final CourseDao courseDao;
+	private final CourseDao courseDao;
 
 	public EnrollDao(CourseDao courseDao) {
 		this.courseDao = courseDao;
@@ -21,7 +21,7 @@ public class EnrollDao extends Dao<Enrollment> {
 		return new Path(new String[] {e.getGroupId(), e.getCourseId(), e.getId()});
 	}
 
-	public String[] findEnrollmentIds() {
+	private String[] findEnrollmentIds() {
 		final String[] pathAll = {null, null, null};
 		final String[][] pathElems = listCriteria(new Path(pathAll));
 
@@ -45,7 +45,7 @@ public class EnrollDao extends Dao<Enrollment> {
 		return load(enrIds);
 	}
 
-	protected Enrollment[] load(String[] enrIds) {
+	private Enrollment[] load(String[] enrIds) {
 		final Enrollment[] enrs = new Enrollment[enrIds.length];
 
 		for (int i = 0; i < enrs.length; i++) {

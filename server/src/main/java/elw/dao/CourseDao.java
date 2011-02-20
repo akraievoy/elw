@@ -6,8 +6,8 @@ import org.slf4j.LoggerFactory;
 
 public class CourseDao extends Dao<Course> {
 	private static final Logger log = LoggerFactory.getLogger(CourseDao.class);
-	protected final AssDao assDao;
-	protected final FileDao fileDao;
+	private final AssDao assDao;
+	private final FileDao fileDao;
 
 	public CourseDao(final AssDao assDao, final FileDao fileDao) {
 		this.assDao = assDao;
@@ -19,7 +19,7 @@ public class CourseDao extends Dao<Course> {
 		return new Path(course.getId());
 	}
 
-	public synchronized String[] findCourseIds() {
+	private synchronized String[] findCourseIds() {
 		final Path pathAll = new Path(new String[]{null});
 		final String[][] pathElems = listCriteria(pathAll);
 

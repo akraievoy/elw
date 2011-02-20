@@ -8,7 +8,7 @@ import java.awt.*;
 
 class LabeledLine extends DataLine {
 
-	String label;
+	private String label;
 
 	public LabeledLine(int size, Color c, String name, String label, String value) {
 		super(size, c, name, label, value);

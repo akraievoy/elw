@@ -5,10 +5,10 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 import java.util.Map;
 
 public class Criteria extends IdName {
-	String ratio = "1.0";
-	String powDef = "";
-	int powMax = 1;
-	boolean auto = false;
+	private String ratio = "1.0";
+	private String powDef = "";
+	private int powMax = 1;
+	private boolean auto = false;
 
 	public String getPowDef() {
 		return powDef;

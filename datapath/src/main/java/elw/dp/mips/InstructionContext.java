@@ -1,11 +1,11 @@
 package elw.dp.mips;
 
 public class InstructionContext {
-	protected final Instructions instructions;
-	protected final Memory memory;
-	protected final Registers registers;
+	private final Instructions instructions;
+	private final Memory memory;
+	private final Registers registers;
 
-	protected Instruction instruction;
+	private Instruction instruction;
 
 	public InstructionContext(final Instructions instructions, final Memory memory, final Registers registers) {
 		this.instructions = instructions;

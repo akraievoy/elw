@@ -19,52 +19,52 @@ import java.util.TreeMap;
 public class Ctx {
 	private static final Logger log = LoggerFactory.getLogger(Ctx.class);
 
-	public static final String STATE_NONE = "";
+	private static final String STATE_NONE = "";
 	public static final String STATE_G = "g";
 	public static final String STATE_GS = "gs";
 	public static final String STATE_ECG = "ecg";
 	public static final String STATE_ECGS = "ecgs";
-	public static final String STATE_C = "c";
+	private static final String STATE_C = "c";
 	public static final String STATE_CT = "ct";
 	public static final String STATE_CTA = "cta";
 	public static final String STATE_CTAV = "ctav";
 	public static final String STATE_CIV = "civ";
 	public static final String STATE_EGSCIV = "egsciv";
 
-	public static final char ELEM_ENR = 'e';
-	public static final char ELEM_INDEX_ENTRY = 'i';
+	private static final char ELEM_ENR = 'e';
+	private static final char ELEM_INDEX_ENTRY = 'i';
 	public static final char ELEM_GROUP = 'g';
 	public static final char ELEM_STUD = 's';
-	public static final char ELEM_COURSE = 'c';
-	public static final char ELEM_ASS_TYPE = 't';
-	public static final char ELEM_ASS = 'a';
-	public static final char ELEM_VER = 'v';
+	private static final char ELEM_COURSE = 'c';
+	private static final char ELEM_ASS_TYPE = 't';
+	private static final char ELEM_ASS = 'a';
+	private static final char ELEM_VER = 'v';
 
-	protected static final String order = "egscitav";
-	protected static final Map<Character, Integer> elemToOrder = createElemToOrderMap();
+	private static final String order = "egscitav";
+	private static final Map<Character, Integer> elemToOrder = createElemToOrderMap();
 
-	public static final String SEP = "--";
+	private static final String SEP = "--";
 
-	protected final String enrId;
-	protected final String courseId;
-	protected final String groupId;
-	protected final String studId;
-	protected int index;
-	protected final String assTypeId;
-	protected final String assId;
-	protected final String verId;
-	protected final String initState;
+	private final String enrId;
+	private final String courseId;
+	private final String groupId;
+	private final String studId;
+	private int index;
+	private final String assTypeId;
+	private final String assId;
+	private final String verId;
+	private final String initState;
 
 	//	required elements resolved
-	protected Enrollment enr;
-	protected Student student;
-	protected AssignmentType assType;
-	protected Assignment ass;
-	protected Version ver;
-	protected String resolveState;
-	protected Course course;
-	protected Group group;
-	protected IndexEntry indexEntry;
+	private Enrollment enr;
+	private Student student;
+	private AssignmentType assType;
+	private Assignment ass;
+	private Version ver;
+	private String resolveState;
+	private Course course;
+	private Group group;
+	private IndexEntry indexEntry;
 
 	public Ctx(
 			final String initState,
@@ -367,7 +367,7 @@ public class Ctx {
 		return res.toString();
 	}
 
-	public String dump() {
+	private String dump() {
 		return
 				"e:" + enrId + " " +
 				"g:" + groupId + " " +
@@ -383,7 +383,7 @@ public class Ctx {
 		return initState;
 	}
 
-	public String getResolveState() {
+	private String getResolveState() {
 		return resolveState;
 	}
 
@@ -427,7 +427,7 @@ public class Ctx {
 		return index;
 	}
 
-	public Ctx extendEnr(final Enrollment enr) {
+	private Ctx extendEnr(final Enrollment enr) {
 		final Ctx ctx = copy();
 
 		if (enr != null) {
@@ -544,7 +544,7 @@ public class Ctx {
 
 	}
 
-	public Ctx extendAssType(final AssignmentType assType) {
+	private Ctx extendAssType(final AssignmentType assType) {
 		final Ctx ctx = copy();
 
 		if (assType != null) {
@@ -563,7 +563,7 @@ public class Ctx {
 		return ctx;
 	}
 
-	public Ctx extendAss(final Assignment ass) {
+	private Ctx extendAss(final Assignment ass) {
 		final Ctx ctx = copy();
 
 		if (ass != null) {
@@ -601,7 +601,7 @@ public class Ctx {
 		return extendAssType(assType).extendAss(ass).extendVer(ver);
 	}
 
-	public Ctx copy() {
+	private Ctx copy() {
 		final Ctx copy = new Ctx(initState, enrId, groupId, studId, courseId, -1, assTypeId, assId, verId);
 
 		copy.resolveState = resolveState;
@@ -632,15 +632,15 @@ public class Ctx {
 		return has(resolveState, c);
 	}
 
-	public boolean inited(char c) {
+	private boolean inited(char c) {
 		return has(initState, c);
 	}
 
-	protected boolean has(StringBuilder resolved, final char elem) {
+	private boolean has(StringBuilder resolved, final char elem) {
 		return has(resolved.toString(), elem);
 	}
 
-	public static boolean has(final String state, char elem) {
+	private static boolean has(final String state, char elem) {
 		for (int i = 0, stateLen = state.length(); i < stateLen; i++) {
 			final char c1 = state.charAt(i);
 			if (c1 == elem) {
@@ -651,7 +651,7 @@ public class Ctx {
 		return false;
 	}
 
-	protected static TreeMap<Character, Integer> createElemToOrderMap() {
+	private static TreeMap<Character, Integer> createElemToOrderMap() {
 		final TreeMap<Character, Integer> elemToOrder = new TreeMap<Character, Integer>();
 
 		for (int pos = 0; pos < order.length(); pos++) {
@@ -661,7 +661,7 @@ public class Ctx {
 		return elemToOrder;
 	}
 
-	protected static boolean isRedundant(String elemsBefore, char elemAfter) {
+	private static boolean isRedundant(String elemsBefore, char elemAfter) {
 		if (elemsBefore.indexOf(ELEM_ENR) >= 0 && elemsBefore.indexOf(ELEM_INDEX_ENTRY) >= 0 && elemAfter == ELEM_VER) {
 			return true;
 		}
@@ -672,7 +672,7 @@ public class Ctx {
 		return elemsBefore.indexOf(ELEM_INDEX_ENTRY) >= 0 && (elemAfter == ELEM_ASS_TYPE || elemAfter == ELEM_ASS);
 	}
 
-	protected static String removeRedundant(final String format) {
+	private static String removeRedundant(final String format) {
 		boolean anyRedundant = false;
 		boolean[] redundant = new boolean[format.length()];
 		for (int afterPos = 1; afterPos < format.length(); afterPos++) {
@@ -696,7 +696,7 @@ public class Ctx {
 		return result.toString();
 	}
 
-	protected static String reorder(final String format) {
+	private static String reorder(final String format) {
 		char[] result = null;
 		for (int count = 0; count < format.length(); count++) {
 			boolean reordered = false;
@@ -729,7 +729,7 @@ public class Ctx {
 		return result != null ? String.valueOf(result) : format;
 	}
 
-	public static String norm(final String state) {
+	private static String norm(final String state) {
 		return removeRedundant(reorder(state));
 	}
 
@@ -801,7 +801,7 @@ public class Ctx {
 	}
 
 	//	LATER move this to base.G4mat
-	public static String renderBytes(byte[] checkSum) {
+	private static String renderBytes(byte[] checkSum) {
 		final StringBuffer result = new StringBuffer();
 
 		for (byte checkByte : checkSum) {

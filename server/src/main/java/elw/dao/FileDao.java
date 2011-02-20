@@ -21,7 +21,7 @@ public class FileDao extends Dao<FileMeta> {
 
 	private static final Logger log = LoggerFactory.getLogger(FileDao.class);
 
-	protected final ScoreDao scoreDao;
+	private final ScoreDao scoreDao;
 	public static final String[] SCOPES = new String[] {FileDao.SCOPE_ASS_TYPE, FileDao.SCOPE_ASS, FileDao.SCOPE_VER, FileDao.SCOPE_STUD};
 
 	public FileDao(final ScoreDao scoreDao) {
@@ -61,7 +61,7 @@ public class FileDao extends Dao<FileMeta> {
 		return files;
 	}
 
-	protected void loadScore(Ctx ctx, String slotId, String fileId, Entry<FileMeta> entry) {
+	private void loadScore(Ctx ctx, String slotId, String fileId, Entry<FileMeta> entry) {
 		if (entry == null) {
 			return;
 		}
@@ -72,12 +72,12 @@ public class FileDao extends Dao<FileMeta> {
 		}
 	}
 
-	protected Stamp setPathAndCreate(final Path path, FileMeta meta, BufferedInputStream binary, BufferedReader text) throws IOException {
+	private Stamp setPathAndCreate(final Path path, FileMeta meta, BufferedInputStream binary, BufferedReader text) throws IOException {
 		meta.setPath(path.getPath());
 		return create(path, meta, binary, text);
 	}
 
-	protected Path pathFor(final String scope, Ctx ctx, String slotId, FileMeta meta) {
+	private Path pathFor(final String scope, Ctx ctx, String slotId, FileMeta meta) {
 		final String[] pathStr;
 
 		if (SCOPE_ASS_TYPE.equals(scope)) {
@@ -124,7 +124,7 @@ public class FileDao extends Dao<FileMeta> {
 		return new Path(pathStr);
 	}
 
-	protected String idForMeta(FileMeta meta) {
+	private String idForMeta(FileMeta meta) {
 		if (meta == null) {
 			return null;
 		}
@@ -140,12 +140,12 @@ public class FileDao extends Dao<FileMeta> {
 		return id;
 	}
 
-	protected Entry<FileMeta>[] findFiles(final Path path) {
+	private Entry<FileMeta>[] findFiles(final Path path) {
 		final String[][] pathElems = listCriteria(path);
 		return load(path, pathElems[pathElems.length - 1]);
 	}
 
-	protected Entry<FileMeta>[] load(final Path path, String[] fileIds) {
+	private Entry<FileMeta>[] load(final Path path, String[] fileIds) {
 		//	generic array creation, aaaaargh!
 		@SuppressWarnings({"unchecked"})
 		final Entry<FileMeta>[] files = (Entry<FileMeta>[]) Array.newInstance(Entry.class, fileIds.length);

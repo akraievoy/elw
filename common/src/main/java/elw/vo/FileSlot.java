@@ -5,20 +5,20 @@ import java.util.Arrays;
 import java.util.List;
 
 public class FileSlot extends IdNameStamped {
-	protected List<String> readApprovals = new ArrayList<String>();
-	protected List<String> writeApprovals = new ArrayList<String>();
-	protected List<String> contentTypes = new ArrayList<String>();
-	protected Class validator = null;
-	protected String shortName;
-	protected long lengthLimit;
-	protected String nameRegex;
-	protected boolean escaped = true;
-	protected boolean binary;
-	protected boolean writable;
-	protected String editor;
+	private List<String> readApprovals = new ArrayList<String>();
+	private List<String> writeApprovals = new ArrayList<String>();
+	private List<String> contentTypes = new ArrayList<String>();
+	private Class validator = null;
+	private String shortName;
+	private long lengthLimit;
+	private String nameRegex;
+	private boolean escaped = true;
+	private boolean binary;
+	private boolean writable;
+	private String editor;
 
-	protected double scoreWeight = 0.0;
-	protected final List<Criteria> criterias = new ArrayList<Criteria>();
+	private double scoreWeight = 0.0;
+	private final List<Criteria> criterias = new ArrayList<Criteria>();
 
 	public boolean isBinary() {
 		return binary;

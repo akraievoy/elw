@@ -4,13 +4,13 @@ import java.util.Arrays;
 
 public class Path {
 	public static final Path EMPTY = new Path();
-	protected final String[] path;
+	private final String[] path;
 
 	public Path(String[] path) {
 		this.path = path;
 	}
 
-	public Path() {
+	private Path() {
 		this.path = new String[0];
 	}
 
@@ -61,7 +61,7 @@ public class Path {
 		return true;
 	}
 
-	public Path set(final int index, final String value) {
+	private Path set(final int index, final String value) {
 		final String[] newPath = this.path.clone();
 
 		newPath[index] = value;

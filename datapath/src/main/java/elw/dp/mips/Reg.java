@@ -25,9 +25,9 @@ public enum Reg {
 	public final static List<Reg> autoRegs = Arrays.asList(pc, sp, ra);
 	public final static List<Reg> tempRegs = Arrays.asList(t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, pc, hi, lo);
 
-	protected static final Map<String, Reg> byName = new TreeMap<String, Reg>();
+	private static final Map<String, Reg> byName = new TreeMap<String, Reg>();
 
-	protected static TreeMap<String, Reg> createByNameMap() {
+	private static TreeMap<String, Reg> createByNameMap() {
 		final TreeMap<String, Reg> byNameMap = new TreeMap<String, Reg>();
 
 		for (Reg reg : values()) {

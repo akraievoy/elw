@@ -7,10 +7,10 @@ import org.akraievoy.gear.G;
 import java.util.Arrays;
 
 public class Registers {
-	final TIntIntHashMap regToValue = new TIntIntHashMap();
+	private final TIntIntHashMap regToValue = new TIntIntHashMap();
 
-	final TIntArrayList readRegs = new TIntArrayList();
-	final TIntArrayList writeRegs = new TIntArrayList();
+	private final TIntArrayList readRegs = new TIntArrayList();
+	private final TIntArrayList writeRegs = new TIntArrayList();
 
 	public int getReg(Reg reg) {
 		readRegs.add(reg.ordinal());
@@ -31,7 +31,7 @@ public class Registers {
 		return setRegInternal(reg, value);
 	}
 
-	public int setRegInternal(Reg reg, int value) {
+	private int setRegInternal(Reg reg, int value) {
 		if (G.contains(Reg.roRegs, reg)) {
 			//	LATER log
 			return 0;

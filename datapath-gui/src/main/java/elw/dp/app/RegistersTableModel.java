@@ -13,8 +13,8 @@ public class RegistersTableModel extends AbstractTableModel {
 	public static final String COL_DEC = "Dec";
 	public static final String COL_ACC = InstructionsTableModel.COL_ACC;
 
-	protected final String[] columns = new String[]{COL_ACC, COL_NUMBER, COL_NAME, COL_HEX, COL_DEC};
-	protected final Registers registers;
+	private final String[] columns = new String[]{COL_ACC, COL_NUMBER, COL_NAME, COL_HEX, COL_DEC};
+	private final Registers registers;
 
 	public RegistersTableModel(Registers registers) {
 		this.registers = registers;
@@ -51,7 +51,7 @@ public class RegistersTableModel extends AbstractTableModel {
 		return "";
 	}
 
-	protected String getAccessMod(Reg rowIndex) {
+	private String getAccessMod(Reg rowIndex) {
 		StringBuffer accessMod = new StringBuffer();
 
 		if (registers.getReadRegs().contains(rowIndex.ordinal())) {

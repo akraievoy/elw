@@ -1,8 +1,8 @@
 package elw.vo;
 
 public class Student extends IdName {
-	protected String email;
-	protected boolean lead;
+	private String email;
+	private boolean lead;
 
 	public boolean isLead() {
 		return lead;

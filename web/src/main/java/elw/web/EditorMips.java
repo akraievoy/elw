@@ -26,7 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.StringWriter;
 
 public class EditorMips implements Editor {
-	protected long cacheBustingToken = System.currentTimeMillis();
+	private long cacheBustingToken = System.currentTimeMillis();
 
 	public String render(HttpServletRequest req, HttpServletResponse resp, Ctx ctx, FileSlot slot) {
 		final StringWriter out = new StringWriter();

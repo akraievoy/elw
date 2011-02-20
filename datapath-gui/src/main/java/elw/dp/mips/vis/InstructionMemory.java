@@ -15,11 +15,12 @@ import static elw.dp.mips.asm.Data.int2long;
 
 class InstructionMemory extends RegMem implements InstructionsModel {
 
-	DataLine input, output;
-	int memory[];
-	String code[];
-	DataPathPanel parent;
-	protected int accessIndex;
+	private DataLine input;
+	private DataLine output;
+	private int[] memory;
+	private String[] code;
+	private DataPathPanel parent;
+	private int accessIndex;
 	private AbstractTableModel instructionsTableModel;
 
 	public InstructionMemory(double x1, double y1, double width, double height, Color color, String label1, String label2, String name, DataLine input, DataLine output, DataPathPanel parent) {
@@ -101,7 +102,7 @@ class InstructionMemory extends RegMem implements InstructionsModel {
 		protected final String[] columns = new String[]{COL_NUMBER, COL_HEX, COL_ACC, COL_CODE};
 		protected final InstructionsModel instructions;
 
-		public InstructionsTableModel(InstructionsModel instructions) {
+		private InstructionsTableModel(InstructionsModel instructions) {
 			this.instructions = instructions;
 		}
 

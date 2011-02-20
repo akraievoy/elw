@@ -19,9 +19,9 @@
 package elw.web;
 
 public class VtTuple {
-	protected final String text;
-	protected final String classes;
-	protected final String sort;
+	private final String text;
+	private final String classes;
+	private final String sort;
 
 	public VtTuple(String text, String classes, String sort) {
 		this.classes = classes;

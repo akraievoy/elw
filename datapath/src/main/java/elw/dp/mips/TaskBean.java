@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TaskBean {
-	protected String statement;
-	protected java.util.List<String> tests = new ArrayList<String>();
-	protected String solution;
+	private String statement;
+	private java.util.List<String> tests = new ArrayList<String>();
+	private String solution;
 
 	public TaskBean(String statement, List<String> tests, String solution) {
 		this.solution = solution;

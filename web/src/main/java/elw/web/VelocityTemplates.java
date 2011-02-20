@@ -275,7 +275,7 @@ public class VelocityTemplates {
 		return new VtTuple(text.toString(), cls.toString(), sort.toString());
 	}
 
-	protected static void overdueClasses(Entry<FileMeta> file, Class classDue, StringBuilder cls) {
+	private static void overdueClasses(Entry<FileMeta> file, Class classDue, StringBuilder cls) {
 		if (classDue != null) {
 			if (classDue.isPassed()) {
 				cls.append(" elw_due_passed");
@@ -289,7 +289,7 @@ public class VelocityTemplates {
 		}
 	}
 
-	public void niceRatio(Format f, final double ratio, final String title, final StringBuilder sb) {
+	private void niceRatio(Format f, final double ratio, final String title, final StringBuilder sb) {
 		if (Math.abs(ratio - 1) < 1e-2) {
 			return;
 		}

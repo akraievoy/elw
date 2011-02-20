@@ -13,11 +13,11 @@ public class Class {
 	private static final DateTimeFormatter FMT_DATE_NICE = DateTimeFormat.forPattern("EEE MMM dd");
 	private static final DateTimeFormatter FMT_TIME = DateTimeFormat.forPattern("HH:mm");
 
-	protected String date;
-	protected String fromTime;
-	protected String toTime;
-	protected Pattern[] onSitePatterns;
-	protected String[] onSite;
+	private String date;
+	private String fromTime;
+	private String toTime;
+	private Pattern[] onSitePatterns;
+	private String[] onSite;
 
 	@JsonIgnore
 	public boolean isCurrent() {
@@ -29,7 +29,7 @@ public class Class {
 		return isStarted(new DateTime());
 	}
 
-	public boolean isStarted(final DateTime beforeTime) {
+	private boolean isStarted(final DateTime beforeTime) {
 		final DateTime fromDateTime = getFromDateTime();
 		return fromDateTime.isBefore(beforeTime);
 	}
@@ -65,7 +65,7 @@ public class Class {
 		return isPassed(new DateTime());
 	}
 
-	public boolean isPassed(final DateTime beforeTime) {
+	private boolean isPassed(final DateTime beforeTime) {
 		final DateTime toDateTime = getToDateTime();
 
 		return toDateTime.isBefore(beforeTime);
@@ -77,7 +77,7 @@ public class Class {
 		return fromDateTime.isBeforeNow() && fromDateTime.plusDays(1).isAfterNow();
 	}
 
-	public String getDate() {
+	private String getDate() {
 		return date;
 	}
 
@@ -111,7 +111,7 @@ public class Class {
 		}
 	}
 
-	public int getDayDiff(final DateTime toDate) {
+	private int getDayDiff(final DateTime toDate) {
 		final DateTime date = getFromDateTime();
 		final DateTime dateMidnight = new DateTime(
 				date.getYear(), date.getMonthOfYear(), date.getDayOfMonth(),
@@ -131,7 +131,7 @@ public class Class {
 		this.date = date;
 	}
 
-	public String getFromTime() {
+	private String getFromTime() {
 		return fromTime;
 	}
 
@@ -147,7 +147,7 @@ public class Class {
 		this.onSite = ipMasks;
 	}
 
-	public String getToTime() {
+	private String getToTime() {
 		return toTime;
 	}
 
@@ -160,7 +160,7 @@ public class Class {
 		return getDaysOverdue(stamp);
 	}
 
-	public int getDaysOverdue(DateTime uploadStamp) {
+	private int getDaysOverdue(DateTime uploadStamp) {
 		final int overdue;
 		if (isPassed(uploadStamp)) {
 			overdue = getDayDiff(uploadStamp);

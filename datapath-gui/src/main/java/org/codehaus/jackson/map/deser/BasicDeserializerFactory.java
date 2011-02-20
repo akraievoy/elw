@@ -31,14 +31,14 @@ public abstract class BasicDeserializerFactory
 {
     // // Can cache some types
 
-    final static JavaType TYPE_STRING = TypeFactory.type(String.class);
+    private final static JavaType TYPE_STRING = TypeFactory.type(String.class);
 
     /**
      * We will pre-create serializers for common non-structured
      * (that is things other than Collection, Map or array)
      * types. These need not go through factory.
      */
-    final static HashMap<JavaType, JsonDeserializer<Object>> _simpleDeserializers = StdDeserializers.constructAll();
+    private final static HashMap<JavaType, JsonDeserializer<Object>> _simpleDeserializers = StdDeserializers.constructAll();
 
 
     /* We do some defaulting for abstract Map classes and
@@ -46,7 +46,7 @@ public abstract class BasicDeserializerFactory
      * cases where the most common concrete Maps will do.
      */
     @SuppressWarnings("unchecked")
-    final static HashMap<String, Class<? extends Map>> _mapFallbacks =
+	private final static HashMap<String, Class<? extends Map>> _mapFallbacks =
         new HashMap<String, Class<? extends Map>>();
     static {
 
@@ -77,7 +77,7 @@ public abstract class BasicDeserializerFactory
      * cases where the most common concrete Collection will do.
      */
     @SuppressWarnings("unchecked")
-    final static HashMap<String, Class<? extends Collection>> _collectionFallbacks =
+	private final static HashMap<String, Class<? extends Collection>> _collectionFallbacks =
         new HashMap<String, Class<? extends Collection>>();
     static {
         _collectionFallbacks.put(Collection.class.getName(), ArrayList.class);
@@ -101,7 +101,7 @@ public abstract class BasicDeserializerFactory
      * And finally, we have special array deserializers for primitive
      * array types
      */
-    final static HashMap<JavaType,JsonDeserializer<Object>> _arrayDeserializers = ArrayDeserializers.getAll();
+    private final static HashMap<JavaType,JsonDeserializer<Object>> _arrayDeserializers = ArrayDeserializers.getAll();
 
     /*
     ////////////////////////////////////////////////////////////
@@ -312,7 +312,7 @@ public abstract class BasicDeserializerFactory
      * has annotation that tells which class to use for deserialization.
      * Returns null if no such annotation found.
      */
-    protected JsonDeserializer<Object> findDeserializerFromAnnotation(DeserializationConfig config, Annotated a)
+	private JsonDeserializer<Object> findDeserializerFromAnnotation(DeserializationConfig config, Annotated a)
     {
         Object deserDef = config.getAnnotationIntrospector().findDeserializer(a);
         if (deserDef != null) {
@@ -322,7 +322,7 @@ public abstract class BasicDeserializerFactory
     }
 
     @SuppressWarnings("unchecked")
-    JsonDeserializer<Object> _constructDeserializer(DeserializationConfig config, Object deserDef)
+	private JsonDeserializer<Object> _constructDeserializer(DeserializationConfig config, Object deserDef)
     {
         if (deserDef instanceof JsonDeserializer) {
             return (JsonDeserializer<Object>) deserDef;
@@ -357,7 +357,7 @@ public abstract class BasicDeserializerFactory
      * @throws JsonMappingException if invalid annotation is found
      */
     @SuppressWarnings("unchecked")
-    protected <T extends JavaType> T modifyTypeByAnnotation(DeserializationConfig config,
+	private <T extends JavaType> T modifyTypeByAnnotation(DeserializationConfig config,
                                               Annotated a, T type)
         throws JsonMappingException
     {
@@ -410,7 +410,7 @@ public abstract class BasicDeserializerFactory
      * Starting with version 1.3, this method will also instances
      * of key and content deserializers if defined by annotations.
      */
-    protected JavaType resolveType(DeserializationConfig config,
+	private JavaType resolveType(DeserializationConfig config,
                                    BasicBeanDescription beanDesc, Type rawType,
                                    Annotated a)
     {
@@ -447,7 +447,7 @@ public abstract class BasicDeserializerFactory
      * Method used to find non-default constructors and factory
      * methods that are marked to be used as Creators for a Map type.
      */
-    CreatorContainer findMapCreators(DeserializationConfig config,
+	private CreatorContainer findMapCreators(DeserializationConfig config,
                                      BasicBeanDescription beanDesc)
         throws JsonMappingException
     {
@@ -506,7 +506,7 @@ public abstract class BasicDeserializerFactory
      * a logical property passed via Creator (constructor or static
      * factory method)
      */
-    protected SettableBeanProperty constructCreatorProperty(DeserializationConfig config,
+	private SettableBeanProperty constructCreatorProperty(DeserializationConfig config,
                                                             BasicBeanDescription beanDesc,
                                                             String name,
                                                             int index,

@@ -69,7 +69,7 @@ public class ElwUri {
 		return "summary?elw_ctx=e--" + enrId;
 	}
 
-	public String fileQuery(final Ctx ctx, final String scope, final String slotId, FileMeta file) {
+	private String fileQuery(final Ctx ctx, final String scope, final String slotId, FileMeta file) {
 		final String xferQuery = "?elw_ctx=" + ctx.toString() + "&s=" + scope + "&sId=" + slotId;
 
 		if (file != null) {

@@ -6,7 +6,7 @@ import java.util.List;
 
 public class IdName {
 	protected String name;
-	protected String id;
+	private String id;
 
 	public String getId() {
 		return id;
@@ -64,7 +64,7 @@ public class IdName {
 		return found;
 	}
 
-	public static <E extends IdName> E findById(final List<E> elems, String id) {
+	protected static <E extends IdName> E findById(final List<E> elems, String id) {
 		E found = null;
 		for (E e : elems) {
 			if (id.equals(e.getId())) {
@@ -104,7 +104,7 @@ public class IdName {
 		return found;
 	}
 
-	public static String ws(final String text) {
+	private static String ws(final String text) {
 		return text.replaceAll("\\s+", " ").trim();
 	}
 }

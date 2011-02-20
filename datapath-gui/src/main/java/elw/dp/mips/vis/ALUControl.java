@@ -12,7 +12,7 @@ class ALUControl extends UtilityUnit {
 
 	private DataLine input, aluOp, output;
 
-	public ALUControl(double x, double y, double w, double h, Color c, String label1, String label2, String name, DataLine aluOp, DataLine input,
+	protected ALUControl(double x, double y, double w, double h, Color c, String label1, String label2, String name, DataLine aluOp, DataLine input,
 					  DataLine output) {
 		super(x, y, w, h, c, label1, label2, name);
 		this.input = input;

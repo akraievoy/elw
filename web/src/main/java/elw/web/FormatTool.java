@@ -39,25 +39,25 @@ import java.util.*;
 public class FormatTool implements Format {
 	private static final Logger log = LoggerFactory.getLogger(FormatTool.class);
 
-	protected final static Map<Locale, FormatTool> cache = new HashMap<Locale, FormatTool>();
+	private final static Map<Locale, FormatTool> cache = new HashMap<Locale, FormatTool>();
 
-	protected static final long KB = 1024;
-	protected static final long HALF_KB = 512;
-	protected static final long MB = KB * KB;
-	protected static final long HALF_MB = HALF_KB * KB;
-	protected static final long MB_BOUNDARY = 10 * MB;
-	protected static final long KB_BOUNDARY = 10 * KB;
+	private static final long KB = 1024;
+	private static final long HALF_KB = 512;
+	private static final long MB = KB * KB;
+	private static final long HALF_MB = HALF_KB * KB;
+	private static final long MB_BOUNDARY = 10 * MB;
+	private static final long KB_BOUNDARY = 10 * KB;
 
-	protected final Locale locale;
-	protected final Map<String, DateTimeFormatter> dtfCache = new TreeMap<String, DateTimeFormatter>();
-	protected final Map<String, PeriodFormatter> pfCache = new TreeMap<String, PeriodFormatter>();
+	private final Locale locale;
+	private final Map<String, DateTimeFormatter> dtfCache = new TreeMap<String, DateTimeFormatter>();
+	private final Map<String, PeriodFormatter> pfCache = new TreeMap<String, PeriodFormatter>();
 
-	protected String pattern = "MMM d";
-	protected String patternWeek = "EEE d HH:mm";
-	protected String patternToday = "HH:mm";
+	private String pattern = "MMM d";
+	private String patternWeek = "EEE d HH:mm";
+	private String patternToday = "HH:mm";
 	public static final String MODEL_KEY = "f";
 
-	protected FormatTool(Locale locale) {
+	private FormatTool(Locale locale) {
 		this.locale = locale;
 	}
 
@@ -150,7 +150,7 @@ public class FormatTool implements Format {
 		}
 	}
 
-	protected DateTimeFormatter lookupFormatter(String pattern) {
+	private DateTimeFormatter lookupFormatter(String pattern) {
 		synchronized (dtfCache) {
 			final DateTimeFormatter cached = dtfCache.get(pattern);
 			if (cached != null) {
@@ -164,7 +164,7 @@ public class FormatTool implements Format {
 		}
 	}
 
-	protected PeriodFormatter lookupPeriodFormatter(String pattern) {
+	private PeriodFormatter lookupPeriodFormatter(String pattern) {
 		synchronized (dtfCache) {
 			final PeriodFormatter cached = pfCache.get(pattern);
 			if (cached != null) {
@@ -179,7 +179,7 @@ public class FormatTool implements Format {
 		}
 	}
 
-	protected static PeriodFormatter createDefaultPeriodFormatted(String pattern) {
+	private static PeriodFormatter createDefaultPeriodFormatted(String pattern) {
 		String[] variants = {" ", ",", ",and ", ", and "};
 		final PeriodFormatter formatter;
 		if ("y".equals(pattern)) {
@@ -317,8 +317,8 @@ public class FormatTool implements Format {
 		}
 	}
 
-	final String escSearches = "&\"\'><\r\n";
-	final String[] escReplaces = {"&amp;", "&quot;", "&#39;", "&gt;", "&lt;", "&#13;", "&#10;"};
+	private final String escSearches = "&\"\'><\r\n";
+	private final String[] escReplaces = {"&amp;", "&quot;", "&#39;", "&gt;", "&lt;", "&#13;", "&#10;"};
 
 
 	public String esc(final String str) {

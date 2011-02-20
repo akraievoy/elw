@@ -12,9 +12,12 @@ import java.util.Vector;
 public class DataLine {
 
 	protected Vector lines;
-	protected Color normalColor, highLightColor;
-	protected String value, name, label;
-	protected boolean selected;
+	private Color normalColor;
+	private Color highLightColor;
+	private String value;
+	private String name;
+	private String label;
+	private boolean selected;
 
 	public DataLine(int size, Color c, String name, String label, String value) {
 		selected = false;

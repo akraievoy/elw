@@ -8,16 +8,16 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class Score implements Stamped {
-	protected final Map<String, Double> ratios = new TreeMap<String, Double>();
-	protected final Map<String, Integer> pows = new TreeMap<String, Integer>();
+	private final Map<String, Double> ratios = new TreeMap<String, Double>();
+	private final Map<String, Integer> pows = new TreeMap<String, Integer>();
 
-	protected Stamp createStamp;
-	protected String[] path;
+	private Stamp createStamp;
+	private String[] path;
 
-	protected Boolean approved;
-	protected String comment;
+	private Boolean approved;
+	private String comment;
 
-	protected boolean best;	//	transient
+	private boolean best;	//	transient
 
 	public Boolean getApproved() {
 		return approved;
@@ -124,7 +124,7 @@ public class Score implements Stamped {
 		return slot.getId() + "--" + c.getId();
 	}
 
-	public boolean contains(String id) {
+	private boolean contains(String id) {
 		return pows.containsKey(id) && ratios.containsKey(id);
 	}
 

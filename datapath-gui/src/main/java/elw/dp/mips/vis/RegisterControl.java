@@ -15,14 +15,14 @@ import java.util.logging.Logger;
 public class RegisterControl {
 	private static final org.slf4j.Logger log = LoggerFactory.getLogger(RegisterControl.class);
 
-	protected final int[] lastLoaded = new int[RegistersModel.REGS];
-	protected final RegistersModel regModel;
+	private final int[] lastLoaded = new int[RegistersModel.REGS];
+	private final RegistersModel regModel;
 
 	public RegisterControl(RegistersModel newRegModel) {
 		regModel = newRegModel;
 	}
 
-	public boolean isRegisterNumber(String registerNumber) {
+	private boolean isRegisterNumber(String registerNumber) {
 		return Data.isDecPositive(registerNumber) && Data.dec2int(registerNumber) < RegistersModel.REGS;
 	}
 
@@ -92,7 +92,7 @@ public class RegisterControl {
 		return true;
 	}
 
-	public void listReload() {
+	private void listReload() {
 		regModel.load(lastLoaded);
 	}
 }

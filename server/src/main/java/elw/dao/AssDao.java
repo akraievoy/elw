@@ -6,7 +6,7 @@ import elw.vo.*;
  * Path: course.id/assType.id/ass.id
  */
 public class AssDao extends Dao<Assignment> {
-	protected final FileDao fileDao;
+	private final FileDao fileDao;
 
 	public AssDao(FileDao fileDao) {
 		this.fileDao = fileDao;
@@ -17,7 +17,7 @@ public class AssDao extends Dao<Assignment> {
 		return new Path(assignment.getPath());
 	}
 
-	protected String[] findIdsForAssType(final Course course, final AssignmentType assType) {
+	private String[] findIdsForAssType(final Course course, final AssignmentType assType) {
 		final String[][] pathElems = listCriteria(forType(course, assType, null));
 
 		return pathElems[2];
@@ -29,7 +29,7 @@ public class AssDao extends Dao<Assignment> {
 		return load(course, type, assIds);
 	}
 
-	protected Assignment[] load(final Course course, final AssignmentType assType, String[] assIds) {
+	private Assignment[] load(final Course course, final AssignmentType assType, String[] assIds) {
 		final Assignment[] assignments = new Assignment[assIds.length];
 
 		for (int i = 0; i < assignments.length; i++) {
@@ -39,7 +39,7 @@ public class AssDao extends Dao<Assignment> {
 		return assignments;
 	}
 
-	protected Assignment findAssignment(final Course course, final AssignmentType assType, final String assId) {
+	private Assignment findAssignment(final Course course, final AssignmentType assType, final String assId) {
 		if (assId == null) {
 			return null;
 		}
@@ -72,7 +72,7 @@ public class AssDao extends Dao<Assignment> {
 		return entry.getMeta();
 	}
 
-	protected static Path forType(Course course, AssignmentType assType, String assId) {
+	private static Path forType(Course course, AssignmentType assType, String assId) {
 		final Path forType = new Path(new String[]{course.getId(), assType.getId(), assId});
 		return forType;
 	}

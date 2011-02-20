@@ -3,13 +3,13 @@ package elw.dp.mips;
 import java.util.*;
 
 public class Instructions {
-	protected SortedMap<Integer, Instruction> addressToInstruction = new TreeMap<Integer, Instruction>();
-	protected Set<Integer> readAddresses = new HashSet<Integer>();
+	private SortedMap<Integer, Instruction> addressToInstruction = new TreeMap<Integer, Instruction>();
+	private Set<Integer> readAddresses = new HashSet<Integer>();
 
-	protected final Random random = new Random();
-	protected int codeBase;
-	protected int stackBase;
-	protected int minStackBase;
+	private final Random random = new Random();
+	private int codeBase;
+	private int stackBase;
+	private int minStackBase;
 
 	public void resetAccess() {
 		readAddresses.clear();

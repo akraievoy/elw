@@ -28,15 +28,16 @@ import elw.web.VtTuple;
 import java.util.*;
 
 public class Core {
-	protected final CourseDao courseDao;
-	protected final GroupDao groupDao;
-	protected final EnrollDao enrollDao;
-	protected final ScoreDao scoreDao;
-	protected final FileDao fileDao;
+	private static final String CTX_TO_SCORE_TOTAL = "--total";
 
-	protected final VelocityTemplates vt = VelocityTemplates.INSTANCE;
-	protected final ElwUri uri = new ElwUri();
-	protected static final String CTX_TO_SCORE_TOTAL = "--total";
+	private final CourseDao courseDao;
+	private final GroupDao groupDao;
+	private final EnrollDao enrollDao;
+	private final ScoreDao scoreDao;
+	private final FileDao fileDao;
+
+	private final VelocityTemplates vt = VelocityTemplates.INSTANCE;
+	private final ElwUri uri = new ElwUri();
 
 	public Core(CourseDao courseDao, EnrollDao enrollDao, FileDao fileDao, GroupDao groupDao, ScoreDao scoreDao) {
 		this.courseDao = courseDao;
@@ -72,7 +73,7 @@ public class Core {
 		return logData;
 	}
 
-	protected void logCourse(
+	private void logCourse(
 			Ctx ctx, Format format, LogFilter lf,
 			List<Object[]> logData, final boolean adm
 	) {
@@ -115,7 +116,7 @@ public class Core {
 		}
 	}
 
-	protected void logStud(Ctx ctx, Format f, LogFilter lf, List<Object[]> logData, boolean adm) {
+	private void logStud(Ctx ctx, Format f, LogFilter lf, List<Object[]> logData, boolean adm) {
 		if (adm) {
 			for (Student stud : ctx.getGroup().getStudents()) {
 				if (W.excluded(lf.getStudId(), stud.getId())) {
@@ -132,7 +133,7 @@ public class Core {
 		}
 	}
 
-	protected void logStudForStud(
+	private void logStudForStud(
 			Ctx ctx, Format f,
 			LogFilter lf, List<Object[]> logData, Ctx ctxStud,
 			boolean adm) {
@@ -165,7 +166,7 @@ public class Core {
 		}
 	}
 
-	protected int logRows(Format format, LogFilter logFilter, List<Object[]> logData, int index, Ctx ctxVer, FileSlot slot, Entry<FileMeta>[] uploads, String scope, boolean adm) {
+	private int logRows(Format format, LogFilter logFilter, List<Object[]> logData, int index, Ctx ctxVer, FileSlot slot, Entry<FileMeta>[] uploads, String scope, boolean adm) {
 		int shown = 0;
 		for (int i = 0, uploadsLength = uploads.length; i < uploadsLength; i++) {
 			final boolean last = i + 1 == uploadsLength;
@@ -182,7 +183,7 @@ public class Core {
 		return shown;
 	}
 
-	protected Object[] logRow(
+	private Object[] logRow(
 			Format f, final String mode, List<Object[]> data,
 			int index, Ctx ctx, FileSlot slot, Entry<FileMeta> e, String scope,
 			boolean adm) {
@@ -283,7 +284,7 @@ public class Core {
 		return indexData;
 	}
 
-	protected Object[] indexRow(List<Object[]> indexData, Enrollment enr) {
+	private Object[] indexRow(List<Object[]> indexData, Enrollment enr) {
 		final Group group = groupDao.findGroup(enr.getGroupId());
 		final Course course = courseDao.findCourse(enr.getCourseId());
 
@@ -351,7 +352,7 @@ public class Core {
 		return logData;
 	}
 
-	protected Score chooseBestScore(SortedMap<Stamp, Entry<Score>> allScores, Ctx ctx, FileSlot slot) {
+	private Score chooseBestScore(SortedMap<Stamp, Entry<Score>> allScores, Ctx ctx, FileSlot slot) {
 		Score scoreBest = null;
 		double pointsBest = 0;
 		for (Stamp s : allScores.keySet()) {
@@ -368,10 +369,10 @@ public class Core {
 	public List<Object[]> tasks(Ctx ctx, final LogFilter filter, Format f, boolean adm) {
 		final List<Object[]> indexData = new ArrayList<Object[]>();
 
-		final TreeMap<String, Map<String, List<Entry<FileMeta>>>> ctxVerToSlotToFiles =
+		final SortedMap<String, Map<String, List<Entry<FileMeta>>>> ctxVerToSlotToFiles =
 				new TreeMap<String, Map<String, List<Entry<FileMeta>>>>();
-		final TreeMap<String, Double> ctxEsToScore = new TreeMap<String, Double>();
-		final TreeMap<String, Summary> ctxEsToSummary = new TreeMap<String, Summary>();
+		final SortedMap<String, Double> ctxEsToScore = new TreeMap<String, Double>();
+		final SortedMap<String, Summary> ctxEsToSummary = new TreeMap<String, Summary>();
 
 		final int studCount = tasksData(ctx, filter, adm, ctxVerToSlotToFiles, ctxEsToScore, ctxEsToSummary);
 
@@ -413,9 +414,9 @@ public class Core {
 		return indexData;
 	}
 
-	protected Object[] tasksRow(
+	private Object[] tasksRow(
 			Format f, List<Object[]> indexData, Ctx ctxAss, boolean adm,
-			TreeMap<String, Double> ctxEsToScore, TreeMap<String, Summary> ctxEsToSummary, int studCount
+			SortedMap<String, Double> ctxEsToScore, SortedMap<String, Summary> ctxEsToSummary, int studCount
 	) {
 		final Class classFrom = ctxAss.cFrom();
 
@@ -520,7 +521,7 @@ public class Core {
 		return students;
 	}
 
-	protected void storeTasksData(
+	private void storeTasksData(
 			Ctx ctxStud, LogFilter filter,
 			Map<String, Map<String, List<Entry<FileMeta>>>> fileMetas,
 			Map<String, Double> ctxToScore,
@@ -531,7 +532,7 @@ public class Core {
 		}
 	}
 
-	protected void storeTaskData(
+	private void storeTaskData(
 			Ctx ctxVer, LogFilter filter,
 			Map<String, Map<String, List<Entry<FileMeta>>>> fileMetas,
 			Map<String, Double> ctxToScore,
@@ -588,7 +589,7 @@ public class Core {
 		}
 	}
 
-	protected Entry<FileMeta> selectBestFile(Ctx ctxVer, String slotId, List<Entry<FileMeta>> filesForSlot, final FileSlot slot) {
+	private Entry<FileMeta> selectBestFile(Ctx ctxVer, String slotId, List<Entry<FileMeta>> filesForSlot, final FileSlot slot) {
 		if (filesForSlot == null || filesForSlot.isEmpty()) {
 			return null;
 		}

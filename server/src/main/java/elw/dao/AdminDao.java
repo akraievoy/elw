@@ -29,7 +29,7 @@ public class AdminDao extends Dao<Admin>{
 		return new Path(adm.getId());
 	}
 
-	protected String[] findAllIds() {
+	private String[] findAllIds() {
 		final Path pathAll = new Path(new String[]{null});
 		final String[][] pathElems = listCriteria(pathAll);
 

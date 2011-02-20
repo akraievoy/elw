@@ -7,15 +7,15 @@ package elw.dp.mips.asm;
 import java.util.regex.Pattern;
 
 public class Data {
-	protected static final String DIGITS = "0123456789";
-	protected static final String HEX_DIGITS = "0123456789ABCDEF";
+	private static final String DIGITS = "0123456789";
+	private static final String HEX_DIGITS = "0123456789ABCDEF";
 
-	protected static final Pattern PATTERN_BIN = Pattern.compile("^[0-1]+$");
-	protected static final Pattern PATTERN_OCT = Pattern.compile("^[0-7]+$");
-	protected static final Pattern PATTERN_HEX = Pattern.compile("^[0-9a-fA-F]+$");
-	protected static final Pattern PATTERN_DEC = Pattern.compile("^[0-9]+$");
+	private static final Pattern PATTERN_BIN = Pattern.compile("^[0-1]+$");
+	private static final Pattern PATTERN_OCT = Pattern.compile("^[0-7]+$");
+	private static final Pattern PATTERN_HEX = Pattern.compile("^[0-9a-fA-F]+$");
+	private static final Pattern PATTERN_DEC = Pattern.compile("^[0-9]+$");
 
-	public static boolean isHexDigit(char c) {
+	private static boolean isHexDigit(char c) {
 		return '0' <= c && c <= '9' || 'A' <= c && c <= 'F' || 'a' <= c && c <= 'f';
 	}
 
@@ -63,7 +63,7 @@ public class Data {
 		return token.length() <= numberOfDigits;
 	}
 
-	public static int valueOfHex(char c) {
+	private static int valueOfHex(char c) {
 		if ('0' <= c && c <= '9') return c - '0';
 		if ('A' <= c && c <= 'F') return 10 + c - 'A';
 		if ('a' <= c && c <= 'f') return 10 + c - 'a';
@@ -71,7 +71,7 @@ public class Data {
 		throw new IllegalArgumentException("Illegal: '" + c + "'");
 	}
 
-	public static int valueOfDec(char c) {
+	private static int valueOfDec(char c) {
 		if ('0' <= c && c <= '9') return c - '0';
 
 		throw new IllegalArgumentException("illegal: '" + c + "'");
@@ -87,7 +87,7 @@ public class Data {
 		return value;
 	}
 
-	public static String invert(final String hex) {
+	private static String invert(final String hex) {
 		StringBuffer result = new StringBuffer();
 
 		for (int i = 0; i < hex.length(); i++) {

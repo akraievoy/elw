@@ -8,7 +8,7 @@ import java.awt.*;
 
 public abstract class Device {
 
-	public Device() {
+	protected Device() {
 	}
 
 	public abstract void execute();

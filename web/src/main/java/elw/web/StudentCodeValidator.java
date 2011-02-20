@@ -37,13 +37,13 @@ import java.util.concurrent.ScheduledExecutorService;
 public class StudentCodeValidator extends G4Run.Task {
 	private static final Logger log = LoggerFactory.getLogger(StudentCodeValidator.class);
 
-	protected int periodMillis = 300000;
-	protected final EnrollDao enrollDao;
-	protected final GroupDao groupDao;
-	protected final CourseDao courseDao;
-	protected final ScoreDao scoreDao;
-	protected final FileDao fileDao;
-	protected final MipsValidator validator;
+	private int periodMillis = 300000;
+	private final EnrollDao enrollDao;
+	private final GroupDao groupDao;
+	private final CourseDao courseDao;
+	private final ScoreDao scoreDao;
+	private final FileDao fileDao;
+	private final MipsValidator validator;
 
 	public StudentCodeValidator(
 			ScheduledExecutorService executor,

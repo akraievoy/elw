@@ -10,12 +10,12 @@ public class ReportMeta implements Stamped {
 	private static final DateTimeFormatter FMT_DATETIME_BRIEF = DateTimeFormat.forPattern("MMM dd");
 	private static final DateTimeFormatter FMT_DATETIME_FNAME = DateTimeFormat.forPattern("MMddHHmm");
 
-	protected Stamp createStamp;
-	protected String[] path;
-	protected String sourceAddress;
-	protected int totalUploads;
-	protected String fileName;
-	protected Stamp scoreStamp;
+	private Stamp createStamp;
+	private String[] path;
+	private String sourceAddress;
+	private int totalUploads;
+	private String fileName;
+	private Stamp scoreStamp;
 
 	public Stamp getCreateStamp() {
 		return createStamp;

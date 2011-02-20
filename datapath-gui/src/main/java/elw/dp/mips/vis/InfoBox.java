@@ -8,9 +8,13 @@ import java.awt.*;
 
 public class InfoBox {
 
-	int x1, y1, width, height;
-	Color color;
-	String line1, line2;
+	private int x1;
+	private int y1;
+	private int width;
+	private int height;
+	private Color color;
+	private String line1;
+	private String line2;
 
 	public InfoBox(int x, int y, int w, Color c) {
 		line1 = "";

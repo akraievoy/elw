@@ -9,16 +9,16 @@ public class CodeMeta implements Stamped {
 	private static final DateTimeFormatter FMT_DATETIME_NICE = DateTimeFormat.forPattern("EEE MMM dd HH:mm");
 	private static final DateTimeFormatter FMT_DATETIME_BRIEF = DateTimeFormat.forPattern("MMM dd");
 
-	protected Stamp createStamp;
-	protected Stamp updateStamp;
+	private Stamp createStamp;
+	private Stamp updateStamp;
 
-	protected String[] path;
+	private String[] path;
 
-	protected int testsPassed;
-	protected int testsFailed;
-	protected long validatorStamp;
-	protected String sourceAddress;
-	protected String fileName;
+	private int testsPassed;
+	private int testsFailed;
+	private long validatorStamp;
+	private String sourceAddress;
+	private String fileName;
 
 	public Stamp getCreateStamp() {
 		return createStamp;

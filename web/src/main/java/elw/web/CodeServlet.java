@@ -41,7 +41,7 @@ public class CodeServlet extends HttpServlet {
 		doGetOrHead(req, resp, false);
 	}
 
-	protected void doGetOrHead(HttpServletRequest req, HttpServletResponse resp, final boolean doCopy) throws IOException {
+	private void doGetOrHead(HttpServletRequest req, HttpServletResponse resp, final boolean doCopy) throws IOException {
 		final String pathInfo = req.getPathInfo();
 
 		if (pathInfo == null || !pathInfo.endsWith(".jar")) {

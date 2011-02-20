@@ -27,43 +27,43 @@ import java.util.regex.Pattern;
 public class Controller implements ControllerSetup, CallbackLoadTask {
 	private static final org.slf4j.Logger log = LoggerFactory.getLogger(Controller.class);
 
-	public static final String PREFIX_TEST = "Test #";
-	protected static final Pattern PATTERN_LINE_SEPARATOR = Pattern.compile("\r|\r\n|\n");
+	private static final String PREFIX_TEST = "Test #";
+	private static final Pattern PATTERN_LINE_SEPARATOR = Pattern.compile("\r|\r\n|\n");
 
-	protected final DataPathForm view = new DataPathForm();
-	protected final JLabel labelStatus = new JLabel();
+	private final DataPathForm view = new DataPathForm();
+	private final JLabel labelStatus = new JLabel();
 
 	//  application state
-	protected AtomicLong sourceStamp = new AtomicLong(1); // NOTE: no modifications still require assembly to run before stepping
-	protected AtomicLong assembleStamp = new AtomicLong(0);
+	private AtomicLong sourceStamp = new AtomicLong(1); // NOTE: no modifications still require assembly to run before stepping
+	private AtomicLong assembleStamp = new AtomicLong(0);
 
-	protected TaskBean task;
+	private TaskBean task;
 
-	protected String baseUrl;
-	protected String uploadHeader;
-	protected String elwCtx;
+	private String baseUrl;
+	private String uploadHeader;
+	private String elwCtx;
 
-	protected final DefaultComboBoxModel testComboModel = new DefaultComboBoxModel();
+	private final DefaultComboBoxModel testComboModel = new DefaultComboBoxModel();
 	//	app data (compile/test/run cycle)
 
 	private final MipsValidator validator = new MipsValidator();
 
-	InstructionsTableModel tmInstructions = new InstructionsTableModel(validator.getDataPath().getInstructions());
-	RegistersTableModel tmRegs = new RegistersTableModel(validator.getDataPath().getRegisters());
-	MemoryTableModel tmMemory = new MemoryTableModel(validator.getDataPath().getMemory());
+	private InstructionsTableModel tmInstructions = new InstructionsTableModel(validator.getDataPath().getInstructions());
+	private RegistersTableModel tmRegs = new RegistersTableModel(validator.getDataPath().getRegisters());
+	private MemoryTableModel tmMemory = new MemoryTableModel(validator.getDataPath().getMemory());
 
 	//	actions
-	protected final ScheduledExecutorService executor = new ScheduledThreadPoolExecutor(3);
-	protected final AssembleAction aAssemble = new AssembleAction("Assemble>", true);
-	protected final AssembleAction aVerify = new AssembleAction("Verify", false);
-	protected final SubmitAction aSubmit = new SubmitAction("Submit");
-	protected final UpdateTestSelectionAction aUpdateTestSelection = new UpdateTestSelectionAction();
-	protected final TestStepAction aTestStep = new TestStepAction("Step>");
-	protected final TestRunAction aTestRun = new TestRunAction("Run");
-	protected final TestBatchAction aTestBatch = new TestBatchAction("Batch");
-	protected final RunStepAction aRunStep = new RunStepAction("Step", 1);
-	protected final RunStepAction aRunRun = new RunStepAction("Run", validator.getRunSteps());
-	protected final RunResetAction aRunReset = new RunResetAction("Reset");
+	private final ScheduledExecutorService executor = new ScheduledThreadPoolExecutor(3);
+	private final AssembleAction aAssemble = new AssembleAction("Assemble>", true);
+	private final AssembleAction aVerify = new AssembleAction("Verify", false);
+	private final SubmitAction aSubmit = new SubmitAction("Submit");
+	private final UpdateTestSelectionAction aUpdateTestSelection = new UpdateTestSelectionAction();
+	private final TestStepAction aTestStep = new TestStepAction("Step>");
+	private final TestRunAction aTestRun = new TestRunAction("Run");
+	private final TestBatchAction aTestBatch = new TestBatchAction("Batch");
+	private final RunStepAction aRunStep = new RunStepAction("Step", 1);
+	private final RunStepAction aRunRun = new RunStepAction("Run", validator.getRunSteps());
+	private final RunResetAction aRunReset = new RunResetAction("Reset");
 
 	public void setBaseUrl(String baseUrl) {
 		this.baseUrl = baseUrl;
@@ -206,13 +206,13 @@ public class Controller implements ControllerSetup, CallbackLoadTask {
 		log.info("startup sequence complete");
 	}
 
-	protected void fireDataPathChanged() {
+	private void fireDataPathChanged() {
 		tmInstructions.fireTableDataChanged();
 		tmMemory.fireTableDataChanged();
 		tmRegs.fireTableDataChanged();
 	}
 
-	protected void selectTest(int i) {
+	private void selectTest(int i) {
 		testComboModel.setSelectedItem(testComboModel.getElementAt(i));
 
 		final String[] regsText = new String[1];
@@ -232,7 +232,7 @@ public class Controller implements ControllerSetup, CallbackLoadTask {
 		setupStatus(view.getRunStatusLabel());
 	}
 
-	protected void job_assemble(final JLabel statusLabel, final Result[] resRef) {
+	private void job_assemble(final JLabel statusLabel, final Result[] resRef) {
 		setupStatus(statusLabel, "Assembling...");
 
 		final String[] sourceLines = getSource();
@@ -242,13 +242,13 @@ public class Controller implements ControllerSetup, CallbackLoadTask {
 		}
 	}
 
-	protected String[] getSource() {
+	private String[] getSource() {
 		final String source = view.getSourceTextArea().getText();
 		
 		return PATTERN_LINE_SEPARATOR.split(source);
 	}
 
-	protected void job_submit(final JLabel statusLabel, final Result[] resRef, String sourceText) {
+	private void job_submit(final JLabel statusLabel, final Result[] resRef, String sourceText) {
 		if (baseUrl == null || baseUrl.length() == 0) {
 			Result.failure(log, resRef, "Upload URL not set");
 			return;
@@ -307,7 +307,7 @@ public class Controller implements ControllerSetup, CallbackLoadTask {
 		Result.success(log, resRef, "Submitted");
 	}
 
-	protected void job_loadTest(final JLabel statusLabel, Result[] resRef, final String test) {
+	private void job_loadTest(final JLabel statusLabel, Result[] resRef, final String test) {
 		final boolean assemble = assembleStamp.get() < sourceStamp.get();
 		if (assemble) {
 			job_assemble(statusLabel, resRef);
@@ -324,7 +324,7 @@ public class Controller implements ControllerSetup, CallbackLoadTask {
 	class AssembleAction extends AbstractAction {
 		final boolean switchToTest;
 
-		public AssembleAction(final String name, boolean switchToTest) {
+		private AssembleAction(final String name, boolean switchToTest) {
 			super(name);
 			this.switchToTest = switchToTest;
 		}
@@ -355,7 +355,7 @@ public class Controller implements ControllerSetup, CallbackLoadTask {
 	}
 
 	class SubmitAction extends AbstractAction {
-		public SubmitAction(final String name) {
+		private SubmitAction(final String name) {
 			super(name);
 		}
 
@@ -384,7 +384,7 @@ public class Controller implements ControllerSetup, CallbackLoadTask {
 
 	class UpdateTestSelectionAction extends AbstractAction {
 
-		public UpdateTestSelectionAction() {
+		private UpdateTestSelectionAction() {
 			super("Update Test Selection");
 		}
 
@@ -397,7 +397,7 @@ public class Controller implements ControllerSetup, CallbackLoadTask {
 	}
 
 	class TestStepAction extends AbstractAction {
-		public TestStepAction(final String name) {
+		private TestStepAction(final String name) {
 			super(name);
 		}
 
@@ -445,7 +445,7 @@ public class Controller implements ControllerSetup, CallbackLoadTask {
 	class RunStepAction extends AbstractAction {
 		protected final int steps;
 
-		public RunStepAction(final String name, final int steps) {
+		private RunStepAction(final String name, final int steps) {
 			super(name);
 			this.steps = steps;
 		}
@@ -482,7 +482,7 @@ public class Controller implements ControllerSetup, CallbackLoadTask {
 	}
 
 	class RunResetAction extends AbstractAction {
-		public RunResetAction(final String name) {
+		private RunResetAction(final String name) {
 			super(name);
 		}
 
@@ -515,7 +515,7 @@ public class Controller implements ControllerSetup, CallbackLoadTask {
 	}
 
 	class TestRunAction extends AbstractAction {
-		public TestRunAction(final String name) {
+		private TestRunAction(final String name) {
 			super(name);
 		}
 
@@ -554,7 +554,7 @@ public class Controller implements ControllerSetup, CallbackLoadTask {
 	}
 
 	class TestBatchAction extends AbstractAction {
-		public TestBatchAction(final String name) {
+		private TestBatchAction(final String name) {
 			super(name);
 		}
 
@@ -581,7 +581,7 @@ public class Controller implements ControllerSetup, CallbackLoadTask {
 		}
 	}
 
-	protected class SourceDocumentListener implements DocumentListener {
+	private class SourceDocumentListener implements DocumentListener {
 		public void insertUpdate(DocumentEvent e) {
 			sourceStamp.set(System.currentTimeMillis());
 			setupStatus(view.getSourceFeedbackLabel());
@@ -601,11 +601,11 @@ public class Controller implements ControllerSetup, CallbackLoadTask {
 		}
 	}
 
-	public static void setupStatus(final JLabel label) {
+	private static void setupStatus(final JLabel label) {
 		setupStatus(label, "...");
 	}
 
-	public static void setupStatus(final JLabel label, final String text) {
+	private static void setupStatus(final JLabel label, final String text) {
 		if (SwingUtilities.isEventDispatchThread()) {
 			label.setText(text);
 			label.setToolTipText(text);
@@ -621,7 +621,7 @@ public class Controller implements ControllerSetup, CallbackLoadTask {
 		}
 	}
 
-	public static void setupStatus(final JLabel label, final Result result) {
+	private static void setupStatus(final JLabel label, final Result result) {
 		if (SwingUtilities.isEventDispatchThread()) {
 			label.setToolTipText(result.getMessage());
 			label.setText(result.getMessage());

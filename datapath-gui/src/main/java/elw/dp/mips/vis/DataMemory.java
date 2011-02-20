@@ -17,9 +17,9 @@ class DataMemory extends RegMem implements MemoryModel {
 	private DataLine memReadControl, memWriteControl, address, writeData, readData;
 	private int memory[];
 
-	protected int readIndex;
-	protected int writeIndex;
-	protected MemoryTableModel memoryTableModel;
+	private int readIndex;
+	private int writeIndex;
+	private MemoryTableModel memoryTableModel;
 
 	public DataMemory(double x1, double y1, double width, double height, Color color, String label1, String label2, String name, int size, DataLine memReadControl,
 					  DataLine memWriteControl, DataLine address, DataLine writeData, DataLine readData) {
@@ -117,7 +117,7 @@ class DataMemory extends RegMem implements MemoryModel {
 		protected final String[] columns = new String[]{COL_NUMBER, COL_HEX, COL_DEC, COL_ACC};
 		protected final MemoryModel memory;
 
-		public MemoryTableModel(MemoryModel memory) {
+		private MemoryTableModel(MemoryModel memory) {
 			this.memory = memory;
 		}
 

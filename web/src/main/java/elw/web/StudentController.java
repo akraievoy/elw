@@ -46,12 +46,12 @@ import java.util.*;
 public class StudentController extends ControllerElw {
 	private static final Logger log = LoggerFactory.getLogger(StudentController.class);
 
-	protected final CourseDao courseDao;
-	protected final GroupDao groupDao;
-	protected final EnrollDao enrollDao;
-	protected final ScoreDao scoreDao;
-	protected final FileDao fileDao;
-	protected final AdminController adminController;
+	private final CourseDao courseDao;
+	private final GroupDao groupDao;
+	private final EnrollDao enrollDao;
+	private final ScoreDao scoreDao;
+	private final FileDao fileDao;
+	private final AdminController adminController;
 
 	public StudentController(
 			CourseDao courseDao, GroupDao groupDao, EnrollDao enrollDao,
@@ -438,7 +438,7 @@ public class StudentController extends ControllerElw {
 		});
 	}
 
-	protected boolean accessDenied(
+	private boolean accessDenied(
 			HttpServletResponse resp, Ctx ctx, String scope, FileSlot slot, boolean checkWrite
 	) throws IOException {
 		if (!ctx.cFrom().isStarted()) {

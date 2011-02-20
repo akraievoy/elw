@@ -21,11 +21,11 @@ package elw.vo;
 import org.akraievoy.gear.G4mat;
 
 public class ScoreTerm {
-	protected final String id;
-	protected final double ratio;
-	protected final int pow;
-	protected final FileSlot slot;
-	protected final Criteria criteria;
+	private final String id;
+	private final double ratio;
+	private final int pow;
+	private final FileSlot slot;
+	private final Criteria criteria;
 
 	public ScoreTerm(String id, double ratio, int pow, final FileSlot slot, final Criteria criteria) {
 		this.id = id;
@@ -51,7 +51,7 @@ public class ScoreTerm {
 		return getNiceRatio(ratio);
 	}
 
-	public static String getNiceRatio(final double ratio) {
+	private static String getNiceRatio(final double ratio) {
 		if (Math.abs(ratio - 1) < 1e-2) {
 			return "";
 		}

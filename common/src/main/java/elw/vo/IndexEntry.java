@@ -11,11 +11,11 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class IndexEntry {
-	protected String[] path;
-	protected int scoreBudget;
-	protected int classFrom;
-	protected final Map<String, Integer> classDue = new TreeMap<String, Integer>();
-	protected boolean requireClean;	//	TODO still not used
+	private String[] path;
+	private int scoreBudget;
+	private int classFrom;
+	private final Map<String, Integer> classDue = new TreeMap<String, Integer>();
+	private boolean requireClean;	//	TODO still not used
 
 	public boolean isRequireClean() {
 		return requireClean;

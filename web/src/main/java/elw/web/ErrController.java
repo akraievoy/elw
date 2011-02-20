@@ -40,7 +40,7 @@ public class ErrController {
 	private static final Logger log = LoggerFactory.getLogger(ErrController.class);
 
 	@SuppressWarnings({"RedundantArrayCreation"})
-	final List<String> ignoredUris = Arrays.asList(new String[]{
+	private final List<String> ignoredUris = Arrays.asList(new String[]{
 			"/s/elw.dp.ui.Applet",
 			"/s/META-INF/services/javax.xml.parsers.DocumentBuilderFactory",
 			"/s/org/apache/log4j/PatternLayoutBeanInfo.class",

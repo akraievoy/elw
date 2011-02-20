@@ -8,7 +8,8 @@ import java.awt.*;
 
 class PC extends RegMem {
 
-	DataLine input, output;
+	private DataLine input;
+	private DataLine output;
 
 	public PC(double x1, double y1, double width, double height, Color color, String label1, String label2, String name, DataLine input, DataLine output) {
 		super(x1, y1, width, height, color, label1, label2, name);

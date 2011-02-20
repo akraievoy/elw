@@ -21,13 +21,13 @@ package elw.vo.sym;
 public enum Scope {
 	STUD("s"), VER("v"), TASK("a"), TYPE("t");
 
-	final String id;
+	private final String id;
 
-	Scope(String id) {
+	private Scope(String id) {
 		this.id = id;
 	}
 
-	public String getId() {
+	private String getId() {
 		return id;
 	}
 

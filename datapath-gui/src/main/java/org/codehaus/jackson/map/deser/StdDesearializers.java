@@ -12,7 +12,7 @@ import org.codehaus.jackson.type.JavaType;
  */
 class StdDeserializers
 {
-    final HashMap<JavaType, JsonDeserializer<Object>> _deserializers = new HashMap<JavaType, JsonDeserializer<Object>>();
+    private final HashMap<JavaType, JsonDeserializer<Object>> _deserializers = new HashMap<JavaType, JsonDeserializer<Object>>();
 
     private StdDeserializers()
     {

@@ -7,13 +7,13 @@ import javax.swing.table.AbstractTableModel;
 
 public class MemoryTableModel extends AbstractTableModel {
 	public static final String COL_ADDR = "Addr";
-	public static final String COL_HEX = "Hex8";
-	public static final String COL_HEX_WORD = "Hex32";
-	public static final String COL_DEC_WORD = "Dec32";
+	private static final String COL_HEX = "Hex8";
+	private static final String COL_HEX_WORD = "Hex32";
+	private static final String COL_DEC_WORD = "Dec32";
 	public static final String COL_ACC = InstructionsTableModel.COL_ACC;
 
-	protected final String[] columns = new String[]{COL_ACC, COL_ADDR, COL_HEX_WORD, COL_DEC_WORD, COL_HEX};
-	protected final Memory memory;
+	private final String[] columns = new String[]{COL_ACC, COL_ADDR, COL_HEX_WORD, COL_DEC_WORD, COL_HEX};
+	private final Memory memory;
 
 	public MemoryTableModel(Memory memory) {
 		this.memory = memory;
@@ -56,7 +56,7 @@ public class MemoryTableModel extends AbstractTableModel {
 		return "";
 	}
 
-	protected String getAccessMod(int address) {
+	private String getAccessMod(int address) {
 		StringBuffer accessMod = new StringBuffer();
 
 		if (memory.getReadAdresses().contains(address)) {

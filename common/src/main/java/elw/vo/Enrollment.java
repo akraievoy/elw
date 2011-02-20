@@ -3,11 +3,11 @@ package elw.vo;
 import java.util.*;
 
 public class Enrollment extends IdNameStamped {
-	protected String groupId;
-	protected String courseId;
+	private String groupId;
+	private String courseId;
 
-	protected List<Class> classes = new ArrayList<Class>();
-	protected List<IndexEntry> index = new ArrayList<IndexEntry>();
+	private List<Class> classes = new ArrayList<Class>();
+	private List<IndexEntry> index = new ArrayList<IndexEntry>();
 
 	public String getCourseId() {
 		return courseId;

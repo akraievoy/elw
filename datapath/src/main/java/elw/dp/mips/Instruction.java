@@ -19,9 +19,9 @@ public class Instruction {
 	public static final String T_ADDR16 = "addr16";
 	public static final String T_ADDR26 = "addr26";
 
-	public static final Map<String, String> tokenToMask = createTokenToMaskMap();
+	private static final Map<String, String> tokenToMask = createTokenToMaskMap();
 
-	protected static Map<String, String> createTokenToMaskMap() {
+	private static Map<String, String> createTokenToMaskMap() {
 		final Map<String, String> map = new LinkedHashMap<String, String>();
 
 		map.put(T_IMM26, "iiiiiiiiiiiiiiiiiiiiiiiiii");
@@ -36,22 +36,22 @@ public class Instruction {
 
 	private static final Pattern PATTERN_COMPLETE = Pattern.compile("^[-01]+$");
 
-	protected final InstructionDesc desc;
-	protected final String codeLine;
-	protected final int index;
-	protected final int lineIndex;
-	protected final String[] labels;
+	private final InstructionDesc desc;
+	private final String codeLine;
+	private final int index;
+	private final int lineIndex;
+	private final String[] labels;
 
-	protected Reg s = Reg.fp;
-	protected Reg t = Reg.fp;
-	protected Reg d = Reg.fp;
+	private Reg s = Reg.fp;
+	private Reg t = Reg.fp;
+	private Reg d = Reg.fp;
 
-	protected int i16;
-	protected int i26;
-	protected int h;
+	private int i16;
+	private int i26;
+	private int h;
 
-	protected String addr16 = "";
-	protected String addr26 = "";
+	private String addr16 = "";
+	private String addr26 = "";
 
 
 	public Instruction(InstructionDesc desc, String codeLine, int index, int lineIndex, String[] labels) {

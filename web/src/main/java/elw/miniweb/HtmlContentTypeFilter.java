@@ -38,7 +38,7 @@ public class HtmlContentTypeFilter implements Filter {
 		chain.doFilter(request, response);
 	}
 
-	protected static boolean isActionUri(ServletRequest request) {
+	private static boolean isActionUri(ServletRequest request) {
 		if (!(request instanceof HttpServletRequest)) {
 			return false;
 		}

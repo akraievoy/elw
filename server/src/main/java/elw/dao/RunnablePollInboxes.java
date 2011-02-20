@@ -10,10 +10,10 @@ import java.util.List;
 public class RunnablePollInboxes implements Runnable {
 	private static final Logger log = LoggerFactory.getLogger(RunnablePollInboxes.class);
 
-	protected List<Dao> daos = new ArrayList<Dao>();
-	protected long period = 60000;
+	private List<Dao> daos = new ArrayList<Dao>();
+	private long period = 60000;
 
-	protected Thread worker;
+	private Thread worker;
 
 	public void setDaos(List<Dao> daos) {
 		this.daos = daos;

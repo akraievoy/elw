@@ -18,11 +18,11 @@ import java.util.regex.Pattern;
 public class MipsAssembler {
 	private static final Logger log = LoggerFactory.getLogger(MipsAssembler.class);
 
-	public static final Pattern PATTERN_LABEL = Pattern.compile("^[a-zA-Z_][a-zA-Z_0-9]*$");
+	private static final Pattern PATTERN_LABEL = Pattern.compile("^[a-zA-Z_][a-zA-Z_0-9]*$");
 
-	protected final static Map<Pattern, String> codeNormMap = createCodeNormMap();
+	private final static Map<Pattern, String> codeNormMap = createCodeNormMap();
 
-	protected static Map<Pattern, String> createCodeNormMap() {
+	private static Map<Pattern, String> createCodeNormMap() {
 		final Map<Pattern, String> map = new LinkedHashMap<Pattern, String>();
 
 		map.put(Pattern.compile("\\s+"), " ");
@@ -67,7 +67,7 @@ public class MipsAssembler {
 		return instructions.toArray(new Instruction[instructions.size()]);
 	}
 
-	protected boolean loadInstructionsFirstPass(String[] codeLines, List<Instruction> instructions, Map<String, Integer> labelIndex, Result[] resRef) {
+	private boolean loadInstructionsFirstPass(String[] codeLines, List<Instruction> instructions, Map<String, Integer> labelIndex, Result[] resRef) {
 		final StringBuilder code = new StringBuilder();
 		final StringBuilder syntax = new StringBuilder();
 		final List<String> labels = new ArrayList<String>();
@@ -176,13 +176,13 @@ public class MipsAssembler {
 		return false;
 	}
 
-	protected static void trim(StringBuilder syntax) {
+	private static void trim(StringBuilder syntax) {
 		while (syntax.length() > 0 && syntax.charAt(0) == ' ') {
 			syntax.deleteCharAt(0);
 		}
 	}
 
-	protected static boolean parseAddr(final String id, final String numId, StringBuilder syntax, StringBuilder code, Instruction inst, Result[] resRef, String prefixOn) {
+	private static boolean parseAddr(final String id, final String numId, StringBuilder syntax, StringBuilder code, Instruction inst, Result[] resRef, String prefixOn) {
 		if (syntax.indexOf(id) == 0) {
 			final String token = scanChunk(code, ",()");
 			syntax.delete(0, id.length());
@@ -205,7 +205,7 @@ public class MipsAssembler {
 		return false;
 	}
 
-	protected static boolean parseNum(final String id, StringBuilder syntax, StringBuilder code, Instruction inst, Result[] resRef, String prefixOn) {
+	private static boolean parseNum(final String id, StringBuilder syntax, StringBuilder code, Instruction inst, Result[] resRef, String prefixOn) {
 		if (syntax.indexOf(id) == 0) {
 			final String numToken = scanChunk(code, ",()");
 			syntax.delete(0, id.length());
@@ -223,7 +223,7 @@ public class MipsAssembler {
 		return false;
 	}
 
-	protected static boolean parseReg(final String regId, StringBuilder syntax, StringBuilder code, InstructionDesc desc, Instruction inst, Result[] resRef, String prefixOn) {
+	private static boolean parseReg(final String regId, StringBuilder syntax, StringBuilder code, InstructionDesc desc, Instruction inst, Result[] resRef, String prefixOn) {
 		if (syntax.indexOf(regId) == 0) {
 			final String regToken = scanChunk(code, ",()");
 			syntax.delete(0, regId.length());
@@ -246,7 +246,7 @@ public class MipsAssembler {
 		return false;
 	}
 
-	protected static String scanChunk(StringBuilder code, final String term) {
+	private static String scanChunk(StringBuilder code, final String term) {
 		for (int l = 0; l < code.length(); l++) {
 			if (term.indexOf(code.charAt(l)) >= 0) {
 				final String chunk = code.substring(0, l);
@@ -260,7 +260,7 @@ public class MipsAssembler {
 		return chunk;
 	}
 
-	protected static boolean checkSeparator(final char sep, StringBuilder syntax, StringBuilder code, Result[] resRef, String prefix) {
+	private static boolean checkSeparator(final char sep, StringBuilder syntax, StringBuilder code, Result[] resRef, String prefix) {
 		if (syntax.charAt(0) == sep) {
 			if (code.length() > 0 && code.charAt(0) == sep) {
 				syntax.delete(0, 1);
@@ -274,7 +274,7 @@ public class MipsAssembler {
 		return false;
 	}
 
-	protected static void loadNormed(String codeLine, StringBuilder code) {
+	private static void loadNormed(String codeLine, StringBuilder code) {
 		code.setLength(0);
 		code.insert(0, codeLine.toLowerCase());
 
@@ -285,7 +285,7 @@ public class MipsAssembler {
 		}
 	}
 
-	protected static String removeOpName(StringBuilder code) {
+	private static String removeOpName(StringBuilder code) {
 		String opName;
 
 		final int opNameEnd = code.indexOf(" ");
@@ -418,7 +418,7 @@ public class MipsAssembler {
 		return new TIntIntHashMap[]{regsIn, regsOut};
 	}
 
-	protected static Reg parseReg(final String regToken, final Logger log, final Result[] resRef, final String prefix) {
+	private static Reg parseReg(final String regToken, final Logger log, final Result[] resRef, final String prefix) {
 		final Reg reg;
 		if (regToken.startsWith("$")) {
 			final String regName = regToken.substring(1).toLowerCase();

@@ -18,16 +18,16 @@ import java.util.List;
 import java.util.Map;
 
 class RunnableLoadTask implements Runnable {
-	protected final CallbackLoadTask callback;
-	protected final ControllerSetup setup;
-	protected final ObjectMapper mapper = new ObjectMapper();
+	private final CallbackLoadTask callback;
+	private final ControllerSetup setup;
+	private final ObjectMapper mapper = new ObjectMapper();
 
 	public RunnableLoadTask(CallbackLoadTask callback, ControllerSetup setup) {
 		this.callback = callback;
 		this.setup = setup;
 	}
 
-	public String loadFile(final String slot, final String scope, final String id) {
+	private String loadFile(final String slot, final String scope, final String id) {
 		callback.updateStatus(
 				"downloading: '" + slot+ "' '" + id + "'@'"+scope+"'" , null
 		);
@@ -63,7 +63,7 @@ class RunnableLoadTask implements Runnable {
 		}
 	}
 
-	protected URLConnection setupGet(URL url) throws IOException {
+	private URLConnection setupGet(URL url) throws IOException {
 		URLConnection uc = url.openConnection();
 		uc.setRequestProperty("Cookie", setup.getUploadHeader());
 		uc.setAllowUserInteraction(false);
@@ -183,7 +183,7 @@ class RunnableLoadTask implements Runnable {
 		);
 	}
 
-	protected static String comment(String statement, final int lineWidth) {
+	private static String comment(String statement, final int lineWidth) {
 		final StringBuilder st = new StringBuilder(statement.replaceAll("\\s+", " ").trim());
 
 		int pos = 0;
@@ -242,10 +242,10 @@ class RunnableLoadTask implements Runnable {
 		protected boolean success;
 		protected Map<String, Map<String, String[]>> data = new HashMap<String, Map<String, String[]>>();
 
-		public ResponseList() {
+		private ResponseList() {
 		}
 
-		public Map<String, Map<String, String[]>> getData() {
+		private Map<String, Map<String, String[]>> getData() {
 			return data;
 		}
 

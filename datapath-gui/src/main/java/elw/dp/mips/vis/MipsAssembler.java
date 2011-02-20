@@ -14,22 +14,22 @@ import java.util.List;
 public class MipsAssembler implements Assembler {
 	private static final org.slf4j.Logger log = LoggerFactory.getLogger(MipsAssembler.class);
 
-	protected ArrayList<String> instructions = new ArrayList<String>();
-	protected ArrayList<String> codeLines = new ArrayList<String>();
+	private ArrayList<String> instructions = new ArrayList<String>();
+	private ArrayList<String> codeLines = new ArrayList<String>();
 
-	public boolean isRegister(String token) {
+	private boolean isRegister(String token) {
 		return G4Str.contains(InstructionsModel.REGS, token.toUpperCase());
 	}
 
-	public boolean isConstantRegister(String token) {
+	private boolean isConstantRegister(String token) {
 		return "$zero".equals(token);
 	}
 
-	public int getRegisterNumber(String token) {
+	private int getRegisterNumber(String token) {
 		return G4Str.indexOf(token.toUpperCase(), InstructionsModel.REGS);
 	}
 
-	public String fourFieldInstruction(String[] instructionComponents) {
+	private String fourFieldInstruction(String[] instructionComponents) {
 		long temp = Data.hex2long(instructionComponents[0]) & 60;
 		String word = Data.long2hex(temp / 4, 1);
 		temp = (Data.hex2long(instructionComponents[0]) & 3) * 4;
@@ -46,7 +46,7 @@ public class MipsAssembler implements Assembler {
 		return word;
 	}
 
-	public String twoFieldInstruction(String[] instructionComponents) {
+	private String twoFieldInstruction(String[] instructionComponents) {
 		long temp = Data.hex2long(instructionComponents[0]) & 60;
 		String word = Data.long2hex(temp / 4, 1);
 		temp = (Data.hex2long(instructionComponents[0]) & 3) * 4;
@@ -56,7 +56,7 @@ public class MipsAssembler implements Assembler {
 		return word;
 	}
 
-	public String sixFieldInstruction(String[] instructionComponents) {
+	private String sixFieldInstruction(String[] instructionComponents) {
 		long temp = Data.hex2long(instructionComponents[0]) & 60;
 		String word = Data.long2hex(temp / 4, 1);
 
@@ -87,7 +87,7 @@ public class MipsAssembler implements Assembler {
 		return word;
 	}
 
-	public String[] immediateType(ArrayList<String> tokenList) {
+	private String[] immediateType(ArrayList<String> tokenList) {
 		ArrayList<String> instructionComponents = new ArrayList<String>();
 		String operation = tokenList.remove(0);
 		if ("addi".equalsIgnoreCase(operation)) {
@@ -136,11 +136,11 @@ public class MipsAssembler implements Assembler {
 		return toArray(instructionComponents);
 	}
 
-	public String[] toArray(ArrayList<String> instructionComponents) {
+	private String[] toArray(ArrayList<String> instructionComponents) {
 		return instructionComponents.toArray(new String[instructionComponents.size()]);
 	}
 
-	public String[] immediateShift(ArrayList<String> tokenList) {
+	private String[] immediateShift(ArrayList<String> tokenList) {
 		ArrayList<String> instructionComponents = new ArrayList<String>();
 		String operation = tokenList.remove(0);
 		if ("sll".equalsIgnoreCase(operation)) {
@@ -193,7 +193,7 @@ public class MipsAssembler implements Assembler {
 		return toArray(instructionComponents);
 	}
 
-	public String[] variableShift(ArrayList<String> tokenList) {
+	private String[] variableShift(ArrayList<String> tokenList) {
 		ArrayList<String> instructionComponents = new ArrayList<String>();
 		String operation = tokenList.remove(0);
 
@@ -245,7 +245,7 @@ public class MipsAssembler implements Assembler {
 		return toArray(instructionComponents);
 	}
 
-	public String[] dataTransfer(ArrayList<String> tokenList) {
+	private String[] dataTransfer(ArrayList<String> tokenList) {
 		ArrayList<String> instructionComponents = new ArrayList<String>();
 		String operation = tokenList.remove(0);
 		if ("lw".equalsIgnoreCase(operation)) {
@@ -295,7 +295,7 @@ public class MipsAssembler implements Assembler {
 		return toArray(instructionComponents);
 	}
 
-	public String[] rType(ArrayList<String> tokenList) {
+	private String[] rType(ArrayList<String> tokenList) {
 		ArrayList<String> instructionComponents = new ArrayList<String>();
 		String operation = tokenList.remove(0);
 
@@ -355,7 +355,7 @@ public class MipsAssembler implements Assembler {
 		return toArray(instructionComponents);
 	}
 
-	public String[] branch(ArrayList<String> tokenList) {
+	private String[] branch(ArrayList<String> tokenList) {
 		ArrayList<String> instructionComponents = new ArrayList<String>();
 		String operation = tokenList.remove(0);
 
@@ -400,7 +400,7 @@ public class MipsAssembler implements Assembler {
 		return toArray(instructionComponents);
 	}
 
-	public String[] jump(ArrayList<String> tokenList) {
+	private String[] jump(ArrayList<String> tokenList) {
 		ArrayList<String> instructionComponents = new ArrayList<String>();
 		setComponent(instructionComponents, 0, "02");
 
@@ -414,7 +414,7 @@ public class MipsAssembler implements Assembler {
 		return toArray(instructionComponents);
 	}
 
-	public String parse(ArrayList<String> tokens) {
+	private String parse(ArrayList<String> tokens) {
 		final String c = tokens.get(0);
 		final String instruction;
 		if (G4Str.contains(new String[]{"ADD", "AND", "OR", "SUB", "SLT", "NOR", "XOR"}, c)) {
@@ -438,7 +438,7 @@ public class MipsAssembler implements Assembler {
 		return instruction;
 	}
 
-	public ArrayList<String> extractTokens(String assemblyCode) {
+	private ArrayList<String> extractTokens(String assemblyCode) {
 		ArrayList<Character> instruction = new ArrayList<Character>();
 		ArrayList<String> tokenList = new ArrayList<String>();
 		tokenList.clear();
@@ -528,7 +528,7 @@ public class MipsAssembler implements Assembler {
 		return instructionsArr;
 	}
 
-	protected static void setComponent(final ArrayList<String> instructionComponents, final int index, final String value) {
+	private static void setComponent(final ArrayList<String> instructionComponents, final int index, final String value) {
 		while (instructionComponents.size() <= index) {
 			instructionComponents.add(null);
 		}

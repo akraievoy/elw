@@ -5,9 +5,9 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Group extends IdName implements Stamped {
-	protected List<Student> students = new ArrayList<Student>();
+	private List<Student> students = new ArrayList<Student>();
 
-	protected Stamp createStamp;
+	private Stamp createStamp;
 
 	public Student[] getStudents() {
 		return students.toArray(new Student[students.size()]);

@@ -27,42 +27,42 @@ import java.util.regex.Pattern;
  * @param <Meta> your entity to be persisted
  */
 public abstract class Dao<Meta extends Stamped> {
-	protected static final DateTimeFormatter FMT_DATE = DateTimeFormat.forPattern("yyyy-MM-dd");
-	protected static final Pattern PATTERN_DATE = Pattern.compile("\\d\\d\\d\\d-\\d\\d-\\d\\d");
+	private static final DateTimeFormatter FMT_DATE = DateTimeFormat.forPattern("yyyy-MM-dd");
+	private static final Pattern PATTERN_DATE = Pattern.compile("\\d\\d\\d\\d-\\d\\d-\\d\\d");
 
-	protected static final String NAME_INBOX = "__inbox";
-	protected static final String DEF_EXT_META = ".json";
-	protected static final String DEF_EXT_BINARY = ".bin";
-	protected static final String DEF_EXT_TEXT = ".txt";
+	private static final String NAME_INBOX = "__inbox";
+	private static final String DEF_EXT_META = ".json";
+	private static final String DEF_EXT_BINARY = ".bin";
+	private static final String DEF_EXT_TEXT = ".txt";
 
 	private static final Logger log = LoggerFactory.getLogger(Dao.class);
 
-	protected ObjectMapper mapper;
-	protected Class<Meta> metaClass;
-	protected String node;
-	protected File base;
-	protected int createGraceTime = 30000;
-	protected int cacheTime = 300000;
-	protected boolean groupByDate = true;
+	private ObjectMapper mapper;
+	private Class<Meta> metaClass;
+	private String node;
+	private File base;
+	private int createGraceTime = 30000;
+	private int cacheTime = 300000;
+	private boolean groupByDate = true;
 
-	protected String extMeta = DEF_EXT_META;
-	protected String extBinary = DEF_EXT_BINARY;
-	protected String extText = DEF_EXT_TEXT;
+	private String extMeta = DEF_EXT_META;
+	private String extBinary = DEF_EXT_BINARY;
+	private String extText = DEF_EXT_TEXT;
 
-	protected final Object createMonitor = new Object();
-	protected long createStamp = -1;
+	private final Object createMonitor = new Object();
+	private long createStamp = -1;
 
-	protected final Object cacheMonitor = new Object();
-	protected final Map<Path, Long> cacheRecStamps
+	private final Object cacheMonitor = new Object();
+	private final Map<Path, Long> cacheRecStamps
 			= new HashMap<Path, Long>();
-	protected final Map<Path, SortedMap<Stamp, Entry<Meta>>> cacheRecs
+	private final Map<Path, SortedMap<Stamp, Entry<Meta>>> cacheRecs
 			= new HashMap<Path, SortedMap<Stamp, Entry<Meta>>>();
-	protected final Map<Path, Long> cachePEStamps
+	private final Map<Path, Long> cachePEStamps
 			= new HashMap<Path, Long>();
-	protected final Map<Path, String[][]> cachePathElems
+	private final Map<Path, String[][]> cachePathElems
 			= new HashMap<Path, String[][]>();
 
-	protected final Object fsMonitor = new Object();
+	private final Object fsMonitor = new Object();
 
 	protected Dao() {
 	}
@@ -111,7 +111,7 @@ public abstract class Dao<Meta extends Stamped> {
 		this.groupByDate = groupByDate;
 	}
 
-	public abstract Path pathFromMeta(Meta meta);
+	protected abstract Path pathFromMeta(Meta meta);
 
 	public void start() {
 		if (metaClass == null) {
@@ -130,7 +130,7 @@ public abstract class Dao<Meta extends Stamped> {
 		log.warn("node: '{}'; base: {}", node, base.getAbsolutePath());
 	}
 
-	protected ObjectMapper createMapper() {
+	private ObjectMapper createMapper() {
 		final ObjectMapper defaultMapper = new ObjectMapper();
 
 		defaultMapper.getSerializationConfig().enable(SerializationConfig.Feature.INDENT_OUTPUT);
@@ -215,14 +215,14 @@ public abstract class Dao<Meta extends Stamped> {
 		}
 	}
 
-	public Stamp create(Path p, Meta meta, BufferedInputStream binary, BufferedReader text) throws IOException {
+	protected Stamp create(Path p, Meta meta, BufferedInputStream binary, BufferedReader text) throws IOException {
 		final Stamp stamp = createStamp();
 		meta.setCreateStamp(stamp);
 
 		return locateAndWrite(p, meta, binary, text, false);
 	}
 
-	public Stamp createStamp() {
+	protected Stamp createStamp() {
 		final long createTime = genId();
 
 		final Stamp stamp = new Stamp(node, createTime);
@@ -243,7 +243,7 @@ public abstract class Dao<Meta extends Stamped> {
 		return locateAndWrite(p, meta, binary, text, true);
 	}
 
-	protected Stamp locateAndWrite(Path p, Meta meta, BufferedInputStream binary, BufferedReader text, boolean requireExistingMeta) throws IOException {
+	private Stamp locateAndWrite(Path p, Meta meta, BufferedInputStream binary, BufferedReader text, boolean requireExistingMeta) throws IOException {
 		final TreeSet<File> dirs = new TreeSet<File>();
 		listCriteria(p, meta, true, false, false, dirs);
 		if (dirs.size() != 1) {
@@ -301,7 +301,7 @@ public abstract class Dao<Meta extends Stamped> {
 	}
 
 
-	public SortedMap<Stamp, Entry<Meta>> findAll(Path p, Boolean text, Boolean binary) {
+	protected SortedMap<Stamp, Entry<Meta>> findAll(Path p, Boolean text, Boolean binary) {
 		final SortedMap<Stamp, Entry<Meta>> metas = load(p);
 
 		filter(metas, null, null, text, binary);
@@ -309,7 +309,7 @@ public abstract class Dao<Meta extends Stamped> {
 		return metas;
 	}
 
-	public Entry<Meta> findLast(Path p, Boolean text, Boolean binary) {
+	protected Entry<Meta> findLast(Path p, Boolean text, Boolean binary) {
 		final SortedMap<Stamp, Entry<Meta>> metas = load(p);
 
 		filter(metas, null, null, text, binary);
@@ -317,7 +317,7 @@ public abstract class Dao<Meta extends Stamped> {
 		return metas.isEmpty() ? null : metas.get(metas.lastKey());
 	}
 
-	public Entry<Meta> findByStamp(Path p, Stamp stamp, Boolean text, Boolean binary) {
+	protected Entry<Meta> findByStamp(Path p, Stamp stamp, Boolean text, Boolean binary) {
 		final SortedMap<Stamp, Entry<Meta>> metas = load(p);
 
 		final Entry<Meta> found = metas.get(stamp);
@@ -353,7 +353,7 @@ public abstract class Dao<Meta extends Stamped> {
 	}
 
 	//	TODO caching review: returned value is modified!
-	protected SortedMap<Stamp, Entry<Meta>> load(Path p) {
+	private SortedMap<Stamp, Entry<Meta>> load(Path p) {
 		final long now = System.currentTimeMillis();
 		final SortedMap<Stamp, Entry<Meta>> loaded;
 
@@ -382,7 +382,7 @@ public abstract class Dao<Meta extends Stamped> {
 		return listCriteria(path, null, false, true, false, null);
 	}
 
-	protected void invalidate(Path p) {
+	private void invalidate(Path p) {
 		synchronized (cacheMonitor) {
 			final Set<Path> cRecStampPaths = cacheRecStamps.keySet();
 			for (final Path pCached : cRecStampPaths) {
@@ -399,7 +399,7 @@ public abstract class Dao<Meta extends Stamped> {
 		}
 	}
 
-	protected void writeAtomically(
+	private void writeAtomically(
 			File dataDir, final boolean requireExistingMeta,
 			Stamped meta, BufferedInputStream binary, BufferedReader text
 	) throws IOException {
@@ -431,7 +431,7 @@ public abstract class Dao<Meta extends Stamped> {
 		}
 	}
 
-	protected void deleteAll(File fileMeta, File fileBinary, File fileText, final String which) {
+	private void deleteAll(File fileMeta, File fileBinary, File fileText, final String which) {
 		synchronized (fsMonitor) {
 			deleteFile(fileMeta, which, "meta");
 			deleteFile(fileBinary, which, "binary");
@@ -439,13 +439,13 @@ public abstract class Dao<Meta extends Stamped> {
 		}
 	}
 
-	protected static void deleteFile(File file, final String which, final String what) {
+	private static void deleteFile(File file, final String which, final String what) {
 		if (file.isFile() && !file.delete()) {
 			log.error("failed to delete " + which + " " + what + ": {}", file.getAbsolutePath());
 		}
 	}
 
-	protected static void writeText(BufferedReader text, File fileText) throws IOException {
+	private static void writeText(BufferedReader text, File fileText) throws IOException {
 		BufferedReader in = null;
 		BufferedWriter out = null;
 
@@ -465,7 +465,7 @@ public abstract class Dao<Meta extends Stamped> {
 		}
 	}
 
-	protected static void writeBinary(BufferedInputStream binary, File fileBinary) throws IOException {
+	private static void writeBinary(BufferedInputStream binary, File fileBinary) throws IOException {
 		BufferedInputStream in = null;
 		BufferedOutputStream out = null;
 		try {
@@ -485,7 +485,7 @@ public abstract class Dao<Meta extends Stamped> {
 		}
 	}
 
-	protected void filter(SortedMap<Stamp, Entry<Meta>> metas, Long sinceTime, Long untilTime, Boolean text, Boolean binary) {
+	private void filter(SortedMap<Stamp, Entry<Meta>> metas, Long sinceTime, Long untilTime, Boolean text, Boolean binary) {
 		final Set<Stamp> stamps = metas.keySet();
 		for (Iterator<Stamp> stampIt = stamps.iterator(); stampIt.hasNext();) {
 			final Stamp stamp = stampIt.next();
@@ -499,7 +499,7 @@ public abstract class Dao<Meta extends Stamped> {
 		}
 	}
 
-	protected boolean isRemoved(Stamp stamp, Entry<Meta> entry, Long sinceTime, Long untilTime, Boolean text, Boolean binary) {
+	private boolean isRemoved(Stamp stamp, Entry<Meta> entry, Long sinceTime, Long untilTime, Boolean text, Boolean binary) {
 		boolean removed =false;
 		if (
 				(sinceTime != null && stamp.getTime() < sinceTime) ||
@@ -525,7 +525,7 @@ public abstract class Dao<Meta extends Stamped> {
 	 * @param dest to dump entries into
 	 * @return dest argument, <code>null</code> in case you don't want to bother with memory allocation yourself
 	 */
-	protected SortedMap<Stamp, Entry<Meta>> listRecords(
+	private SortedMap<Stamp, Entry<Meta>> listRecords(
 			final Set<File> dirs,
 			final SortedMap<Stamp, Entry<Meta>> dest
 	) {
@@ -603,7 +603,7 @@ public abstract class Dao<Meta extends Stamped> {
 		return result;
 	}
 
-	protected File[] listMetas(File dir) {
+	private File[] listMetas(File dir) {
 		final File[] metas;
 
 		synchronized (fsMonitor) {
@@ -617,7 +617,7 @@ public abstract class Dao<Meta extends Stamped> {
 		return metas;
 	}
 
-	protected static Stamp parseStamp(File f, final String ext) {
+	private static Stamp parseStamp(File f, final String ext) {
 		final String n = f.getName();
 		if (!f.isFile() || !n.endsWith(ext)) {
 			return null;
@@ -641,7 +641,7 @@ public abstract class Dao<Meta extends Stamped> {
 	 * @param dirs			 pass-in arg to return directories which contain records for this criteria	 @return all possible values for each criteria path position
 	 * @return all reachable selectors, an array for each level
 	 */
-	protected String[][] listCriteria(
+	private String[][] listCriteria(
 			final Path p,
 			final Meta meta,
 			final boolean create,

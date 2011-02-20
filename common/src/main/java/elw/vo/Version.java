@@ -5,11 +5,11 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 import java.util.*;
 
 public class Version extends IdName {
-	protected Map<String, List<Entry<FileMeta>>> files = new TreeMap<String, List<Entry<FileMeta>>>();
+	private Map<String, List<Entry<FileMeta>>> files = new TreeMap<String, List<Entry<FileMeta>>>();
 
 	@SuppressWarnings({"unchecked"})
 	@JsonIgnore
-	public Entry<FileMeta>[] getFiles(final String slotId) {
+	private Entry<FileMeta>[] getFiles(final String slotId) {
 		final List<Entry<FileMeta>> filesForSlot = files.get(slotId);
 		if (filesForSlot == null) {
 			return new Entry[0];
@@ -56,7 +56,7 @@ public class Version extends IdName {
 		return true;
 	}
 
-	public boolean isApprovedAny(
+	private boolean isApprovedAny(
 			final String slotId,
 			final Map<String, List<Entry<FileMeta>>> filesStud
 	) {

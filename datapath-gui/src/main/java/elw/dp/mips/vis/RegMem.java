@@ -8,11 +8,16 @@ import java.awt.*;
 
 abstract class RegMem extends Device {
 
-	protected double x1, y1, width, height;
-	protected Color color;
-	protected String label1, label2, name;
+	private double x1;
+	private double y1;
+	private double width;
+	private double height;
+	private Color color;
+	private String label1;
+	private String label2;
+	private String name;
 
-	public RegMem(double x1, double y1, double width, double height, Color color, String label1, String label2, String name) {
+	protected RegMem(double x1, double y1, double width, double height, Color color, String label1, String label2, String name) {
 		this.x1 = x1;
 		this.y1 = y1;
 		this.width = width;

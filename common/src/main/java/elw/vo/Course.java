@@ -7,11 +7,11 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Course extends IdName implements Stamped {
-	protected final List<AssignmentType> assTypes = new ArrayList<AssignmentType>();
+	private final List<AssignmentType> assTypes = new ArrayList<AssignmentType>();
 
-	protected Stamp createStamp;
+	private Stamp createStamp;
 
-	protected String resourcePath;
+	private String resourcePath;
 
 	public String getResourcePath() {
 		return resourcePath;

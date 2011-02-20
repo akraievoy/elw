@@ -25,14 +25,14 @@ import java.util.Collections;
 import java.util.List;
 
 public class Message {
-	public static final String TYPE_INFO = "info";
-	public static final String TYPE_WARN = "warn";
-	public static final String TYPE_ERR = "err";
+	private static final String TYPE_INFO = "info";
+	private static final String TYPE_WARN = "warn";
+	private static final String TYPE_ERR = "err";
 
-	protected String message;
-	protected String type;
+	private String message;
+	private String type;
 
-	public Message(String message, String type) {
+	private Message(String message, String type) {
 		this.message = message;
 		this.type = type;
 	}
@@ -45,7 +45,7 @@ public class Message {
 		return type;
 	}
 
-	public static List<Message> getMessages(HttpServletRequest req) {
+	private static List<Message> getMessages(HttpServletRequest req) {
 		final HttpSession session = req.getSession(true);
 
 		List<Message> messages;
@@ -71,7 +71,7 @@ public class Message {
 		return result;
 	}
 
-	public static void addMessage(final HttpServletRequest req, final String type, final String message) {
+	private static void addMessage(final HttpServletRequest req, final String type, final String message) {
 		getMessages(req).add(new Message(message, type));
 	}
 

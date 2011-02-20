@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Answer {
-	protected String questionId;
-	protected ArrayList<String> answers;
+	private String questionId;
+	private ArrayList<String> answers;
 
 	public String[] getAnswers() {
 		return answers.toArray(new String[answers.size()]);

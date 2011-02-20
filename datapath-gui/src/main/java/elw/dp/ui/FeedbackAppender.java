@@ -15,19 +15,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class FeedbackAppender extends AppenderSkeleton {
-	protected static final String PATTERN_DEFAULT = "%d{HH:mm:ss.SSS} %c{1} %m";
+	private static final String PATTERN_DEFAULT = "%d{HH:mm:ss.SSS} %c{1} %m";
 
-	protected final JTextPane outputPane;
-	protected Map<Level, Style> styles = new HashMap<Level, Style>();
+	private final JTextPane outputPane;
+	private Map<Level, Style> styles = new HashMap<Level, Style>();
 
 	//	please access this value only from Swing worker thread...
-	protected int traceStart = -1;
+	private int traceStart = -1;
 
 	public FeedbackAppender(JTextPane outputPane) {
 		this(outputPane, PATTERN_DEFAULT);
 	}
 
-	public FeedbackAppender(JTextPane outputPane, final String patternDefault) {
+	private FeedbackAppender(JTextPane outputPane, final String patternDefault) {
 		this.outputPane = outputPane;
 
 		setLayout(new PatternLayout(patternDefault));
@@ -35,7 +35,7 @@ public class FeedbackAppender extends AppenderSkeleton {
 		init();
 	}
 
-	protected void init() {
+	private void init() {
 		final Style fatal = outputPane.addStyle("fatal", null);
 		StyleConstants.setForeground(fatal, Color.RED.darker().darker());
 		StyleConstants.setBold(fatal, true);

@@ -7,10 +7,10 @@ import gnu.trove.TIntIntHashMap;
 import java.util.*;
 
 public class Memory {
-	protected TIntByteHashMap contentMap = new TIntByteHashMap();
+	private TIntByteHashMap contentMap = new TIntByteHashMap();
 
-	protected TIntArrayList readAdresses = new TIntArrayList();
-	protected TIntArrayList writeAdresses = new TIntArrayList();
+	private TIntArrayList readAdresses = new TIntArrayList();
+	private TIntArrayList writeAdresses = new TIntArrayList();
 
 	public int getWord(int address) {
 		readAdresses.add(address);
@@ -36,7 +36,7 @@ public class Memory {
 		return setWordInternal(address, newWord);
 	}
 
-	public int setWordInternal(int address, int newWord) {
+	private int setWordInternal(int address, int newWord) {
 		final int oldWord = getWordInternal(address);
 
 		setByteInternal(address, (byte) (newWord >> 24));
@@ -51,7 +51,7 @@ public class Memory {
 		return contentMap.get(address);
 	}
 
-	byte setByteInternal(int address, byte value) {
+	private byte setByteInternal(int address, byte value) {
 		return contentMap.put(address, value);
 	}
 
@@ -106,7 +106,7 @@ public class Memory {
 		return hasByte(address) && hasByte(address + 1) && hasByte(address + 2) && hasByte(address + 3);
 	}
 
-	public boolean hasByte(final int address) {
+	private boolean hasByte(final int address) {
 		return contentMap.containsKey(address);
 	}
 }

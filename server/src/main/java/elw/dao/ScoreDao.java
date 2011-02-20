@@ -41,7 +41,7 @@ public class ScoreDao extends Dao<Score> {
 		return findLast(toPath(ctx, slotId, fileId), false, false);
 	}
 
-	protected Path toPath(Ctx ctx, final String slotId, final String fileId) {
+	private Path toPath(Ctx ctx, final String slotId, final String fileId) {
 		if (ctx == null || !ctx.resolved(Ctx.STATE_EGSCIV)) {
 			throw new IllegalStateException("context not fully set up: " + String.valueOf(ctx));
 		}

@@ -5,8 +5,8 @@ import java.util.regex.Pattern;
 public class Stamp implements Comparable<Stamp> {
 	public static final Pattern PATTERN_STRING = Pattern.compile("\\w+-\\w+");
 
-	protected String node;
-	protected long time;
+	private String node;
+	private long time;
 
 	public Stamp() {
 	}

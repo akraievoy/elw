@@ -3,19 +3,19 @@ package elw.vo;
 import org.codehaus.jackson.annotate.JsonIgnore;
 
 public class FileMeta extends IdNameStamped {
-	protected String contentType;
-	protected String nameNorm;	//	TODO wipe FileMeta.nameNorm as it`s now computed on the fly
-	protected String comment;
-	protected String sourceAddress;
-	protected String author;
+	private String contentType;
+	private String nameNorm;	//	TODO wipe FileMeta.nameNorm as it`s now computed on the fly
+	private String comment;
+	private String sourceAddress;
+	private String author;
 
 	//	second pass properties, issued by validator (if any)
-	protected int testsPassed;
-	protected int testsFailed;
-	protected long validatorStamp;
+	private int testsPassed;
+	private int testsFailed;
+	private long validatorStamp;
 
 	//	transient
-	protected Score score;
+	private Score score;
 
 	public FileMeta() {
 	}

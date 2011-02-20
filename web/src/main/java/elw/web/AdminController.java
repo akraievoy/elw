@@ -54,14 +54,14 @@ import java.util.regex.Pattern;
 public class AdminController extends ControllerElw {
 	private static final Logger log = LoggerFactory.getLogger(AdminController.class);
 	
-	protected final CourseDao courseDao;
-	protected final GroupDao groupDao;
-	protected final EnrollDao enrollDao;
-	protected final ScoreDao scoreDao;
-	protected final FileDao fileDao;
+	private final CourseDao courseDao;
+	private final GroupDao groupDao;
+	private final EnrollDao enrollDao;
+	private final ScoreDao scoreDao;
+	private final FileDao fileDao;
 
-	protected final AdminDao adminDao;
-	protected final SortedSet<String> validNonces = new TreeSet<String>();
+	private final AdminDao adminDao;
+	private final SortedSet<String> validNonces = new TreeSet<String>();
 
 	public AdminController(
 			CourseDao courseDao, EnrollDao enrollDao, GroupDao groupDao, ScoreDao scoreDao, FileDao fileDao,

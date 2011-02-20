@@ -41,14 +41,14 @@ public class BasicSerializerFactory
      * about ClassLoader used to load them. Rather, we can just
      * use the class name, and keep things simple and efficient.
      */
-    final static HashMap<String, JsonSerializer<?>> _concrete =
+    private final static HashMap<String, JsonSerializer<?>> _concrete =
         new HashMap<String, JsonSerializer<?>>();
     /**
      * There are also standard interfaces and abstract classes
      * that we need to support without knowing conrecte implementation
      * classes.
      */
-    final static ArrayList<SerializerMapping> _abstractSerializers =
+    private final static ArrayList<SerializerMapping> _abstractSerializers =
         new ArrayList<SerializerMapping>();
 
     static {
@@ -203,7 +203,7 @@ public class BasicSerializerFactory
      * but make it protected so that no non-singleton instances of
      * the class will be instantiated.
      */
-    protected BasicSerializerFactory() { }
+	private BasicSerializerFactory() { }
 
     /*
     ////////////////////////////////////////////////////////////
@@ -258,7 +258,7 @@ public class BasicSerializerFactory
      * type itself, but not consider super-classes or implemented
      * interfaces.
      */
-    public final JsonSerializer<?> findSerializerByLookup(Class<?> type, SerializationConfig config)
+	private JsonSerializer<?> findSerializerByLookup(Class<?> type, SerializationConfig config)
     {
         JsonSerializer<?> ser = _concrete.get(type.getName());
         /* 08-Nov-2009, tatus: Some standard types may need customization;
@@ -280,7 +280,7 @@ public class BasicSerializerFactory
      * a "primary" interface. Primary here is defined as the main function
      * of the Object; as opposed to "add-on" functionality.
      */
-    public final JsonSerializer<?> findSerializerByPrimaryType(Class<?> type, SerializationConfig config)
+	private JsonSerializer<?> findSerializerByPrimaryType(Class<?> type, SerializationConfig config)
     {
         /* Some types are final, and hence not checked here (will
          * have been handled by fast method above):
@@ -370,7 +370,7 @@ public class BasicSerializerFactory
      * bean classes may implement {@link Iterable}, but their main
      * function is usually something else. The reason for
      */
-    public final JsonSerializer<?> findSerializerByAddonType(Class<?> type, SerializationConfig config)
+	private JsonSerializer<?> findSerializerByAddonType(Class<?> type, SerializationConfig config)
     {
         // These need to be in decreasing order of specificity...
         if (Iterator.class.isAssignableFrom(type)) {
@@ -393,7 +393,7 @@ public class BasicSerializerFactory
      * Returns null if no such annotation found.
      */
     @SuppressWarnings("unchecked")
-    protected JsonSerializer<Object> findSerializerFromAnnotation(SerializationConfig config, Annotated a)
+	private JsonSerializer<Object> findSerializerFromAnnotation(SerializationConfig config, Annotated a)
     {
         Object serDef = config.getAnnotationIntrospector().findSerializer(a);
         if (serDef != null) {
@@ -419,7 +419,7 @@ public class BasicSerializerFactory
      * Helper method that handles configuration details when constructing serializers for
      * {@link java.util.Map} types.
      */
-    protected JsonSerializer<?> buildMapSerializer(Class<?> type, SerializationConfig config)
+	private JsonSerializer<?> buildMapSerializer(Class<?> type, SerializationConfig config)
     {
         AnnotationIntrospector intr = config.getAnnotationIntrospector();
         BasicBeanDescription beanDesc = config.introspectClassAnnotations(type);
@@ -451,11 +451,11 @@ public class BasicSerializerFactory
             _serializer = ser;
         }
 
-        public boolean matches(Class<?> c) {
+        private boolean matches(Class<?> c) {
             return _class.isAssignableFrom(c);
         }
 
-        public JsonSerializer<?> getSerializer() { return _serializer; }
+        private JsonSerializer<?> getSerializer() { return _serializer; }
     }
 
     /*
@@ -505,7 +505,7 @@ public class BasicSerializerFactory
     /**
      * This is the special serializer for regular {@link java.lang.String}s.
      */
-    public final static class StringSerializer
+    private final static class StringSerializer
         extends SerializerBase<String>
     {
         @Override
@@ -526,7 +526,7 @@ public class BasicSerializerFactory
      * Also: default bean access will not do much good with Class.class. But
      * we can just serialize the class name and that should be enough.
      */
-    public final static class ClassSerializer
+    private final static class ClassSerializer
         extends SerializerBase<Class<?>>
     {
         @Override
@@ -550,7 +550,7 @@ public class BasicSerializerFactory
     ////////////////////////////////////////////////////////////
      */
 
-    public final static class IntegerSerializer
+    private final static class IntegerSerializer
         extends SerializerBase<Integer>
     {
         @Override
@@ -573,10 +573,10 @@ public class BasicSerializerFactory
      * instead, cast is to {@link java.lang.Number}, and conversion is
      * by calling {@link java.lang.Number#intValue}.
      */
-    public final static class IntLikeSerializer
+    protected final static class IntLikeSerializer
         extends SerializerBase<Number>
     {
-        final static IntLikeSerializer instance = new IntLikeSerializer();
+        private final static IntLikeSerializer instance = new IntLikeSerializer();
 
         @Override
         public void serialize(Number value, JsonGenerator jgen, SerializerProvider provider)
@@ -593,10 +593,10 @@ public class BasicSerializerFactory
         }
     }
 
-    public final static class LongSerializer
+    protected final static class LongSerializer
         extends SerializerBase<Long>
     {
-        final static LongSerializer instance = new LongSerializer();
+        private final static LongSerializer instance = new LongSerializer();
 
         @Override
         public void serialize(Long value, JsonGenerator jgen, SerializerProvider provider)
@@ -612,10 +612,10 @@ public class BasicSerializerFactory
         }
     }
 
-    public final static class FloatSerializer
+    protected final static class FloatSerializer
         extends SerializerBase<Float>
     {
-        final static FloatSerializer instance = new FloatSerializer();
+        private final static FloatSerializer instance = new FloatSerializer();
 
         @Override
 		public void serialize(Float value, JsonGenerator jgen, SerializerProvider provider)
@@ -631,10 +631,10 @@ public class BasicSerializerFactory
         }
     }
 
-    public final static class DoubleSerializer
+    protected final static class DoubleSerializer
         extends SerializerBase<Double>
     {
-        final static DoubleSerializer instance = new DoubleSerializer();
+        private final static DoubleSerializer instance = new DoubleSerializer();
 
         @Override
 		public void serialize(Double value, JsonGenerator jgen, SerializerProvider provider)
@@ -657,7 +657,7 @@ public class BasicSerializerFactory
     public final static class NumberSerializer
         extends SerializerBase<Number>
     {
-        public final static NumberSerializer instance = new NumberSerializer();
+        private final static NumberSerializer instance = new NumberSerializer();
 
         @Override
         public void serialize(Number value, JsonGenerator jgen, SerializerProvider provider)
@@ -698,7 +698,7 @@ public class BasicSerializerFactory
     public final static class CalendarSerializer
         extends SerializerBase<Calendar>
     {
-        public final static CalendarSerializer instance = new CalendarSerializer();
+        private final static CalendarSerializer instance = new CalendarSerializer();
         @Override
 		public void serialize(Calendar value, JsonGenerator jgen, SerializerProvider provider)
             throws IOException, JsonGenerationException
@@ -722,7 +722,7 @@ public class BasicSerializerFactory
     public final static class UtilDateSerializer
         extends SerializerBase<java.util.Date>
     {
-        public final static UtilDateSerializer instance = new UtilDateSerializer();
+        private final static UtilDateSerializer instance = new UtilDateSerializer();
         @Override
         public void serialize(java.util.Date value, JsonGenerator jgen, SerializerProvider provider)
             throws IOException, JsonGenerationException
@@ -745,7 +745,7 @@ public class BasicSerializerFactory
      * representation here. Why? Basically to truncate of time part, since
      * that should not be used by plain SQL date.
      */
-    public final static class SqlDateSerializer
+    private final static class SqlDateSerializer
         extends SerializerBase<java.sql.Date>
     {
         @Override
@@ -763,7 +763,7 @@ public class BasicSerializerFactory
         }
     }
 
-    public final static class SqlTimeSerializer
+    private final static class SqlTimeSerializer
         extends SerializerBase<java.sql.Time>
     {
         @Override
@@ -788,7 +788,7 @@ public class BasicSerializerFactory
     public final static class NullSerializer
         extends SerializerBase<Object>
     {
-        public final static NullSerializer instance = new NullSerializer();
+        private final static NullSerializer instance = new NullSerializer();
 
         private NullSerializer() { }
 
@@ -810,7 +810,7 @@ public class BasicSerializerFactory
     public final static class SerializableSerializer
         extends SerializerBase<JsonSerializable>
     {
-        final static SerializableSerializer instance = new SerializableSerializer();
+        private final static SerializableSerializer instance = new SerializableSerializer();
 
         private SerializableSerializer() { }
 

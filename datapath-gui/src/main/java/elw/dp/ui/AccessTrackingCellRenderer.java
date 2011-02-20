@@ -5,12 +5,12 @@ import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 
 public class AccessTrackingCellRenderer implements TableCellRenderer {
-	protected final TableCellRenderer wrapped;
-	protected final RendererFactory factory;
+	private final TableCellRenderer wrapped;
+	private final RendererFactory factory;
 
-	protected static final Color W_COLOR = new Color(0xFF, 0xDD, 0xDD);
-	protected static final Color R_COLOR = new Color(0xEE, 0xDD, 0xFF);
-	protected static final Color N_COLOR = Color.white;
+	private static final Color W_COLOR = new Color(0xFF, 0xDD, 0xDD);
+	private static final Color R_COLOR = new Color(0xEE, 0xDD, 0xFF);
+	private static final Color N_COLOR = Color.white;
 
 	public AccessTrackingCellRenderer(TableCellRenderer wrapped, RendererFactory factory) {
 		this.wrapped = wrapped;
@@ -39,7 +39,7 @@ public class AccessTrackingCellRenderer implements TableCellRenderer {
 		return cell;
 	}
 
-	public Color darker(Color what, int row) {
+	private Color darker(Color what, int row) {
 		if (row % 2 == 0) {
 			return what;
 		}

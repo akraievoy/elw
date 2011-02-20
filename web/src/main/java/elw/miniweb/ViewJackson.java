@@ -28,9 +28,9 @@ import java.util.Map;
 
 public class ViewJackson implements View {
 	public final static ObjectMapper MAPPER = createMapper();
-	protected String contentType = "text/json";
+	private String contentType = "text/json";
 
-	protected static ObjectMapper createMapper() {
+	private static ObjectMapper createMapper() {
 		final ObjectMapper mapper = new ObjectMapper();
 
 		mapper.getSerializationConfig().enable(SerializationConfig.Feature.INDENT_OUTPUT);
@@ -38,19 +38,19 @@ public class ViewJackson implements View {
 		return mapper;
 	}
 
-	protected final State state;
+	private final State state;
 
-	protected ViewJackson(State state) {
+	private ViewJackson(State state) {
 		this.state = state;
 	}
 
 	@Deprecated
-	public ViewJackson(Object data) {
+	private ViewJackson(Object data) {
 		this(new State(true, null, data));
 	}
 
 	@Deprecated
-	public ViewJackson(String message) {
+	private ViewJackson(String message) {
 		this(new State(false, message, null));
 	}
 
@@ -83,7 +83,7 @@ public class ViewJackson implements View {
 		protected final String message;
 		protected final Object data;
 
-		public State(boolean success, String message, Object data) {
+		private State(boolean success, String message, Object data) {
 			this.success = success;
 			this.message = message;
 			this.data = data;

@@ -9,13 +9,13 @@ import javax.swing.table.AbstractTableModel;
 
 public class InstructionsTableModel extends AbstractTableModel {
 	public static final String COL_ADDR = "Addr";
-	public static final String COL_BIN = "Hex";
-	public static final String COL_LABELS = "Labels";
+	private static final String COL_BIN = "Hex";
+	private static final String COL_LABELS = "Labels";
 	public static final String COL_CODE = "Code";
 	public static final String COL_ACC = "rw";
 
-	protected final String[] columns = new String[]{COL_ACC, COL_ADDR, COL_BIN, COL_CODE, COL_LABELS};
-	protected final Instructions instructions;
+	private final String[] columns = new String[]{COL_ACC, COL_ADDR, COL_BIN, COL_CODE, COL_LABELS};
+	private final Instructions instructions;
 
 	public InstructionsTableModel(Instructions instructions) {
 		this.instructions = instructions;
@@ -70,7 +70,7 @@ public class InstructionsTableModel extends AbstractTableModel {
 		return code;
 	}
 
-	protected String getAccessMod(int rowIndex) {
+	private String getAccessMod(int rowIndex) {
 		StringBuffer accessMod = new StringBuffer();
 
 		if (instructions.getReadAddresses().contains(rowIndex)) {

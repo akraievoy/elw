@@ -8,13 +8,13 @@ import java.io.*;
 public class Entry<Meta> {
 	private static final Logger log = LoggerFactory.getLogger(Entry.class);
 
-	protected final Meta meta;
-	protected final File fileMeta;
-	protected final File fileBinary;
-	protected final File fileText;
-	protected final long stamp;
-	protected ThreadLocal<BufferedInputStream> binary = new ThreadLocal<BufferedInputStream>();
-	protected ThreadLocal<BufferedReader> text = new ThreadLocal<BufferedReader>();
+	private final Meta meta;
+	private final File fileMeta;
+	private final File fileBinary;
+	private final File fileText;
+	private final long stamp;
+	private ThreadLocal<BufferedInputStream> binary = new ThreadLocal<BufferedInputStream>();
+	private ThreadLocal<BufferedReader> text = new ThreadLocal<BufferedReader>();
 
 	public Entry(File fileMeta, File fileText, File fileBinary, Meta meta, long stamp) {
 		this.meta = meta;

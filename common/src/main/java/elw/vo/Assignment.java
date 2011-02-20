@@ -5,10 +5,10 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 import java.util.*;
 
 public class Assignment extends IdNameStamped {
-	protected final List<Version> versions = new ArrayList<Version>();
-	protected Map<String, List<Entry<FileMeta>>> files = new TreeMap<String, List<Entry<FileMeta>>>();
+	private final List<Version> versions = new ArrayList<Version>();
+	private Map<String, List<Entry<FileMeta>>> files = new TreeMap<String, List<Entry<FileMeta>>>();
 	//	TODO remove this flag
-	protected boolean shared = false;
+	private boolean shared = false;
 
 	public Version[] getVersions() {
 		return versions.toArray(new Version[versions.size()]);
