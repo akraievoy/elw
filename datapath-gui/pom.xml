@@ -8,7 +8,7 @@
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
-	<name>datapath-gui</name>
+	<name>elw :: datapath-gui</name>
 	<artifactId>datapath-gui</artifactId>
 	<groupId>org.akraievoy.elw</groupId>
 

@@ -8,7 +8,7 @@
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
-	<name>server</name>
+	<name>elw :: server</name>
 	<artifactId>server</artifactId>
 	<groupId>org.akraievoy.elw</groupId>
 

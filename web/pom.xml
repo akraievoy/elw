@@ -8,7 +8,7 @@
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
-	<name>web</name>
+	<name>elw :: web</name>
 	<artifactId>web</artifactId>
 	<groupId>org.akraievoy.elw</groupId>
 	<packaging>war</packaging>
