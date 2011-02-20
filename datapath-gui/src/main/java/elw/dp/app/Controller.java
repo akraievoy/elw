@@ -24,7 +24,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
 
-public class Controller implements ControllerSetup, CallbackLoadTask {
+public class Controller implements ControllerSetup, RunnableLoadTask.Callback {
 	private static final org.slf4j.Logger log = LoggerFactory.getLogger(Controller.class);
 
 	private static final String PREFIX_TEST = "Test #";

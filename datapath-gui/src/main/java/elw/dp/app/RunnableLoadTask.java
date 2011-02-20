@@ -18,11 +18,17 @@ import java.util.List;
 import java.util.Map;
 
 class RunnableLoadTask implements Runnable {
-	private final CallbackLoadTask callback;
+	public static interface Callback {
+		void setTask(TaskBean task);
+		void updateStatus(String newStatus, Throwable fault);
+		void onTaskLoadComplete();
+	}
+
+	private final Callback callback;
 	private final ControllerSetup setup;
 	private final ObjectMapper mapper = new ObjectMapper();
 
-	public RunnableLoadTask(CallbackLoadTask callback, ControllerSetup setup) {
+	public RunnableLoadTask(Callback callback, ControllerSetup setup) {
 		this.callback = callback;
 		this.setup = setup;
 	}
