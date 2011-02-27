@@ -207,13 +207,13 @@ public class Core {
 		final String ulRef;
 		if (adm) {
 			if (!FileDao.SCOPE_STUD.equals(scope)) {
-				ulRef = uri.upload(ctx, scope, slot.getId(), null);	//	FIXME context/scope here is not set properly
+				ulRef = uri.upload(ctx, scope, slot.getId());	//	FIXME context/scope here is not set properly
 			} else {
 				ulRef = null;
 			}
 		} else {
 			if (studEditable) {
-				ulRef = uri.upload(ctx, scope, slot.getId(), null);
+				ulRef = uri.upload(ctx, scope, slot.getId());
 			} else {
 				ulRef = null;
 			}

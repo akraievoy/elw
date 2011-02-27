@@ -1,12 +1,15 @@
 package elw.dao;
 
+import base.pattern.Result;
+import com.google.common.base.Strings;
+import com.google.common.io.ByteStreams;
+import com.google.common.io.Closeables;
+import com.google.common.io.InputSupplier;
 import elw.vo.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.List;
@@ -23,6 +26,7 @@ public class FileDao extends Dao<FileMeta> {
 
 	private final ScoreDao scoreDao;
 	public static final String[] SCOPES = new String[] {FileDao.SCOPE_ASS_TYPE, FileDao.SCOPE_ASS, FileDao.SCOPE_VER, FileDao.SCOPE_STUD};
+	protected static final int DETECT_SIZE_LIMIT = 1024 * 1024 * 1024;
 
 	public FileDao(final ScoreDao scoreDao) {
 		this.scoreDao = scoreDao;
@@ -33,9 +37,64 @@ public class FileDao extends Dao<FileMeta> {
 		return new Path(file.getPath());
 	}
 
-	public Stamp createFileFor(
+	public Result createFileFor(
+			String scope, Ctx ctx, FileSlot slot, FileMeta fileMeta,
+			long length, InputSupplier<InputStream> is
+	) throws IOException {
+		//	LATER this means that all files which are greater than limit are binary (which makes some sense, but...)
+		boolean binaryEffective = slot.isBinary() || length >= DETECT_SIZE_LIMIT;
+
+		final InputSupplier<? extends InputStream> isEffective;
+		if (!slot.isBinary() && length < DETECT_SIZE_LIMIT) {
+			final byte[] bytes = ByteStreams.toByteArray(is);
+			//	implemented as per this SO answer:
+			//	http://stackoverflow.com/questions/277521/identify-file-binary/277568#277568
+			for (byte b : bytes) {
+				if (b >= 0 && b < 9 || b > 13 && b < 32) {
+					binaryEffective = true;
+					break;
+				}
+			}
+			isEffective = ByteStreams.newInputStreamSupplier(bytes);
+		} else {
+			isEffective = is;
+		}
+
+		if (!slot.isBinaryAllowed() &&  binaryEffective) {
+			return new Result("binary files not allowed", false);
+		}
+
+		if (!slot.isTextAllowed() && !binaryEffective) {
+			return new Result("text files not allowed", false);
+		}
+
+		if (Strings.isNullOrEmpty(fileMeta.getContentType())) {
+			fileMeta.setContentType(binaryEffective ? "application/octet-stream" : "text/plain");
+		}
+		if (Strings.isNullOrEmpty(fileMeta.getName())) {
+			fileMeta.setContentType(binaryEffective ? "upload.bin" : "upload.txt");
+		}
+		fileMeta.setBinary(binaryEffective);
+
+		InputStream input = null;
+		try {
+			input = isEffective.getInput();
+
+			//	TODO: there's no added value in separating files this way
+			final BufferedInputStream streamBinary = binaryEffective ? new BufferedInputStream(input) : null;
+			final BufferedReader streamText = binaryEffective ? null : new BufferedReader(new InputStreamReader(input, "UTF-8"));
+
+			createFileFor(scope, ctx, slot.getId(), fileMeta, streamBinary, streamText);
+			return new Result("file created", true);
+		} finally {
+			Closeables.closeQuietly(input);
+		}
+	}
+
+	private Stamp createFileFor(
 			final String scope, Ctx ctx, String slotId,
-			FileMeta meta, BufferedInputStream binary, BufferedReader text) throws IOException {
+			FileMeta meta, BufferedInputStream binary, BufferedReader text
+	) throws IOException {
 		return setPathAndCreate(pathFor(scope, ctx, slotId, meta), meta, binary, text);
 	}
 

@@ -1,13 +1,15 @@
 package elw.vo;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
+@JsonIgnoreProperties("nameNorm")
 public class FileMeta extends IdNameStamped {
 	private String contentType;
-	private String nameNorm;	//	TODO wipe FileMeta.nameNorm as it`s now computed on the fly
 	private String comment;
 	private String sourceAddress;
 	private String author;
+	private boolean binary;
 
 	//	second pass properties, issued by validator (if any)
 	private int testsPassed;
@@ -20,9 +22,8 @@ public class FileMeta extends IdNameStamped {
 	public FileMeta() {
 	}
 
-	public FileMeta(String name, String nameNorm, String contentType, String author, String sourceAddress) {
+	public FileMeta(String name, String contentType, String author, String sourceAddress) {
 		this.name = name;
-		this.nameNorm = nameNorm;
 		this.author = author;
 		this.contentType = contentType;
 		this.sourceAddress = sourceAddress;
@@ -33,20 +34,20 @@ public class FileMeta extends IdNameStamped {
 		return extractNameFromPath(super.getName());
 	}
 
+	public boolean isBinary() {
+		return binary;
+	}
+
+	public void setBinary(boolean binary) {
+		this.binary = binary;
+	}
+
 	public String getContentType() {
 		return contentType;
 	}
 
 	public void setContentType(String contentType) {
 		this.contentType = contentType;
-	}
-
-	public String getNameNorm() {
-		return nameNorm;
-	}
-
-	public void setNameNorm(String nameNorm) {
-		this.nameNorm = nameNorm;
 	}
 
 	public String getSourceAddress() {

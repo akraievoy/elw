@@ -25,16 +25,8 @@ import elw.vo.*;
 import elw.web.core.Core;
 import elw.web.core.LogFilter;
 import elw.web.core.W;
-import org.akraievoy.gear.G4Io;
 import org.akraievoy.gear.G4Parse;
-import org.akraievoy.gear.G4Str;
-import org.akraievoy.gear.G4mat;
-import org.apache.commons.fileupload.FileItemIterator;
-import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -47,9 +39,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.util.*;
-import java.util.regex.Pattern;
 
-@Controller
+	@Controller
 @RequestMapping("/a/**/*")
 public class AdminController extends ControllerElw {
 	private static final Logger log = LoggerFactory.getLogger(AdminController.class);
@@ -393,10 +384,11 @@ public class AdminController extends ControllerElw {
 		return wmFile(req, resp, "", null, new WebMethodFile() {
 			@Override
 			protected ModelAndView handleFile(String scope, FileSlot slot) throws IOException {
+				final String failureUri = core.getUri().upload(ctx, scope, slot.getId());
 				final String refreshUri = core.getUri().logCourseE(ctx.getEnr().getId());
 				final String authorName = ((Admin)model.get(S_ADMIN)).getName();
 
-				return storeFile(scope, slot, refreshUri, authorName, core.getFileDao());
+				return storeFile(scope, slot, refreshUri, failureUri, authorName, core.getFileDao());
 			}
 		});
 	}

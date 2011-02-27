@@ -46,8 +46,7 @@ public class Version extends IdName {
 	) {
 		final FileSlot fileSlot = assType.findSlotById(slotId);
 
-		final String[] readApprovals = fileSlot.getReadApprovals();
-		for (String slotIdRA : readApprovals) {
+		for (String slotIdRA : fileSlot.getReadApprovals()) {
 			if (!isApprovedAny(slotIdRA, filesStud)) {
 				return false;
 			}
@@ -112,7 +111,7 @@ public class Version extends IdName {
 			return false;
 		}
 
-		final String[] writeApprovals = fileSlot.getWriteApprovals();
+		final List<String> writeApprovals = fileSlot.getWriteApprovals();
 		for (String slotIdWA : writeApprovals) {
 			if (!isApprovedAny(slotIdWA, filesStud)) {
 				return false;

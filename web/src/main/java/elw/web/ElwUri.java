@@ -18,6 +18,7 @@
 
 package elw.web;
 
+import com.google.common.base.Strings;
 import elw.dao.Ctx;
 import elw.vo.Entry;
 import elw.vo.FileMeta;
@@ -54,15 +55,23 @@ public class ElwUri {
 	}
 
 	public String logPendingEAV(final Ctx ctx) {
-		return "log?elw_ctx=e--" + ctx.getEnr().getId() + "&f_verId=" + ctx.getAss().getId() + "--" + ctx.getVer().getId() + "--&f_scope=s--p--&f_due=twoweeks&f_mode=dd";
+		return logEAV(ctx, "s--p--", "set") +"&f_mode=dd";
+	}
+
+	public String logAnyEAV(final Ctx ctx) {
+		return logEAV(ctx, "s--", "set") +"&f_mode=dd";
 	}
 
 	public String logOpenEAV(final Ctx ctx) {
-		return "log?elw_ctx=e--" + ctx.getEnr().getId() + "&f_verId=" + ctx.getAss().getId() + "--" + ctx.getVer().getId() + "--&f_scope=s--o--&f_due=twoweeks&f_mode=dd";
+		return logEAV(ctx, "s--o--", "set") +"&f_mode=dd";
 	}
 
 	public String logCourseEAV(final Ctx ctx) {
-		return "log?elw_ctx=e--" + ctx.getEnr().getId() + "&f_verId=" + ctx.getAss().getId() + "--" + ctx.getVer().getId() + "--&f_scope=c--av--&f_due=any";
+		return logEAV(ctx, "c--av--", "any");
+	}
+
+	public String logEAV(Ctx ctx, String scope, String due) {
+		return "log?elw_ctx=e--" + ctx.getEnr().getId() + "&f_verId=" + ctx.getAss().getId() + "--" + ctx.getVer().getId() + "--&f_scope="+ scope +"&f_due="+ due;
 	}
 
 	public String summary(final String enrId) {
@@ -72,14 +81,15 @@ public class ElwUri {
 	private String fileQuery(final Ctx ctx, final String scope, final String slotId, FileMeta file) {
 		final String xferQuery = "?elw_ctx=" + ctx.toString() + "&s=" + scope + "&sId=" + slotId;
 
-		if (file != null) {
+		if (file != null && !Strings.isNullOrEmpty(file.getId())) {
 			return xferQuery + "&fId=" + file.getId();
 		}
+
 		return xferQuery;
 	}
 
-	public String upload(final Ctx ctx, final String scope, final String slotId, Entry<FileMeta> e) {
-		return "ul" + fileQuery(ctx, scope, slotId, e == null ? null : e.getMeta());
+	public String upload(final Ctx ctx, final String scope, final String slotId) {
+		return "ul" + fileQuery(ctx, scope, slotId, null);
 	}
 
 	public String download(final Ctx ctx, final String scope, final String slotId, Entry<FileMeta> e, String nameNorm) {

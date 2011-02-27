@@ -427,13 +427,14 @@ public class StudentController extends ControllerElw {
 		return wmFile(req, resp, "", FileDao.SCOPE_STUD, new WebMethodFile() {
 			@Override
 			protected ModelAndView handleFile(String scope, FileSlot slot) throws IOException {
-				final String refreshUri = core.getUri().logPendingEAV(ctx);
-
 				if (accessDenied(resp, ctx, scope, slot, true)) {
 					return null;
 				}
 
-				return storeFile(scope, slot, refreshUri, ctx.getStudent().getName(), core.getFileDao());
+				final String refreshUri = core.getUri().logPendingEAV(ctx);
+				final String failureUri = core.getUri().upload(ctx, scope, slot.getId());
+
+				return storeFile(scope, slot, refreshUri, failureUri, ctx.getStudent().getName(), core.getFileDao());
 			}
 		});
 	}

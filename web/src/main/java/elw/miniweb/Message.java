@@ -18,6 +18,8 @@
 
 package elw.miniweb;
 
+import base.pattern.Result;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
@@ -85,5 +87,13 @@ public class Message {
 
 	public static void addErr(final HttpServletRequest req, final String message) {
 		addMessage(req, TYPE_ERR, message);
+	}
+
+	public static void addResult(final HttpServletRequest req, Result result) {
+		if (result.isSuccess()) {
+			addInfo(req, result.getMessage());
+		} else {
+			addErr(req, result.getMessage());
+		}
 	}
 }

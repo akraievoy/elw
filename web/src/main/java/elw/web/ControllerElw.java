@@ -18,6 +18,11 @@
 
 package elw.web;
 
+import base.pattern.Result;
+import com.google.common.base.Charsets;
+import com.google.common.base.Strings;
+import com.google.common.io.CharStreams;
+import com.google.common.io.InputSupplier;
 import elw.dao.Ctx;
 import elw.dao.FileDao;
 import elw.miniweb.Message;
@@ -27,8 +32,6 @@ import elw.vo.FileSlot;
 import elw.vo.Stamp;
 import elw.web.core.Core;
 import elw.web.core.W;
-import org.akraievoy.gear.G4Io;
-import org.akraievoy.gear.G4Str;
 import org.akraievoy.gear.G4mat;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
@@ -259,7 +262,7 @@ public abstract class ControllerElw extends MultiActionController implements Web
 		protected abstract ModelAndView handleFile(String scope, FileSlot slot) throws IOException;
 
 		protected void retrieveFile(FileSlot slot, Entry<FileMeta> entry) throws IOException {
-			boolean binary = slot.isBinary();
+			boolean binary = slot.isBinary() || entry.getMeta().isBinary();
 
 			try {
 				if (binary) {
@@ -282,6 +285,7 @@ public abstract class ControllerElw extends MultiActionController implements Web
 					resp.setHeader("Content-Disposition", "attachment;");
 
 					//	copy the data with the original line breaks (we've set the content-length header)
+					//	LATER we should recode the data in some cases
 					final BufferedReader reader = entry.openTextReader();
 					final PrintWriter writer = resp.getWriter();
 
@@ -297,121 +301,102 @@ public abstract class ControllerElw extends MultiActionController implements Web
 		}
 
 		public ModelAndView storeFile(
-				String scope, FileSlot slot, String refreshUri, String authorName, FileDao fileDao
+				String scope, FileSlot slot, String refreshUri, String failureUri, String authorName, FileDao fileDao
 		) throws IOException {
 			final boolean put = "PUT".equalsIgnoreCase(req.getMethod());
-			if (req.getContentLength() == -1) {
-				if (!put) {
-					Message.addWarn(req, "upload size not reported");
-					resp.sendRedirect(refreshUri);
-				} else {
-					resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "upload size not reported");
-				}
-				return null;
-			}
+			final int length = req.getContentLength();
 
-			if (req.getContentLength() > slot.getLengthLimit()) {
-				final String message = "upload exceeds " + G4mat.formatMem(slot.getLengthLimit());
-				if (!put) {
-					Message.addWarn(req, message);
-					resp.sendRedirect(refreshUri);
+			if (length == -1 || length > slot.getLengthLimit()) {
+				final String message;
+				if (length == -1) {
+					message = "upload size not reported";
 				} else {
+					message = "upload exceeds " + G4mat.formatMem(slot.getLengthLimit());
+				}
+				if (put) {
 					resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
+				} else {
+					Message.addWarn(req, message);
+					resp.sendRedirect(failureUri);
 				}
 				return null;
 			}
 
-			final boolean binary = slot.isBinary() ;
+			FileMeta file = new FileMeta();
+			file.setAuthor(authorName);
+			file.setSourceAddress(W.resolveRemoteAddress(req));
+
 			if (put) {
-				//	LATER add some sensible defaults to the FileSlot entity
-				final String name = "upload" + (binary ? ".bin" : ".txt");
-				final FileMeta fileMeta = new FileMeta(
-						name,
-						name,
-						binary ? "application/octet-stream" : "text/plain",
-						authorName,
-						W.resolveRemoteAddress(req)
-				);
-
-				fileDao.createFileFor(
-						scope,
-						ctx,
-						slot.getId(),
-						fileMeta,
-						binary ? new BufferedInputStream(req.getInputStream()) : null,
-						binary ? null : new BufferedReader(new InputStreamReader(req.getInputStream(), "UTF-8"))
-				);
-
+				final Result result = fileDao.createFileFor(scope, ctx, slot, file, length, supplierForRequest(req));
+				if (!result.isSuccess()) {
+					resp.sendError(HttpServletResponse.SC_BAD_REQUEST, result.getMessage());
+				}
 				return null;
 			}
 
-			int fileCount = 0;
 			try {
 				final ServletFileUpload sfu = new ServletFileUpload(fileItemFactory);
 				final FileItemIterator fii = sfu.getItemIterator(req);
-				fileCount = 0;
-				String comment = null;
 				while (fii.hasNext()) {
 					final FileItemStream item = fii.next();
 					if (item.isFormField()) {
 						if ("comment".equals(item.getFieldName())) {
-							comment = G4Io.dumpToString(item.openStream());
+							file.setComment(fieldText(item));
 						}
 						continue;
 					}
 
-					if (fileCount > 0) {
-						Message.addWarn(req, "one file per upload, please");
-						resp.sendRedirect(refreshUri);
-						return null;
-					}
-
-					final String fName = FileMeta.extractNameFromPath(item.getName());
-					if (!Pattern.compile(slot.getNameRegex()).matcher(fName.toLowerCase()).matches()) {
+					file.setName(Strings.nullToEmpty(FileMeta.extractNameFromPath(item.getName())));
+					if (!Pattern.compile(slot.getNameRegex()).matcher(file.getName().toLowerCase()).matches()) {
 						Message.addWarn(req, "check the file name: regex check failed");
-						resp.sendRedirect(refreshUri);
+						resp.sendRedirect(failureUri);
 						return null;
 					}
 
-					final String contentType = item.getContentType();
-					if (G4Str.indexOf(contentType, slot.getContentTypes()) < 0) {
-						Message.addWarn(req, "contentType '" + contentType + "': not listed in the slot");
+					file.setContentType(Strings.nullToEmpty(item.getContentType()));
+					if (!slot.getContentTypes().contains(file.getContentType().toLowerCase())) {
+						Message.addWarn(req, "contentType '" + file.getContentType() + "': not listed in the slot");
 					}
 
-					final FileMeta fileMeta = new FileMeta(
-							fName,
-							fName,
-							contentType,
-							authorName,
-							W.resolveRemoteAddress(req)
+					final Result result = fileDao.createFileFor(
+							scope, ctx, slot, file, length, supplierForFileItem(item)
 					);
-					if (comment != null) {
-						fileMeta.setComment(comment);
+					Message.addResult(req, result);
+					if (result.isSuccess()) {
+						resp.sendRedirect(refreshUri);
+					} else {
+						resp.sendRedirect(failureUri);
 					}
 
-					fileDao.createFileFor(
-							scope,
-							ctx,
-							slot.getId(),
-							fileMeta,
-							binary ? new BufferedInputStream(item.openStream()) : null,
-							binary ? null : new BufferedReader(new InputStreamReader(item.openStream(), "UTF-8"))
-					);
-					fileCount++;
+					return null;
 				}
 			} catch (FileUploadException e) {
 				throw new IOException(e);
 			}
 
-			if (fileCount == 1) {
-				Message.addInfo(req, "Your upload has succeeded");
-				resp.sendRedirect(refreshUri);
-			} else {
-				Message.addWarn(req, "Multiple uploads not allowed");
-				resp.sendRedirect(refreshUri);
-			}
-
+			Message.addWarn(req, "No files in upload");
+			resp.sendRedirect(failureUri);
 			return null;
 		}
+
+		protected static String fieldText(final FileItemStream item) throws IOException {
+			return CharStreams.toString(CharStreams.newReaderSupplier(supplierForFileItem(item), Charsets.UTF_8));
+		}
+	}
+
+	protected static InputSupplier<InputStream> supplierForRequest(final HttpServletRequest myReq) {
+		return new InputSupplier<InputStream>() {
+			public InputStream getInput() throws IOException {
+				return myReq.getInputStream();
+			}
+		};
+	}
+
+	protected static InputSupplier<InputStream> supplierForFileItem(final FileItemStream item) {
+		return new InputSupplier<InputStream>() {
+			public InputStream getInput() throws IOException {
+				return item.openStream();
+			}
+		};
 	}
 }

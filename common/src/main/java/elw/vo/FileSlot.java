@@ -2,24 +2,33 @@ package elw.vo;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class FileSlot extends IdNameStamped {
-	private List<String> readApprovals = new ArrayList<String>();
-	private List<String> writeApprovals = new ArrayList<String>();
-	private List<String> contentTypes = new ArrayList<String>();
+	private final List<String> readApprovals = new ArrayList<String>();
+	private final List<String> writeApprovals = new ArrayList<String>();
+	private final List<String> contentTypes = new ArrayList<String>();
 	private Class validator = null;
 	private String shortName;
 	private long lengthLimit;
 	private String nameRegex;
 	private boolean escaped = true;
-	private boolean binary;
+
+	private boolean binary = true;	//	TODO this should be better renamed to strict or something
+	private boolean binaryAllowed = true;
+	private boolean textAllowed = true;
+
 	private boolean writable;
 	private String editor;
 
 	private double scoreWeight = 0.0;
 	private final List<Criteria> criterias = new ArrayList<Criteria>();
 
+	/**
+	 * Forces treating all files of this slot as binary, with full byte-to-byte integrity.
+	 * @return <code>binary</code> property
+	 */
 	public boolean isBinary() {
 		return binary;
 	}
@@ -28,13 +37,39 @@ public class FileSlot extends IdNameStamped {
 		this.binary = binary;
 	}
 
-	public String[] getContentTypes() {
-		return contentTypes.toArray(new String[contentTypes.size()]);
+	/**
+	 * Are any files looking as binary to be passed into the slot?
+	 * @return <code>binary</code> property
+	 */
+	public boolean isBinaryAllowed() {
+		return binaryAllowed;
 	}
 
-	public void setContentTypes(String[] contentTypes) {
+	public void setBinaryAllowed(boolean binaryAllowed) {
+		this.binaryAllowed = binaryAllowed;
+	}
+
+	/**
+	 * Are any files looking as text to be passed into this slot?
+	 * @return <code>binary</code> property
+	 */
+	public boolean isTextAllowed() {
+		return textAllowed;
+	}
+
+	public void setTextAllowed(boolean textAllowed) {
+		this.textAllowed = textAllowed;
+	}
+
+	public List<String> getContentTypes() {
+		return Collections.unmodifiableList(contentTypes);
+	}
+
+	public void setContentTypes(List<String> contentTypes) {
 		this.contentTypes.clear();
-		this.contentTypes.addAll(Arrays.asList(contentTypes));
+		if (contentTypes != null) {
+			this.contentTypes.addAll(contentTypes);
+		}
 	}
 
 	public long getLengthLimit() {
@@ -53,22 +88,26 @@ public class FileSlot extends IdNameStamped {
 		this.nameRegex = nameRegex;
 	}
 
-	public String[] getReadApprovals() {
-		return readApprovals.toArray(new String[readApprovals.size()]);
+	public List<String> getReadApprovals() {
+		return Collections.unmodifiableList(readApprovals);
 	}
 
-	public void setReadApprovals(String[] readApprovals) {
+	public void setReadApprovals(List<String> readApprovals) {
 		this.readApprovals.clear();
-		this.readApprovals.addAll(Arrays.asList(readApprovals));
+		if (readApprovals != null) {
+			this.readApprovals.addAll(readApprovals);
+		}
 	}
 
-	public String[] getWriteApprovals() {
-		return writeApprovals.toArray(new String[writeApprovals.size()]);
+	public List<String> getWriteApprovals() {
+		return Collections.unmodifiableList(writeApprovals);
 	}
 
-	public void setWriteApprovals(String[] writeApprovals) {
+	public void setWriteApprovals(List<String> writeApprovals) {
 		this.writeApprovals.clear();
-		this.writeApprovals.addAll(Arrays.asList(writeApprovals));
+		if (writeApprovals != null) {
+			this.writeApprovals.addAll(writeApprovals);
+		}
 	}
 
 	public String getShortName() {
@@ -95,6 +134,12 @@ public class FileSlot extends IdNameStamped {
 		this.editor = editor;
 	}
 
+	/**
+	 * Usually text files are escaped on view, but sometimes you want them to be inlined in the
+	 * page, as some links, for example.
+	 *
+	 * @return <code>escaped</code> property
+	 */
 	public boolean isEscaped() {
 		return escaped;
 	}
