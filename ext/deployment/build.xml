@@ -10,7 +10,7 @@
 
 		<exec executable="/bin/bash" failonerror="true">
 			<arg value="-c"/>
-			<arg value="7z a -mx=3 /var/backups/`date +%y%m%d`.7z /usr/share/jetty/elw-data/"/>
+			<arg value="7z a -bd -mx=3 /var/backups/`date +%y%m%d`.7z /usr/share/jetty/elw-data/"/>
 		</exec>
 
         <delete dir="${elw.dst}" failonerror="true"/>
