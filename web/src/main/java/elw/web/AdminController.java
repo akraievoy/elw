@@ -374,6 +374,8 @@ public class AdminController extends ControllerElw {
 			@Override
 			protected ModelAndView handleFile(String scope, FileSlot slot) throws IOException {
 				model.put("slot", slot);
+				final Ctx ctx = (Ctx) model.get("elw_ctx");
+				model.put("elw_ctx_type", Ctx.forEnr(ctx.getEnr()).extCourse(ctx.getCourse()).extIndex(ctx.getIndex()));
 				return new ModelAndView("a/ul", model);
 			}
 		});

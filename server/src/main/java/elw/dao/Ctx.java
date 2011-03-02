@@ -427,7 +427,7 @@ public class Ctx {
 
 	@SuppressWarnings({"SimplifiableIfStatement"})
 	private static boolean isRedundant(String elemsBefore, char elemAfter) {
-		if (elemsBefore.indexOf(ELEM_ENR) >= 0 && elemsBefore.indexOf(ELEM_INDEX_ENTRY) >= 0 && elemAfter == ELEM_VER) {
+		if (elemsBefore.indexOf(ELEM_ENR) >= 0 && elemsBefore.indexOf(ELEM_STUD) >= 0 && elemsBefore.indexOf(ELEM_INDEX_ENTRY) >= 0 && elemAfter == ELEM_VER) {
 			return true;
 		}
 		if (elemsBefore.indexOf(ELEM_ENR) >= 0 && (elemAfter == ELEM_COURSE || elemAfter == ELEM_GROUP)) {

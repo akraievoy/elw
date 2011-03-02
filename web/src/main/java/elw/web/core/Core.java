@@ -77,11 +77,17 @@ public class Core {
 			Ctx ctx, Format format, LogFilter lf,
 			List<Object[]> logData, final boolean adm
 	) {
+		final List<String> listedTypes= new ArrayList<String>();
 		for (int i = 0; i < ctx.getEnr().getIndex().size(); i++) {
 			final Ctx ctxAss = ctx.extendIndex(i);
 
 			final AssignmentType aType = ctxAss.getAssType();
 			final FileSlot[] slots = aType.getFileSlots();
+			boolean newType = false;
+			if (!listedTypes.contains(aType.getId())) {
+				listedTypes.add(aType.getId());
+				newType = true;
+			}
 			for (FileSlot slot : slots) {
 				if (W.excluded(lf.getSlotId(), aType.getId(), slot.getId())) {
 					continue;
@@ -91,6 +97,14 @@ public class Core {
 				}
 				if (!adm && !ctxAss.cFrom().isStarted()) {
 					continue;
+				}
+
+				if (newType) {
+					final Entry<FileMeta>[] uploadsType =
+							fileDao.findFilesFor(FileDao.SCOPE_ASS_TYPE, ctxAss, slot.getId());
+					if (lf.cScopeOne('t')) {
+						logRows(format, lf, logData, i, ctxAss, slot, uploadsType, FileDao.SCOPE_ASS_TYPE, adm);
+					}
 				}
 
 				final Entry<FileMeta>[] uploadsAss = fileDao.findFilesFor(FileDao.SCOPE_ASS, ctxAss, slot.getId());

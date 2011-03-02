@@ -1,4 +1,6 @@
+#* @vtlvariable name="f" type="elw.web.FormatTool" *#
 #* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
+#* @vtlvariable name="elw_ctx_type" type="elw.dao.Ctx" *#
 #* @vtlvariable name="slot" type="elw.vo.FileSlot" *#
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -24,9 +26,10 @@
    <form id="ul_form" method="POST" enctype="multipart/form-data">
     <div class="formLabel" style="height: 7em;"><label for="ul_ctx">Context:</label></div>
     <div class="formField" style="height: 7em;"><select id="ul_ctx">
-     <option value="$elw_ctx.toString()">$elw_ctx.getAss().getName()</option>
-     #foreach($ver in $elw_ctx.ass.getVersions())
-      <option value="$elw_ctx.extendVer($ver).toString()">$ver.getName()</option>
+     <option value="$elw_ctx_type.toString()scope=t">Task Type: $f.esc($elw_ctx_type.assType.name)</option>
+     <option value="$elw_ctx_type.toString()scope=a">Task: $f.esc($elw_ctx_type.ass.name)</option>
+     #foreach($ver in $elw_ctx_type.ass.getVersions())
+      <option value="$elw_ctx_type.extendVer($ver).toString()scope=v">Version: $ver.getName()</option>
      #end
     </select></div>
     <div class="formLabel" style="height: 7em;"><label for="ul_comment">Comment:</label></div>
@@ -44,10 +47,10 @@
 <script type="text/javascript">
 jQuery(document).ready(function() {
   jQuery("#ul_trig").click(function() {
-   this.attr("disabled", "disabled");
-   var ctx = jQuery("#ul_ctx").val();
-   var scope = ctx.length > $elw_ctx.toString().length() ? "v" : "a";
-   jQuery("#ul_form").attr("action", "ul?elw_ctx=" + ctx + "&sId=$slot.id&s=" + scope).submit();
+   jQuery(this).attr("disabled", "disabled");
+   var ctxAndScope = jQuery("#ul_ctx").val().split("scope=");
+   var scope = ctxAndScope[1];
+   jQuery("#ul_form").attr("action", "ul?elw_ctx=" + ctxAndScope[0] + "&sId=$slot.id&s=" + scope).submit();
   });
 });
 </script>

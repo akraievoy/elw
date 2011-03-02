@@ -9,6 +9,7 @@
  <option value="s--d--">Declined @ Student</option>
  <option value="c--">Any @ Course</option>
  <option value="c--v--">Version @ Course</option>
+ <option value="c--t--">Type @ Course</option>
  <option value="c--a--">Task @ Course</option>
  <option value="c--av--">Version/Task @ Course</option>
  <option value="c--o--">Open @ Course</option>
