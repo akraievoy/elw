@@ -104,10 +104,6 @@ public class Controller implements ControllerSetup, RunnableLoadTask.Callback {
 		view.getTestComboBox().setEnabled(false);
 
 		//	this does not work for unsigned applets...
-/*
-		final FeedbackHandler feedbackHandler = new FeedbackHandler(view.getLogTextPane());
-		Logger.getLogger("elw").addHandler(feedbackHandler);
-*/
 
 		view.getProblemTextPane().setText("loading...");
 		view.getSourceTextArea().setText("loading...");
