@@ -3,14 +3,16 @@
         <property name="elw.dst" value="/var/www/jetty-elw.akraievoy.org"/>
         <property name="elw.src" value="tmp/elw/web-1.3.war"/>
 
-        <exec executable="/sbin/service">
+        <exec executable="/usr/sbin/service">
             <arg value="jetty"/>
             <arg value="stop"/>
         </exec>
 
-		<exec executable="7z" failonerror="true">
+		<exec executable="/bin/bash" failonerror="true">
+			<arg value="-c"/>
+			<arg value="7z"/>
 			<arg value="a"/>
-			<arg value="-mx=9"/>
+			<arg value="-mx=3"/>
 			<arg value="/var/backups/`date +%y%m%d`.7z"/>
 			<arg value="/usr/share/jetty/elw-data/"/>
 		</exec>
@@ -18,7 +20,7 @@
         <delete dir="${elw.dst}" failonerror="true"/>
         <unwar src="${elw.src}" dest="${elw.dst}"/>
 
-        <exec executable="/sbin/service">
+        <exec executable="/usr/sbin/service">
             <arg value="jetty"/>
             <arg value="start"/>
         </exec>
