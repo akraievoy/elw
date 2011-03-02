@@ -130,6 +130,10 @@ public class FileMeta extends IdNameStamped {
 	}
 
 	public static String extractNameFromPath(final String name) {
+		if (name == null) {
+			return null;
+		}
+
 		final int lastSlash = Math.max(name.lastIndexOf("\\"), name.lastIndexOf("/"));
 		final String fName = lastSlash >= 0 ? name.substring(lastSlash + 1) : name;
 

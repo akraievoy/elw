@@ -2,7 +2,10 @@ package elw.dp.app;
 
 import elw.dp.mips.TaskBean;
 import org.akraievoy.gear.G4Io;
-import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.JsonFactory;
+import org.codehaus.jackson.JsonGenerator;
+import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.JsonToken;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.swing.*;
@@ -12,10 +15,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 class RunnableLoadTask implements Runnable {
 	public static interface Callback {
@@ -26,7 +26,6 @@ class RunnableLoadTask implements Runnable {
 
 	private final Callback callback;
 	private final ControllerSetup setup;
-	private final ObjectMapper mapper = new ObjectMapper();
 
 	public RunnableLoadTask(Callback callback, ControllerSetup setup) {
 		this.callback = callback;
@@ -104,8 +103,7 @@ class RunnableLoadTask implements Runnable {
 		try {
 			URLConnection ucList = setupGet(urlList);
 			is = ucList.getInputStream();
-
-			respList = mapper.readValue(is, ResponseList.class);
+			respList = readRespList(is);
 		} catch (IOException e) {
 			callback.updateStatus("list failed: '" + strList+ "'", e);
 			return;
@@ -189,6 +187,47 @@ class RunnableLoadTask implements Runnable {
 		);
 	}
 
+	protected static ResponseList readRespList(InputStream is) throws IOException {
+		JsonFactory jf = new JsonFactory();
+		JsonParser jp = jf.createJsonParser(is);
+		ResponseList response = new ResponseList();
+
+		if (jp.nextToken() != JsonToken.START_OBJECT) {
+			throw new IllegalStateException("expecting start object");
+		}
+		while (jp.nextToken() != JsonToken.END_OBJECT) {
+			String fieldname = jp.getCurrentName();
+			jp.nextToken(); // move to START_OBJECT
+			if ("success".equals(fieldname)) {
+				response.setSuccess(Boolean.parseBoolean(jp.getText()));
+			}
+			if ("message".equals(fieldname)) {
+				response.setMessage(jp.getText());	//	LATER this returns 'null' on me!
+			}
+			if ("data".equals(fieldname)) {
+				final Map<String, Map<String, String[]>> dataMap = new TreeMap<String, Map<String, String[]>>();
+				while (jp.nextToken() != JsonToken.END_OBJECT) {
+					String dataKeySlot = jp.getCurrentName();
+					jp.nextToken(); // move to START_OBJECT
+					final Map<String, String[]> scopeToIdList = new TreeMap<String, String[]>();
+					while (jp.nextToken() != JsonToken.END_OBJECT) {
+						String dataKeyScope = jp.getCurrentName();
+						jp.nextToken(); // move to START_ARRAY
+						List<String> idList = new ArrayList<String>();
+						while (jp.nextToken() != JsonToken.END_ARRAY) {
+							idList.add(jp.getText());
+						}
+						scopeToIdList.put(dataKeyScope, idList.toArray(new String[idList.size()]));
+					}
+					dataMap.put(dataKeySlot, scopeToIdList);
+				}
+				response.setData(dataMap);
+			}
+		}
+
+		return response;
+	}
+
 	private static String comment(String statement, final int lineWidth) {
 		final StringBuilder st = new StringBuilder(statement.replaceAll("\\s+", " ").trim());
 
@@ -215,22 +254,6 @@ class RunnableLoadTask implements Runnable {
 		return st.toString();
 	}
 
-/*
-	public static void main(String[] args) {
-		for (int lw = 1; lw < 1000; lw++) {
-			System.out.println(comment(
-					"   aiuhiudfh asd haiufshiudhfk sjdfhk jhskdjfhk sjdf ksdjfh  \n" +
-					"  ksfh ksdjfhkjhkjd hfskjdfhks jdfhksjdfhksjd fhkjhskjdfhskj dfhskdj fhkjhsk djf " +
-					"  ksfh ksdjfhkjhk jdhfskjdfhksj xdfhk sjdfhksjdfhkjhskjdfhs kjdfhskdjfhkjhskdjf " +
-					"  ksfh ksdjfhkjhkjdhfskjdfhks jdfhksjdfhksjdfhkjhskjdfhskjdf hskdjfhkjhskdjf " +
-					"  ksfh ksdjfhkjhkjdhfskjdfhksjdfhksjdfhksjdfhkjhskjdfhskjdfhskdjfhkjhskdjf " +
-					"ksdjfh ksdfjh skdfjh ksjdfh skdjfh ",
-					lw
-			));
-		}
-	}
-*/
-
 	protected void setupGet(URLConnection ucList) {
 		ucList.setRequestProperty("Cookie", setup.getUploadHeader());
 		ucList.setAllowUserInteraction(false);
@@ -242,37 +265,37 @@ class RunnableLoadTask implements Runnable {
 			((HttpsURLConnection) ucList).setInstanceFollowRedirects(false);
 		}
 	}
+}
 
-	public static class ResponseList {
-		protected String message;
-		protected boolean success;
-		protected Map<String, Map<String, String[]>> data = new HashMap<String, Map<String, String[]>>();
+class ResponseList {
+	protected String message;
+	protected boolean success;
+	protected Map<String, Map<String, String[]>> data = new HashMap<String, Map<String, String[]>>();
 
-		private ResponseList() {
-		}
+	public ResponseList() {
+	}
 
-		private Map<String, Map<String, String[]>> getData() {
-			return data;
-		}
+	public Map<String, Map<String, String[]>> getData() {
+		return data;
+	}
 
-		public void setData(Map<String, Map<String, String[]>> data) {
-			this.data = data;
-		}
+	public void setData(Map<String, Map<String, String[]>> data) {
+		this.data = data;
+	}
 
-		public String getMessage() {
-			return message;
-		}
+	public String getMessage() {
+		return message;
+	}
 
-		public void setMessage(String message) {
-			this.message = message;
-		}
+	public void setMessage(String message) {
+		this.message = message;
+	}
 
-		public boolean isSuccess() {
-			return success;
-		}
+	public boolean isSuccess() {
+		return success;
+	}
 
-		public void setSuccess(boolean success) {
-			this.success = success;
-		}
+	public void setSuccess(boolean success) {
+		this.success = success;
 	}
 }
