@@ -1,7 +1,6 @@
 package elw.dp.ui;
 
 import elw.dp.app.Controller;
-import org.apache.log4j.BasicConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,8 +18,6 @@ public class Applet extends JApplet{
 		} catch (Exception e) {
 			System.out.println("Error setting native LAF: " + e);
 		}
-
-		BasicConfigurator.configure();
 
 		final Controller controller = new Controller();
 		controller.setBaseUrl(getCodeBase().toString());

@@ -3,11 +3,9 @@ package elw.dp.app;
 import base.pattern.Result;
 import elw.dp.mips.*;
 import elw.dp.ui.DataPathForm;
-import elw.dp.ui.FeedbackAppender;
+import elw.dp.ui.FeedbackHandler;
 import elw.dp.ui.RendererFactory;
 import org.akraievoy.gear.G;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
@@ -22,6 +20,7 @@ import java.net.*;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 public class Controller implements ControllerSetup, RunnableLoadTask.Callback {
@@ -104,9 +103,8 @@ public class Controller implements ControllerSetup, RunnableLoadTask.Callback {
 	public void start() {
 		view.getTestComboBox().setEnabled(false);
 
-		final FeedbackAppender feedbackAppender = new FeedbackAppender(view.getLogTextPane());
-		feedbackAppender.setThreshold(Level.ALL);
-		Logger.getRootLogger().addAppender(feedbackAppender);
+		final FeedbackHandler feedbackHandler = new FeedbackHandler(view.getLogTextPane());
+		Logger.getLogger("elw").addHandler(feedbackHandler);
 
 		view.getProblemTextPane().setText("loading...");
 		view.getSourceTextArea().setText("loading...");

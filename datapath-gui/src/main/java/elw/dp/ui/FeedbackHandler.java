@@ -1,37 +1,30 @@
 package elw.dp.ui;
 
-import org.apache.log4j.AppenderSkeleton;
-import org.apache.log4j.Level;
-import org.apache.log4j.PatternLayout;
-import org.apache.log4j.spi.LoggingEvent;
-
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import java.awt.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
 
-public class FeedbackAppender extends AppenderSkeleton {
-	private static final String PATTERN_DEFAULT = "%d{HH:mm:ss.SSS} %c{1} %m";
-
+public class FeedbackHandler extends Handler {
+	private  final static SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss.SSS");
 	private final JTextPane outputPane;
 	private Map<Level, Style> styles = new HashMap<Level, Style>();
 
 	//	please access this value only from Swing worker thread...
 	private int traceStart = -1;
 
-	public FeedbackAppender(JTextPane outputPane) {
-		this(outputPane, PATTERN_DEFAULT);
-	}
-
-	private FeedbackAppender(JTextPane outputPane, final String patternDefault) {
+	public FeedbackHandler(JTextPane outputPane) {
+		super();
 		this.outputPane = outputPane;
-
-		setLayout(new PatternLayout(patternDefault));
-
 		init();
 	}
 
@@ -39,17 +32,17 @@ public class FeedbackAppender extends AppenderSkeleton {
 		final Style fatal = outputPane.addStyle("fatal", null);
 		StyleConstants.setForeground(fatal, Color.RED.darker().darker());
 		StyleConstants.setBold(fatal, true);
-		styles.put(Level.FATAL, fatal);
+		styles.put(Level.SEVERE, fatal);
 
 		final Style error = outputPane.addStyle("error", null);
 		StyleConstants.setForeground(error, Color.RED.darker());
 		StyleConstants.setBold(fatal, true);
-		styles.put(Level.ERROR, error);
+		styles.put(Level.WARNING, error);
 
 		final Style warn = outputPane.addStyle("warn", null);
 		StyleConstants.setForeground(warn, Color.ORANGE.darker());
 		StyleConstants.setBold(warn, true);
-		styles.put(Level.WARN, warn);
+		styles.put(Level.CONFIG, warn);
 
 		final Style info = outputPane.addStyle("info", null);
 		StyleConstants.setForeground(info, Color.DARK_GRAY.darker());
@@ -57,16 +50,26 @@ public class FeedbackAppender extends AppenderSkeleton {
 
 		final Style debug = outputPane.addStyle("debug", null);
 		StyleConstants.setForeground(debug, Color.GRAY);
-		styles.put(Level.DEBUG, debug);
+		styles.put(Level.FINE, debug);
 
-		final Style trace = outputPane.addStyle("trace", null);
-		StyleConstants.setForeground(trace, Color.GRAY.brighter());
-		styles.put(Level.TRACE, trace);
+		final Style finer = outputPane.addStyle("finer", null);
+		StyleConstants.setForeground(finer, Color.GRAY.brighter());
+		styles.put(Level.FINER, finer);
+
+		final Style finest = outputPane.addStyle("finest", null);
+		StyleConstants.setForeground(finest, Color.GRAY.brighter().brighter());
+		styles.put(Level.FINEST, finest);
 	}
 
-	protected void append(final LoggingEvent event) {
-		final Style style = styles.get(event.getLevel());
-		final String message = getLayout().format(event);
+	@Override
+	public void publish(final LogRecord record) {
+		final Style style = styles.get(record.getLevel());
+//		private static final String PATTERN_DEFAULT = "%d{HH:mm:ss.SSS} %c{1} %m";
+
+		final String message =
+				dateFormat.format(new Date(record.getMillis())) + " " +
+				record.getSourceClassName() + "." +
+				record.getSourceMethodName() + "() " + record.getMessage();
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -91,7 +94,7 @@ public class FeedbackAppender extends AppenderSkeleton {
 							style.copyAttributes()
 					);
 
-					if (Level.DEBUG.isGreaterOrEqual(event.getLevel())) {
+					if (Level.INFO.intValue() > record.getLevel().intValue()) {
 						traceStart = prevLength;
 					}
 				} catch (BadLocationException e) {
@@ -101,11 +104,13 @@ public class FeedbackAppender extends AppenderSkeleton {
 		});
 	}
 
-	public boolean requiresLayout() {
-		return true;
+	@Override
+	public void flush() {
+		//	nothing to do here
 	}
 
-	public void close() {
+	@Override
+	public void close() throws SecurityException {
 		//	nothing to do
 	}
 }
