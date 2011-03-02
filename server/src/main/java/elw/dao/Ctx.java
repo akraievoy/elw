@@ -6,8 +6,6 @@ import org.akraievoy.gear.G4Parse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.URLEncoder;
@@ -33,60 +31,67 @@ public class Ctx {
 
 	private static final char ELEM_ENR = 'e';
 	private static final char ELEM_INDEX_ENTRY = 'i';
-	public static final char ELEM_GROUP = 'g';
-	public static final char ELEM_STUD = 's';
+	private static final char ELEM_GROUP = 'g';
+	private static final char ELEM_STUD = 's';
 	private static final char ELEM_COURSE = 'c';
 	private static final char ELEM_ASS_TYPE = 't';
 	private static final char ELEM_ASS = 'a';
 	private static final char ELEM_VER = 'v';
 
 	private static final String order = "egscitav";
-	private static final Map<Character, Integer> elemToOrder = createElemToOrderMap();
 
 	private static final String SEP = "--";
 
-	private final String enrId;
-	private final String courseId;
-	private final String groupId;
-	private final String studId;
-	private int index;
-	private final String assTypeId;
-	private final String assId;
-	private final String verId;
-	private final String initState;
+	private final KeyVal<String, Enrollment> enr;
+	private final KeyVal<String, Student> student;
+	private final KeyVal<String, AssignmentType> assType;
+	private final KeyVal<String, Assignment> ass;
+	private final KeyVal<String, Version> ver;
 
-	//	required elements resolved
-	private Enrollment enr;
-	private Student student;
-	private AssignmentType assType;
-	private Assignment ass;
-	private Version ver;
-	private String resolveState;
-	private Course course;
-	private Group group;
-	private IndexEntry indexEntry;
+	private final KeyVal<String, Course> course;
+	private final KeyVal<String, Group> group;
+	private final KeyVal<Integer, IndexEntry> indexEntry;
+
+	private final Map<Character, KeyVal> elemToKeyVal = new TreeMap<Character, KeyVal>();
 
 	public Ctx(
-			final String initState,
 			String enrId, String groupId, String studId,
-			String courseId, int index, String assTypeId, String assId, String verId
+			String courseId, Integer index, String assTypeId, String assId, String verId
 	) {
-		this.initState = initState;
-		this.resolveState = "";
+		enr = new KeyVal<String, Enrollment>(Enrollment.class, enrId);
+		student = new KeyVal<String, Student>(Student.class, studId);
+		assType = new KeyVal<String, AssignmentType>(AssignmentType.class, assTypeId);
+		ass = new KeyVal<String, Assignment>(Assignment.class, assId);
+		ver = new KeyVal<String, Version>(Version.class, verId);
 
-		this.enrId = enrId;
-		this.groupId = groupId;
-		this.studId = studId;
-		this.courseId = courseId;
-		this.index = index;
-		this.assTypeId = assTypeId;
-		this.assId = assId;
-		this.verId = verId;
+		course = new KeyVal<String, Course>(Course.class, courseId);
+		group = new KeyVal<String, Group>(Group.class, groupId);
+		indexEntry = new KeyVal<Integer, IndexEntry>(IndexEntry.class, index);
+
+		elemToKeyVal.put(ELEM_ENR, enr);
+		elemToKeyVal.put(ELEM_STUD, student);
+		elemToKeyVal.put(ELEM_ASS_TYPE, assType);
+		elemToKeyVal.put(ELEM_ASS, ass);
+		elemToKeyVal.put(ELEM_VER, ver);
+		elemToKeyVal.put(ELEM_COURSE, course);
+		elemToKeyVal.put(ELEM_GROUP, group);
+		elemToKeyVal.put(ELEM_INDEX_ENTRY, indexEntry);
 	}
 
 	protected Ctx() {
-		this(STATE_NONE, null, null, null, null, -1, null, null, null);
+		this(null, null, null, null, null, null, null, null);
 	}
+
+	public Assignment getAss() { return ass.getValue(); }
+	public AssignmentType getAssType() { return assType.getValue(); }
+	public Course getCourse() { return course.getValue(); }
+	public Enrollment getEnr() { return enr.getValue(); }
+	public Group getGroup() { return group.getValue(); }
+	public Student getStudent() { return student.getValue(); }
+	public Version getVer() { return ver.getValue(); }
+	public String getAssTypeId() { return assType.getKey(); }
+	public IndexEntry getIndexEntry() { return indexEntry.getValue(); }
+	public int getIndex() { return indexEntry.getKey(); }
 
 	public static Ctx fromString(final String path) {
 		if (path == null || path.trim().length() == 0) {
@@ -94,115 +99,66 @@ public class Ctx {
 		}
 
 		final String[] comp = path.split(SEP);
-		if (comp.length <= 1) {
+		if (comp.length < 1) {
 			return new Ctx();
+		}
+		if (comp.length == 1) {
+			throw new IllegalArgumentException("invalid context: '" + path + "'");
 		}
 
 		final String format = comp[0];
 		if (format.length() + 1 != comp.length) {
-			log.warn("format does not match content, NOT parsing: {}", path);
-			return new Ctx();
+			throw new IllegalArgumentException("format does not match content: '" + path + "'");
 		}
 
-		final String initState = reorder(format);
+		Ctx ctx = new Ctx();
+		for (char elem : order.toCharArray()) {
+			if (format.indexOf(elem) >= 0) {
+				final String elemKeyStr = comp[format.indexOf(elem) + 1];
+				if (elem != ELEM_INDEX_ENTRY) {
+					//noinspection unchecked
+					ctx.elemToKeyVal.get(elem).setKey(elemKeyStr);
+					continue;
+				}
 
-		final String enrId;
-		if (format.indexOf(ELEM_ENR) >= 0) {
-			enrId = comp[format.indexOf(ELEM_ENR) + 1];
-		} else {
-			enrId = null;
-		}
-
-		final String courseId;
-		if (format.indexOf(ELEM_COURSE) >= 0) {
-			courseId = comp[format.indexOf(ELEM_COURSE) + 1];
-		} else {
-			courseId = null;
-		}
-
-		final String groupId;
-		if (format.indexOf(ELEM_GROUP) >= 0) {
-			groupId = comp[format.indexOf(ELEM_GROUP) + 1];
-		} else {
-			groupId = null;
-		}
-
-		final String studId;
-		if (format.indexOf(ELEM_STUD) >= 0) {
-			studId = comp[format.indexOf(ELEM_STUD) + 1];
-		} else {
-			studId = null;
-		}
-
-		final int index;
-		if (format.indexOf(ELEM_INDEX_ENTRY) >= 0) {
-			index = G4Parse.parse(comp[format.indexOf(ELEM_INDEX_ENTRY) + 1], -1);
-			if (index < 0) {
-				log.warn("path[{}] must be an integer: {}", format.indexOf(ELEM_INDEX_ENTRY) + 1, path);
+				Integer index = G4Parse.parse(elemKeyStr, -1);
+				if (index < 0) {
+					throw new IllegalArgumentException("invalid indexEntry: '" + path + "'");
+				}
+				//noinspection unchecked
+				ctx.elemToKeyVal.get(elem).setKey(index);
 			}
-		} else {
-			index = -1;
 		}
 
-		final String typeId;
-		if (format.indexOf(ELEM_ASS_TYPE) >= 0) {
-			typeId = comp[format.indexOf(ELEM_ASS_TYPE) + 1];
-		} else {
-			typeId = null;
-		}
-
-		final String assId;
-		if (format.indexOf(ELEM_ASS) >= 0) {
-			assId = comp[format.indexOf(ELEM_ASS) + 1];
-		} else {
-			assId = null;
-		}
-
-		final String verId;
-		if (format.indexOf(ELEM_VER) >= 0) {
-			verId = comp[format.indexOf(ELEM_VER) + 1];
-		} else {
-			verId = null;
-		}
-
-		return new Ctx(initState, enrId, groupId, studId, courseId, index, typeId, assId, verId);
+		return ctx;
 	}
 
 	public static Ctx forCourse(final Course course) {
 		if (course == null) {
-			throw new IllegalArgumentException("please provide the course for context");
+			throw new IllegalArgumentException("course is null");
 		}
-		return new Ctx(STATE_C, null, null, null, course.getId(), -1, null, null, null).extendCourse(course);
+		return new Ctx().extendCourse(course);
 	}
 
 	public static Ctx forEnr(final Enrollment enr) {
 		if (enr == null) {
-			throw new IllegalArgumentException("please provide the enr for context");
+			throw new IllegalArgumentException("enr is null");
 		}
-		return new Ctx("e", enr.getId(), null, null, null, -1, null, null, null).extendEnr(enr);
+		return new Ctx().extEnr(enr);
 	}
 
 	public static Ctx forAssType(final Course course, final AssignmentType assType) {
-		if (course == null) {
-			throw new IllegalArgumentException("please provide course for context");
-		}
 		if (assType == null) {
-			throw new IllegalArgumentException("please provide assType for context");
+			throw new IllegalArgumentException("task type is null");
 		}
-		return new Ctx(STATE_CT, null, null, null, course.getId(), -1, assType.getId(), null, null).extendCourse(course).extendAssType(assType);
+		return forCourse(course).extendAssType(assType);
 	}
 
 	public static Ctx forAss(Course course, AssignmentType assType, Assignment ass) {
-		if (course == null) {
-			throw new IllegalArgumentException("please provide course for context");
-		}
-		if (assType == null) {
-			throw new IllegalArgumentException("please provide assType for context");
-		}
 		if (ass == null) {
-			throw new IllegalArgumentException("please provide ass for context");
+			throw new IllegalArgumentException("ass is null");
 		}
-		return new Ctx(STATE_CTA, null, null, null, course.getId(), -1, assType.getId(), ass.getId(), null).extendCourse(course).extendAssType(assType).extendAss(ass);
+		return forAssType(course, assType).extendAss(ass);
 	}
 
 	public String ei() {
@@ -213,123 +169,180 @@ public class Ctx {
 	}
 
 	public Ctx resolve(EnrollDao enrDao, GroupDao groupDao, CourseDao courseDao) {
-		final StringBuilder resolved = new StringBuilder();
-
-		if (inited(ELEM_ENR)) {
-			enr = enrDao.findEnrollment(enrId);
-			if (enr != null) {
-				resolved.append(ELEM_ENR);
-
-				course = courseDao.findCourse(enr.getCourseId());
-				if (course != null) {
-					resolved.append(ELEM_COURSE);
-				} else {
-					log.warn("course {} not found: {}", enr.getCourseId(), dump());
-				}
-
-				group = groupDao.findGroup(enr.getGroupId());
-				if (group != null) {
-					resolved.append(ELEM_GROUP);
-				} else {
-					log.warn("group {} not found: {}", enr.getGroupId(), dump());
-				}
-			}
-
+		if (enr.isPending()) {
+			extEnr(enrDao.findEnrollment(enr.getKey()));
+		}
+		if (course.isPending()) {
+			extCourse(courseDao.findCourse(course.getKey()));
+		}
+		if (group.isPending()) {
+			extGroup(groupDao.findGroup(group.getKey()));
 		}
 
-		if (inited(ELEM_COURSE) && !has(resolved, ELEM_COURSE)) {
-			course = courseDao.findCourse(courseId);
-			if (course != null) {
-				resolved.append(ELEM_COURSE);
+		return resolve();
+	}
+
+	protected Ctx resolve() {	//	this does not involve DAO lookups at all
+		if (group.isResolved() && student.isPending()) {
+			student.setValue(IdName.findById(group.getValue().getStudents(), student.getKey()));
+		}
+
+		if (enr.isResolved() && indexEntry.isPending()) {
+			final Integer index = indexEntry.getKey();
+			final IndexEntry ieVal;
+			if (index >= 0 && index < enr.getValue().getIndex().size()) {
+				ieVal = enr.getValue().getIndex().get(index);
 			} else {
-				log.warn("course {} not found: {}", courseId, dump());
+				ieVal = null;
+			}
+			if (indexEntry.resolve(ieVal)) {
+				assType.setKey(indexEntry.getValue().getPath()[0]);
+				ass.setKey(indexEntry.getValue().getPath()[1]);
 			}
 		}
 
-		if (inited(ELEM_GROUP) && !has(resolved, ELEM_GROUP)) {
-			group = groupDao.findGroup(groupId);
-			if (group != null) {
-				resolved.append(ELEM_GROUP);
-			} else {
-				log.warn("group {} not found: {}", groupId, dump());
-			}
+		if (course.isResolved() && assType.isPending()) {
+			assType.resolve(IdName.findById(course.getValue().getAssTypes(), assType.getKey()));
 		}
 
-		if (has(resolved, ELEM_GROUP) && inited(ELEM_STUD)) {
-			student = IdName.findById(group.getStudents(), studId);
-			if (student != null) {
-				resolved.append(ELEM_STUD);
-			} else {
-				log.warn("student {} not found: {}", studId, dump());
-			}
+		if (assType.isResolved() && ass.isPending()) {
+			ass.resolve(IdName.findById(assType.getValue().getAssignments(), ass.getKey()));
 		}
 
-		if (has(resolved, ELEM_ENR) && inited(ELEM_INDEX_ENTRY)) {
-			if (index >= 0 && index < enr.getIndex().size()) {
-				indexEntry = enr.getIndex().get(index);
-				resolved.append(ELEM_INDEX_ENTRY);
+		if (student.isResolved() && ass.isResolved()) {
+			final String salt = student.getValue().getName() + ":" + ass.getValue().getName();
+			final BigInteger shaNum = new BigInteger(digest(salt), 16);
+			final Version[] versions = ass.getValue().getVersions();
+			final int verIdx = shaNum.mod(BigInteger.valueOf(versions.length)).intValue();
 
-				assType = IdName.findById(course.getAssTypes(), indexEntry.getPath()[0]);
-				if (assType != null) {
-					resolved.append(ELEM_ASS_TYPE);
-				} else {
-					log.warn("type not found: {}", assTypeId, dump());
-				}
-
-				ass = IdName.findById(assType.getAssignments(), indexEntry.getPath()[1]);
-				if (ass != null) {
-					resolved.append(ELEM_ASS);
-				} else {
-					log.warn("assignment not found: {}", dump());
-				}
-
-				if (student != null && ass != null) {
-					final String salt = student.getName() + ":" + ass.getName();
-					final BigInteger shaNum = new BigInteger(digest(salt), 16);
-					final Version[] vers = ass.getVersions();
-					final int verIdx = shaNum.mod(BigInteger.valueOf(vers.length)).intValue();
-
-					ver = vers[verIdx];
-					resolved.append(ELEM_VER);
-				}
-			} else {
-				log.warn("task not found by index: {}", index, dump());
-			}
+			ver.setKey(versions[verIdx].getId());
 		}
 
-		if (has(resolved, ELEM_COURSE) && inited(ELEM_ASS_TYPE)) {
-			assType = IdName.findById(course.getAssTypes(), assTypeId);
-			if (assType != null) {
-				resolved.append(ELEM_ASS_TYPE);
-			} else {
-				log.warn("type not found: {}", assTypeId, dump());
-			}
+		if (ass.isResolved() && ver.isPending()) {
+			ver.setValue(IdName.findById(ass.getValue().getVersions(), ver.getKey()));
 		}
 
-		if (has(resolved, ELEM_ASS_TYPE) && inited(ELEM_ASS)) {
-			ass = IdName.findById(assType.getAssignments(), assId);
-			if (ass != null) {
-				resolved.append(ELEM_ASS);
-			} else {
-				log.warn("assignment not found: {}", dump());
-			}
-		}
-
-		if (has(resolved, ELEM_ASS) && inited(ELEM_VER)) {
-			if (student == null) {
-				ver = IdName.findById(ass.getVersions(), verId);
-				if (ver != null) {
-					resolved.append(ELEM_VER);
-				} else {
-					log.warn("version not found: {}", this);
-				}
-			} else {
-				log.warn("student set, version is redundant: {}", this);
-			}
-		}
-
-		resolveState = resolved.toString();
 		return this;
+	}
+
+	private Ctx extEnr(final Enrollment newEnr) {
+		if (enr.resolve(newEnr)) {
+			course.setKey(enr.getValue().getCourseId());
+			group.setKey(enr.getValue().getGroupId());
+		}
+		return this;
+	}
+
+	public Ctx extGroup(final Group newGroup) {
+		if (enr.isResolved() && !newGroup.getId().equals(enr.getValue().getGroupId())) {
+			throw new IllegalArgumentException("enrollment/group mismatch");
+		}
+		group.resolve(newGroup);
+		return this;
+	}
+
+	public Ctx extCourse(final Course newCourse) {
+		if (enr.isResolved() && !newCourse.getId().equals(enr.getValue().getCourseId())) {
+			throw new IllegalArgumentException("enrollment/course mismatch");
+		}
+		course.resolve(newCourse);
+		return this;
+	}
+
+	public Ctx extStudent(final Student newStud) {
+		if (!group.isResolved()) {
+			throw new IllegalStateException("group not resolved");
+		}
+		if (IdName.findById(group.getValue().getStudents(), newStud.getId()) == null) {
+			throw new IllegalArgumentException("group/student mismatch");
+		}
+		student.resolve(newStud);
+		return resolve();
+	}
+
+	public Ctx extIndex(final int index) {
+		if (!enr.isResolved()) {
+			throw new IllegalStateException("enrollment not resolved");
+		}
+		if (index < 0 || index >= enr.getValue().getIndex().size()) {
+			throw new IllegalArgumentException("enrollment/index entry mismatch: " + index);
+		}
+		indexEntry.setKey(index);
+		return resolve();
+	}
+
+	private Ctx extAssType(final AssignmentType newType) {
+		if (!course.isResolved()) {
+			throw new IllegalStateException("course not set");
+		}
+		if (IdName.findById(course.getValue().getAssTypes(), newType.getId()) == null) {
+			throw new IllegalArgumentException("course/aType mismatch");
+		}
+		assType.resolve(newType);
+		return resolve();
+	}
+
+	private Ctx extAss(final Assignment newTask) {
+		if (!assType.isResolved()) {
+			throw new IllegalStateException("taskType not set");
+		}
+		final Assignment[] tasks = assType.getValue().getAssignments();
+		if (tasks.length > 0 && IdName.findById(tasks, newTask.getId()) == null) {
+			throw new IllegalArgumentException("taskType/task mismatch");
+		}
+		ass.resolve(newTask);
+		return resolve();
+	}
+
+	public Ctx extVer(final Version newVer) {
+		if (!ass.isResolved()) {
+			throw new IllegalArgumentException("task not set");
+		}
+		if (IdName.findById(ass.getValue().getVersions(), newVer.getId()) == null) {
+			throw new IllegalArgumentException("task/ver mismatch");
+		}
+		ver.resolve(newVer);
+		return this;
+	}
+
+	public Ctx extendGroup(final Group newGroup) {
+		return copy().extGroup(newGroup);
+	}
+
+	public Ctx extendCourse(final Course newCourse) {
+		return copy().extCourse(newCourse);
+	}
+
+	public Ctx extendStudent(final Student newStud) {
+		return copy().extStudent(newStud);
+	}
+
+	public Ctx extendIndex(final int index) {
+		return copy().extIndex(index);
+	}
+
+	private Ctx extendAssType(final AssignmentType newType) {
+		return copy().extAssType(newType);
+	}
+
+	private Ctx extendAss(final Assignment newTask) {
+		return copy().extAss(newTask);
+	}
+
+	public Ctx extendVer(final Version newVer) {
+		return copy().extVer(newVer);
+	}
+
+	private String getResolveState() {
+		final StringBuilder res = new StringBuilder();
+
+		for (char elem : order.toCharArray()) {
+			if (elemToKeyVal.get(elem).isResolved()) {
+				res.append((elem));
+			}
+		}
+
+		return res.toString();
 	}
 
 	public String toString() {
@@ -339,288 +352,72 @@ public class Ctx {
 			return "";
 		}
 
-		final StringBuilder res = new StringBuilder();
-		res.append(format);
+		final StringBuilder res = new StringBuilder(format);
 
-		for (int i = 0; i < format.length(); i++) {
+		for (char comp : format.toCharArray()) {
 			res.append(SEP);
-			final char comp = res.charAt(i);
-			if (comp == ELEM_ENR) {
-				res.append(getEnr().getId());
-			} else if (comp == ELEM_GROUP) {
-				res.append(getGroup().getId());
-			} else if (comp == ELEM_STUD) {
-				res.append(getStudent().getId());
-			} else if (comp == ELEM_COURSE) {
-				res.append(getCourse().getId());
-			} else if (comp == ELEM_INDEX_ENTRY) {
-				res.append(getIndex());
-			} else if (comp == ELEM_ASS_TYPE) {
-				res.append(getAssType().getId());
-			} else if (comp == ELEM_ASS) {
-				res.append(getAss().getId());
-			} else if (comp == ELEM_VER) {
-				res.append(getVer().getId());
-			}
+			res.append(elemToKeyVal.get(comp).getKey());
 		}
 
 		return res.toString();
 	}
 
+	@SuppressWarnings({"RedundantIfStatement"})
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		Ctx ctx = (Ctx) o;
+
+		if (!ass.equals(ctx.ass)) return false;
+		if (!assType.equals(ctx.assType)) return false;
+		if (!course.equals(ctx.course)) return false;
+		if (!enr.equals(ctx.enr)) return false;
+		if (!group.equals(ctx.group)) return false;
+		if (!indexEntry.equals(ctx.indexEntry)) return false;
+		if (!student.equals(ctx.student)) return false;
+		if (!ver.equals(ctx.ver)) return false;
+
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = enr.hashCode();
+		result = 31 * result + student.hashCode();
+		result = 31 * result + assType.hashCode();
+		result = 31 * result + ass.hashCode();
+		result = 31 * result + ver.hashCode();
+		result = 31 * result + course.hashCode();
+		result = 31 * result + group.hashCode();
+		result = 31 * result + indexEntry.hashCode();
+		return result;
+	}
+
 	private String dump() {
-		return
-				"e:" + enrId + " " +
-				"g:" + groupId + " " +
-				"s:" + studId + " " +
-				"c:" + courseId + " " +
-				"i:" + index + " " +
-				"t:" + assTypeId + " " +
-				"a:" + assId + " " +
-				"v:" + verId;
-	}
-
-	public String getInitState() {
-		return initState;
-	}
-
-	private String getResolveState() {
-		return resolveState;
-	}
-
-	public Assignment getAss() {
-		return ass;
-	}
-
-	public AssignmentType getAssType() {
-		return assType;
-	}
-
-	public Course getCourse() {
-		return course;
-	}
-
-	public Enrollment getEnr() {
-		return enr;
-	}
-
-	public Group getGroup() {
-		return group;
-	}
-
-	public Student getStudent() {
-		return student;
-	}
-
-	public Version getVer() {
-		return ver;
-	}
-
-	public String getAssTypeId() {
-		return assTypeId;
-	}
-
-	public IndexEntry getIndexEntry() {
-		return indexEntry;
-	}
-
-	public int getIndex() {
-		return index;
-	}
-
-	private Ctx extendEnr(final Enrollment enr) {
-		final Ctx ctx = copy();
-
-		if (enr != null) {
-			ctx.enr = enr;
-			if (ctx.resolveState.indexOf(ELEM_ENR) < 0) {
-				ctx.resolveState += ELEM_ENR;
-			}
-		} else {
-			log.warn("extending with no enrollment");
-		}
-
-		return ctx;
-	}
-
-	public Ctx extendGroup(final Group group) {
-		final Ctx ctx = copy();
-
-		if (group != null) {
-			if (enr == null || enr.getGroupId().equals(group.getId())) {
-				ctx.group = group;
-				if (ctx.resolveState.indexOf(ELEM_GROUP) < 0) {
-					ctx.resolveState += ELEM_GROUP;
-				}
-			} else {
-				log.warn("extending with wrong group");
-			}
-		} else {
-			log.warn("extending with no group");
-		}
-
-		return ctx;
-	}
-
-	public Ctx extendCourse(final Course course) {
-		final Ctx ctx = copy();
-
-		if (course != null) {
-			if (enr == null || enr.getCourseId().equals(course.getId())) {
-				ctx.course = course;
-				if (ctx.resolveState.indexOf(ELEM_COURSE) < 0) {
-					ctx.resolveState += ELEM_COURSE;
-				}
-			} else {
-				log.warn("extending with wrong course");
-			}
-		} else {
-			log.warn("extending with no course");
-		}
-
-		return ctx;
-	}
-
-	public Ctx extendStudent(final Student student) {
-		final Ctx ctx = copy();
-
-		if (student != null) {
-			if (group != null && IdName.findById(group.getStudents(), student.getId()) != null) {
-				ctx.student = student;
-				if (ctx.resolveState.indexOf(ELEM_STUD) < 0) {
-					ctx.resolveState += ELEM_STUD;
-				}
-			} else {
-				log.warn("extending with wrong student (or no group)");
-			}
-		} else {
-			log.warn("extending with no student");
-		}
-
-		return ctx;
-	}
-
-	public Ctx extendIndex(final int index) {
-		final Ctx ctx = copy();
-
-		if (index >= 0) {
-			if (enr != null && enr.getIndex().size() > index) {
-				ctx.index = index;
-				ctx.indexEntry = enr.getIndex().get(index);
-				if (ctx.resolveState.indexOf(ELEM_INDEX_ENTRY) < 0) {
-					ctx.resolveState += ELEM_INDEX_ENTRY;
-				}
-
-				ctx.assType = IdName.findById(ctx.course.getAssTypes(), ctx.indexEntry.getPath()[0]);
-				if (ctx.assType != null) {
-					ctx.resolveState += ELEM_ASS_TYPE;
-				} else {
-					log.warn("assignment type not found: {}", assTypeId, dump());
-				}
-
-				ctx.ass = IdName.findById(ctx.assType.getAssignments(), ctx.indexEntry.getPath()[1]);
-				if (ctx.ass != null) {
-					ctx.resolveState += ELEM_ASS;
-				} else {
-					log.warn("assignment not found: {}", dump());
-				}
-
-				if (ctx.student != null && ctx.ass != null) {
-					final String salt = ctx.student.getName() + ":" + ctx.ass.getName();
-					final BigInteger shaNum = new BigInteger(digest(salt), 16);
-					final Version[] vers = ctx.ass.getVersions();
-					final int verIdx = shaNum.mod(BigInteger.valueOf(vers.length)).intValue();
-
-					ctx.ver = vers[verIdx];
-					ctx.resolveState += ELEM_VER;
-				}
-			} else {
-				log.warn("extending with wrong index (or no enr resolved)");
-			}
-		} else {
-			log.warn("extending with negative index");
-		}
-
-		return ctx;
-
-	}
-
-	private Ctx extendAssType(final AssignmentType assType) {
-		final Ctx ctx = copy();
-
-		if (assType != null) {
-			if (course != null && IdName.findById(course.getAssTypes(), assType.getId()) != null) {
-				ctx.assType = assType;
-				if (ctx.resolveState.indexOf(ELEM_ASS_TYPE) < 0) {
-					ctx.resolveState += ELEM_ASS_TYPE;
-				}
-			} else {
-				log.warn("extending with wrong assType (or no course resolved)");
-			}
-		} else {
-			log.warn("extending with no assType");
-		}
-
-		return ctx;
-	}
-
-	private Ctx extendAss(final Assignment ass) {
-		final Ctx ctx = copy();
-
-		if (ass != null) {
-			ctx.ass = ass;
-			if (ctx.resolveState.indexOf(ELEM_ASS) < 0) {
-				ctx.resolveState += ELEM_ASS;
-			}
-		} else {
-			log.warn("extending with no assignment");
-		}
-
-		return ctx;
-	}
-
-	public Ctx extendVer(final Version ver) {
-		final Ctx ctx = copy();
-
-		if (ver != null) {
-			if (ass != null && IdName.findById(ass.getVersions(), ver.getId()) != null) {
-				ctx.ver = ver;
-				if (ctx.resolveState.indexOf(ELEM_VER) < 0) {
-					ctx.resolveState += ELEM_VER;
-				}
-			} else {
-				log.warn("extending with wrong version (or no assignment)");
-			}
-		} else {
-			log.warn("extending with no version");
-		}
-
-		return ctx;
-	}
-
-	public Ctx extendTAV(AssignmentType assType, Assignment ass, Version ver) {
-		return extendAssType(assType).extendAss(ass).extendVer(ver);
+		return "e:" + enr + " g:" + group + " s:" + student + " c:" + course + "; " +
+				" i:" + indexEntry + " t:" + assType + " a:" + ass + " v:" + ver;
 	}
 
 	private Ctx copy() {
-		final Ctx copy = new Ctx(initState, enrId, groupId, studId, courseId, -1, assTypeId, assId, verId);
+		final Ctx copy = new Ctx();
 
-		copy.resolveState = resolveState;
-		copy.enr = enr;
-		copy.group = group;
-		copy.student = student;
-		copy.course = course;
-		copy.index = index;
-		copy.indexEntry = indexEntry;
-		copy.assType = assType;
-		copy.ass = ass;
-		copy.ver = ver;
+		copy.enr.copyOf(enr);
+		copy.group.copyOf(group);
+		copy.student.copyOf(student);
+		copy.course.copyOf(course);
+		copy.indexEntry.copyOf(indexEntry);
+		copy.assType.copyOf(assType);
+		copy.ass.copyOf(ass);
+		copy.ver.copyOf(ver);
 
 		return copy;
 	}
 
 	public boolean resolved(final String state) {
-		for (int i = 0, stateLength = state.length(); i < stateLength; i++) {
-			if (!resolved(state.charAt(i))) {
+		for (char elem : state.toCharArray()) {
+			if (!elemToKeyVal.get(elem).isResolved()) {
 				return false;
 			}
 		}
@@ -628,39 +425,7 @@ public class Ctx {
 		return true;
 	}
 
-	public boolean resolved(char c) {
-		return has(resolveState, c);
-	}
-
-	private boolean inited(char c) {
-		return has(initState, c);
-	}
-
-	private boolean has(StringBuilder resolved, final char elem) {
-		return has(resolved.toString(), elem);
-	}
-
-	private static boolean has(final String state, char elem) {
-		for (int i = 0, stateLen = state.length(); i < stateLen; i++) {
-			final char c1 = state.charAt(i);
-			if (c1 == elem) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	private static TreeMap<Character, Integer> createElemToOrderMap() {
-		final TreeMap<Character, Integer> elemToOrder = new TreeMap<Character, Integer>();
-
-		for (int pos = 0; pos < order.length(); pos++) {
-			elemToOrder.put(order.charAt(pos), pos);
-		}
-
-		return elemToOrder;
-	}
-
+	@SuppressWarnings({"SimplifiableIfStatement"})
 	private static boolean isRedundant(String elemsBefore, char elemAfter) {
 		if (elemsBefore.indexOf(ELEM_ENR) >= 0 && elemsBefore.indexOf(ELEM_INDEX_ENTRY) >= 0 && elemAfter == ELEM_VER) {
 			return true;
@@ -711,7 +476,7 @@ public class Ctx {
 					next = result[pos + 1];
 				}
 
-				if (elemToOrder.get(cur) > elemToOrder.get(next)) {
+				if (order.indexOf(cur) > order.indexOf(next)) {
 					reordered = true;
 					if (result == null) {
 						result = format.toCharArray();
@@ -770,36 +535,6 @@ public class Ctx {
 		}
 	}
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-
-		Ctx ctx = (Ctx) o;
-
-		if (assTypeId != null ? !assTypeId.equals(ctx.assTypeId) : ctx.assTypeId != null) return false;
-		if (assId != null ? !assId.equals(ctx.assId) : ctx.assId != null) return false;
-		if (courseId != null ? !courseId.equals(ctx.courseId) : ctx.courseId != null) return false;
-		if (enrId != null ? !enrId.equals(ctx.enrId) : ctx.enrId != null) return false;
-		if (groupId != null ? !groupId.equals(ctx.groupId) : ctx.groupId != null) return false;
-		if (studId != null ? !studId.equals(ctx.studId) : ctx.studId != null) return false;
-		if (verId != null ? !verId.equals(ctx.verId) : ctx.verId != null) return false;
-
-		return true;
-	}
-
-	@Override
-	public int hashCode() {
-		int result = enrId != null ? enrId.hashCode() : 0;
-		result = 31 * result + (courseId != null ? courseId.hashCode() : 0);
-		result = 31 * result + (groupId != null ? groupId.hashCode() : 0);
-		result = 31 * result + (studId != null ? studId.hashCode() : 0);
-		result = 31 * result + (assTypeId != null ? assTypeId.hashCode() : 0);
-		result = 31 * result + (assId != null ? assId.hashCode() : 0);
-		result = 31 * result + (verId != null ? verId.hashCode() : 0);
-		return result;
-	}
-
 	//	LATER move this to base.G4mat
 	private static String renderBytes(byte[] checkSum) {
 		final StringBuffer result = new StringBuffer();
@@ -847,5 +582,118 @@ public class Ctx {
 		}
 
 		return result;
+	}
+
+	protected class KeyVal<KeyType, ValueType> {
+		private final java.lang.Class<ValueType> valueClass;
+
+		private KeyType key;
+		private ValueType value;
+
+		public KeyVal(final java.lang.Class<ValueType> valueClass) {
+			this(valueClass, null, null);
+		}
+
+		public KeyVal(final java.lang.Class<ValueType> valueClass, KeyType key) {
+			this(valueClass, key, null);
+		}
+
+		public KeyVal(java.lang.Class<ValueType> valueClass, KeyType key, ValueType value) {
+			this.key = key;
+			this.value = value;
+			this.valueClass = valueClass;
+		}
+
+		public KeyType getKey() {
+			return key;
+		}
+
+		public void setKey(KeyType key) {
+			this.key = key;
+		}
+
+		public ValueType getValue() {
+			return value;
+		}
+
+		public void setValue(ValueType value) {
+			this.value = value;
+		}
+
+		@SuppressWarnings("unchecked")
+		public boolean resolve(ValueType value) {
+			if (value == null) {
+				log.warn("resolved " + valueClass.getSimpleName() + " to null: " + Ctx.this.dump());
+				return false;
+			}
+
+			if (value instanceof IdName) {
+				final String valueKey = ((IdName) value).getId();
+				if (key != null) {
+					if (!key.equals(valueKey)) {
+						throw new IllegalStateException(
+								"resolved " + valueClass.getSimpleName() + " to a different object: " + Ctx.this.dump()
+						);
+					}
+				} else {
+					this.key = (KeyType) valueKey;
+				}
+			} else {
+				if (key == null){
+					throw new IllegalStateException(
+							"please set " + valueClass.getSimpleName() + " key first: " + Ctx.this.dump()
+					);
+				}
+			}
+
+			this.value = (ValueType) value;
+
+			return true;
+		}
+
+		public void copyOf(KeyVal<KeyType, ValueType> that) {
+			this.key = that.key;
+			this.value = that.value;	//	LATER possible aliasing here
+		}
+
+		public boolean isInited() {
+			return key != null;
+		}
+
+		public boolean isResolved() {
+			return value != null;
+		}
+
+		public boolean isPending() {
+			return isInited() && !isResolved();
+		}
+
+		@Override
+		public String toString() {
+			if (!isInited()) {
+				return "?";
+			}
+			return "'" + String.valueOf(key) + "'" + (isResolved() ? "":"?");
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+
+			KeyVal val = (KeyVal) o;
+
+			if (key != null ? !key.equals(val.key) : val.key != null) return false;
+			if (!valueClass.equals(val.valueClass)) return false;
+
+			return true;
+		}
+
+		@Override
+		public int hashCode() {
+			int result = valueClass.hashCode();
+			result = 31 * result + (key != null ? key.hashCode() : 0);
+			return result;
+		}
 	}
 }

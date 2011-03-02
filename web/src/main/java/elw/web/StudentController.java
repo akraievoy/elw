@@ -91,10 +91,10 @@ public class StudentController extends ControllerElw {
 		final Student student = (Student) session.getAttribute(S_STUD);
 		if (group != null && student != null) {
 			ctx.resolve(enrollDao, groupDao, courseDao);
-			if (!ctx.resolved(Ctx.ELEM_GROUP)) {
+			if (ctx.getGroup() == null) {
 				ctx = ctx.extendGroup(group);
 			}
-			if (!ctx.resolved(Ctx.ELEM_STUD)) {
+			if (ctx.getStudent() == null) {
 				ctx = ctx.extendStudent(student);
 			}
 			if (!ctx.resolved(Ctx.STATE_GS)) {

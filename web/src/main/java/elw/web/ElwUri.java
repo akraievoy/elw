@@ -109,6 +109,6 @@ public class ElwUri {
 	}
 
 	public String edit(final Ctx ctxVer, final String scope, final String slotId, final String fileId) {
-		return "edit?elw_ctx=" + ctxVer.toString() + "&s=" + scope + "&sId=" + slotId + "&fId" + fileId;
+		return "edit?elw_ctx=" + ctxVer.toString() + "&s=" + scope + "&sId=" + slotId + "&fId=" + fileId;
 	}
 }
