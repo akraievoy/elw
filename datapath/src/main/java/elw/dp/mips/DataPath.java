@@ -53,10 +53,6 @@ public class DataPath {
 		final TIntArrayList writeRegs = registers.getWriteRegs();
 		final TIntArrayList readRegs = registers.getReadRegs();
 
-		if (!writeRegs.contains(Reg.pc.ordinal())) {
-			ctx.advPc();
-		}
-
 		final boolean hiLoWritten = writeRegs.contains(Reg.hi.ordinal()) || writeRegs.contains(Reg.lo.ordinal());
 		final boolean hiLoRead = readRegs.contains(Reg.hi.ordinal()) || readRegs.contains(Reg.lo.ordinal());
 

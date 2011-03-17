@@ -9,6 +9,7 @@ public class Alu {
 	)
 	public void addu(final InstructionContext ctx) {
 		ctx.setD(ctx.getS() + ctx.getT());
+		ctx.advPc();
 	}
 
 	@InstructionDesc(
@@ -18,6 +19,7 @@ public class Alu {
 	)
 	public void add(final InstructionContext ctx) {
 		ctx.setD(ctx.getS() + ctx.getT());
+		ctx.advPc();
 	}
 
 	@InstructionDesc(
@@ -27,6 +29,7 @@ public class Alu {
 	)
 	public void addi(final InstructionContext ctx) {
 		ctx.setT(ctx.getS() + ctx.getI16());
+		ctx.advPc();
 	}
 
 	@InstructionDesc(
@@ -37,6 +40,7 @@ public class Alu {
 	)
 	public void addiu(final InstructionContext ctx) {
 		ctx.setT(ctx.getS() + ctx.getI16());
+		ctx.advPc();
 	}
 
 	@InstructionDesc(
@@ -46,6 +50,7 @@ public class Alu {
 	)
 	public void and(final InstructionContext ctx) {
 		ctx.setD(ctx.getS() & ctx.getT());
+		ctx.advPc();
 	}
 
 	@InstructionDesc(
@@ -55,6 +60,7 @@ public class Alu {
 	)
 	public void andi(final InstructionContext ctx) {
 		ctx.setT(ctx.getS() & ctx.getI16());
+		ctx.advPc();
 	}
 
 	@InstructionDesc(
@@ -65,6 +71,8 @@ public class Alu {
 	public void beq(final InstructionContext ctx) {
 		if (ctx.getS() == ctx.getT()) {
 			ctx.advPc(ctx.getI16() << 2);
+		} else {
+			ctx.advPc();
 		}
 	}
 
@@ -76,6 +84,8 @@ public class Alu {
 	public void bgez(final InstructionContext ctx) {
 		if (ctx.getS() >= 0) {
 			ctx.advPc(ctx.getI16() << 2);
+		} else {
+			ctx.advPc();
 		}
 	}
 
@@ -88,6 +98,8 @@ public class Alu {
 		if (ctx.getS() >= 0) {
 			ctx.storeRa();
 			ctx.advPc(ctx.getI16() << 2);
+		} else {
+			ctx.advPc();
 		}
 	}
 
@@ -99,6 +111,8 @@ public class Alu {
 	public void bgtz(final InstructionContext ctx) {
 		if (ctx.getS() > 0) {
 			ctx.advPc(ctx.getI16() << 2);
+		} else {
+			ctx.advPc();
 		}
 	}
 
@@ -110,6 +124,8 @@ public class Alu {
 	public void blez(final InstructionContext ctx) {
 		if (ctx.getS() <= 0) {
 			ctx.advPc(ctx.getI16() << 2);
+		} else {
+			ctx.advPc();
 		}
 	}
 
@@ -121,6 +137,8 @@ public class Alu {
 	public void bltz(final InstructionContext ctx) {
 		if (ctx.getS() < 0) {
 			ctx.advPc(ctx.getI16() << 2);
+		} else {
+			ctx.advPc();
 		}
 	}
 
@@ -133,6 +151,8 @@ public class Alu {
 		if (ctx.getS() < 0) {
 			ctx.storeRa();
 			ctx.advPc(ctx.getI16() << 2);
+		} else {
+			ctx.advPc();
 		}
 	}
 
@@ -144,6 +164,8 @@ public class Alu {
 	public void bne(final InstructionContext ctx) {
 		if (ctx.getS() != ctx.getT()) {
 			ctx.advPc(ctx.getI16() << 2);
+		} else {
+			ctx.advPc();
 		}
 	}
 
@@ -159,6 +181,7 @@ public class Alu {
 
 		ctx.getRegisters().setReg(Reg.lo, s / t);
 		ctx.getRegisters().setReg(Reg.hi, s % t);
+		ctx.advPc();
 	}
 
 	@InstructionDesc(
@@ -172,6 +195,7 @@ public class Alu {
 
 		ctx.getRegisters().setReg(Reg.lo, s / t);
 		ctx.getRegisters().setReg(Reg.hi, s % t);
+		ctx.advPc();
 	}
 
 	@InstructionDesc(
@@ -214,6 +238,7 @@ public class Alu {
 	)
 	public void lb(final InstructionContext ctx) {
 		ctx.setT(ctx.getMemory().getByte(ctx.getS() + ctx.getI16()));
+		ctx.advPc();
 	}
 
 	@InstructionDesc(
@@ -223,6 +248,7 @@ public class Alu {
 	)
 	public void lui(final InstructionContext ctx) {
 		ctx.setT(ctx.getI16() << 16);
+		ctx.advPc();
 	}
 
 	@InstructionDesc(
@@ -232,6 +258,7 @@ public class Alu {
 	)
 	public void lw(final InstructionContext ctx) {
 		ctx.setT(ctx.getMemory().getWord(ctx.getS() + ctx.getI16()));
+		ctx.advPc();
 	}
 
 	@InstructionDesc(
@@ -241,6 +268,7 @@ public class Alu {
 	)
 	public void mfhi(final InstructionContext ctx) {
 		ctx.setD(ctx.getRegisters().getReg(Reg.hi));
+		ctx.advPc();
 	}
 
 	@InstructionDesc(
@@ -250,6 +278,7 @@ public class Alu {
 	)
 	public void mflo(final InstructionContext ctx) {
 		ctx.setD(ctx.getRegisters().getReg(Reg.lo));
+		ctx.advPc();
 	}
 
 	@InstructionDesc(
@@ -266,6 +295,7 @@ public class Alu {
 
 		ctx.getRegisters().setReg(Reg.lo, (int) value);
 		ctx.getRegisters().setReg(Reg.hi, (int) (value >> 32));
+		ctx.advPc();
 	}
 
 	@InstructionDesc(
@@ -281,6 +311,7 @@ public class Alu {
 
 		ctx.getRegisters().setReg(Reg.lo, (int) value);
 		ctx.getRegisters().setReg(Reg.hi, (int) (value >> 32));
+		ctx.advPc();
 	}
 
 	@InstructionDesc(
@@ -289,6 +320,7 @@ public class Alu {
 			writeRegs = ""
 	)
 	public void noop(final InstructionContext ctx) {
+		ctx.advPc();
 	}
 
 	@InstructionDesc(
@@ -298,6 +330,7 @@ public class Alu {
 	)
 	public void or(final InstructionContext ctx) {
 		ctx.setD(ctx.getS() | ctx.getT());
+		ctx.advPc();
 	}
 
 	@InstructionDesc(
@@ -307,6 +340,7 @@ public class Alu {
 	)
 	public void ori(final InstructionContext ctx) {
 		ctx.setT(ctx.getS() | ctx.getI16());
+		ctx.advPc();
 	}
 
 	@InstructionDesc(
@@ -316,6 +350,7 @@ public class Alu {
 	)
 	public void sb(final InstructionContext ctx) {
 		ctx.getMemory().setByte(ctx.getS() + ctx.getI16(), (byte) (0xFF & ctx.getT()));
+		ctx.advPc();
 	}
 
 	@InstructionDesc(
@@ -325,6 +360,7 @@ public class Alu {
 	)
 	public void sll(final InstructionContext ctx) {
 		ctx.setD(ctx.getT() << ctx.getInstruction().getBits(Instruction.T_H5));
+		ctx.advPc();
 	}
 
 	@InstructionDesc(
@@ -334,6 +370,7 @@ public class Alu {
 	)
 	public void sllv(final InstructionContext ctx) {
 		ctx.setD(ctx.getT() << ctx.getS());
+		ctx.advPc();
 	}
 
 	@InstructionDesc(
@@ -348,6 +385,7 @@ public class Alu {
 		} else {
 			ctx.setD(0);
 		}
+		ctx.advPc();
 	}
 
 	@InstructionDesc(
@@ -361,6 +399,7 @@ public class Alu {
 		} else {
 			ctx.setD(0);
 		}
+		ctx.advPc();
 	}
 
 	@InstructionDesc(
@@ -375,6 +414,7 @@ public class Alu {
 		} else {
 			ctx.setT(0);
 		}
+		ctx.advPc();
 	}
 
 	@InstructionDesc(
@@ -388,6 +428,7 @@ public class Alu {
 		} else {
 			ctx.setT(0);
 		}
+		ctx.advPc();
 	}
 
 	@InstructionDesc(
@@ -397,6 +438,7 @@ public class Alu {
 	)
 	public void sra(final InstructionContext ctx) {
 		ctx.setD(ctx.getT() >> ctx.getInstruction().getBits(Instruction.T_H5));
+		ctx.advPc();
 	}
 
 	@InstructionDesc(
@@ -406,6 +448,7 @@ public class Alu {
 	)
 	public void srl(final InstructionContext ctx) {
 		ctx.setD(ctx.getT() >>> ctx.getInstruction().getBits(Instruction.T_H5));
+		ctx.advPc();
 	}
 
 	@InstructionDesc(
@@ -415,6 +458,7 @@ public class Alu {
 	)
 	public void srlv(final InstructionContext ctx) {
 		ctx.setD(ctx.getT() >>> ctx.getS());
+		ctx.advPc();
 	}
 
 	@InstructionDesc(
@@ -424,6 +468,7 @@ public class Alu {
 	)
 	public void sub(final InstructionContext ctx) {
 		ctx.setD(ctx.getS() - ctx.getT());
+		ctx.advPc();
 	}
 
 	@InstructionDesc(
@@ -434,6 +479,7 @@ public class Alu {
 	)
 	public void subu(final InstructionContext ctx) {
 		ctx.setD(ctx.getS() - ctx.getT());
+		ctx.advPc();
 	}
 
 	@InstructionDesc(
@@ -443,6 +489,7 @@ public class Alu {
 	)
 	public void sw(final InstructionContext ctx) {
 		ctx.getMemory().setWord(ctx.getS() + ctx.getI16(), ctx.getT());
+		ctx.advPc();
 	}
 
 	@InstructionDesc(
@@ -451,6 +498,7 @@ public class Alu {
 			writeRegs = ""
 	)
 	public void syscall(final InstructionContext ctx) {
+		ctx.advPc();
 	}
 
 	@InstructionDesc(
@@ -460,6 +508,7 @@ public class Alu {
 	)
 	public void xor(final InstructionContext ctx) {
 		ctx.setD(ctx.getS() ^ ctx.getT());
+		ctx.advPc();
 	}
 
 	@InstructionDesc(
@@ -469,5 +518,6 @@ public class Alu {
 	)
 	public void xori(final InstructionContext ctx) {
 		ctx.setT(ctx.getS() ^ ctx.getI16());
+		ctx.advPc();
 	}
 }
