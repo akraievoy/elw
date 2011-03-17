@@ -38,7 +38,15 @@ public class AluTest extends TestCase {
 	}
 
 	protected void assembleInstruction(final String instructionCode) {
-		final Instruction instruction = validator.assemble(new Result[1], new String[]{instructionCode})[0];
+		assembleInstructions(new String[]{
+				instructionCode,
+				"noop",
+				"label: noop",
+		});
+	}
+
+	protected void assembleInstructions(final String[] intstructions) {
+		final Instruction instruction = validator.assemble(new Result[1], intstructions)[0];
 		iCtx.setInstruction(instruction);
 	}
 
@@ -54,6 +62,52 @@ public class AluTest extends TestCase {
 		assertEquals(-1, registers.getReg(Reg.t2));
 		assertEquals(2, registers.getReg(Reg.t3));
 		assertEquals(1, registers.getReg(Reg.t1));
+	}
+
+	public void testAdd_forOverflow() {
+		registers.setReg(Reg.t1, 18);
+		registers.setReg(Reg.t2, 2);
+		registers.setReg(Reg.t3, Integer.MAX_VALUE);
+
+		assembleInstruction("add $t1, $t2, $t3");
+
+		alu.add(iCtx);
+
+		assertEquals(Integer.MIN_VALUE + 1, registers.getReg(Reg.t1));
+		assertEquals(2, registers.getReg(Reg.t2));
+		assertEquals(Integer.MAX_VALUE, registers.getReg(Reg.t3));
+	}
+
+	public void testBGEZAL_forJAL() {
+		registers.setReg(Reg.t1, 18);
+
+		assembleInstruction("bgezal $t1, label");
+
+		final int codeBase = validator.getDataPath().getInstructions().getCodeBase();
+		assertEquals(codeBase, registers.getReg(Reg.pc));
+
+		alu.bgezal(iCtx);
+
+		assertEquals(18, registers.getReg(Reg.t1));
+		assertEquals(codeBase + 8, registers.getReg(Reg.pc));
+		assertEquals(codeBase + 4, registers.getReg(Reg.ra));
+	}
+
+	public void testBGEZAL_forDefault() {
+		registers.setReg(Reg.t1, -18);
+		registers.setReg(Reg.ra, 0x123456);
+
+		assembleInstruction("bgezal $t1, label");
+
+		final int codeBase =
+			validator.getDataPath().getInstructions().getCodeBase();
+		assertEquals(codeBase, registers.getReg(Reg.pc));
+
+		alu.bgezal(iCtx);
+
+		assertEquals(-18, registers.getReg(Reg.t1));
+		assertEquals(codeBase + 4, registers.getReg(Reg.pc));
+		assertEquals(0x123456, registers.getReg(Reg.ra));
 	}
 
 }
