@@ -132,13 +132,31 @@ public class Core {
 
 	private void logStud(Ctx ctx, Format f, LogFilter lf, List<Object[]> logData, boolean adm) {
 		if (adm) {
-			for (Student stud : ctx.getGroup().getStudents()) {
-				if (W.excluded(lf.getStudId(), stud.getId())) {
-					continue;
-				}
+			if (lf.getVerId() != null && lf.getVerId().trim().length() > 0 &&
+				(lf.getStudId() == null || lf.getStudId().trim().length() == 0)) {
+				//	do the same, but across all enrollments
+				for (Enrollment enr : enrollDao.findAllEnrollments()) {
+					if (enr.getCourseId().equals(ctx.getCourse().getId())) {
+						final Ctx enrCtx = Ctx.forEnr(enr).resolve(enrollDao, groupDao, courseDao);
+						for (Student stud : enrCtx.getGroup().getStudents()) {
+							if (W.excluded(lf.getStudId(), stud.getId())) {
+								continue;
+							}
 
-				final Ctx ctxStud = ctx.extendStudent(stud);
-				logStudForStud(ctx, f, lf, logData, ctxStud, adm);
+							final Ctx ctxStud = enrCtx.retainAll(Ctx.STATE_ECG).extendStudent(stud);
+							logStudForStud(ctxStud, f, lf, logData, ctxStud, adm);
+						}
+					}
+				}
+			} else {
+				for (Student stud : ctx.getGroup().getStudents()) {
+					if (W.excluded(lf.getStudId(), stud.getId())) {
+						continue;
+					}
+
+					final Ctx ctxStud = ctx.retainAll(Ctx.STATE_ECG).extendStudent(stud);
+					logStudForStud(ctx, f, lf, logData, ctxStud, adm);
+				}
 			}
 		} else {
 			if (ctx.getStudent() != null) {

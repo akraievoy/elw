@@ -17,12 +17,12 @@ import java.util.TreeMap;
 public class Ctx {
 	private static final Logger log = LoggerFactory.getLogger(Ctx.class);
 
-	private static final String STATE_NONE = "";
+	public static final String STATE_NONE = "";
 	public static final String STATE_G = "g";
 	public static final String STATE_GS = "gs";
 	public static final String STATE_ECG = "ecg";
 	public static final String STATE_ECGS = "ecgs";
-	private static final String STATE_C = "c";
+	public static final String STATE_C = "c";
 	public static final String STATE_CT = "ct";
 	public static final String STATE_CTA = "cta";
 	public static final String STATE_CTAV = "ctav";
@@ -92,6 +92,31 @@ public class Ctx {
 	public String getAssTypeId() { return assType.getKey(); }
 	public IndexEntry getIndexEntry() { return indexEntry.getValue(); }
 	public int getIndex() { return indexEntry.getKey(); }
+
+	public Ctx removeAll(String elements) {
+		final Ctx res = copy();
+		for (char element : elements.toCharArray()) {
+			final KeyVal keyVal = res.elemToKeyVal.get(element);
+			if (keyVal != null) {
+				keyVal.clear();
+			} else {
+				throw new IllegalArgumentException("no keyVal for element '" + element + "'");
+			}
+		}
+		return res;
+	}
+
+	public Ctx retainAll(String elements) {
+		final Ctx res = copy();
+		for (char element : res.elemToKeyVal.keySet()) {
+			final KeyVal keyVal = res.elemToKeyVal.get(element);
+			if (elements.indexOf(element) >= 0) {
+				continue;
+			}
+			keyVal.clear();
+		}
+		return res;
+	}
 
 	public static Ctx fromString(final String path) {
 		if (path == null || path.trim().length() == 0) {
@@ -651,7 +676,7 @@ public class Ctx {
 				}
 			}
 
-			this.value = (ValueType) value;
+			this.value = value;
 
 			return true;
 		}
@@ -659,6 +684,11 @@ public class Ctx {
 		public void copyOf(KeyVal<KeyType, ValueType> that) {
 			this.key = that.key;
 			this.value = that.value;	//	LATER possible aliasing here
+		}
+
+		public void clear() {
+			this.key = null;
+			this.value = null;
 		}
 
 		public boolean isInited() {

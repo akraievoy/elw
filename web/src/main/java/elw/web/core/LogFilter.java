@@ -73,7 +73,7 @@ public class LogFilter {
 		return studId;
 	}
 
-	private String getVerId() {
+	public String getVerId() {
 		return verId;
 	}
 
