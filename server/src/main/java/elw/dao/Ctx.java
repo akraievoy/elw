@@ -568,8 +568,13 @@ public class Ctx {
 					slot.getName() + "-" + f.format(meta.getCreateStamp().getTime(), "MMdd-HHmm");
 
 			final String oriName = meta.getName();
-			final int oriLastDot = oriName.lastIndexOf(".");
-			final String oriExt = oriLastDot < 0 ? "" : oriName.substring(oriLastDot);
+			final String oriExt;
+			if (oriName != null && oriName.trim().length() > 0) {
+				final int oriLastDot = oriName.lastIndexOf(".");
+				oriExt = oriLastDot < 0 ? "" : oriName.substring(oriLastDot);
+			} else {
+				oriExt = ".txt";
+			}
 
 			final String normNameNoWs = normName.replaceAll("[\\s\\\\/]+", "_") + oriExt;
 
