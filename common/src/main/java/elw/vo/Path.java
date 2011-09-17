@@ -3,8 +3,7 @@ package elw.vo;
 import java.util.Arrays;
 
 public class Path {
-	public static final Path EMPTY = new Path();
-	private final String[] path;
+    private final String[] path;
 
 	public Path(String[] path) {
 		this.path = path;

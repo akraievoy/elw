@@ -271,37 +271,8 @@ public abstract class Dao<Meta extends Stamped> {
 		return meta.getCreateStamp();
 	}
 
-	public SortedSet<Stamp> findAllStamps(Path p, Boolean text, Boolean binary) throws IOException {
-		final SortedMap<Stamp, Entry<Meta>> metas = load(p);
 
-		filter(metas, null, null, text, binary);
-
-		return new TreeSet<Stamp>(metas.keySet());
-	}
-
-	public static long[] listTimes(final SortedSet<Stamp> stamps) {
-		final List<Long> times = new ArrayList<Long>();
-
-		Long lastTime = null;
-		for (final Stamp stamp : stamps) {
-			final long time = stamp.getTime();
-			if (lastTime == null || lastTime != time) {
-				times.add(time);
-				lastTime = time;
-			}
-		}
-
-		final long[] timesArr = new long[times.size()];
-
-		for (int i = 0; i < timesArr.length; i++) {
-			timesArr[i] = times.get(i);
-		}
-
-		return timesArr;
-	}
-
-
-	protected SortedMap<Stamp, Entry<Meta>> findAll(Path p, Boolean text, Boolean binary) {
+    protected SortedMap<Stamp, Entry<Meta>> findAll(Path p, Boolean text, Boolean binary) {
 		final SortedMap<Stamp, Entry<Meta>> metas = load(p);
 
 		filter(metas, null, null, text, binary);
@@ -329,30 +300,7 @@ public abstract class Dao<Meta extends Stamped> {
 		return found;
 	}
 
-	public Entry<Meta> findByTime(Path p, long time, Boolean text, Boolean binary) {
-		final SortedMap<Stamp, Entry<Meta>> metas = load(p);
-
-		final Stamp infStamp = new Stamp("", time);
-		final Stamp supStamp = new Stamp("", time + 1);
-		final SortedMap<Stamp, Entry<Meta>> narrowMap = metas.tailMap(infStamp).headMap(supStamp);
-
-		filter(narrowMap, null, null, text, binary);
-
-		return narrowMap.isEmpty() ? null : narrowMap.get(narrowMap.lastKey());
-	}
-
-	public int countVersions(
-			Path p, Long sinceTime, Long untilTime,
-			Boolean text, Boolean binary
-	) {
-		final SortedMap<Stamp, Entry<Meta>> metas = load(p);
-
-		filter(metas, sinceTime, untilTime, text, binary);
-
-		return metas.size();
-	}
-
-	//	TODO caching review: returned value is modified!
+    //	TODO caching review: returned value is modified!
 	private SortedMap<Stamp, Entry<Meta>> load(Path p) {
 		final long now = System.currentTimeMillis();
 		final SortedMap<Stamp, Entry<Meta>> loaded;
