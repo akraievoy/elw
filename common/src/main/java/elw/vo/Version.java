@@ -1,123 +1,38 @@
 package elw.vo;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
-
 import java.util.*;
 
-public class Version extends IdName {
-	private Map<String, List<Entry<FileMeta>>> files = new TreeMap<String, List<Entry<FileMeta>>>();
+public class Version implements IdNamed {
+    private String id;
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
 
-	@SuppressWarnings({"unchecked"})
-	@JsonIgnore
-	private Entry<FileMeta>[] getFiles(final String slotId) {
-		final List<Entry<FileMeta>> filesForSlot = files.get(slotId);
+    private String name;
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    private boolean shared = false;
+    public boolean isShared() { return shared; }
+    public void setShared(boolean shared) { this.shared = shared; }
+
+	private Map<String, List<Solution>> files = new TreeMap<String, List<Solution>>();
+	private List<Solution> getFiles(final String slotId) {
+		final List<Solution> filesForSlot = files.get(slotId);
 		if (filesForSlot == null) {
-			return new Entry[0];
+			return Collections.emptyList();
 		}
-		return filesForSlot.toArray(new Entry[filesForSlot.size()]);
+		return Collections.unmodifiableList(filesForSlot);
 	}
-
-	@JsonIgnore
-	public void setFiles(final String slotId, Entry<FileMeta>[] files) {
-		final List<Entry<FileMeta>> filesForSlot = this.files.get(slotId);
+	public void setFiles(final String slotId, List<Solution> files) {
+		final List<Solution> filesForSlot = this.files.get(slotId);
 		if (filesForSlot == null) {
-			this.files.put(slotId, new ArrayList<Entry<FileMeta>>(Arrays.asList(files)));
+			this.files.put(slotId, new ArrayList<Solution>(files));
 			return;
 		}
 
 		filesForSlot.clear();
-		filesForSlot.addAll(Arrays.asList(files));
-	}
-
-	public int countFiles(
-			final AssignmentType assType, final Assignment ass, final String slotId,
-			final Map<String, List<Entry<FileMeta>>> filesStud
-	) {
-		return
-				assType.getFiles(slotId).length +
-				ass.getFiles(slotId).length +
-				getFiles(slotId).length + 
-				filesStud.get(slotId).size();
-	}
-
-	public boolean checkRead(
-			final AssignmentType assType, final Assignment ass, final String slotId,
-			final Map<String, List<Entry<FileMeta>>> filesStud
-	) {
-		final FileSlot fileSlot = assType.findSlotById(slotId);
-
-		for (String slotIdRA : fileSlot.getReadApprovals()) {
-			if (!isApprovedAny(slotIdRA, filesStud)) {
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	private boolean isApprovedAny(
-			final String slotId,
-			final Map<String, List<Entry<FileMeta>>> filesStud
-	) {
-		final List<Entry<FileMeta>> files = filesStud.get(slotId);
-
-		if (files == null || files.isEmpty()) {
-			return false;
-		}
-
-		boolean approved = false;
-		for (Entry<FileMeta> f : files) {
-			if (f.getMeta().getScore() != null && Boolean.TRUE.equals(f.getMeta().getScore().getApproved())) {
-				approved = true;
-			}
-		}
-		return approved;
-	}
-
-	public boolean isDeclinedLast(
-			String slotId,
-			final Map<String, List<Entry<FileMeta>>> filesStud
-	) {
-		final List<Entry<FileMeta>> files = filesStud.get(slotId);
-
-		if (files == null || files.size() == 0) {
-			return false;
-		}
-
-		final Entry<FileMeta> f = files.get(files.size() - 1);
-		return f.getMeta().getScore() != null && !Boolean.TRUE.equals(f.getMeta().getScore().getApproved());
-	}
-
-	public boolean isPendingLast(
-			String slotId,
-			final Map<String, List<Entry<FileMeta>>> filesStud
-	) {
-		final List<Entry<FileMeta>> files = filesStud.get(slotId);
-
-		if (files == null || files.isEmpty()) {
-			return false;
-		}
-
-		final Entry<FileMeta> f = files.get(files.size() - 1);
-		return f.getMeta().getScore() == null;
-	}
-
-	public boolean checkWrite(
-			final AssignmentType assType, final Assignment ass, final String slotId,
-			final Map<String, List<Entry<FileMeta>>> filesStud
-	) {
-		final FileSlot fileSlot = assType.findSlotById(slotId);
-		if (!fileSlot.isWritable()) {
-			return false;
-		}
-
-		final List<String> writeApprovals = fileSlot.getWriteApprovals();
-		for (String slotIdWA : writeApprovals) {
-			if (!isApprovedAny(slotIdWA, filesStud)) {
-				return false;
-			}
-		}
-
-		return true;
-	}
+        if (files != null) {
+            filesForSlot.addAll(files);
+        }
+    }
 }

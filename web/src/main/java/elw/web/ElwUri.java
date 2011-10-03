@@ -20,8 +20,7 @@ package elw.web;
 
 import com.google.common.base.Strings;
 import elw.dao.Ctx;
-import elw.vo.Entry;
-import elw.vo.FileMeta;
+import elw.vo.FileBase;
 
 public class ElwUri {
 	public static final String MODEL_KEY = "elw_uri";
@@ -78,7 +77,7 @@ public class ElwUri {
 		return "summary?elw_ctx=e--" + enrId;
 	}
 
-	private String fileQuery(final Ctx ctx, final String scope, final String slotId, FileMeta file) {
+	private String fileQuery(final Ctx ctx, final String scope, final String slotId, FileBase file) {
 		final String xferQuery = "?elw_ctx=" + ctx.toString() + "&s=" + scope + "&sId=" + slotId;
 
 		if (file != null && !Strings.isNullOrEmpty(file.getId())) {
@@ -92,20 +91,20 @@ public class ElwUri {
 		return "ul" + fileQuery(ctx, scope, slotId, null);
 	}
 
-	public String download(final Ctx ctx, final String scope, final String slotId, Entry<FileMeta> e, String nameNorm) {
+	public String download(final Ctx ctx, final String scope, final String slotId, FileBase e, String nameNorm) {
 		if (e == null) {
 			return null;
 		}
 
-		final String name = nameNorm == null ? e.getMeta().getName() : nameNorm;
-		return "dl/" + name + fileQuery(ctx, scope, slotId, e.getMeta());
+		final String name = nameNorm == null ? e.getName() : nameNorm;
+		return "dl/" + name + fileQuery(ctx, scope, slotId, e);
 	}
 
-	public String approve(final Ctx ctx, final String scope, final String slotId, Entry<FileMeta> e) {
+	public String approve(final Ctx ctx, final String scope, final String slotId, FileBase e) {
 		if (e == null) {
 			return null;
 		}
-		return "approve" + fileQuery(ctx, scope, slotId, e.getMeta());
+		return "approve" + fileQuery(ctx, scope, slotId, e);
 	}
 
 	public String edit(final Ctx ctxVer, final String scope, final String slotId, final String fileId) {

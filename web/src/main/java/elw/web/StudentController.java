@@ -19,6 +19,7 @@
 package elw.web;
 
 import elw.dao.*;
+import elw.dao.Ctx;
 import elw.miniweb.Message;
 import elw.miniweb.ViewJackson;
 import elw.vo.*;
@@ -46,27 +47,15 @@ import java.util.*;
 public class StudentController extends ControllerElw {
 	private static final Logger log = LoggerFactory.getLogger(StudentController.class);
 
-	private final CourseDao courseDao;
-	private final GroupDao groupDao;
-	private final EnrollDao enrollDao;
-	private final ScoreDao scoreDao;
-	private final FileDao fileDao;
-	private final AdminController adminController;
+	private final CouchDao couchDao;
 
-	public StudentController(
-			CourseDao courseDao, GroupDao groupDao, EnrollDao enrollDao,
-			ScoreDao scoreDao, FileDao fileDao,
-			AdminController adminController,
-			Core core
-	) {
+    public StudentController(
+            CouchDao couchDao,
+            Core core
+    ) {
 		super(core);
-		this.courseDao = courseDao;
-		this.groupDao = groupDao;
-		this.enrollDao = enrollDao;
-		this.scoreDao = scoreDao;
-		this.fileDao = fileDao;
-		this.adminController = adminController;
-	}
+		this.couchDao = couchDao;
+    }
 
 	protected HashMap<String, Object> auth(final HttpServletRequest req, final HttpServletResponse resp, final String pathToRoot) throws IOException {
 		final HttpSession session = req.getSession(true);
@@ -75,7 +64,7 @@ public class StudentController extends ControllerElw {
 		//	admin impersonation
 		final Admin admin = (Admin) session.getAttribute(S_ADMIN);
 		if (admin != null) {
-			if (!ctx.resolve(enrollDao, groupDao, courseDao).resolved(Ctx.STATE_GS)) {
+			if (!ctx.resolve(couchDao).resolved(Ctx.STATE_GS)) {
 				resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "context path problem, please check the logs");
 				return null;
 			}
@@ -90,7 +79,7 @@ public class StudentController extends ControllerElw {
 		final Group group = (Group) session.getAttribute(S_GROUP);
 		final Student student = (Student) session.getAttribute(S_STUD);
 		if (group != null && student != null) {
-			ctx.resolve(enrollDao, groupDao, courseDao);
+			ctx.resolve(couchDao);
 			if (ctx.getGroup() == null) {
 				ctx = ctx.extendGroup(group);
 			}
@@ -156,7 +145,7 @@ public class StudentController extends ControllerElw {
 	public ModelAndView do_login(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
 		final HashMap<String, Object> model = prepareDefaultModel(req);
 
-		model.put("groups", groupDao.findAllGroups());
+		model.put("groups", core.getQueries().groups());
 		model.put("groupName", req.getSession(true).getAttribute("groupName"));
 		model.put("studentName", req.getSession(true).getAttribute("studentName"));
 
@@ -176,12 +165,12 @@ public class StudentController extends ControllerElw {
 		) {
 			Message.addErr(req, "fields NOT set");
 		} else {
-			final Group[] groups = groupDao.findAllGroups();
-			final Group group = IdName.findByName(groups, groupName.trim(), true);
+			final List<Group> groups = core.getQueries().groups();
+			final Group group = IdNamed._.findByName(groups, groupName.trim(), true);
 
 			if (group != null) {
-				final Student[] students = group.getStudents();
-				final Student student = IdName.findByName(students, studentName.trim(), true);
+				final Collection<Student> students = group.getStudents().values();
+				final Student student = IdNamed._.findByName(students, studentName.trim(), true);
 
 				if (student != null) {
 					session.setAttribute(S_GROUP, group);
@@ -191,9 +180,9 @@ public class StudentController extends ControllerElw {
 					session.removeAttribute("groupName");
 					session.removeAttribute("studentName");
 
-					Enrollment[] enrs = enrollDao.findEnrollmentsForGroupId(group.getId());
-					if (enrs.length == 1) {
-						resp.sendRedirect("tasks?elw_ctx=e--" + enrs[0].getId());
+					List<Enrollment> enrs = core.getQueries().enrollmentsForGroup(group.getId());
+					if (enrs.size() == 1) {
+						resp.sendRedirect("tasks?elw_ctx=e--" + enrs.get(0).getId());
 					} else {
 						resp.sendRedirect("index");
 					}
@@ -240,7 +229,7 @@ public class StudentController extends ControllerElw {
 		}
 
 		final Ctx ctx = (Ctx) model.get(R_CTX);
-		final Enrollment[] enrolls = enrollDao.findEnrollmentsForGroupId(ctx.getGroup().getId());
+		final List<Enrollment> enrolls = core.getQueries().enrollmentsForGroup(ctx.getGroup().getId());
 		final List<Object[]> indexData = core.index(enrolls);
 
 		return new ModelAndView(ViewJackson.success(indexData));
@@ -325,16 +314,16 @@ public class StudentController extends ControllerElw {
 		final Map<String, Map<String, String[]>> slotToScopeToFileId =
 				new HashMap<String, Map<String, String[]>>();
 
-		for (FileSlot slot : ctx.getAssType().getFileSlots()) {
+		for (FileSlot slot : ctx.getAssType().getFileSlots().values()) {
 			final HashMap<String, String[]> scopeToFileId = new HashMap<String, String[]>();
 			slotToScopeToFileId.put(slot.getId(), scopeToFileId);
 
-			for (String scope : FileDao.SCOPES) {
-				final Entry<FileMeta>[] fileEntries = fileDao.findFilesFor(scope, ctx, slot.getId());
-				final String[] fileIds = new String[fileEntries.length];
+			for (String scope : FileBase.SCOPES) {
+				final List<? extends FileBase> fileEntries = core.getQueries().files(scope, ctx, slot);
+				final String[] fileIds = new String[fileEntries.size()];
 
-				for (int i = 0, filesLength = fileEntries.length; i < filesLength; i++) {
-					fileIds[i] = fileEntries[i].getMeta().getId();
+				for (int i = 0, filesLength = fileEntries.size(); i < filesLength; i++) {
+					fileIds[i] = fileEntries.get(i).getId();
 				}
 
 				scopeToFileId.put(scope, fileIds);
@@ -343,7 +332,7 @@ public class StudentController extends ControllerElw {
 		return new ModelAndView(ViewJackson.success(slotToScopeToFileId));
 	}
 
-	@RequestMapping(value = "dl/*.*", method = RequestMethod.GET)
+    @RequestMapping(value = "dl/*.*", method = RequestMethod.GET)
 	public ModelAndView do_dl(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
 		return wmFile(req, resp, "../", null, new WebMethodFile() {
 			@Override
@@ -358,13 +347,13 @@ public class StudentController extends ControllerElw {
 					return null;
 				}
 
-				final Entry<FileMeta> entry = fileDao.findFileFor(scope, ctx, slot.getId(), fileId);
+				final FileBase entry = core.getQueries().file(scope, ctx, slot, fileId);
 				if (entry == null) {
 					resp.sendError(HttpServletResponse.SC_NOT_FOUND, "no file found");
 					return null;
 				}
 
-				retrieveFile(slot, entry);
+				retrieveFile(entry, core.getQueries().getCouchDao());
 
 				return null;
 			}
@@ -373,14 +362,14 @@ public class StudentController extends ControllerElw {
 
 	@RequestMapping(value = "edit", method = RequestMethod.GET)
 	public ModelAndView do_edit(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		return wmFile(req, resp, "", FileDao.SCOPE_STUD, new WebMethodFile() {
+		return wmFile(req, resp, "", Solution.SCOPE, new WebMethodFile() {
 			@Override
 			protected ModelAndView handleFile(String scope, FileSlot slot) throws IOException {
 				if (accessDenied(resp, ctx, scope, slot, true)) {
 					return null;
 				}
 
-				final String customEditName = slot.getEditor();
+				final String customEditName = IdNamed._.one(slot.getFileTypes()).getEditor();
 				if (customEditName == null || customEditName.trim().length() == 0) {
 					resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "editor not set for slot " + slot.getId());
 					return null;
@@ -413,7 +402,7 @@ public class StudentController extends ControllerElw {
 
 	@RequestMapping(value = "ul", method = {RequestMethod.GET})
 	public ModelAndView do_ul(final HttpServletRequest req, final HttpServletResponse resp) throws IOException, FileUploadException {
-		return wmFile(req, resp, "", FileDao.SCOPE_STUD, new WebMethodFile() {
+		return wmFile(req, resp, "", Solution.SCOPE, new WebMethodFile() {
 			@Override
 			protected ModelAndView handleFile(String scope, FileSlot slot) throws IOException {
 				model.put("slot", slot);
@@ -424,7 +413,7 @@ public class StudentController extends ControllerElw {
 
 	@RequestMapping(value = "ul", method = {RequestMethod.POST, RequestMethod.PUT})
 	public ModelAndView do_ulPost(final HttpServletRequest req, final HttpServletResponse resp) throws IOException, FileUploadException {
-		return wmFile(req, resp, "", FileDao.SCOPE_STUD, new WebMethodFile() {
+		return wmFile(req, resp, "", Solution.SCOPE, new WebMethodFile() {
 			@Override
 			protected ModelAndView handleFile(String scope, FileSlot slot) throws IOException {
 				if (accessDenied(resp, ctx, scope, slot, true)) {
@@ -434,7 +423,10 @@ public class StudentController extends ControllerElw {
 				final String refreshUri = core.getUri().logPendingEAV(ctx);
 				final String failureUri = core.getUri().upload(ctx, scope, slot.getId());
 
-				return storeFile(scope, slot, refreshUri, failureUri, ctx.getStudent().getName(), core.getFileDao());
+				return storeFile(
+                        slot, refreshUri, failureUri, ctx.getStudent().getName(),
+                        core.getQueries(), new Solution()
+                );
 			}
 		});
 	}
@@ -447,13 +439,13 @@ public class StudentController extends ControllerElw {
 			return true;
 		}
 
-		if (FileDao.SCOPE_STUD.equals(scope)) {
-			final SortedMap<String, List<Entry<FileMeta>>> filesStud = fileDao.loadFilesStud(ctx);
-			if (!ctx.getVer().checkRead(ctx.getAssType(), ctx.getAss(), slot.getId(), filesStud)) {
+		if (Solution.SCOPE.equals(scope)) {
+			final SortedMap<String, List<Solution>> filesStud = core.getQueries().solutions(ctx);
+			if (!ctx.checkRead(slot, filesStud)) {
 				resp.sendError(HttpServletResponse.SC_FORBIDDEN, "not readable yet");
 				return true;
 			}
-			if (checkWrite && !ctx.getVer().checkWrite(ctx.getAssType(), ctx.getAss(), slot.getId(), filesStud)) {
+			if (checkWrite && !ctx.checkWrite(slot, filesStud)) {
 				resp.sendError(HttpServletResponse.SC_FORBIDDEN, "not writable yet");
 				return true;
 			}
@@ -461,4 +453,5 @@ public class StudentController extends ControllerElw {
 
 		return false;
 	}
+
 }

@@ -1,72 +1,49 @@
 package elw.vo;
 
-import org.akraievoy.gear.G4mat;
 import org.codehaus.jackson.annotate.JsonIgnore;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
 public class IndexEntry {
 	private String[] path;
+    public String[] getPath() { return path; }
+    public void setPath(String[] path) { this.path = path; }
+
 	private int scoreBudget;
+    public int getScoreBudget() { return scoreBudget; }
+    public void setScoreBudget(int scoreBudget) { this.scoreBudget = scoreBudget; }
+
 	private int classFrom;
+    public int getClassFrom() { return classFrom; }
+    public void setClassFrom(int classFrom) { this.classFrom = classFrom; }
+
 	private final Map<String, Integer> classDue = new TreeMap<String, Integer>();
-	private boolean requireClean;	//	TODO still not used
+    public Map<String, Integer> getClassDue() {
+        return Collections.unmodifiableMap(classDue);
+    }
+    public void setClassDue(Map<String, Integer> classDue) {
+        this.classDue.clear();
+        if (classDue != null) {
+            this.classDue.putAll(classDue);
+        }
+    }
 
-	public boolean isRequireClean() {
-		return requireClean;
-	}
-
-	public void setRequireClean(boolean requireClean) {
-		this.requireClean = requireClean;
-	}
-
-	public int getClassFrom() {
-		return classFrom;
-	}
-
-	public void setClassFrom(int classFrom) {
-		this.classFrom = classFrom;
-	}
-
-	public int getScoreBudget() {
-		return scoreBudget;
-	}
-
-	public void setScoreBudget(int scoreBudget) {
-		this.scoreBudget = scoreBudget;
-	}
-
-	public String[] getPath() {
-		return path;
-	}
-
-	public void setPath(String[] path) {
-		this.path = path;
-	}
-
-	public Map<String, Integer> getClassDue() {
-		return Collections.unmodifiableMap(classDue);
-	}
-
-	public void setClassDue(Map<String, Integer> classDue) {
-		this.classDue.clear();
-		if (classDue != null) {
-			this.classDue.putAll(classDue);
-		}
-	}
+	//	TODO still not used
+    private boolean requireClean;
+	public boolean isRequireClean() { return requireClean; }
+	public void setRequireClean(boolean requireClean) { this.requireClean = requireClean; }
 
 	//	TODO pass Ctx to this place somehow
-	public String normName(final Enrollment enr, final Student stud, final Assignment ass, final Version ver,
-						   final FileSlot slot, final FileMeta meta, final Format format) {
+	public String normName(final Enrollment enr, final Student stud, final Task ass, final Version ver,
+						   final FileSlot slot, final Solution meta, final Format format) {
 		try {
 			final String normName = enr.getName() + "-" + stud.getName() + "--" +
 					ass.getName() + (ver == null ? "" : "-" + ver.getName()) + "--" +
-					slot.getName() + "-" + format.format(meta.getCreateStamp().getTime(), "MMdd-HHmm");
+					slot.getName() + "-" + format.format(meta.getStamp(), "MMdd-HHmm");
 
 			final String oriName = meta.getName();
 			final int oriLastDot = oriName.lastIndexOf(".");
@@ -97,10 +74,10 @@ public class IndexEntry {
 	}
 
 	@JsonIgnore
-	public double getTotal(final AssignmentType aType, Score score) {
+	public double getTotal(final TaskType aType, Score score) {
 		double result = 0.0;
 
-		for (FileSlot slot : aType.getFileSlots()) {
+		for (FileSlot slot : aType.getFileSlots().values()) {
 			if (!Boolean.TRUE.equals(score.getApproved())) {
 				continue;
 			}
@@ -110,5 +87,4 @@ public class IndexEntry {
 
 		return result;
 	}
-
 }

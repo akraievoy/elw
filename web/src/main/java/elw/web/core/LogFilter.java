@@ -19,10 +19,7 @@
 package elw.web.core;
 
 import elw.dao.Ctx;
-import elw.vo.Entry;
-import elw.vo.FileMeta;
-import elw.vo.FileSlot;
-import elw.vo.Score;
+import elw.vo.*;
 import org.joda.time.DateTime;
 
 public class LogFilter {
@@ -97,10 +94,8 @@ public class LogFilter {
 		return getScopePath()[1].length() == 0 || getScopePath()[1].indexOf(ch) >= 0;
 	}
 
-	public boolean cScopeStud(FileSlot slot, Entry<FileMeta> e) {
-		final FileMeta file = e != null ? e.getMeta() : null;
-		final Score score = file != null ? file.getScore() : null;
-
+	public boolean cScopeStud(FileSlot slot, FileBase file) {
+		final Score score = file instanceof Solution ? ((Solution) file).getScore() : null;
 		if (file == null) {
 			return slot.isWritable() && cScopeOne('o');
 		} else if (score == null || score.getApproved() == null) {

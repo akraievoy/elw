@@ -4,6 +4,8 @@ import base.pattern.Result;
 import junit.framework.TestCase;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
 
 public class AluTest extends TestCase {
 	protected InstructionContext iCtx;
@@ -38,14 +40,14 @@ public class AluTest extends TestCase {
 	}
 
 	protected void assembleInstruction(final String instructionCode) {
-		assembleInstructions(new String[]{
+		assembleInstructions(Arrays.asList(
 				instructionCode,
 				"noop",
-				"label: noop",
-		});
+				"label: noop"
+		));
 	}
 
-	protected void assembleInstructions(final String[] intstructions) {
+	protected void assembleInstructions(final List<String> intstructions) {
 		final Instruction instruction = validator.assemble(new Result[1], intstructions)[0];
 		iCtx.setInstruction(instruction);
 	}

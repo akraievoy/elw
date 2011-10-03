@@ -4,84 +4,71 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 
 import java.util.Map;
 
-public class Criteria extends IdName {
-	private String ratio = "1.0";
-	private String powDef = "";
-	private int powMax = 1;
-	private boolean auto = false;
+public class Criteria implements IdNamed {
+    private String id;
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
 
-	public String getPowDef() {
-		return powDef;
-	}
+    private String name;
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-	public void setPowDef(String powDef) {
-		this.powDef = powDef;
-	}
+    private String powDef = "";
+    public String getPowDef() { return powDef; }
+    public void setPowDef(String powDef) { this.powDef = powDef; }
 
-	public int getPowMax() {
-		return powMax;
-	}
+    private int powMax = 1;
+    public int getPowMax() { return powMax; }
+    public void setPowMax(int powMax) { this.powMax = powMax; }
 
-	public void setPowMax(int powMax) {
-		this.powMax = powMax;
-	}
+    private String ratio = "1.0";
+    public String getRatio() { return ratio; }
+    public void setRatio(String ratio) { this.ratio = ratio; }
 
-	public String getRatio() {
-		return ratio;
-	}
+    public boolean auto() {
+        return (powDef != null && powDef.indexOf("$") >= 0) || (ratio != null && ratio.indexOf("$") >= 0);
+    }
 
-	public void setRatio(String ratio) {
-		this.ratio = ratio;
-	}
+    public Integer resolvePowDef(Map<String, Double> vars) {
+        if (powDef.startsWith("$")) {
+            if (vars != null) {
+                for (String var : vars.keySet()) {
+                    if (powDef.trim().equalsIgnoreCase(var)) {
+                        return vars.get(var).intValue();
+                    }
+                }
+            }
 
-	public boolean isAuto() {
-		return auto || (powDef != null && powDef.indexOf("$") >= 0) || (ratio != null && ratio.indexOf("$") >= 0);
-	}
+            return null;
+        }
 
-	public void setAuto(boolean auto) {
-		this.auto = auto;
-	}
+        return Integer.parseInt(powDef);
+    }
 
-	public Integer resolvePowDef(Map<String, Double> vars) {
-		if (powDef.startsWith("$")) {
-			if (vars != null) {
-				for (String var : vars.keySet()) {
-					if (powDef.trim().equalsIgnoreCase(var)) {
-						return vars.get(var).intValue();
-					}
-				}
-			}
+    public Double resolveRatio(Map<String, Double> vars) {
+        if (ratio.startsWith("$")) {
+            if (vars != null) {
+                for (String var : vars.keySet()) {
+                    if (ratio.trim().equalsIgnoreCase(var)) {
+                        return vars.get(var);
+                    }
+                }
+            }
 
-			return null;
-		}
+            return null;
+        }
 
-		return Integer.parseInt(powDef);
-	}
+        return Double.parseDouble(ratio);
+    }
 
-	public Double resolveRatio(Map<String, Double> vars) {
-		if (ratio.startsWith("$")) {
-			if (vars != null) {
-				for (String var : vars.keySet()) {
-					if (ratio.trim().equalsIgnoreCase(var)) {
-						return vars.get(var);
-					}
-				}
-			}
+    @JsonIgnore
+    public int[] getPows() {
+        final int[] pows = new int[powMax + 1];
 
-			return null;
-		}
+        for (int i = 0; i < pows.length; i++) {
+            pows[i] = i;
+        }
 
-		return Double.parseDouble(ratio);
-	}
-
-	@JsonIgnore
-	public int[] getPows() {
-		final int[] pows = new int[powMax + 1];
-
-		for (int i = 0; i < pows.length; i++) {
-			pows[i] = i;
-		}
-
-		return pows;
-	}
+        return pows;
+    }
 }

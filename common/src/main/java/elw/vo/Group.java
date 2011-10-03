@@ -1,28 +1,29 @@
 package elw.vo;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
-public class Group extends IdName implements Stamped {
-	private List<Student> students = new ArrayList<Student>();
+public class Group extends Squab implements IdNamed {
+    private String id;
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
 
-	private Stamp createStamp;
+    private String name;
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-	public Student[] getStudents() {
-		return students.toArray(new Student[students.size()]);
+	private SortedMap<String, Student> students = new TreeMap<String, Student>();
+	public Map<String, Student> getStudents() {
+		return Collections.unmodifiableSortedMap(students);
 	}
-
-	public void setStudents(Student[] students) {
+	public void setStudents(SortedMap<String, Student> students) {
 		this.students.clear();
-		this.students.addAll(Arrays.asList(students));
-	}
+        if (students != null) {
+            this.students.putAll(students);
+        }
+    }
 
-	public Stamp getCreateStamp() {
-		return createStamp;
-	}
-
-	public void setCreateStamp(Stamp createStamp) {
-		this.createStamp = createStamp;
-	}
+    @Override
+    protected String[] pathElems() {
+        return new String[] { id };
+    }
 }

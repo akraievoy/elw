@@ -4,6 +4,7 @@ import base.pattern.Result;
 import elw.dp.mips.Instruction;
 import junit.framework.TestCase;
 
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class MipsAssemblerTestCase extends TestCase {
@@ -13,7 +14,7 @@ public class MipsAssemblerTestCase extends TestCase {
 
 		final Result[] results = {new Result("oops", false)};
 		final Instruction[] instructions = asm.loadInstructions(
-				new String[]{
+				Arrays.asList(
 						"begin:",
 						"\tadd\t$3,\t$0,\t$5\t",
 						"add $t1, $t2, $a0",
@@ -27,7 +28,7 @@ public class MipsAssemblerTestCase extends TestCase {
 						"\tbne\t$3,\t$0,\t0xFF\t",
 						"add\t$s0,\t$zero,\t$a0",
 						"j begin"
-				},
+				),
 				results,
 				indexes
 		);

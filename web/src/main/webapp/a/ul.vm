@@ -28,7 +28,7 @@
     <div class="formField" style="height: 7em;"><select id="ul_ctx">
      <option value="$elw_ctx_type.toString()scope=t">Task Type: $f.esc($elw_ctx_type.assType.name)</option>
      <option value="$elw_ctx_type.toString()scope=a">Task: $f.esc($elw_ctx_type.ass.name)</option>
-     #foreach($ver in $elw_ctx_type.ass.getVersions())
+     #foreach($ver in $elw_ctx_type.ass.getVersions().values())
       <option value="$elw_ctx_type.extendVer($ver).toString()scope=v">Version: $ver.getName()</option>
      #end
     </select></div>

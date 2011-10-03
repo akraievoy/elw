@@ -4,7 +4,7 @@
 #* @vtlvariable name="f_studId" type="java.lang.String" *#
 {
  var f_studId = jQuery("form#${__qId}_filter select[name=f_studId]");
- #foreach($stud in $elw_ctx.group.students)
+ #foreach($stud in $elw_ctx.group.students.values())
   f_studId.append(
     jQuery("<option></option>").attr("value", $f.json($stud.id)).text($f.json($stud.getName()))
   );

@@ -92,7 +92,7 @@ public class Class {
 	}
 
 	public int computeToDiffStamp(Stamped stamped) {
-		final DateTime time = stamped == null ? new DateTime() : new DateTime(stamped.getCreateStamp().getTime());
+		final DateTime time = stamped == null ? new DateTime() : new DateTime(stamped.getStamp());
 		return computeToDiff(time);
 	}
 
@@ -155,8 +155,8 @@ public class Class {
 		this.toTime = toTime;
 	}
 
-	public int computeDaysOverdue(final Stamp uploadStamp) {
-		final DateTime stamp = uploadStamp == null ? new DateTime() : new DateTime(uploadStamp.getTime());
+	public int computeDaysOverdue(final Stamped stamped) {
+		final DateTime stamp = stamped == null ? new DateTime() : new DateTime(stamped.getStamp());
 		return getDaysOverdue(stamp);
 	}
 
@@ -189,8 +189,8 @@ public class Class {
 		return false;
 	}
 
-	public boolean checkOnTime(Stamp createStamp) {
-		final long instant = createStamp.getTime();
+	public boolean checkOnTime(Stamped stamed) {
+		final long instant = stamed.getStamp();
 		final long min = getFromDateTime().getMillis();
 		final long max = getToDateTime().getMillis();
 		final int lateTolerance = 30 * 60 * 1000;

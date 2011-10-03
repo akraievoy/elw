@@ -2,91 +2,49 @@ package elw.vo;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
-public class Score implements Stamped {
-	private final Map<String, Double> ratios = new TreeMap<String, Double>();
-	private final Map<String, Integer> pows = new TreeMap<String, Integer>();
-
-	private Stamp createStamp;
-	private String[] path;
-
+public class Score extends Squab.Stamped implements Stamped {
 	private Boolean approved;
+    public Boolean getApproved() { return approved; }
+    public void setApproved(Boolean approved) { this.approved = approved; }
+
 	private String comment;
+    public String getComment() { return comment; }
+    public void setComment(String comment) { this.comment = comment; }
+
+    private final Map<String, Double> ratios = new TreeMap<String, Double>();
+    public Map<String, Double> getRatios() {
+        return Collections.unmodifiableMap(ratios);
+    }
+    @SuppressWarnings({"UnusedDeclaration"})
+    public void setRatios(Map<String, Double> ratios) {
+        this.ratios.clear();
+        if (ratios != null) {
+            this.ratios.putAll(ratios);
+        }
+    }
+
+    private final Map<String, Integer> pows = new TreeMap<String, Integer>();
+    public Map<String, Integer> getPows() {
+        return Collections.unmodifiableMap(pows);
+    }
+    public void setPows(Map<String, Integer> pows) {
+        this.pows.clear();
+        if (pows != null) {
+            this.pows.putAll(pows);
+        }
+    }
 
 	private boolean best;	//	transient
-
-	public Boolean getApproved() {
-		return approved;
-	}
-
-	public void setApproved(Boolean approved) {
-		this.approved = approved;
-	}
-
-	@JsonIgnore
-	public boolean isBest() {
-		return best;
-	}
-
-	@JsonIgnore
-	public void setBest(boolean best) {
-		this.best = best;
-	}
-
-	public String getComment() {
-		return comment;
-	}
-
-	@SuppressWarnings({"UnusedDeclaration"})
-	public void setComment(String comment) {
-		this.comment = comment;
-	}
-
-	public Stamp getCreateStamp() {
-		return createStamp;
-	}
-
-	public void setCreateStamp(Stamp createStamp) {
-		this.createStamp = createStamp;
-	}
-
-	public String[] getPath() {
-		return path;
-	}
-
-	public void setPath(String[] path) {
-		this.path = path;
-	}
-
-	public Map<String, Integer> getPows() {
-		return pows;
-	}
-
-	@SuppressWarnings({"UnusedDeclaration"})
-	public void setPows(Map<String, Integer> pows) {
-		this.pows.clear();
-		this.pows.putAll(pows);
-	}
-
-	public Map<String, Double> getRatios() {
-		return ratios;
-	}
-
-	@SuppressWarnings({"UnusedDeclaration"})
-	public void setRatios(Map<String, Double> ratios) {
-		this.ratios.clear();
-		this.ratios.putAll(ratios);
-	}
+    @JsonIgnore
+    public boolean isBest() { return best; }
+    @JsonIgnore
+    public void setBest(boolean best) { this.best = best; }
 
 	public Score copy() {
 		final Score copy = new Score();
 
-		copy.setCreateStamp(createStamp);
-		copy.setPath(null != path ? path.clone() : null);
 		copy.ratios.putAll(ratios);
 		copy.pows.putAll(pows);
 
@@ -109,7 +67,7 @@ public class Score implements Stamped {
 	public double computeRatio(FileSlot slot) {
 		double res = 1.0;
 
-		for (final Criteria c : slot.getCriterias()) {
+		for (final Criteria c : slot.getCriterias().values()) {
 			final String id = idFor(slot, c);
 			if (!contains(id)) {
 				continue;
@@ -151,11 +109,11 @@ public class Score implements Stamped {
 	}
 
 	@JsonIgnore
-	public ScoreTerm[] getTerms(AssignmentType aType, final boolean includeIdentity) {
+	public ScoreTerm[] getTerms(TaskType aType, final boolean includeIdentity) {
 		final List<ScoreTerm> scoreTerms = new ArrayList<ScoreTerm>();
 
-		for (FileSlot slot : aType.getFileSlots()) {
-			for (final Criteria c : slot.getCriterias()) {
+		for (FileSlot slot : aType.getFileSlots().values()) {
+			for (final Criteria c : slot.getCriterias().values()) {
 				final String id = idFor(slot, c);
 				if (contains(slot, c)) {
 					final Integer pow = pows.get(id);
@@ -175,4 +133,46 @@ public class Score implements Stamped {
 
 		return scoreTerms.toArray(new ScoreTerm[scoreTerms.size()]);
 	}
+
+    protected String[] extraPathElems = null;
+
+    @Override
+    protected String[] pathElems() {
+        if (extraPathElems == null || extraPathElems.length != 5) {
+            throw new IllegalStateException(
+                    "pathElems: " +
+                            "groupId" + PATH_SEP + // 0
+                            "studId" + PATH_SEP + // 1
+                            "courseId" + PATH_SEP + // 2
+                            "ctxIdx" + PATH_SEP + // 3
+                            "tTypeId" + PATH_SEP + // 4
+                            "taskId" + PATH_SEP + // 5
+                            "verId" + PATH_SEP + // 6
+                            "slotId" + PATH_SEP + // 7
+                            "solutionId" + PATH_SEP + // 8
+                            "solutionStamp" // 9
+            );
+        } else {
+            return new String[] {
+                    extraPathElems[0], extraPathElems[1], extraPathElems[2], extraPathElems[3],
+                    extraPathElems[4], extraPathElems[5], extraPathElems[6], extraPathElems[7],
+                    extraPathElems[8], extraPathElems[9]
+            };
+        }
+    }
+
+    public void setupPathElems(Ctx ctx, FileSlot slot, Solution solution) {
+        extraPathElems = new String[] {
+                ctx.getGroup().getId(),
+                ctx.getStudent().getId(),
+                ctx.getCourse().getId(),
+                String.valueOf(ctx.getIndex()),
+                ctx.getAssType().getId(),
+                ctx.getAss().getId(),
+                ctx.getVer().getId(),
+                slot.getId(),
+                solution.getId(),
+                String.valueOf(solution.getStamp())
+        };
+    }
 }

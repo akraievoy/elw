@@ -1,7 +1,7 @@
 #* @vtlvariable name="f" type="elw.web.FormatTool" *#
 #* @vtlvariable name="score" type="elw.vo.Score" *#
 #* @vtlvariable name="slot" type="elw.vo.FileSlot" *#
-#* @vtlvariable name="file" type="elw.vo.Entry<elw.vo.FileMeta>" *#
+#* @vtlvariable name="file" type="elw.vo.Solution" *#
 #* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
 #* @vtlvariable name="elw_uri" type="elw.web.ElwUri" *#
 #* @vtlvariable name="stamp" type="elw.vo.Stamp" *#
@@ -41,7 +41,7 @@
     <form method="POST" action="approve">
      <input type="hidden" name="elw_ctx" value="$f.esc($elw_ctx.toString())"/>
      <input type="hidden" name="sId" value="$f.esc($slot.id)"/>
-     <input type="hidden" name="fId" value="$f.esc($file.meta.id)"/>
+     <input type="hidden" name="fId" value="$f.esc($file.id)"/>
      #if($stamp)
       <input type="hidden" name="stamp" value="$f.esc($stamp.toString())"/>
      #end
@@ -87,10 +87,10 @@
 
   var sliders = jQuery("#sliders");
   var sliders_auto = jQuery("#sliders_auto");
-  #foreach($cri in $slot.criterias)
+  #foreach($cri in $slot.criterias.values())
    (function() {
     var criId = $f.json($slot.id) + "--" + $f.json($cri.id);
-    sliders#if($cri.isAuto())_auto#{end}.append(
+    sliders#if($cri.auto())_auto#{end}.append(
       jQuery("<div/>").toggleClass("formLabel").css({"width":"16em"}).append(
         jQuery("<span/>").text($f.json($cri.name)).attr("title", $f.json($cri.ratio))
       )
@@ -150,7 +150,7 @@
   function loadData() {
    var f_data = {};
    f_data["elw_ctx"] = $f.json($elw_ctx.toString());
-   f_data["fId"] = $f.json($file.meta.id);
+   f_data["fId"] = $f.json($file.id);
    f_data["sId"] = $f.json($slot.id);
    #if($stamp)
     f_data["stamp"] = $f.json($stamp.toString());
@@ -190,7 +190,7 @@
  #if(!$f_due) #set($f_due = "any") #end
  #if(!$f_mode) #set($f_mode = "s") #end
  #if(!$f_latest) #set($f_latest = "true") #end
- #set($__highlight = $file.meta.id)
+ #set($__highlight = $file.id)
  #set($__qId = "log") #parse("/__/queryJsLog.vm")
  #parse("/__/ready.vm")
 </html>

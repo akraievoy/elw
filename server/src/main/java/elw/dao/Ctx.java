@@ -11,25 +11,12 @@ import java.math.BigInteger;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
-public class Ctx {
+public class Ctx implements elw.vo.Ctx {
 	private static final Logger log = LoggerFactory.getLogger(Ctx.class);
 
-	public static final String STATE_NONE = "";
-	public static final String STATE_G = "g";
-	public static final String STATE_GS = "gs";
-	public static final String STATE_ECG = "ecg";
-	public static final String STATE_ECGS = "ecgs";
-	public static final String STATE_C = "c";
-	public static final String STATE_CT = "ct";
-	public static final String STATE_CTA = "cta";
-	public static final String STATE_CTAV = "ctav";
-	public static final String STATE_CIV = "civ";
-	public static final String STATE_EGSCIV = "egsciv";
-
-	private static final char ELEM_ENR = 'e';
+    private static final char ELEM_ENR = 'e';
 	private static final char ELEM_INDEX_ENTRY = 'i';
 	private static final char ELEM_GROUP = 'g';
 	private static final char ELEM_STUD = 's';
@@ -44,8 +31,8 @@ public class Ctx {
 
 	private final KeyVal<String, Enrollment> enr;
 	private final KeyVal<String, Student> student;
-	private final KeyVal<String, AssignmentType> assType;
-	private final KeyVal<String, Assignment> ass;
+	private final KeyVal<String, TaskType> assType;
+	private final KeyVal<String, Task> ass;
 	private final KeyVal<String, Version> ver;
 
 	private final KeyVal<String, Course> course;
@@ -60,8 +47,8 @@ public class Ctx {
 	) {
 		enr = new KeyVal<String, Enrollment>(Enrollment.class, enrId);
 		student = new KeyVal<String, Student>(Student.class, studId);
-		assType = new KeyVal<String, AssignmentType>(AssignmentType.class, assTypeId);
-		ass = new KeyVal<String, Assignment>(Assignment.class, assId);
+		assType = new KeyVal<String, TaskType>(TaskType.class, assTypeId);
+		ass = new KeyVal<String, Task>(Task.class, assId);
 		ver = new KeyVal<String, Version>(Version.class, verId);
 
 		course = new KeyVal<String, Course>(Course.class, courseId);
@@ -82,8 +69,8 @@ public class Ctx {
 		this(null, null, null, null, null, null, null, null);
 	}
 
-	public Assignment getAss() { return ass.getValue(); }
-	public AssignmentType getAssType() { return assType.getValue(); }
+	public Task getAss() { return ass.getValue(); }
+	public TaskType getAssType() { return assType.getValue(); }
 	public Course getCourse() { return course.getValue(); }
 	public Enrollment getEnr() { return enr.getValue(); }
 	public Group getGroup() { return group.getValue(); }
@@ -172,14 +159,14 @@ public class Ctx {
 		return new Ctx().extEnr(enr);
 	}
 
-	public static Ctx forAssType(final Course course, final AssignmentType assType) {
+	public static Ctx forAssType(final Course course, final TaskType assType) {
 		if (assType == null) {
 			throw new IllegalArgumentException("task type is null");
 		}
 		return forCourse(course).extendAssType(assType);
 	}
 
-	public static Ctx forAss(Course course, AssignmentType assType, Assignment ass) {
+	public static Ctx forAss(Course course, TaskType assType, Task ass) {
 		if (ass == null) {
 			throw new IllegalArgumentException("ass is null");
 		}
@@ -193,23 +180,24 @@ public class Ctx {
 		return norm("ecgs") + SEP + getEnr().getId() + SEP + getStudent().getId();
 	}
 
-	public Ctx resolve(EnrollDao enrDao, GroupDao groupDao, CourseDao courseDao) {
-		if (enr.isPending()) {
-			extEnr(enrDao.findEnrollment(enr.getKey()));
+	public Ctx resolve(CouchDao couchDao) {
+		final Queries q = new Queries(couchDao);
+        if (enr.isPending()) {
+			extEnr(q.enrollmentSome(enr.getKey()));
 		}
 		if (course.isPending()) {
-			extCourse(courseDao.findCourse(course.getKey()));
+			extCourse(q.course(course.getKey()));
 		}
 		if (group.isPending()) {
-			extGroup(groupDao.findGroup(group.getKey()));
+			extGroup(q.group(group.getKey()));
 		}
 
 		return resolve();
 	}
 
-	protected Ctx resolve() {	//	this does not involve DAO lookups at all
+    protected Ctx resolve() {	//	this does not involve DAO lookups at all
 		if (group.isResolved() && student.isPending()) {
-			student.setValue(IdName.findById(group.getValue().getStudents(), student.getKey()));
+			student.setValue(group.getValue().getStudents().get(student.getKey()));
 		}
 
 		if (enr.isResolved() && indexEntry.isPending()) {
@@ -227,24 +215,25 @@ public class Ctx {
 		}
 
 		if (course.isResolved() && assType.isPending()) {
-			assType.resolve(IdName.findById(course.getValue().getAssTypes(), assType.getKey()));
+			assType.resolve(course.getValue().getTaskTypes().get(assType.getKey()));
 		}
 
 		if (assType.isResolved() && ass.isPending()) {
-			ass.resolve(IdName.findById(assType.getValue().getAssignments(), ass.getKey()));
+			ass.resolve(assType.getValue().getTasks().get(ass.getKey()));
 		}
 
 		if (student.isResolved() && ass.isResolved()) {
 			final String salt = student.getValue().getName() + ":" + ass.getValue().getName();
 			final BigInteger shaNum = new BigInteger(digest(salt), 16);
-			final Version[] versions = ass.getValue().getVersions();
-			final int verIdx = shaNum.mod(BigInteger.valueOf(versions.length)).intValue();
+            //  FIXME less brutal version assignment, please
+			final List<Version> versions = new ArrayList<Version>(ass.getValue().getVersions().values());
+			final int verIdx = shaNum.mod(BigInteger.valueOf(versions.size())).intValue();
 
-			ver.setKey(versions[verIdx].getId());
+			ver.setKey(versions.get(verIdx).getId());
 		}
 
 		if (ass.isResolved() && ver.isPending()) {
-			ver.setValue(IdName.findById(ass.getValue().getVersions(), ver.getKey()));
+			ver.setValue(ass.getValue().getVersions().get(ver.getKey()));
 		}
 
 		return this;
@@ -278,7 +267,7 @@ public class Ctx {
 		if (!group.isResolved()) {
 			throw new IllegalStateException("group not resolved");
 		}
-		if (IdName.findById(group.getValue().getStudents(), newStud.getId()) == null) {
+		if (group.getValue().getStudents().get(newStud.getId()) == null) {
 			throw new IllegalArgumentException("group/student mismatch");
 		}
 		student.resolve(newStud);
@@ -296,23 +285,22 @@ public class Ctx {
 		return resolve();
 	}
 
-	private Ctx extAssType(final AssignmentType newType) {
+	private Ctx extAssType(final TaskType newType) {
 		if (!course.isResolved()) {
 			throw new IllegalStateException("course not set");
 		}
-		if (IdName.findById(course.getValue().getAssTypes(), newType.getId()) == null) {
+		if (course.getValue().getTaskTypes().get(newType.getId()) == null) {
 			throw new IllegalArgumentException("course/aType mismatch");
 		}
 		assType.resolve(newType);
 		return resolve();
 	}
 
-	private Ctx extAss(final Assignment newTask) {
+	private Ctx extAss(final Task newTask) {
 		if (!assType.isResolved()) {
 			throw new IllegalStateException("taskType not set");
 		}
-		final Assignment[] tasks = assType.getValue().getAssignments();
-		if (tasks.length > 0 && IdName.findById(tasks, newTask.getId()) == null) {
+		if (assType.getValue().getTasks().get(newTask.getId()) == null) {
 			throw new IllegalArgumentException("taskType/task mismatch");
 		}
 		ass.resolve(newTask);
@@ -323,7 +311,7 @@ public class Ctx {
 		if (!ass.isResolved()) {
 			throw new IllegalArgumentException("task not set");
 		}
-		if (IdName.findById(ass.getValue().getVersions(), newVer.getId()) == null) {
+		if (ass.getValue().getVersions().get(newVer.getId()) == null) {
 			throw new IllegalArgumentException("task/ver mismatch");
 		}
 		ver.resolve(newVer);
@@ -346,11 +334,11 @@ public class Ctx {
 		return copy().extIndex(index);
 	}
 
-	private Ctx extendAssType(final AssignmentType newType) {
+	private Ctx extendAssType(final TaskType newType) {
 		return copy().extAssType(newType);
 	}
 
-	private Ctx extendAss(final Assignment newTask) {
+	private Ctx extendAss(final Task newTask) {
 		return copy().extAss(newTask);
 	}
 
@@ -583,16 +571,15 @@ public class Ctx {
 		}
 	}
 
-	public String cmpNameNorm(Format f, FileSlot slot, Entry<FileMeta> e) {
+	public String cmpNameNorm(Format f, FileSlot slot, FileBase file) {
 		final Version ver = getVer();
-		final FileMeta meta = e.getMeta();
 		String result;
 		try {
 			final String normName = getEnr().getName() + "-" + getStudent().getName() + "--" +
 					getAss().getName() + (ver == null ? "" : "-" + ver.getName()) + "--" +
-					slot.getName() + "-" + f.format(meta.getCreateStamp().getTime(), "MMdd-HHmm");
+					slot.getName() + "-" + f.format(file.getStamp(), "MMdd-HHmm");
 
-			final String oriName = meta.getName();
+			final String oriName = file.getName();
 			final String oriExt;
 			if (oriName != null && oriName.trim().length() > 0) {
 				final int oriLastDot = oriName.lastIndexOf(".");
@@ -614,7 +601,82 @@ public class Ctx {
 		return result;
 	}
 
-	protected class KeyVal<KeyType, ValueType> {
+    public boolean checkRead(FileSlot slot, SortedMap<String, List<Solution>> filesStud) {
+        final FileSlot fileSlot = getAssType().getFileSlots().get(slot.getId());
+
+        for (String slotIdRA : fileSlot.getReadApprovals()) {
+            if (!isApprovedAny(slotIdRA, filesStud)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public boolean checkWrite(FileSlot slot, SortedMap<String, List<Solution>> filesStud) {
+        final FileSlot fileSlot = getAssType().getFileSlots().get(slot.getId());
+        if (!fileSlot.isWritable()) {
+            return false;
+        }
+
+        final List<String> writeApprovals = fileSlot.getWriteApprovals();
+        for (String slotIdWA : writeApprovals) {
+            if (!isApprovedAny(slotIdWA, filesStud)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public static boolean isApprovedAny(
+            final String slotId,
+            final Map<String, List<Solution>> filesStud
+    ) {
+        final List<Solution> files = filesStud.get(slotId);
+
+        if (files == null || files.isEmpty()) {
+            return false;
+        }
+
+        boolean approved = false;
+        for (Solution s : files) {
+            if (s.getScore() != null && Boolean.TRUE.equals(s.getScore().getApproved())) {
+                approved = true;
+            }
+        }
+        return approved;
+    }
+
+    public static boolean isDeclinedLast(
+			String slotId,
+			final Map<String, List<Solution>> filesStud
+	) {
+		final List<Solution> files = filesStud.get(slotId);
+
+		if (files == null || files.size() == 0) {
+			return false;
+		}
+
+		final Solution s = files.get(files.size() - 1);
+		return s.getScore() != null && !Boolean.TRUE.equals(s.getScore().getApproved());
+	}
+
+    public static boolean isPendingLast(
+			String slotId,
+			final Map<String, List<Solution>> filesStud
+	) {
+		final List<Solution> files = filesStud.get(slotId);
+
+		if (files == null || files.isEmpty()) {
+			return false;
+		}
+
+		final Solution f = files.get(files.size() - 1);
+		return f.getScore() == null;
+	}
+
+    protected class KeyVal<KeyType, ValueType> {
 		private final java.lang.Class<ValueType> valueClass;
 
 		private KeyType key;
@@ -657,8 +719,8 @@ public class Ctx {
 				return false;
 			}
 
-			if (value instanceof IdName) {
-				final String valueKey = ((IdName) value).getId();
+			if (value instanceof IdNamed) {
+				final String valueKey = ((IdNamed) value).getId();
 				if (key != null) {
 					if (!key.equals(valueKey)) {
 						throw new IllegalStateException(

@@ -17,7 +17,7 @@
        .text($f.json($__ctx_ass.ass.name))
     );
    #end
-   #foreach($ver in $__ctx_ass.ass.versions)
+   #foreach($ver in $__ctx_ass.ass.versions.values())
     #if($elw_admin || $__ctx_ass.ver.id == $ver.id)
      f_verId.append(
        jQuery("<option></option>")

@@ -71,12 +71,7 @@ public class W {
 		return !typeSlotExpr.startsWith(aTypeSlotFilter);
 	}
 
-	public static Stamp parseStamp(HttpServletRequest req, final String paramName) {
-		final String paramVal = req.getParameter(paramName);
-		return paramVal != null ? Stamp.fromString(paramVal) : null;
-	}
-
-	public static LogFilter parseFilter(HttpServletRequest req) {
+    public static LogFilter parseFilter(HttpServletRequest req) {
 		final String due = req.getParameter("f_due");
 		final boolean latest = "true".equals(req.getParameter("f_latest"));
 		final String slotId = req.getParameter("f_slotId");

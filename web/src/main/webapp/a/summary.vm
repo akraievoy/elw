@@ -1,5 +1,5 @@
 #* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
-#* @vtlvariable name="fileMetas" type="java.util.Map<java.lang.String,java.util.Map<java.lang.String,java.util.List<elw.vo.Entry<elw.vo.FileMeta>>>>" *#
+#* @vtlvariable name="fileMetas" type="java.util.Map<java.lang.String,java.util.Map<java.lang.String,java.util.List<elw.vo.Solution>>>" *#
 #* @vtlvariable name="ctxToScore" type="java.util.Map<java.lang.String,java.lang.Double>" *#
 #* @vtlvariable name="totalBudget" type="java.lang.Integer" *#
 
@@ -75,7 +75,7 @@
    #set($elw_ctx_ass = $elw_ctx.extendIndex($idx))
 
    #set($tp_taskHeader_colspan = 0)
-   #foreach($slot in $elw_ctx_ass.assType.fileSlots)
+   #foreach($slot in $elw_ctx_ass.assType.fileSlots.values())
     #if($elw_ctx_ass.cDue($slot.id))
      #set($z = "--") #* idea yells at me if I do this directly*#
      #set($z = "${elw_ctx_ass.assType.id}${z}${slot.id}${z}")
@@ -84,7 +84,7 @@
       te_slotHeader.parent().append(tp_slotHeader);
       #set($tp_taskHeader_colspan = $tp_taskHeader_colspan + 1)
 
-      #foreach($stud in $elw_ctx.group.students)
+      #foreach($stud in $elw_ctx.group.students.values())
        #if(!$f_studId || $f_studId == $stud.id)
         #set($elw_ctx_stud = $elw_ctx.extendStudent($stud))
         #if($studRowsCreated)

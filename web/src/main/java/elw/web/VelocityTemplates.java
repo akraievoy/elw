@@ -19,11 +19,9 @@
 package elw.web;
 
 import elw.dao.Ctx;
-import elw.dao.FileDao;
 import elw.vo.*;
 import elw.vo.Class;
 import elw.web.core.Summary;
-import org.akraievoy.gear.G4mat;
 import org.joda.time.DateTime;
 
 import java.util.List;
@@ -38,13 +36,13 @@ public class VelocityTemplates {
 		return new Ref<E>(e);
 	}
 
-	public Entry<FileMeta> bestOrLastOrNull(List<Entry<FileMeta>> entries) {
+	public Solution bestOrLastOrNull(List<Solution> entries) {
 		if (entries == null || entries.isEmpty()) {
 			return null;
 		}
 
-		for (Entry<FileMeta> entry : entries) {
-			if (entry.getMeta().getScore() != null && entry.getMeta().getScore().isBest()) {
+		for (Solution entry : entries) {
+			if (entry.getScore() != null && entry.getScore().isBest()) {
 				return entry;
 			}
 		}
@@ -54,14 +52,14 @@ public class VelocityTemplates {
 
 	public VtTuple status(
 			Format f, String mode,
-			String scope, Ctx ctx, FileSlot slot, Entry<FileMeta> file
+			String scope, Ctx ctx, FileSlot slot, FileBase file
 	) {
-		return status(f, mode, scope, ctx, slot, file, file != null ? file.getMeta().getScore() : null);
+		return status(f, mode, scope, ctx, slot, file, file instanceof Solution ? ((Solution) file).getScore() : null);
 	}
 
 	public VtTuple status(
 			Format f, String mode,
-			String scope, Ctx ctx, FileSlot slot, Entry<FileMeta> file, Score score
+			String scope, Ctx ctx, FileSlot slot, FileBase file, Score score
 	) {
 		final StringBuilder text = new StringBuilder();
 		final StringBuilder cls = new StringBuilder();
@@ -70,7 +68,7 @@ public class VelocityTemplates {
 		final elw.vo.Class classFrom = ctx.cFrom();
 		final elw.vo.Class classDue = ctx.cDue(slot.getId());
 
-		if (FileDao.SCOPE_STUD.equalsIgnoreCase(scope)) {
+		if (Solution.SCOPE.equalsIgnoreCase(scope)) {
 			if ("a".equalsIgnoreCase(mode)) {
 				if (!classFrom.isStarted()) {
 					text.append("Closed");
@@ -107,7 +105,7 @@ public class VelocityTemplates {
 					text.append("No Due Date");
 					sort.append(0);
 				} else {
-					int dueDiff = classDue.computeToDiffStamp(file == null ? null : file.getMeta());
+					int dueDiff = classDue.computeToDiffStamp(file);
 					if (dueDiff > 0) {
 						text.append(dueDiff).append("d overdue");
 					} else if (dueDiff == 0) {
@@ -202,12 +200,12 @@ public class VelocityTemplates {
 					sort.append(0);
 				} else {
 					final DateTime scoreStamp;
-					if (score == null || score.getCreateStamp() == null) {
+					if (score == null || score.getStamp() == null) {
 						scoreStamp = new DateTime();
 					} else {
-						scoreStamp = new DateTime(score.getCreateStamp().getTime());
+						scoreStamp = new DateTime(score.getStamp());
 					}
-					final int dta = classFrom.computeToDiff(scoreStamp) - classFrom.computeToDiffStamp(file.getMeta());
+					final int dta = classFrom.computeToDiff(scoreStamp) - classFrom.computeToDiffStamp(file);
 					text.append(dta).append(" days");
 					sort.append(dta);
 				}
@@ -221,7 +219,7 @@ public class VelocityTemplates {
 					cls.append("elw_open");
 					sort.append(0);
 				} else {
-					final int dtu = classFrom.computeToDiffStamp(file.getMeta());
+					final int dtu = classFrom.computeToDiffStamp(file);
 					text.append(dtu).append(" days");
 					sort.append(dtu);
 				}
@@ -238,16 +236,16 @@ public class VelocityTemplates {
 				int sortVal = -1;
 				if (file != null) {
 					sortVal++;
-					text.append(file.getMeta().getSourceAddress());
-					if (!classFrom.checkOnSite(file.getMeta().getSourceAddress())) {
+					text.append(file.getSourceAddress());
+					if (!classFrom.checkOnSite(file.getSourceAddress())) {
 						sortVal+=4;
 						cls.append(" elw_offsite");
 					}
-					if (!ctx.getEnr().checkOnTime(file.getMeta().getCreateStamp())) {
+					if (!ctx.getEnr().checkOnTime(file)) {
 						sortVal+=2;
 						cls.append(" elw_offtime");
 					}
-					if (!classFrom.checkOnTime(file.getMeta().getCreateStamp())) {
+					if (!classFrom.checkOnTime(file)) {
 						sortVal++;
 						cls.append(" elw_rapid");
 					}
@@ -258,16 +256,10 @@ public class VelocityTemplates {
 			overdueClasses(file, classDue, cls);
 		} else {
 			if (file == null) {
-				text.append("Open @ Course");
+				text.append("Solution");
 				sort.append(-2);
-			} else if (FileDao.SCOPE_ASS_TYPE.equalsIgnoreCase(scope)) {
-				text.append("Type @ Course");
-				sort.append(-1);
-			} else if (FileDao.SCOPE_ASS.equalsIgnoreCase(scope)) {
-				text.append("Task @ Course");
-				sort.append(0);
-			} else if (FileDao.SCOPE_VER.equalsIgnoreCase(scope)) {
-				text.append("Ver @ Course");
+			} else if (Attachment.SCOPE.equalsIgnoreCase(scope)) {
+				text.append("Attachment");
 				sort.append(1);
 			}
 		}
@@ -275,12 +267,12 @@ public class VelocityTemplates {
 		return new VtTuple(text.toString(), cls.toString(), sort.toString());
 	}
 
-	private static void overdueClasses(Entry<FileMeta> file, Class classDue, StringBuilder cls) {
+	private static void overdueClasses(FileBase file, Class classDue, StringBuilder cls) {
 		if (classDue != null) {
 			if (classDue.isPassed()) {
 				cls.append(" elw_due_passed");
 
-				if (file == null || classDue.computeDaysOverdue(file.getMeta().getCreateStamp()) > 0) {
+				if (file == null || classDue.computeDaysOverdue(file) > 0) {
 					cls.append(" elw_overdue");
 				}
 			}

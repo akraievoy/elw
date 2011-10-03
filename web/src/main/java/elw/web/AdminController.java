@@ -19,6 +19,7 @@
 package elw.web;
 
 import elw.dao.*;
+import elw.dao.Ctx;
 import elw.miniweb.Message;
 import elw.miniweb.ViewJackson;
 import elw.vo.*;
@@ -40,34 +41,20 @@ import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.util.*;
 
-	@Controller
+@Controller
 @RequestMapping("/a/**/*")
 public class AdminController extends ControllerElw {
 	private static final Logger log = LoggerFactory.getLogger(AdminController.class);
 	
-	private final CourseDao courseDao;
-	private final GroupDao groupDao;
-	private final EnrollDao enrollDao;
-	private final ScoreDao scoreDao;
-	private final FileDao fileDao;
-
-	private final AdminDao adminDao;
+	private final CouchDao couchDao;
 	private final SortedSet<String> validNonces = new TreeSet<String>();
 
 	public AdminController(
-			CourseDao courseDao, EnrollDao enrollDao, GroupDao groupDao, ScoreDao scoreDao, FileDao fileDao,
-			AdminDao adminDao,
-			Core core
-	) {
+            CouchDao couchDao,
+            Core core
+    ) {
 		super(core);
-
-		this.courseDao = courseDao;
-		this.enrollDao = enrollDao;
-		this.groupDao = groupDao;
-		this.scoreDao = scoreDao;
-		this.fileDao = fileDao;
-
-		this.adminDao = adminDao;
+		this.couchDao = couchDao;
 	}
 
 	protected HashMap<String, Object> auth(final HttpServletRequest req, final HttpServletResponse resp, final String pathToRoot) throws IOException {
@@ -94,7 +81,7 @@ public class AdminController extends ControllerElw {
 
 		final HashMap<String, Object> model = prepareDefaultModel(req);
 		model.put(S_ADMIN, admin);
-		model.put(R_CTX, Ctx.fromString(req.getParameter(R_CTX)).resolve(enrollDao, groupDao, courseDao));
+		model.put(R_CTX, Ctx.fromString(req.getParameter(R_CTX)).resolve(couchDao));
 
 		return model;
 	}
@@ -133,7 +120,7 @@ public class AdminController extends ControllerElw {
 			}
 
 			if (nonceValid) {
-				final Admin admin = adminDao.findAdminById(login);
+				final Admin admin = core.getQueries().adminSome(login);
 				final String hashExpected;
 				if (admin != null) {
 					hashExpected = Ctx.digest(nonce + "-->" + login + "-->" + admin.getPassword());
@@ -189,7 +176,7 @@ public class AdminController extends ControllerElw {
 			return null;
 		}
 
-		final Enrollment[] enrolls = enrollDao.findAllEnrollments();
+		final List<Enrollment> enrolls = core.getQueries().enrollments();
 		final List<Object[]> indexData = core.index(enrolls);
 		return new ModelAndView(ViewJackson.success(indexData));
 	}
@@ -202,7 +189,8 @@ public class AdminController extends ControllerElw {
 				W.filterDefault(model, "f_mode", "a");
 				final LogFilter filter = W.parseFilter(req);
 
-				final SortedMap<String, Map<String, List<Entry<FileMeta>>>> fileMetas = new TreeMap<String, Map<String, List<Entry<FileMeta>>>>();
+				final SortedMap<String, Map<String, List<Solution>>> fileMetas =
+                        new TreeMap<String, Map<String, List<Solution>>>();
 				final Map<String, Double> ctxToScore = new HashMap<String, Double>();
 
 				core.tasksData(ctx, filter, true, fileMetas, ctxToScore, null);
@@ -269,13 +257,13 @@ public class AdminController extends ControllerElw {
 	public ModelAndView do_approve(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
 		return wmScore(req, resp, "", new WebMethodScore() {
 			public ModelAndView handleScore(
-					HttpServletRequest req, HttpServletResponse resp, Ctx ctx, FileSlot slot, Entry<FileMeta> file, Stamp stamp, Map<String, Object> model
+					HttpServletRequest req, HttpServletResponse resp, Ctx ctx, FileSlot slot, Solution file, Long stamp, Map<String, Object> model
 			) {
-				final SortedMap<Stamp, Entry<Score>> allScores = scoreDao.findAllScores(ctx, slot.getId(), file.getMeta().getId());
+				final SortedMap<Long, Score> allScores = core.getQueries().scores(ctx, slot, file);
 
-				final Entry<Score> lastScoreEntry = allScores.isEmpty() ? null : allScores.get(allScores.lastKey());
-				final Entry<Score> scoreEntry = stamp == null ? lastScoreEntry : allScores.get(stamp);
-				final Score score = ScoreDao.updateAutos(ctx, slot.getId(), file, scoreEntry == null ? null : scoreEntry.getMeta());
+				final Score lastScoreEntry = allScores.isEmpty() ? null : allScores.get(allScores.lastKey());
+				final Score scoreEntry = stamp == null ? lastScoreEntry : allScores.get(stamp);
+                final Score score = Queries.updateAutos(ctx, slot.getId(), file, scoreEntry);
 
 				model.put("stamp", stamp);
 				model.put("score", score);
@@ -291,12 +279,11 @@ public class AdminController extends ControllerElw {
 	public ModelAndView do_restScoreLog(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
 		return wmScore(req, resp, null, new WebMethodScore() {
 			public ModelAndView handleScore(
-					HttpServletRequest req, HttpServletResponse resp, Ctx ctx, FileSlot slot, Entry<FileMeta> file, Stamp stamp, Map<String, Object> model
+					HttpServletRequest req, HttpServletResponse resp, Ctx ctx, FileSlot slot, Solution file, Long stamp, Map<String, Object> model
 			) {
 				final Format f = (Format) model.get(FormatTool.MODEL_KEY);
 
-				final ScoreDao scoreDaoLocal = scoreDao;
-				final SortedMap<Stamp, Entry<Score>> allScores = scoreDaoLocal.findAllScoresAuto(ctx, slot, file);
+				final SortedMap<Long, Score> allScores = core.getQueries().scoresAuto(ctx, slot, file);
 
 				final String mode = req.getParameter("f_mode");
 
@@ -311,24 +298,23 @@ public class AdminController extends ControllerElw {
 	public ModelAndView do_approvePost(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
 		return wmScore(req, resp, "", new WebMethodScore() {
 			public ModelAndView handleScore(
-					HttpServletRequest req, HttpServletResponse resp, Ctx ctx, FileSlot slot, Entry<FileMeta> file, Stamp stamp, Map<String, Object> model
+					HttpServletRequest req, HttpServletResponse resp, Ctx ctx, FileSlot slot, Solution file, Long stamp, Map<String, Object> model
 			) throws IOException {
 				final Score scoreByStamp;
-				final String fileId = file.getMeta().getId();
+				final String fileId = file.getId();
 				if (stamp == null) {
 					scoreByStamp = null;
 				} else {
-					scoreByStamp = scoreDao.findScoreByStamp(ctx, stamp, slot.getId(), fileId).getMeta();
+					scoreByStamp = core.getQueries().score(ctx, slot, file, stamp);
 				}
-				final Score score = ScoreDao.updateAutos(ctx, slot.getId(), file, scoreByStamp);
+                final Score score = Queries.updateAutos(ctx, slot.getId(), file, scoreByStamp);
 
 				final String action = req.getParameter("action");
 				if ("next".equalsIgnoreCase(action) || "approve".equalsIgnoreCase(action) || "decline".equalsIgnoreCase(action)) {
 					if ("approve".equalsIgnoreCase(action) || "decline".equalsIgnoreCase(action)) {
 						score.setApproved("approve".equalsIgnoreCase(action));
 
-						final Criteria[] cris = slot.getCriterias();
-						for (Criteria cri : cris) {
+                        for (Criteria cri : slot.getCriterias().values()) {
 							final int powDef = score.getPow(slot, cri);
 							final double ratioDef = score.getRatio(slot, cri);
 
@@ -341,10 +327,11 @@ public class AdminController extends ControllerElw {
 						}
 
 						score.setComment(req.getParameter("comment"));
-						scoreDao.createScore(ctx, slot.getId(), fileId, score);
+                        score.setupPathElems(ctx, slot, file);
+						core.getQueries().getCouchDao().update(score);
 					}
 
-					resp.sendRedirect(core.cmpForwardToEarliestPendingSince(ctx, slot, file.getMeta().getCreateStamp()));
+					resp.sendRedirect(core.cmpForwardToEarliestPendingSince(ctx, slot, file.getStamp()));
 				} else {
 					resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Bad action: " + action);
 				}
@@ -361,7 +348,7 @@ public class AdminController extends ControllerElw {
 			return null;
 		}
 
-		final Group[] groups = groupDao.findAllGroups();
+		final List<Group> groups = core.getQueries().groups();
 
 		model.put("groups", groups);
 
@@ -390,7 +377,10 @@ public class AdminController extends ControllerElw {
 				final String refreshUri = core.getUri().logCourseE(ctx.getEnr().getId());
 				final String authorName = ((Admin)model.get(S_ADMIN)).getName();
 
-				return storeFile(scope, slot, refreshUri, failureUri, authorName, core.getFileDao());
+				return storeFile(
+                        slot, refreshUri, failureUri, authorName,
+                        core.getQueries(), new Attachment()
+                );
 			}
 		});
 	}
@@ -406,13 +396,13 @@ public class AdminController extends ControllerElw {
 					return null;
 				}
 
-				final Entry<FileMeta> entry = fileDao.findFileFor(scope, ctx, slot.getId(), fileId);
+				final FileBase entry = core.getQueries().file(scope, ctx, slot, fileId);
 				if (entry == null) {
 					resp.sendError(HttpServletResponse.SC_NOT_FOUND, "no file found");
 					return null;
 				}
 
-				retrieveFile(slot, entry);
+				retrieveFile(entry, core.getQueries().getCouchDao());
 
 				return null;
 			}

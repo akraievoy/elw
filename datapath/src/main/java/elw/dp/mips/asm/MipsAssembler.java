@@ -36,7 +36,7 @@ public class MipsAssembler {
 		return map;
 	}
 
-	public Instruction[] loadInstructions(String[] codeLines, Result[] resRef, final Map<String, Integer> labelIndex) {
+	public Instruction[] loadInstructions(List<String> codeLines, Result[] resRef, final Map<String, Integer> labelIndex) {
 		labelIndex.clear();
 		final List<Instruction> instructions = new ArrayList<Instruction>();
 
@@ -67,14 +67,14 @@ public class MipsAssembler {
 		return instructions.toArray(new Instruction[instructions.size()]);
 	}
 
-	private boolean loadInstructionsFirstPass(String[] codeLines, List<Instruction> instructions, Map<String, Integer> labelIndex, Result[] resRef) {
+	private boolean loadInstructionsFirstPass(List<String> codeLines, List<Instruction> instructions, Map<String, Integer> labelIndex, Result[] resRef) {
 		final StringBuilder code = new StringBuilder();
 		final StringBuilder syntax = new StringBuilder();
 		final List<String> labels = new ArrayList<String>();
 		int instructionIndex = 0;
-		for (int lineIndex = 0, codeLinesLength = codeLines.length; lineIndex < codeLinesLength; lineIndex++) {
+		for (int lineIndex = 0, codeLinesLength = codeLines.size(); lineIndex < codeLinesLength; lineIndex++) {
 			final String prefix = "Code(line " + (lineIndex + 1) + "): ";
-			final String codeLine = codeLines[lineIndex].trim();
+			final String codeLine = codeLines.get(lineIndex).trim();
 
 			if (codeLine.startsWith("#") || codeLine.isEmpty()) {
 				continue;

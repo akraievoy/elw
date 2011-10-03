@@ -1,40 +1,55 @@
 package elw.vo;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
+import java.util.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import static java.util.Collections.unmodifiableSortedMap;
 
-public class Course extends IdName implements Stamped {
-	private final List<AssignmentType> assTypes = new ArrayList<AssignmentType>();
+public class Course extends Squab implements IdNamed {
+    private String id;
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
 
-	private Stamp createStamp;
+    private String name;
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-	private String resourcePath;
+    private String template;
+    public String getTemplate() { return template; }
+    public void setTemplate(String template) { this.template = template; }
 
-	public String getResourcePath() {
-		return resourcePath;
-	}
+    private final SortedMap<String, Criteria> criterias = new TreeMap<String, Criteria>();
+    public SortedMap<String, Criteria> getCriterias() {
+        return unmodifiableSortedMap(criterias);
+    }
+    public void setCriterias(SortedMap<String, Criteria> criterias) {
+        this.criterias.clear();
+        if (criterias != null) {
+            this.criterias.putAll(criterias);
+        }
+    }
 
-	public void setResourcePath(String resourcePath) {
-		this.resourcePath = resourcePath;
-	}
+    private final SortedMap<String, FileType> fileTypes = new TreeMap<String, FileType>();
+    public SortedMap<String, FileType> getFileTypes() {
+        return unmodifiableSortedMap(fileTypes);
+    }
+    public void setFileTypes(SortedMap<String, FileType> fileTypes) {
+        this.fileTypes.clear();
+        if (fileTypes != null) {
+            this.fileTypes.putAll(fileTypes);
+        }
+    }
 
-	public AssignmentType[] getAssTypes() {
-		return assTypes.toArray(new AssignmentType[assTypes.size()]);
-	}
+    private final SortedMap<String, TaskType> taskTypes = new TreeMap<String, TaskType>();
+    public SortedMap<String, TaskType> getTaskTypes() {
+        return unmodifiableSortedMap(taskTypes);
+    }
+    public void setTaskTypes(SortedMap<String, TaskType> taskTypes) {
+        this.taskTypes.clear();
+        if (taskTypes != null) {
+            this.taskTypes.putAll(taskTypes);
+        }
+    }
 
-	public void setAssTypes(AssignmentType[] assTypes) {
-		this.assTypes.clear();
-		this.assTypes.addAll(Arrays.asList(assTypes));
-	}
-
-	public Stamp getCreateStamp() {
-		return createStamp;
-	}
-
-	public void setCreateStamp(Stamp createStamp) {
-		this.createStamp = createStamp;
-	}
+    @Override
+    protected String[] pathElems() { return new String[]{id}; }
 }

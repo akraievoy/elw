@@ -37,49 +37,17 @@
 	</bean>
 	<context:component-scan base-package="elw.web"/>
 
-	<bean id="mapper" class="elw.dao.MapperFactory" factory-method="createMapper"/>
-
-	<bean id="adminDao" class="elw.dao.AdminDao">
-		<property name="metaClass" value="elw.vo.Admin"/>
-	</bean>
-	<bean id="fileDao" class="elw.dao.FileDao">
-		<property name="metaClass" value="elw.vo.FileMeta"/>
-	</bean>
-	<bean id="assDao" class="elw.dao.AssDao">
-		<property name="metaClass" value="elw.vo.Assignment"/>
-	</bean>
-	<bean id="courseDao" class="elw.dao.CourseDao">
-		<property name="metaClass" value="elw.vo.Course"/>
-	</bean>
-	<bean id="groupDao" class="elw.dao.GroupDao">
-		<property name="metaClass" value="elw.vo.Group"/>
-	</bean>
-	<bean id="enrollmentDao" class="elw.dao.EnrollDao">
-		<property name="metaClass" value="elw.vo.Enrollment"/>
-	</bean>
-	<bean id="scoreDao" class="elw.dao.ScoreDao">
-		<property name="metaClass" value="elw.vo.Score"/>
-	</bean>
+    <bean id="couchDao" class="elw.dao.CouchDao">
+        <property name="couchUrl" value="http://localhost:5984/"/>
+        <property name="dbName" value="elw-data"/>
+        <property name="username" value="supercow"/>
+        <property name="password" value="typical"/>
+    </bean>
 
 	<bean id="core" class="elw.web.core.Core">
-		<constructor-arg type="elw.dao.CourseDao" ref="courseDao"/>
-		<constructor-arg type="elw.dao.EnrollDao" ref="enrollmentDao"/>
-		<constructor-arg type="elw.dao.FileDao" ref="fileDao"/>
-		<constructor-arg type="elw.dao.GroupDao" ref="groupDao"/>
-		<constructor-arg type="elw.dao.ScoreDao" ref="scoreDao"/>
+		<constructor-arg type="elw.dao.CouchDao" ref="couchDao"/>
 	</bean>
 
-	<bean class="elw.dao.RunnablePollInboxes">
-		<property name="daos">
-			<list>
-				<ref bean="assDao"/>
-				<ref bean="courseDao"/>
-				<ref bean="groupDao"/>
-				<ref bean="enrollmentDao"/>
-				<ref bean="adminDao"/>
-			</list>
-		</property>
-	</bean>
 
 	<bean id="daemonThreadFactory" class="org.akraievoy.gear.G4Run$ThreadFactory">
 		<constructor-arg type="boolean" value="true"/>

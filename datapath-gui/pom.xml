@@ -26,7 +26,7 @@
 					</descriptorRefs>
 					<archive>
 						<manifest>
-							<!--fixme: add the main GUI class -->
+							<!--TODO: add the main GUI class -->
 							<mainClass>fixme</mainClass>
 						</manifest>
 					</archive>

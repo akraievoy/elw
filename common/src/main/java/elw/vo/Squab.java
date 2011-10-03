@@ -15,9 +15,9 @@ import java.util.TreeMap;
  * CouchDB Entity.
  */
 public abstract class Squab {
-    private static final String PATH_SEP = "-";
-    private static final String PATH_SEP_MAX = ".";
-    private static final String PATH_WILD = "*";
+    protected static final String PATH_SEP = "-";
+    protected static final String PATH_SEP_MAX = ".";
+    protected static final String PATH_WILD = "*";
 
     private TreeMap<String, CouchFile> couchFiles = null;
     @JsonProperty("_attachments")
@@ -26,8 +26,8 @@ public abstract class Squab {
     @JsonProperty("_attachments")
     public void setCouchFiles(TreeMap<String, CouchFile> couchFiles) { this.couchFiles = couchFiles; }
 
-    private String couchId = "";
-    private String couchRev = "";
+    protected String couchId = "";
+    protected String couchRev = "";
 
     @JsonProperty("_id")
     @JsonWriteNullProperties(false)
@@ -71,12 +71,16 @@ public abstract class Squab {
     @JsonIgnore
     public Path getCouchPath() {
         if (couchId == null || couchId.length() == 0) {
-            couchId = generateCouchPath().id();
+            couchId = couchPath(pathElems()).id();
         }
         return Path.fromId(couchId);
     }
 
-    protected abstract Path generateCouchPath();
+    protected Path couchPath(String... pathElems) {
+        return new Path(getClass(), pathElems);
+    }
+
+    protected abstract String[] pathElems();
 
     @Override
     public boolean equals(Object o) {
@@ -220,12 +224,24 @@ public abstract class Squab {
      * Same as super, but tracks stamp (millis, base36) as last part of path.
      */
     public static abstract class Stamped extends Squab {
-        private Long stamp = null;
+        protected Long stamp = null;
         public Long getStamp() { return stamp; }
         public void setStamp(Long stamp) { this.stamp = stamp; }
 
+        protected Path couchPath(String... pathElems) {
+            if (stamp == null) {
+                stamp = genStamp();
+            }
+            final String[] elemsWithStamp = new String[pathElems.length + 1];
+            System.arraycopy(pathElems, 0, elemsWithStamp, 0, pathElems.length);
+            elemsWithStamp[elemsWithStamp.length - 1] = Long.toString(stamp, 36);
+            return new Path(getClass(), elemsWithStamp);
+        }
+
         public long updateStamp() {
             this.stamp = genStamp();
+            super.couchId = null;
+            super.couchRev = null;
             return this.stamp;
         }
 
@@ -239,10 +255,10 @@ public abstract class Squab {
 
     //  LATER document which fields are required/provided on PUT and GET
     public static class CouchFile {
-        private byte[] content;
+        private byte[] data;
         @JsonWriteNullProperties(false)
-        public byte[] getContent() { return content; }
-        public void setContent(byte[] content) { this.content = content; }
+        public byte[] getData() { return data; }
+        public void setData(byte[] data) { this.data = data; }
 
         private String contentType;
         @JsonProperty("content_type")
@@ -254,6 +270,11 @@ public abstract class Squab {
         @JsonWriteNullProperties(false)
         public Long getLength() { return length; }
         public void setLength(Long length) { this.length = length; }
+
+        private Long revpos;
+        @JsonWriteNullProperties(false)
+        public Long getRevpos() { return revpos; }
+        public void setRevpos(Long revpos) { this.revpos = revpos; }
 
         private Boolean stub;
         @JsonWriteNullProperties(false)

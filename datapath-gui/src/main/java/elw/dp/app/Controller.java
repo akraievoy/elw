@@ -3,7 +3,6 @@ package elw.dp.app;
 import base.pattern.Result;
 import elw.dp.mips.*;
 import elw.dp.ui.DataPathForm;
-import elw.dp.ui.FeedbackHandler;
 import elw.dp.ui.RendererFactory;
 import org.akraievoy.gear.G;
 import org.slf4j.LoggerFactory;
@@ -17,10 +16,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.*;
+import java.util.Arrays;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 public class Controller implements ControllerSetup, RunnableLoadTask.Callback {
@@ -232,17 +231,17 @@ public class Controller implements ControllerSetup, RunnableLoadTask.Callback {
 	private void job_assemble(final JLabel statusLabel, final Result[] resRef) {
 		setupStatus(statusLabel, "Assembling...");
 
-		final String[] sourceLines = getSource();
+		final java.util.List<String> sourceLines = getSource();
 		final Instruction[] newInstructions = validator.assemble(resRef, sourceLines);
 		if (newInstructions != null) {
 			assembleStamp.set(System.currentTimeMillis());
 		}
 	}
 
-	private String[] getSource() {
+	private java.util.List<String> getSource() {
 		final String source = view.getSourceTextArea().getText();
 		
-		return PATTERN_LINE_SEPARATOR.split(source);
+		return Arrays.asList(PATTERN_LINE_SEPARATOR.split(source));
 	}
 
 	private void job_submit(final JLabel statusLabel, final Result[] resRef, String sourceText) {

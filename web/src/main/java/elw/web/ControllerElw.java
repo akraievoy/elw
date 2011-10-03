@@ -21,17 +21,17 @@ package elw.web;
 import base.pattern.Result;
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
+import com.google.common.io.ByteStreams;
 import com.google.common.io.CharStreams;
 import com.google.common.io.InputSupplier;
+import elw.dao.CouchDao;
 import elw.dao.Ctx;
-import elw.dao.FileDao;
+import elw.dao.Queries;
 import elw.miniweb.Message;
-import elw.vo.Entry;
-import elw.vo.FileMeta;
-import elw.vo.FileSlot;
-import elw.vo.Stamp;
+import elw.vo.*;
 import elw.web.core.Core;
 import elw.web.core.W;
+import org.akraievoy.gear.G4Parse;
 import org.akraievoy.gear.G4mat;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
@@ -44,13 +44,10 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.regex.Pattern;
+import java.util.*;
 
 public abstract class ControllerElw extends MultiActionController implements WebSymbols {
 	private static final Logger log = LoggerFactory.getLogger(ControllerElw.class);
@@ -87,15 +84,16 @@ public abstract class ControllerElw extends MultiActionController implements Web
 			final String pathToRoot
 	) throws IOException;
 
-	protected static interface WebMethodScore {
+    protected static interface WebMethodScore {
 		ModelAndView handleScore(
 				HttpServletRequest req, HttpServletResponse resp,
-				Ctx ctx, FileSlot slot, Entry<FileMeta> file, Stamp stamp,
+				Ctx ctx, FileSlot slot, Solution file, Long stamp,
 				Map<String, Object> model
 		) throws IOException;
 	}
 
-	protected ModelAndView wmScore(
+	//  FIXME some of file VT parameters are broken
+    protected ModelAndView wmScore(
 			HttpServletRequest req, HttpServletResponse resp,
 			final String pathToRoot, final WebMethodScore wm
 	) throws IOException {
@@ -116,7 +114,7 @@ public abstract class ControllerElw extends MultiActionController implements Web
 			return null;
 		}
 
-		final FileSlot slot = ctx.getAssType().findSlotById(slotId);
+        final FileSlot slot = ctx.getAssType().getFileSlots().get(slotId);
 		if (slot == null) {
 			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "slot for id " + slotId + " not found");
 			return null;
@@ -128,13 +126,13 @@ public abstract class ControllerElw extends MultiActionController implements Web
 			return null;
 		}
 
-		final Entry<FileMeta> file = core.getFileDao().findFileFor(FileDao.SCOPE_STUD, ctx, slotId, fileId);
+		final Solution file = core.getQueries().solution(ctx, slotId, fileId);
 		if (file == null) {
 			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "file for id " + fileId + " not found");
 			return null;
 		}
 
-		final Stamp stamp = W.parseStamp(req, "stamp");
+		final Long stamp = G4Parse.parse(req.getParameter("stamp"), (Long) null);
 
 		return wm.handleScore(req, resp, ctx, slot, file, stamp, model);
 	}
@@ -219,22 +217,12 @@ public abstract class ControllerElw extends MultiActionController implements Web
 				return null;
 			}
 
-			if (FileDao.SCOPE_ASS_TYPE.equals(scope)) {
-				if (!ctx.resolved(Ctx.STATE_CT)) {
-					resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "context path problem, please check the logs");
-					return null;
-				}
-			} else if (FileDao.SCOPE_ASS.equals(scope)) {
-				if (!ctx.resolved(Ctx.STATE_CTA)) {
-					resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "context path problem, please check the logs");
-					return null;
-				}
-			} else if (FileDao.SCOPE_VER.equals(scope)) {
+            if (Attachment.SCOPE.equals(scope)) {
 				if (!ctx.resolved(Ctx.STATE_CTAV)) {
 					resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "context path problem, please check the logs");
 					return null;
 				}
-			} else if (FileDao.SCOPE_STUD.equals(scope)) {
+			} else if (Solution.SCOPE.equals(scope)) {
 				if (!ctx.resolved(Ctx.STATE_EGSCIV)) {
 					resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "context path problem, please check the logs");
 					return null;
@@ -250,7 +238,7 @@ public abstract class ControllerElw extends MultiActionController implements Web
 				return null;
 			}
 
-			final FileSlot slot = ctx.getAssType().findSlotById(slotId);
+            final FileSlot slot = ctx.getAssType().getFileSlots().get(slotId);
 			if (slot == null) {
 				resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "slot '" + slotId + "' not found");
 				return null;
@@ -261,125 +249,154 @@ public abstract class ControllerElw extends MultiActionController implements Web
 
 		protected abstract ModelAndView handleFile(String scope, FileSlot slot) throws IOException;
 
-		protected void retrieveFile(FileSlot slot, Entry<FileMeta> entry) throws IOException {
-			boolean binary = slot.isBinary() || entry.getMeta().isBinary();
+		protected void retrieveFile(FileBase fileBase, final CouchDao couchDao) throws IOException {
+            final FileType fileType = IdNamed._.one(fileBase.getFileType());
+            final String contentType;
+            if (!fileType.getContentTypes().isEmpty()) {
+                contentType = fileType.getContentTypes().get(0);
+            } else {
+                contentType = fileType.isBinary() ? "binary/octet-stream" : "text/plain";
+            }
 
-			try {
-				if (binary) {
-					resp.setContentType(entry.getMeta().getContentType());
-					resp.setContentLength((int) (entry.getFileBinary()).length());
-					resp.setHeader("Content-Disposition", "attachment;");
+            if (fileType.isBinary()) {
+                resp.setContentType(contentType);
+            } else {
+                resp.setContentType(contentType+ "; charset=UTF-8");
+                resp.setCharacterEncoding("UTF-8");
+            }
 
-					final BufferedInputStream bis = entry.openBinaryStream();
-					final ServletOutputStream os = resp.getOutputStream();
+            resp.setContentLength(fileBase.getCouchFile(FileBase.CONTENT).getLength().intValue());
+            resp.setHeader("Content-Disposition", "attachment;");
 
-					final byte[] buf = new byte[32768];
-					int numRead;
-					while ((numRead = bis.read(buf, 0, buf.length)) > 0) {
-						os.write(buf, 0, numRead);
-					}
-				} else {
-					resp.setCharacterEncoding("UTF-8");
-					resp.setContentType(entry.getMeta().getContentType()+ "; charset=UTF-8");
-					resp.setContentLength((int) (entry.getFileText()).length());
-					resp.setHeader("Content-Disposition", "attachment;");
-
-					//	copy the data with the original line breaks (we've set the content-length header)
-					//	LATER we should recode the data in some cases
-					final BufferedReader reader = entry.openTextReader();
-					final PrintWriter writer = resp.getWriter();
-
-					final char[] buf = new char[16384];
-					int numRead;
-					while ((numRead = reader.read(buf, 0, buf.length)) > 0) {
-						writer.write(buf, 0, numRead);
-					}
-				}
-			} finally {
-				entry.closeStreams();
-			}
+            ByteStreams.copy(couchDao.file(fileBase, FileBase.CONTENT), resp.getOutputStream());
 		}
 
 		public ModelAndView storeFile(
-				String scope, FileSlot slot, String refreshUri, String failureUri, String authorName, FileDao fileDao
-		) throws IOException {
+                FileSlot slot, String refreshUri, String failureUri, String authorName,
+                Queries queries, final FileBase file
+        ) throws IOException {
+            //  FIXME upload page should contain full listing of validation rules
+            final SortedMap<String, FileType> allTypes = slot.getFileTypes();
+            final SortedMap<String, FileType> validTypes = new TreeMap<String, FileType>(allTypes);
 			final boolean put = "PUT".equalsIgnoreCase(req.getMethod());
 			final int length = req.getContentLength();
 
-			if (length == -1 || length > slot.getLengthLimit()) {
-				final String message;
-				if (length == -1) {
-					message = "upload size not reported";
-				} else {
-					message = "upload exceeds " + G4mat.formatMem(slot.getLengthLimit());
-				}
-				if (put) {
-					resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
-				} else {
-					Message.addWarn(req, message);
-					resp.sendRedirect(failureUri);
-				}
-				return null;
-			}
+            file.setAuthor(authorName);
+            file.setSourceAddress(W.resolveRemoteAddress(req));
 
-			FileMeta file = new FileMeta();
-			file.setAuthor(authorName);
-			file.setSourceAddress(W.resolveRemoteAddress(req));
-
+            InputSupplier<? extends InputStream> inputSupplier = null;
+            String contentType = null;
 			if (put) {
-				final Result result = fileDao.createFileFor(scope, ctx, slot, file, length, supplierForRequest(req));
-				if (!result.isSuccess()) {
-					resp.sendError(HttpServletResponse.SC_BAD_REQUEST, result.getMessage());
-				}
-				return null;
-			}
+                //  FIXME remove this extra variant with non-encoded put uploads
+                inputSupplier = supplierForRequest(req);
+                contentType = "text/plain";
+                file.setName("upload.txt");
+            } else {
+                try {
+                    final ServletFileUpload sfu = new ServletFileUpload(fileItemFactory);
+                    final FileItemIterator fii = sfu.getItemIterator(req);
+                    while (fii.hasNext()) {
+                        final FileItemStream item = fii.next();
+                        if (item.isFormField()) {
+                            if ("comment".equals(item.getFieldName())) {
+                                file.setComment(fieldText(item));
+                            }
+                            continue;
+                        }
 
-			try {
-				final ServletFileUpload sfu = new ServletFileUpload(fileItemFactory);
-				final FileItemIterator fii = sfu.getItemIterator(req);
-				while (fii.hasNext()) {
-					final FileItemStream item = fii.next();
-					if (item.isFormField()) {
-						if ("comment".equals(item.getFieldName())) {
-							file.setComment(fieldText(item));
-						}
-						continue;
-					}
+                        file.setName(Strings.nullToEmpty(extractNameFromPath(item)));
+                        contentType = item.getContentType();
+                        inputSupplier = supplierForFileItem(item);
+                        //  TODO find length of this particular item, if implied by protocol
+                        break;
+                    }
+                } catch (FileUploadException e) {
+                    throw new IOException(e);
+                }
+                if (inputSupplier == null) {
+                    return fail(put, failureUri, "File being uploaded not found in the form");
+                }
+                if (contentType == null) {
+                    return fail(put, failureUri, "Content Type not reported in upload");
+                }
+            }
 
-					file.setName(Strings.nullToEmpty(FileMeta.extractNameFromPath(item.getName())));
-					if (!Pattern.compile(slot.getNameRegex()).matcher(file.getName().toLowerCase()).matches()) {
-						Message.addWarn(req, "check the file name: regex check failed");
-						resp.sendRedirect(failureUri);
-						return null;
-					}
+            if (length == -1) {
+                final String message = "Upload size not reported";
+                return fail(put, failureUri, message);
+            }
+            FileType._.filterByLength(validTypes, length);
+            if (validTypes.isEmpty()) {
+                return fail(put, failureUri, "Size " + G4mat.formatMem(length) + " exceeds size limits");
+            }
+            FileType._.filterByName(validTypes, file.getName().toLowerCase());
+            if (validTypes.isEmpty()) {
+                return fail(put, failureUri, "File name failed all regex checks");
+            }
+            if (validTypes.size() > 1) {
+                Message.addWarn(req, "More than one valid file type left: " + validTypes.keySet());
+            }
+            final FileType fileType = validTypes.get(validTypes.firstKey());
+            if (!fileType.getContentTypes().contains(Strings.nullToEmpty(contentType))) {
+                Message.addWarn(req, "contentType '" + contentType + "': not listed in the file type");
+            }
+            file.setFileType(IdNamed._.singleton(fileType));
+            if (!fileType.isBinary()) {
+                if (length > FileBase.DETECT_SIZE_LIMIT) {
+                    return fail(put, failureUri, "Non-binary file is too big for content check");
+                }
+                final byte[] bytes = ByteStreams.toByteArray(inputSupplier);
+                //	implemented as per this SO answer:
+                //	http://stackoverflow.com/questions/277521/identify-file-binary/277568#277568
+                for (byte b : bytes) {
+                    if (b >= 0 && b < 9 || b > 13 && b < 32) {
+                        return fail(put, failureUri, "Non-binary file contains binary data");
+                    }
+                }
+                inputSupplier = ByteStreams.newInputStreamSupplier(bytes);
+            }
 
-					file.setContentType(Strings.nullToEmpty(item.getContentType()));
-					if (!slot.getContentTypes().contains(file.getContentType().toLowerCase())) {
-						Message.addWarn(req, "contentType '" + file.getContentType() + "': not listed in the slot");
-					}
+            //  TODO validate headers and binary content here
 
-					final Result result = fileDao.createFileFor(
-							scope, ctx, slot, file, length, supplierForFileItem(item)
-					);
-					Message.addResult(req, result);
-					if (result.isSuccess()) {
-						resp.sendRedirect(refreshUri);
-					} else {
-						resp.sendRedirect(failureUri);
-					}
-
-					return null;
-				}
-			} catch (FileUploadException e) {
-				throw new IOException(e);
-			}
-
-			Message.addWarn(req, "No files in upload");
-			resp.sendRedirect(failureUri);
-			return null;
+            final Result result = queries.createFile(ctx, slot, file, inputSupplier, contentType);
+            if (result.isSuccess()) {
+                return succeed(put, refreshUri, result);
+            } else {
+                return fail(put, failureUri, result.getMessage());
+            }
 		}
 
-		protected static String fieldText(final FileItemStream item) throws IOException {
+        protected static String extractNameFromPath(FileItemStream item) {
+            final String name = item.getName();
+            if (name == null) {
+                return null;
+            }
+
+            final int lastSlash = Math.max(name.lastIndexOf("\\"), name.lastIndexOf("/"));
+            final String fName = lastSlash >= 0 ? name.substring(lastSlash + 1) : name;
+
+            return fName;
+        }
+
+        protected ModelAndView succeed(boolean put, String refreshUri, Result result) throws IOException {
+            if (!put) {
+                Message.addResult(req, result);
+                resp.sendRedirect(refreshUri);
+            }
+            return null;
+        }
+
+        protected ModelAndView fail(boolean put, String failureUri, String message) throws IOException {
+            if (put) {
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
+            } else {
+                Message.addWarn(req, message);
+                resp.sendRedirect(failureUri);
+            }
+            return null;
+        }
+
+        protected static String fieldText(final FileItemStream item) throws IOException {
 			return CharStreams.toString(CharStreams.newReaderSupplier(supplierForFileItem(item), Charsets.UTF_8));
 		}
 	}

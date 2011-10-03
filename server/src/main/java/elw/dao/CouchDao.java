@@ -1,6 +1,11 @@
 package elw.dao;
 
+import com.google.common.base.Charsets;
+import com.google.common.base.Supplier;
 import com.google.common.collect.MapMaker;
+import com.google.common.io.ByteStreams;
+import com.google.common.io.CharStreams;
+import com.google.common.io.InputSupplier;
 import elw.vo.*;
 import org.apache.commons.codec.binary.Base64;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -10,6 +15,7 @@ import java.io.*;
 import java.lang.Class;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
@@ -22,11 +28,25 @@ public class CouchDao {
     {
         mapper.getSerializationConfig().enable(SerializationConfig.Feature.INDENT_OUTPUT);
     }
-    //  FIXME config
-    protected String urlCouch = "http://localhost:5984/";
-    private String urlDatabase = urlCouch +"elw-data/";
 
-    private final MapMaker caches = new MapMaker().concurrencyLevel(3).expireAfterWrite(10L, TimeUnit.MINUTES);
+    protected String couchUrl = "http://localhost:5984/";
+    public void setCouchUrl(String couchUrl) {
+        if (!couchUrl.endsWith("/")) {
+            throw new IllegalArgumentException("couchUrl '" + couchUrl + "' must end with '/'");
+        }
+        this.couchUrl = couchUrl;
+    }
+
+    protected String dbName = "elw-data";
+    public void setDbName(String dbName) { this.dbName = dbName; }
+
+    protected String username = "supercow";
+    public void setPassword(String password) { this.password = password; }
+
+    protected String password = "typical";
+    public void setUsername(String username) { this.username = username; }
+
+    private final MapMaker caches = new MapMaker().concurrencyLevel(3).expireAfterWrite(1L, TimeUnit.MINUTES);
     private final ConcurrentMap<Squab.Path, List<Squab.Path>> cachePaths = caches.makeMap();
     private final ConcurrentMap<Squab.Path, List<List<String>>> cacheAxes = caches.makeMap();
     private final ConcurrentMap<Squab.Path, List<? extends Squab>> cacheSquabs = caches.makeMap();
@@ -35,12 +55,7 @@ public class CouchDao {
     private static final SortedMap<Long, ? extends Squab.Stamped> EMPTY_MAP =
             Collections.unmodifiableSortedMap(new TreeMap<Long,Squab.Stamped>());
 
-    public CouchDao() {
-    }
-
-    public void setUrlDatabase(String urlDatabase) {
-        this.urlDatabase = urlDatabase;
-    }
+    public CouchDao() { /* nothing to do here */ }
 
     protected void invalidate(Squab.Path path) {
         invalidate_(path, cacheAxes.keySet());
@@ -58,7 +73,6 @@ public class CouchDao {
     }
 
     //  Squab
-
     public Long update(Squab squab) {
         Long stamp = null;
         if (squab instanceof Squab.Stamped) {
@@ -80,6 +94,28 @@ public class CouchDao {
             );
         }
         return all.get(0);
+    }
+
+    public InputSupplier<InputStream> file(final Squab squab, String fileName) {
+        return couchFileGet(squab.getCouchPath(), fileName);
+    }
+
+    public byte[] fileBytes(final Squab squab, String fileName) throws IOException {
+        return ByteStreams.toByteArray(couchFileGet(squab.getCouchPath(), fileName));
+    }
+
+    public List<String> fileLines(final Squab squab, String fileName) throws IOException {
+        return CharStreams.readLines(CharStreams.newReaderSupplier(
+                couchFileGet(squab.getCouchPath(), fileName),
+                Charsets.UTF_8
+        ));
+    }
+
+    public String fileText(final Squab squab, String fileName) throws IOException {
+        return CharStreams.toString(CharStreams.newReaderSupplier(
+                couchFileGet(squab.getCouchPath(), fileName),
+                Charsets.UTF_8
+        ));
     }
 
     public <S extends Squab> S findSome(final Class<S> squabClass, String... path) {
@@ -170,7 +206,7 @@ public class CouchDao {
             }
             boolean afterWild = false;
             boolean matches = true;
-            for (int i = 0; i < rowPath.len(); i++) {
+            for (int i = 0; i < fullPath.len(); i++) {
                 //  path may have some wilds in the middle, so we have to filter even after couch range-query
                 afterWild |= i > 0 && fullPath.elem(i - 1) == null;
                 if (afterWild && i < fullPath.len() && fullPath.elem(i) != null && !fullPath.elem(i).equals(rowPath.elem(i))) {
@@ -191,7 +227,6 @@ public class CouchDao {
     }
 
     //  Squab.Stamped
-
     public <S extends Squab.Stamped> S findLast(Class<S> squabClass, String... path) {
         final SortedMap<Long, S> timeToSquab = findAllStamped(squabClass, path);
         return timeToSquab.isEmpty() ? null : timeToSquab.get(timeToSquab.lastKey());
@@ -249,14 +284,14 @@ public class CouchDao {
     }
 
     //  Couch HTTP
-
     protected Squab.RespViewList couchList(Squab.Path path) {
         URL url;
         HttpURLConnection connection = null;
         try {
-            url = new URL(urlDatabase + "_all_docs/?" +
-                    "startkey=\"" + path.rangeMin() + "\"&" +
-                    "endkey=\"" + path.rangeMax() + "\""
+            url = new URL(couchUrl +
+                    dbName + "/" + "_all_docs/?" +
+                    "startkey=\"" + URLEncoder.encode(path.rangeMin(), "UTF-8") + "\"&" +
+                    "endkey=\"" + URLEncoder.encode(path.rangeMax(), "UTF-8") + "\""
             );
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
@@ -283,7 +318,7 @@ public class CouchDao {
         URL url;
         HttpURLConnection connection = null;
         try {
-            url = new URL(urlDatabase + path.id());
+            url = new URL(couchUrl + dbName + "/" + URLEncoder.encode(path.id(), "UTF-8"));
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             connection.setUseCaches(true);
@@ -305,6 +340,38 @@ public class CouchDao {
         }
     }
 
+    public InputSupplier<InputStream> couchFileGet(Squab.Path path, final String fileName) {
+        final URL url;
+        try {
+            url = new URL(
+                    couchUrl +
+                    dbName + "/" +
+                    URLEncoder.encode(path.id(), "UTF-8") + "/" +
+                    URLEncoder.encode(fileName, "UTF-8")
+            );
+
+            return new InputSupplier<InputStream>() {
+                public InputStream getInput() throws IOException {
+                    final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                    connection.setRequestMethod("GET");
+                    connection.setUseCaches(true);
+                    connection.setDoInput(true);
+                    connection.setDoOutput(false);
+
+                    return new FilterInputStream(connection.getInputStream()) {
+                        @Override
+                        public void close() throws IOException {
+                            connection.disconnect();
+                            super.close();
+                        }
+                    };
+                }
+            };
+        } catch (IOException e) {
+            throw new IllegalStateException("failed to construct URL", e);
+        }
+    }
+
     protected void couchPut(String couchId, Squab squab) {
         HttpURLConnection connection = null;
 
@@ -313,7 +380,7 @@ public class CouchDao {
             final String squabJSON = mapper.writeValueAsString(squab);
 
             //Create connection
-            url = new URL(urlDatabase + couchId);
+            url = new URL(couchUrl + dbName + "/" + URLEncoder.encode(couchId, "UTF-8"));
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("PUT");
             connection.setRequestProperty(
@@ -327,16 +394,16 @@ public class CouchDao {
             connection.addRequestProperty(
                     "Authorization",
                     //  some newline lurked in
-                    "Basic " + Base64.encodeBase64String(("supercow" + ":" + "typical").getBytes()).trim()
+                    "Basic " + Base64.encodeBase64String((username + ":" + password).getBytes()).trim()
             );
             connection.setUseCaches(false);
             connection.setDoInput(true);
             connection.setDoOutput(true);
 
-            DataOutputStream dos = new DataOutputStream(connection.getOutputStream());
-            dos.writeBytes(squabJSON);
-            dos.flush();
-            dos.close();
+            BufferedOutputStream bos = new BufferedOutputStream(connection.getOutputStream());
+            bos.write(squabJSON.getBytes(Charsets.UTF_8));
+            bos.flush();
+            bos.close();
 
             final InputStream is = connection.getInputStream();
             final Squab.RespUpdate update =

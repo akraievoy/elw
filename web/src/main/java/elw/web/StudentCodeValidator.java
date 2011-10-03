@@ -20,6 +20,7 @@ package elw.web;
 
 import base.pattern.Result;
 import elw.dao.*;
+import elw.dao.Ctx;
 import elw.dp.mips.MipsValidator;
 import elw.dp.mips.TaskBean;
 import elw.vo.*;
@@ -27,35 +28,25 @@ import org.akraievoy.gear.G4Run;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 
 public class StudentCodeValidator extends G4Run.Task {
 	private static final Logger log = LoggerFactory.getLogger(StudentCodeValidator.class);
 
 	private int periodMillis = 300000;
-	private final EnrollDao enrollDao;
-	private final GroupDao groupDao;
-	private final CourseDao courseDao;
-	private final ScoreDao scoreDao;
-	private final FileDao fileDao;
+	private final CouchDao couchDao;
+    private final Queries q;
 	private final MipsValidator validator;
 
 	public StudentCodeValidator(
-			ScheduledExecutorService executor,
-			EnrollDao enrollDao, GroupDao groupDao,
-			CourseDao courseDao, ScoreDao scoreDao, FileDao fileDao) {
+            ScheduledExecutorService executor,
+            CouchDao couchDao) {
 		super(executor);
-		this.enrollDao = enrollDao;
-		this.groupDao = groupDao;
-		this.courseDao = courseDao;
-		this.scoreDao = scoreDao;
-		this.fileDao = fileDao;
+		this.couchDao = couchDao;
 		this.validator = new MipsValidator();
+        this.q = new Queries(couchDao);
 	}
 
 	public void setPeriodMillis(int periodMillis) {
@@ -71,12 +62,12 @@ public class StudentCodeValidator extends G4Run.Task {
 	}
 
 	protected void runInternal() throws Throwable {
-		final Enrollment[] enrs = enrollDao.findAllEnrollments();
+		final List<Enrollment> enrs = q.enrollments();
 		for (Enrollment enr : enrs) {
 			final Ctx ctxEnr;
 			{
-				final Course course = courseDao.findCourse(enr.getCourseId());
-				final Group group = groupDao.findGroup(enr.getGroupId());
+                final Course course = q.course(enr.getCourseId());
+				final Group group = q.group(enr.getGroupId());
 				ctxEnr = Ctx.forEnr(enr).extendCourse(course).extendGroup(group);
 			}
 
@@ -84,8 +75,7 @@ public class StudentCodeValidator extends G4Run.Task {
 				continue;
 			}
 
-			final Student[] students = ctxEnr.getGroup().getStudents();
-			for (Student student : students) {
+            for (Student student : ctxEnr.getGroup().getStudents().values()) {
 				final Ctx ctxStud = ctxEnr.extendStudent(student);
 				for (int index = 0; index < enr.getIndex().size(); index++) {
 					final Ctx ctxVer = ctxStud.extendIndex(index);
@@ -94,9 +84,9 @@ public class StudentCodeValidator extends G4Run.Task {
 					}
 
 					final String slotId = "code";
-					final Entry<FileMeta>[] files = fileDao.findFilesFor(FileDao.SCOPE_STUD, ctxVer, slotId);
-					for (Entry<FileMeta> f : files) {
-						if (f.getMeta().getValidatorStamp() > 0 && f.getMeta().getScore() != null) {
+					final List<Solution> files = q.solutions(ctxVer, slotId);
+					for (Solution f : files) {
+						if (f.getValidatorStamp() > 0 && f.getScore() != null) {
 							continue;
 						}
 
@@ -104,39 +94,39 @@ public class StudentCodeValidator extends G4Run.Task {
 						try {
 							final Result[] resRef = {new Result("unknown", false)};
 							final int[] passFailCounts = new int[2];
-							final Entry<FileMeta>[] allStatements = fileDao.findFilesFor(FileDao.SCOPE_VER, ctxVer, "statement");
-							final Entry<FileMeta>[] allTests = fileDao.findFilesFor(FileDao.SCOPE_VER, ctxVer, "test");
-							final String[] allTestsStr = new String[allTests.length];
-							for (int i = 0; i < allTestsStr.length; i++) {
-								allTestsStr[i] = allTests[i].getText();
+							final List<Attachment> allStatements = q.attachments(ctxVer, "statement");
+							final List<Attachment> allTests = q.attachments(ctxVer, "test");
+							final List<String> allTestsStr = new ArrayList<String>();
+							for (int i = 0; i < allTestsStr.size(); i++) {
+								allTestsStr.add(couchDao.fileText(allTests.get(i), FileBase.CONTENT));
 							}
 							final TaskBean taskBean = new TaskBean(
-									allStatements[allStatements.length - 1].getText(),
-									Arrays.asList(allTestsStr),
+									couchDao.fileText(allStatements.get(allStatements.size() - 1), FileBase.CONTENT),
+									allTestsStr,
 									""
 							);
-							validator.batch(resRef, taskBean, f.getText().split("\r\n|\r|\n"), passFailCounts);
-							f.getMeta().setTestsFailed(passFailCounts[1]);
-							f.getMeta().setTestsPassed(passFailCounts[0]);
+							validator.batch(resRef, taskBean, couchDao.fileLines(f, FileBase.CONTENT), passFailCounts);
+							f.setTestsFailed(passFailCounts[1]);
+							f.setTestsPassed(passFailCounts[0]);
 
-							score = ScoreDao.updateAutos(ctxVer, slotId, f, null);
+                            score = Queries.updateAutos(ctxVer, slotId, f, null);
 							final boolean passed = passFailCounts[1] == 0 && passFailCounts[0] > 0;
 							if (passed) {
 								score.setApproved(passed);
 							}
 						} catch (Throwable t) {
-							log.warn("exception while validating {} / {}", ctxVer, f.getMeta().getCreateStamp());
+							log.warn("exception while validating {} / {} / {}", new Object[] {ctxVer, f.getId(), f.getStamp()});
 						} finally {
-							f.getMeta().setValidatorStamp(System.currentTimeMillis());
-							f.closeStreams();
+							f.setValidatorStamp(System.currentTimeMillis());
 						}
 
 						if (score != null) {
 							try {
-								fileDao.update(new Path(f.getMeta().getPath()), f.getMeta(), null, null);
-								scoreDao.createScore(ctxVer, slotId, f.getMeta().getId(), score);
-							} catch (IOException t) {
-								log.warn("exception while storing update {} / {}", ctxVer, f.getMeta().getCreateStamp());
+                                couchDao.update(f);
+                                score.setupPathElems(ctxVer, ctxVer.getAssType().getFileSlots().get(slotId), f);
+								couchDao.update(score);
+							} catch (Throwable t) {
+								log.warn("exception while storing update {} / {} / {}", new Object[] {ctxVer, f.getId(), f.getStamp()});
 							}
 						}
 					}

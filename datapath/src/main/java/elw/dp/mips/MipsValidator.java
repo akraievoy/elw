@@ -37,7 +37,7 @@ public class MipsValidator {
 		this.runSteps = runSteps;
 	}
 
-	public Instruction[] assemble(Result[] resRef, String[] sourceLines) {
+	public Instruction[] assemble(Result[] resRef, List<String> sourceLines) {
 		final Instruction[] newInstructions = assembler.loadInstructions(sourceLines, resRef, labelIndex);
 
 		if (resRef[0].isSuccess()) {
@@ -185,7 +185,7 @@ public class MipsValidator {
 		Result.success(log, resRef, "Test Passed Register Spec");
 	}
 
-	public void run(Result[] resRef, final String test, final String[] code) {
+	public void run(Result[] resRef, final String test, final List<String> code) {
 		assemble(resRef, code);
 		if (resRef[0].isSuccess()) {
 			loadTest(resRef, test);
@@ -200,7 +200,7 @@ public class MipsValidator {
 		}
 	}
 
-	public void batch(Result[] resRef, final TaskBean task, final String[] code, final int[] passFailCounts) {
+	public void batch(Result[] resRef, final TaskBean task, final List<String> code, final int[] passFailCounts) {
 		int failCount = 0;
 		List<String> tests = task.getTests();
 		for (int i = 0, testsLength = tests.size(); i < testsLength; i++) {

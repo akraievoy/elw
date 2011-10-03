@@ -18,14 +18,21 @@
 
 package elw.vo;
 
-public class Admin extends IdNameStamped {
-	private String password;
+public class Admin extends Squab implements IdNamed {
+    private String id;
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
 
-	public String getPassword() {
-		return password;
-	}
+    private String name;
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
+    private String password;
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
+
+    @Override
+    protected String[] pathElems() {
+        return new String[] {id};
+    }
 }
