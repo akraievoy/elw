@@ -17,6 +17,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import static elw.vo.IdNamed._.*;
+import static elw.vo.IdNamed._.resolve;
 
 public class Queries {
     private static final Logger log = LoggerFactory.getLogger(Queries.class);
@@ -30,8 +31,6 @@ public class Queries {
     public CouchDao getCouchDao() {
         return couchDao;
     }
-
-    //  FIXME resolve Solution.file from Course.fileTypes
 
     public Group group(final String groupId) {
         final Group group = couchDao.findOne(Group.class, groupId);
@@ -48,7 +47,8 @@ public class Queries {
                 ctxVer.getVer().getId(),
                 slotId
         );
-        return attachments;
+
+        return resolveFileType(ctxVer, attachments);
     }
 
     public Attachment attachment(Ctx ctxVer, final String slotId, final String id) {
@@ -61,7 +61,8 @@ public class Queries {
                 slotId,
                 id
         );
-        return attachment;
+
+        return resolveFileType(ctxVer, attachment);
     }
 
     public SortedMap<String, List<Solution>> solutions(Ctx ctx) {
@@ -73,7 +74,7 @@ public class Queries {
     }
 
     public List<Solution> solutions(Ctx ctx, final String slotId) {
-        return couchDao.findAll(
+        final List<Solution> solutions = couchDao.findAll(
                 Solution.class,
                 ctx.getGroup().getId(),
                 ctx.getStudent().getId(),
@@ -84,10 +85,12 @@ public class Queries {
                 ctx.getVer().getId(),
                 slotId
         );
+
+        return resolveFileType(ctx, solutions);
     }
 
     public Solution solution(Ctx ctx, String slotId, String fileId) {
-        return couchDao.findLast(
+        final Solution solution = couchDao.findLast(
                 Solution.class,
                 ctx.getGroup().getId(),
                 ctx.getStudent().getId(),
@@ -99,6 +102,23 @@ public class Queries {
                 slotId,
                 fileId
         );
+
+        return resolveFileType(ctx, solution);
+    }
+
+    protected static <F extends FileBase> List<F> resolveFileType(Ctx ctx, List<F> files) {
+        for (F file : files) {
+            resolveFileType(ctx, file);
+        }
+        return files;
+    }
+
+    protected static <F extends FileBase> F resolveFileType(Ctx ctx, F file) {
+        file.setFileType(resolve(
+                new TreeMap<String, FileType>(file.getFileType()),
+                ctx.getCourse().getFileTypes()
+        ));
+        return file;
     }
 
     //	TODO jackson hacks to forfeit content-length reporting to ensure in-place streaming
@@ -123,7 +143,7 @@ public class Queries {
 
             //  there's  no need to store full file type object, it's easily resolved on-load
             final TreeMap<String, FileType> emptyMap = new TreeMap<String, FileType>();
-            emptyMap.put(IdNamed._.one(emptyMap).getId(), null);
+            emptyMap.put(IdNamed._.one(file.getFileType()).getId(), null);
             file.setFileType(emptyMap);
 
             couchDao.update(file);
