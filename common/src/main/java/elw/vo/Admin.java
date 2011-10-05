@@ -18,6 +18,7 @@
 
 package elw.vo;
 
+//  FIXME this plain-text password stored in the couch is... well.. LAME
 public class Admin extends Squab implements IdNamed {
     private String id;
     public String getId() { return id; }

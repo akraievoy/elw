@@ -18,68 +18,65 @@
 
 package elw.web.core;
 
-import elw.vo.*;
-
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
 import java.util.Map;
 
 public class W {
-	public static void storeFilter(HttpServletRequest req, Map<String, Object> model) {
-		final Map params = req.getParameterMap();
-		for (Object o : params.keySet()) {
-			String paramName = (String) o;
-			if (paramName.startsWith("f_")) {
-				final String value = req.getParameter(paramName);
-				if (value != null && value.length() > 0) {
-					model.put(paramName, value);
-				}
-			}
-		}
-	}
+    public static void storeFilter(HttpServletRequest req, Map<String, Object> model) {
+        final Map params = req.getParameterMap();
+        for (Object o : params.keySet()) {
+            String paramName = (String) o;
+            if (paramName.startsWith("f_")) {
+                final String value = req.getParameter(paramName);
+                if (value != null && value.length() > 0) {
+                    model.put(paramName, value);
+                }
+            }
+        }
+    }
 
-	public static String resolveRemoteAddress(HttpServletRequest req) {
-		final String remoteAddr = req.getRemoteAddr();
+    public static String resolveRemoteAddress(HttpServletRequest req) {
+        final String remoteAddr = req.getRemoteAddr();
 
-		final String xff = req.getHeader("X-Forwarded-For");
-		if (xff != null && xff.trim().length() > 0) {
-			return xff.replaceAll("\\s+", "").split(",")[0];
-		}
+        final String xff = req.getHeader("X-Forwarded-For");
+        if (xff != null && xff.trim().length() > 0) {
+            return xff.replaceAll("\\s+", "").split(",")[0];
+        }
 
-		return remoteAddr;
-	}
+        return remoteAddr;
+    }
 
-	public static boolean excluded(Object filterValue, String actualValue) {
-		if (!(filterValue instanceof String)) {
-			return false;
-		}
-		return ((String) filterValue).trim().length() > 0 && !filterValue.equals(actualValue);
-	}
+    public static boolean excluded(Object filterValue, String actualValue) {
+        if (!(filterValue instanceof String)) {
+            return false;
+        }
+        return ((String) filterValue).trim().length() > 0 && !filterValue.equals(actualValue);
+    }
 
-	public static void filterDefault(Map<String, Object> model, String fKey, String fDefault) {
-		if (model.get(fKey) == null || model.get(fKey).toString().trim().length() == 0) {
-			model.put(fKey, fDefault);
-		}
-	}
+    public static void filterDefault(Map<String, Object> model, String fKey, String fDefault) {
+        if (model.get(fKey) == null || model.get(fKey).toString().trim().length() == 0) {
+            model.put(fKey, fDefault);
+        }
+    }
 
-	public static boolean excluded(String aTypeSlotFilter, String typeId, String slotId) {
-		if (aTypeSlotFilter == null) {
-			return false;
-		}
+    public static boolean excluded(String aTypeSlotFilter, String typeId, String slotId) {
+        if (aTypeSlotFilter == null) {
+            return false;
+        }
 
-		final String typeSlotExpr = typeId + "--" + slotId + "--";
-		return !typeSlotExpr.startsWith(aTypeSlotFilter);
-	}
+        final String typeSlotExpr = typeId + "--" + slotId + "--";
+        return !typeSlotExpr.startsWith(aTypeSlotFilter);
+    }
 
     public static LogFilter parseFilter(HttpServletRequest req) {
-		final String due = req.getParameter("f_due");
-		final boolean latest = "true".equals(req.getParameter("f_latest"));
-		final String slotId = req.getParameter("f_slotId");
-		final String verId = req.getParameter("f_verId");
-		final String studId = req.getParameter("f_studId");
-		final String mode = req.getParameter("f_mode");
-		final String scope = req.getParameter("f_scope");
-		final LogFilter logFilter = new LogFilter(slotId, studId, verId, due == null ? "any" : due, mode == null ? "s" : mode, scope == null ? "s--opd--" : scope, latest);
-		return logFilter;
-	}
+        final String due = req.getParameter("f_due");
+        final boolean latest = "true".equals(req.getParameter("f_latest"));
+        final String slotId = req.getParameter("f_slotId");
+        final String verId = req.getParameter("f_verId");
+        final String studId = req.getParameter("f_studId");
+        final String mode = req.getParameter("f_mode");
+        final String scope = req.getParameter("f_scope");
+        final LogFilter logFilter = new LogFilter(slotId, studId, verId, due == null ? "any" : due, mode == null ? "s" : mode, scope == null ? "s--opd--" : scope, latest);
+        return logFilter;
+    }
 }

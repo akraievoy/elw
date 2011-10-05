@@ -14,23 +14,23 @@ public class Version implements IdNamed {
     private boolean shared = false;
     public boolean isShared() { return shared; }
     public void setShared(boolean shared) { this.shared = shared; }
+    
+    private Map<String, List<Solution>> files = new TreeMap<String, List<Solution>>();
+    private List<Solution> getFiles(final String slotId) {
+        final List<Solution> filesForSlot = files.get(slotId);
+        if (filesForSlot == null) {
+            return Collections.emptyList();
+        }
+        return Collections.unmodifiableList(filesForSlot);
+    }
+    public void setFiles(final String slotId, List<Solution> files) {
+        final List<Solution> filesForSlot = this.files.get(slotId);
+        if (filesForSlot == null) {
+            this.files.put(slotId, new ArrayList<Solution>(files));
+            return;
+        }
 
-	private Map<String, List<Solution>> files = new TreeMap<String, List<Solution>>();
-	private List<Solution> getFiles(final String slotId) {
-		final List<Solution> filesForSlot = files.get(slotId);
-		if (filesForSlot == null) {
-			return Collections.emptyList();
-		}
-		return Collections.unmodifiableList(filesForSlot);
-	}
-	public void setFiles(final String slotId, List<Solution> files) {
-		final List<Solution> filesForSlot = this.files.get(slotId);
-		if (filesForSlot == null) {
-			this.files.put(slotId, new ArrayList<Solution>(files));
-			return;
-		}
-
-		filesForSlot.clear();
+        filesForSlot.clear();
         if (files != null) {
             filesForSlot.addAll(files);
         }

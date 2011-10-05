@@ -26,7 +26,7 @@ public class Criteria implements IdNamed {
     public void setRatio(String ratio) { this.ratio = ratio; }
 
     public boolean auto() {
-        return (powDef != null && powDef.indexOf("$") >= 0) || (ratio != null && ratio.indexOf("$") >= 0);
+        return (powDef != null && powDef.contains("$")) || (ratio != null && ratio.contains("$"));
     }
 
     public Integer resolvePowDef(Map<String, Double> vars) {

@@ -8,193 +8,194 @@ import org.joda.time.format.DateTimeFormatter;
 
 import java.util.regex.Pattern;
 
+//  LATER think of some other name for this entity, collision with java.lang smells
 public class Class {
-	private static final DateTimeFormatter FMT_DATE = DateTimeFormat.forPattern("yyyy-MM-dd");
-	private static final DateTimeFormatter FMT_DATE_NICE = DateTimeFormat.forPattern("EEE MMM dd");
-	private static final DateTimeFormatter FMT_TIME = DateTimeFormat.forPattern("HH:mm");
+    private static final DateTimeFormatter FMT_DATE = DateTimeFormat.forPattern("yyyy-MM-dd");
+    private static final DateTimeFormatter FMT_DATE_NICE = DateTimeFormat.forPattern("EEE MMM dd");
+    private static final DateTimeFormatter FMT_TIME = DateTimeFormat.forPattern("HH:mm");
 
-	private String date;
-	private String fromTime;
-	private String toTime;
-	private Pattern[] onSitePatterns;
-	private String[] onSite;
+    private String date;
+    private String fromTime;
+    private String toTime;
+    private Pattern[] onSitePatterns;
+    private String[] onSite;
 
-	@JsonIgnore
-	public boolean isCurrent() {
-		return isStarted() && !isPassed();
-	}
+    @JsonIgnore
+    public boolean isCurrent() {
+        return isStarted() && !isPassed();
+    }
 
-	@JsonIgnore
-	public boolean isStarted() {
-		return isStarted(new DateTime());
-	}
+    @JsonIgnore
+    public boolean isStarted() {
+        return isStarted(new DateTime());
+    }
 
-	private boolean isStarted(final DateTime beforeTime) {
-		final DateTime fromDateTime = getFromDateTime();
-		return fromDateTime.isBefore(beforeTime);
-	}
+    private boolean isStarted(final DateTime beforeTime) {
+        final DateTime fromDateTime = getFromDateTime();
+        return fromDateTime.isBefore(beforeTime);
+    }
 
-	@JsonIgnore
-	public DateTime getFromDateTime() {
-		final DateTime fromDate = FMT_DATE.parseDateTime(getDate());
-		final DateTime fromTime = FMT_TIME.parseDateTime(getFromTime());
-		final DateTime dateExact = new DateTime(
-				fromDate.getYear(), fromDate.getMonthOfYear(), fromDate.getDayOfMonth(),
-				fromTime.getHourOfDay(), fromTime.getMinuteOfHour(),
-				0, 0
-		);
+    @JsonIgnore
+    public DateTime getFromDateTime() {
+        final DateTime fromDate = FMT_DATE.parseDateTime(getDate());
+        final DateTime fromTime = FMT_TIME.parseDateTime(getFromTime());
+        final DateTime dateExact = new DateTime(
+                fromDate.getYear(), fromDate.getMonthOfYear(), fromDate.getDayOfMonth(),
+                fromTime.getHourOfDay(), fromTime.getMinuteOfHour(),
+                0, 0
+        );
 
-		return dateExact;
-	}
+        return dateExact;
+    }
 
-	@JsonIgnore
-	public DateTime getToDateTime() {
-		final DateTime fromDate = FMT_DATE.parseDateTime(getDate());
-		final DateTime toTime = FMT_TIME.parseDateTime(getToTime());
-		final DateTime dateExact = new DateTime(
-				fromDate.getYear(), fromDate.getMonthOfYear(), fromDate.getDayOfMonth(),
-				toTime.getHourOfDay(), toTime.getMinuteOfHour(),
-				0, 0
-		);
+    @JsonIgnore
+    public DateTime getToDateTime() {
+        final DateTime fromDate = FMT_DATE.parseDateTime(getDate());
+        final DateTime toTime = FMT_TIME.parseDateTime(getToTime());
+        final DateTime dateExact = new DateTime(
+                fromDate.getYear(), fromDate.getMonthOfYear(), fromDate.getDayOfMonth(),
+                toTime.getHourOfDay(), toTime.getMinuteOfHour(),
+                0, 0
+        );
 
-		return dateExact;
-	}
+        return dateExact;
+    }
 
-	@JsonIgnore
-	public boolean isPassed() {
-		return isPassed(new DateTime());
-	}
+    @JsonIgnore
+    public boolean isPassed() {
+        return isPassed(new DateTime());
+    }
 
-	private boolean isPassed(final DateTime beforeTime) {
-		final DateTime toDateTime = getToDateTime();
+    private boolean isPassed(final DateTime beforeTime) {
+        final DateTime toDateTime = getToDateTime();
 
-		return toDateTime.isBefore(beforeTime);
-	}
+        return toDateTime.isBefore(beforeTime);
+    }
 
-	@JsonIgnore
-	public boolean isToday() {
-		final DateTime fromDateTime = getFromDateTime();
-		return fromDateTime.isBeforeNow() && fromDateTime.plusDays(1).isAfterNow();
-	}
+    @JsonIgnore
+    public boolean isToday() {
+        final DateTime fromDateTime = getFromDateTime();
+        return fromDateTime.isBeforeNow() && fromDateTime.plusDays(1).isAfterNow();
+    }
 
-	private String getDate() {
-		return date;
-	}
+    private String getDate() {
+        return date;
+    }
 
-	@JsonIgnore
-	public String getNiceDate() {
-		return FMT_DATE_NICE.print(getFromDateTime());
-	}
+    @JsonIgnore
+    public String getNiceDate() {
+        return FMT_DATE_NICE.print(getFromDateTime());
+    }
 
-	@JsonIgnore
-	public int getDayDiff() {
-		return getDayDiff(new DateTime());
-	}
+    @JsonIgnore
+    public int getDayDiff() {
+        return getDayDiff(new DateTime());
+    }
 
-	public int computeToDiffStamp(Stamped stamped) {
-		final DateTime time = stamped == null ? new DateTime() : new DateTime(stamped.getStamp());
-		return computeToDiff(time);
-	}
+    public int computeToDiffStamp(Stamped stamped) {
+        final DateTime time = stamped == null ? new DateTime() : new DateTime(stamped.getStamp());
+        return computeToDiff(time);
+    }
 
-	public int computeToDiff(DateTime time) {
-		final DateTime toDateTime = getToDateTime();
-		final DateTime toMidnight = new DateTime(
-				toDateTime.getYear(), toDateTime.getMonthOfYear(), toDateTime.getDayOfMonth(),
-				0, 0, 0, 0
-		);
-		if (toMidnight.isAfter(time)) {
-			return -Days.daysBetween(time, toMidnight).getDays() - 1;
-		} else if (toMidnight.plusDays(1).isAfter(time)) {
-			return 0;
-		} else {
-			return Days.daysBetween(toMidnight, time).getDays();
-		}
-	}
+    public int computeToDiff(DateTime time) {
+        final DateTime toDateTime = getToDateTime();
+        final DateTime toMidnight = new DateTime(
+                toDateTime.getYear(), toDateTime.getMonthOfYear(), toDateTime.getDayOfMonth(),
+                0, 0, 0, 0
+        );
+        if (toMidnight.isAfter(time)) {
+            return -Days.daysBetween(time, toMidnight).getDays() - 1;
+        } else if (toMidnight.plusDays(1).isAfter(time)) {
+            return 0;
+        } else {
+            return Days.daysBetween(toMidnight, time).getDays();
+        }
+    }
 
-	private int getDayDiff(final DateTime toDate) {
-		final DateTime date = getFromDateTime();
-		final DateTime dateMidnight = new DateTime(
-				date.getYear(), date.getMonthOfYear(), date.getDayOfMonth(),
-				0, 0,
-				0, 0
-		);
-		if (dateMidnight.isAfter(toDate)) {
-			return Days.daysBetween(toDate, dateMidnight).getDays() + 1;
-		} else if (dateMidnight.plusDays(1).isAfter(toDate)) {
-			return 0;
-		} else {
-			return Days.daysBetween(dateMidnight, toDate).getDays();
-		}
-	}
+    private int getDayDiff(final DateTime toDate) {
+        final DateTime date = getFromDateTime();
+        final DateTime dateMidnight = new DateTime(
+                date.getYear(), date.getMonthOfYear(), date.getDayOfMonth(),
+                0, 0,
+                0, 0
+        );
+        if (dateMidnight.isAfter(toDate)) {
+            return Days.daysBetween(toDate, dateMidnight).getDays() + 1;
+        } else if (dateMidnight.plusDays(1).isAfter(toDate)) {
+            return 0;
+        } else {
+            return Days.daysBetween(dateMidnight, toDate).getDays();
+        }
+    }
 
-	public void setDate(String date) {
-		this.date = date;
-	}
+    public void setDate(String date) {
+        this.date = date;
+    }
 
-	private String getFromTime() {
-		return fromTime;
-	}
+    private String getFromTime() {
+        return fromTime;
+    }
 
-	public void setFromTime(String fromTime) {
-		this.fromTime = fromTime;
-	}
+    public void setFromTime(String fromTime) {
+        this.fromTime = fromTime;
+    }
 
-	public String[] getOnSite() {
-		return onSite;
-	}
+    public String[] getOnSite() {
+        return onSite;
+    }
 
-	public void setOnSite(String[] ipMasks) {
-		this.onSite = ipMasks;
-	}
+    public void setOnSite(String[] ipMasks) {
+        this.onSite = ipMasks;
+    }
 
-	private String getToTime() {
-		return toTime;
-	}
+    private String getToTime() {
+        return toTime;
+    }
 
-	public void setToTime(String toTime) {
-		this.toTime = toTime;
-	}
+    public void setToTime(String toTime) {
+        this.toTime = toTime;
+    }
 
-	public int computeDaysOverdue(final Stamped stamped) {
-		final DateTime stamp = stamped == null ? new DateTime() : new DateTime(stamped.getStamp());
-		return getDaysOverdue(stamp);
-	}
+    public int computeDaysOverdue(final Stamped stamped) {
+        final DateTime stamp = stamped == null ? new DateTime() : new DateTime(stamped.getStamp());
+        return getDaysOverdue(stamp);
+    }
 
-	private int getDaysOverdue(DateTime uploadStamp) {
-		final int overdue;
-		if (isPassed(uploadStamp)) {
-			overdue = getDayDiff(uploadStamp);
-		} else {
-			overdue = 0;
-		}
-		return overdue;
-	}
+    private int getDaysOverdue(DateTime uploadStamp) {
+        final int overdue;
+        if (isPassed(uploadStamp)) {
+            overdue = getDayDiff(uploadStamp);
+        } else {
+            overdue = 0;
+        }
+        return overdue;
+    }
 
-	public boolean checkOnSite(String sourceAddress) {
-		synchronized (this) {
-			if (onSitePatterns == null) {
-				onSitePatterns = new Pattern[onSite.length];
-				for (int i = 0; i < onSite.length; i++) {
-					onSitePatterns[i] = Pattern.compile(onSite[i]);
-				}
-			}
-		}
+    public boolean checkOnSite(String sourceAddress) {
+        synchronized (this) {
+            if (onSitePatterns == null) {
+                onSitePatterns = new Pattern[onSite.length];
+                for (int i = 0; i < onSite.length; i++) {
+                    onSitePatterns[i] = Pattern.compile(onSite[i]);
+                }
+            }
+        }
 
-		for (Pattern onSitePattern : onSitePatterns) {
-			if (onSitePattern.matcher(sourceAddress).matches()) {
-				return true;
-			}
-		}
+        for (Pattern onSitePattern : onSitePatterns) {
+            if (onSitePattern.matcher(sourceAddress).matches()) {
+                return true;
+            }
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	public boolean checkOnTime(Stamped stamed) {
-		final long instant = stamed.getStamp();
-		final long min = getFromDateTime().getMillis();
-		final long max = getToDateTime().getMillis();
-		final int lateTolerance = 30 * 60 * 1000;
+    public boolean checkOnTime(Stamped stamed) {
+        final long instant = stamed.getStamp();
+        final long min = getFromDateTime().getMillis();
+        final long max = getToDateTime().getMillis();
+        final int lateTolerance = 30 * 60 * 1000;
 
-		return min <= instant && instant <= max + lateTolerance;
-	}
+        return min <= instant && instant <= max + lateTolerance;
+    }
 }

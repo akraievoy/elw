@@ -4,15 +4,15 @@ package elw.dp.app;
  * LATER add javadocs for a class created by anton
  */
 public interface ControllerSetup {
-	void setBaseUrl(String baseUrl);
+    void setBaseUrl(String baseUrl);
 
-	void setUploadHeader(String uploadHeader);
+    void setUploadHeader(String uploadHeader);
 
-	void setElwCtx(String elwCtx);
+    void setElwCtx(String elwCtx);
 
-	String getElwCtx();
+    String getElwCtx();
 
-	String getBaseUrl();
+    String getBaseUrl();
 
-	String getUploadHeader();
+    String getUploadHeader();
 }

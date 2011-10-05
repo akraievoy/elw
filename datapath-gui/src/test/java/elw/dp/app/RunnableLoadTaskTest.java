@@ -24,49 +24,49 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 public class RunnableLoadTaskTest extends TestCase {
-	protected static final String RESP_LIST_JSON =
-			"{\n" +
-			"  \"message\" : null,\n" +
-			"  \"data\" : {\n" +
-			"    \"statement\" : {\n" +
-			"      \"v\" : [ \"gepq8ks1\" ],\n" +
-			"      \"t\" : [ ],\n" +
-			"      \"s\" : [ ],\n" +
-			"      \"a\" : [ ]\n" +
-			"    },\n" +
-			"    \"test\" : {\n" +
-			"      \"v\" : [ \"gepq8ks6\", \"gepq8ksa\", \"gepq8kse\" ],\n" +
-			"      \"t\" : [ ],\n" +
-			"      \"s\" : [ ],\n" +
-			"      \"a\" : [ ]\n" +
-			"    },\n" +
-			"    \"report\" : {\n" +
-			"      \"v\" : [ ],\n" +
-			"      \"t\" : [ \"gfp5746n\", \"gfpakao2\" ],\n" +
-			"      \"s\" : [ \"gk8auy9y\", \"gknupkbn\" ],\n" +
-			"      \"a\" : [ ]\n" +
-			"    },\n" +
-			"    \"code\" : {\n" +
-			"      \"v\" : [ ],\n" +
-			"      \"t\" : [ ],\n" +
-			"      \"s\" : [ \"gk8a6aj4\", \"gknu3opt\", \"gknxekr2\" ],\n" +
-			"      \"a\" : [ ]\n" +
-			"    },\n" +
-			"    \"reference\" : {\n" +
-			"      \"v\" : [ \"gepq8ksj\" ],\n" +
-			"      \"t\" : [ ],\n" +
-			"      \"s\" : [ ],\n" +
-			"      \"a\" : [ ]\n" +
-			"    }\n" +
-			"  },\n" +
-			"  \"success\" : true\n" +
-			"}";
+    protected static final String RESP_LIST_JSON =
+            "{\n" +
+                    "  \"message\" : null,\n" +
+                    "  \"data\" : {\n" +
+                    "    \"statement\" : {\n" +
+                    "      \"v\" : [ \"gepq8ks1\" ],\n" +
+                    "      \"t\" : [ ],\n" +
+                    "      \"s\" : [ ],\n" +
+                    "      \"a\" : [ ]\n" +
+                    "    },\n" +
+                    "    \"test\" : {\n" +
+                    "      \"v\" : [ \"gepq8ks6\", \"gepq8ksa\", \"gepq8kse\" ],\n" +
+                    "      \"t\" : [ ],\n" +
+                    "      \"s\" : [ ],\n" +
+                    "      \"a\" : [ ]\n" +
+                    "    },\n" +
+                    "    \"report\" : {\n" +
+                    "      \"v\" : [ ],\n" +
+                    "      \"t\" : [ \"gfp5746n\", \"gfpakao2\" ],\n" +
+                    "      \"s\" : [ \"gk8auy9y\", \"gknupkbn\" ],\n" +
+                    "      \"a\" : [ ]\n" +
+                    "    },\n" +
+                    "    \"code\" : {\n" +
+                    "      \"v\" : [ ],\n" +
+                    "      \"t\" : [ ],\n" +
+                    "      \"s\" : [ \"gk8a6aj4\", \"gknu3opt\", \"gknxekr2\" ],\n" +
+                    "      \"a\" : [ ]\n" +
+                    "    },\n" +
+                    "    \"reference\" : {\n" +
+                    "      \"v\" : [ \"gepq8ksj\" ],\n" +
+                    "      \"t\" : [ ],\n" +
+                    "      \"s\" : [ ],\n" +
+                    "      \"a\" : [ ]\n" +
+                    "    }\n" +
+                    "  },\n" +
+                    "  \"success\" : true\n" +
+                    "}";
 
-	public void testReadRespList() throws IOException {
-		final ResponseList respList = RunnableLoadTask.readRespList(
-				new ByteArrayInputStream(RESP_LIST_JSON.getBytes("UTF-8"))
-		);
-		assertNotNull(respList);
-		assertEquals("gknu3opt", respList.getData().get("code").get("s")[1]);
-	}
+    public void testReadRespList() throws IOException {
+        final ResponseList respList = RunnableLoadTask.readRespList(
+                new ByteArrayInputStream(RESP_LIST_JSON.getBytes("UTF-8"))
+        );
+        assertNotNull(respList);
+        assertEquals("gknu3opt", respList.getData().get("code").get("s")[1]);
+    }
 }

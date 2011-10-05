@@ -37,80 +37,80 @@ import java.util.List;
 @Controller
 @RequestMapping("/err/**")
 public class ErrController {
-	private static final Logger log = LoggerFactory.getLogger(ErrController.class);
+    private static final Logger log = LoggerFactory.getLogger(ErrController.class);
 
-	@SuppressWarnings({"RedundantArrayCreation"})
-	private final List<String> ignoredUris = Arrays.asList(new String[]{
-			"/s/elw.dp.ui.Applet",
-			"/s/META-INF/services/javax.xml.parsers.DocumentBuilderFactory",
-			"/s/org/apache/log4j/PatternLayoutBeanInfo.class",
-			"/s/org/apache/log4j/LayoutBeanInfo.class",
-			"/s/java/lang/ObjectBeanInfo.class",
-			"/s/com/ibm/uvm/tools/DebugSupport.class"
-	});
+    @SuppressWarnings({"RedundantArrayCreation"})
+    private final List<String> ignoredUris = Arrays.asList(new String[]{
+            "/s/elw.dp.ui.Applet",
+            "/s/META-INF/services/javax.xml.parsers.DocumentBuilderFactory",
+            "/s/org/apache/log4j/PatternLayoutBeanInfo.class",
+            "/s/org/apache/log4j/LayoutBeanInfo.class",
+            "/s/java/lang/ObjectBeanInfo.class",
+            "/s/com/ibm/uvm/tools/DebugSupport.class"
+    });
 
-	@RequestMapping(value = "*")
-	public ModelAndView do_handle(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-		final String url = (String) req.getAttribute("javax.servlet.error.request_uri");
-		final Integer statusCode = (Integer) req.getAttribute("javax.servlet.error.status_code");
+    @RequestMapping(value = "*")
+    public ModelAndView do_handle(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+        final String url = (String) req.getAttribute("javax.servlet.error.request_uri");
+        final Integer statusCode = (Integer) req.getAttribute("javax.servlet.error.status_code");
 
-		if (statusCode != null && 404 == statusCode && ignoredUris.contains(url)) {
-			resp.sendError(410, "ignored");
-			return null;
-		}
+        if (statusCode != null && 404 == statusCode && ignoredUris.contains(url)) {
+            resp.sendError(410, "ignored");
+            return null;
+        }
 
-		try {
-			final String message = (String) req.getAttribute("javax.servlet.error.message");
-			final Throwable throwable = (Throwable) req.getAttribute("javax.servlet.error.exception");
-			final String eventId = Long.toString(System.currentTimeMillis(), 36);
+        try {
+            final String message = (String) req.getAttribute("javax.servlet.error.message");
+            final Throwable throwable = (Throwable) req.getAttribute("javax.servlet.error.exception");
+            final String eventId = Long.toString(System.currentTimeMillis(), 36);
 
-			final StringWriter logDest = new StringWriter();
-			final PrintWriter logOut = new PrintWriter(logDest);
-			final HttpSession session = req.getSession(false);
+            final StringWriter logDest = new StringWriter();
+            final PrintWriter logOut = new PrintWriter(logDest);
+            final HttpSession session = req.getSession(false);
 
-			logOut.println("web error: eventId="+eventId+" status=" + statusCode + " message='" + message + "'");
-			logOut.println("url: " + url);
-			logOut.print("attributes: ");
-			final Enumeration reqAttrNames = req.getAttributeNames();
-			while (reqAttrNames.hasMoreElements()) {
-				final String aName = (String) reqAttrNames.nextElement();
-				if (!aName.startsWith("javax.servlet") && !aName.startsWith("org.springframework")) {
-					logOut.print(aName + "="+String.valueOf(req.getAttribute(aName)) + " ");
-				}
-			}
-			logOut.println();
+            logOut.println("web error: eventId=" + eventId + " status=" + statusCode + " message='" + message + "'");
+            logOut.println("url: " + url);
+            logOut.print("attributes: ");
+            final Enumeration reqAttrNames = req.getAttributeNames();
+            while (reqAttrNames.hasMoreElements()) {
+                final String aName = (String) reqAttrNames.nextElement();
+                if (!aName.startsWith("javax.servlet") && !aName.startsWith("org.springframework")) {
+                    logOut.print(aName + "=" + String.valueOf(req.getAttribute(aName)) + " ");
+                }
+            }
+            logOut.println();
 
-			if (session != null) {
-				logOut.println("session id: " + session.getId());
-				logOut.print("session: ");
-				final Enumeration sessAttrNames = session.getAttributeNames();
-				while (sessAttrNames.hasMoreElements()) {
-					final String aName = (String) sessAttrNames.nextElement();
-					if (!aName.startsWith("javax.servlet") && !aName.startsWith("org.springframework")) {
-						logOut.print(aName + "="+String.valueOf(session.getAttribute(aName)) + " ");
-					}
-				}
-				logOut.println();
-			}
+            if (session != null) {
+                logOut.println("session id: " + session.getId());
+                logOut.print("session: ");
+                final Enumeration sessAttrNames = session.getAttributeNames();
+                while (sessAttrNames.hasMoreElements()) {
+                    final String aName = (String) sessAttrNames.nextElement();
+                    if (!aName.startsWith("javax.servlet") && !aName.startsWith("org.springframework")) {
+                        logOut.print(aName + "=" + String.valueOf(session.getAttribute(aName)) + " ");
+                    }
+                }
+                logOut.println();
+            }
 
-			log.error(
-					logDest.toString(), throwable
-			);
+            log.error(
+                    logDest.toString(), throwable
+            );
 
-			final PrintWriter out = resp.getWriter();
+            final PrintWriter out = resp.getWriter();
 
-			out.print(
-					"<html><title>HTTP status " + statusCode + " : " + message + "</title>" +
-					"<body><h3>HTTP status " + statusCode + " : " + message + "</h3>" +
-					"Sorry for inconvenience and thanks for finding just another bug out there.<br/>" +
-					"For the time being, you may log out, log in and then try the operation once again.<br/><br/>" +
-					"Event reference id: <b>"+eventId+"</b>." +
-					"</body></html>"
-			);
-		} catch (Throwable t) {
-			log.error("failed on reporting error", t);
-		}
+            out.print(
+                    "<html><title>HTTP status " + statusCode + " : " + message + "</title>" +
+                            "<body><h3>HTTP status " + statusCode + " : " + message + "</h3>" +
+                            "Sorry for inconvenience and thanks for finding just another bug out there.<br/>" +
+                            "For the time being, you may log out, log in and then try the operation once again.<br/><br/>" +
+                            "Event reference id: <b>" + eventId + "</b>." +
+                            "</body></html>"
+            );
+        } catch (Throwable t) {
+            log.error("failed on reporting error", t);
+        }
 
-		return null;
-	}
+        return null;
+    }
 }

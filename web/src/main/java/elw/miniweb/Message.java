@@ -27,73 +27,73 @@ import java.util.Collections;
 import java.util.List;
 
 public class Message {
-	private static final String TYPE_INFO = "info";
-	private static final String TYPE_WARN = "warn";
-	private static final String TYPE_ERR = "err";
+    private static final String TYPE_INFO = "info";
+    private static final String TYPE_WARN = "warn";
+    private static final String TYPE_ERR = "err";
 
-	private String message;
-	private String type;
+    private String message;
+    private String type;
 
-	private Message(String message, String type) {
-		this.message = message;
-		this.type = type;
-	}
+    private Message(String message, String type) {
+        this.message = message;
+        this.type = type;
+    }
 
-	public String getMessage() {
-		return message;
-	}
+    public String getMessage() {
+        return message;
+    }
 
-	public String getType() {
-		return type;
-	}
+    public String getType() {
+        return type;
+    }
 
-	private static List<Message> getMessages(HttpServletRequest req) {
-		final HttpSession session = req.getSession(true);
+    private static List<Message> getMessages(HttpServletRequest req) {
+        final HttpSession session = req.getSession(true);
 
-		List<Message> messages;
-		synchronized (Message.class) {
-			messages = (List<Message>) session.getAttribute("elw_messages");
+        List<Message> messages;
+        synchronized (Message.class) {
+            messages = (List<Message>) session.getAttribute("elw_messages");
 
-			if (messages == null) {
-				messages = Collections.synchronizedList(new ArrayList<Message>());
-				session.setAttribute("elw_messages", messages);
-			}
-		}
+            if (messages == null) {
+                messages = Collections.synchronizedList(new ArrayList<Message>());
+                session.setAttribute("elw_messages", messages);
+            }
+        }
 
-		return messages;
-	}
+        return messages;
+    }
 
-	public static Message[] drainMessages(HttpServletRequest req) {
-		final List<Message> messages = getMessages(req);
+    public static Message[] drainMessages(HttpServletRequest req) {
+        final List<Message> messages = getMessages(req);
 
-		final Message[] result = messages.toArray(new Message[messages.size()]);
+        final Message[] result = messages.toArray(new Message[messages.size()]);
 
-		messages.clear();
+        messages.clear();
 
-		return result;
-	}
+        return result;
+    }
 
-	private static void addMessage(final HttpServletRequest req, final String type, final String message) {
-		getMessages(req).add(new Message(message, type));
-	}
+    private static void addMessage(final HttpServletRequest req, final String type, final String message) {
+        getMessages(req).add(new Message(message, type));
+    }
 
-	public static void addInfo(final HttpServletRequest req, final String message) {
-		addMessage(req, TYPE_INFO, message);
-	}
+    public static void addInfo(final HttpServletRequest req, final String message) {
+        addMessage(req, TYPE_INFO, message);
+    }
 
-	public static void addWarn(final HttpServletRequest req, final String message) {
-		addMessage(req, TYPE_WARN, message);
-	}
+    public static void addWarn(final HttpServletRequest req, final String message) {
+        addMessage(req, TYPE_WARN, message);
+    }
 
-	public static void addErr(final HttpServletRequest req, final String message) {
-		addMessage(req, TYPE_ERR, message);
-	}
+    public static void addErr(final HttpServletRequest req, final String message) {
+        addMessage(req, TYPE_ERR, message);
+    }
 
-	public static void addResult(final HttpServletRequest req, Result result) {
-		if (result.isSuccess()) {
-			addInfo(req, result.getMessage());
-		} else {
-			addErr(req, result.getMessage());
-		}
-	}
+    public static void addResult(final HttpServletRequest req, Result result) {
+        if (result.isSuccess()) {
+            addInfo(req, result.getMessage());
+        } else {
+            addErr(req, result.getMessage());
+        }
+    }
 }

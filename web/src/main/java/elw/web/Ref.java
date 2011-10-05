@@ -22,13 +22,13 @@ package elw.web;
  * Dumb workaround against velocity's reluctance to unset template parameters.
  */
 public class Ref<E> {
-	private final E e;
+    private final E e;
 
-	public Ref(E e) {
-		this.e = e;
-	}
+    public Ref(E e) {
+        this.e = e;
+    }
 
-	public E getE() {
-		return e;
-	}
+    public E getE() {
+        return e;
+    }
 }

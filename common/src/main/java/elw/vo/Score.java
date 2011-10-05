@@ -5,11 +5,11 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 import java.util.*;
 
 public class Score extends Squab.Stamped implements Stamped {
-	private Boolean approved;
+    private Boolean approved;
     public Boolean getApproved() { return approved; }
     public void setApproved(Boolean approved) { this.approved = approved; }
 
-	private String comment;
+    private String comment;
     public String getComment() { return comment; }
     public void setComment(String comment) { this.comment = comment; }
 
@@ -36,103 +36,103 @@ public class Score extends Squab.Stamped implements Stamped {
         }
     }
 
-	private boolean best;	//	transient
+    private boolean best;	//	transient
     @JsonIgnore
     public boolean isBest() { return best; }
     @JsonIgnore
     public void setBest(boolean best) { this.best = best; }
 
-	public Score copy() {
-		final Score copy = new Score();
+    public Score copy() {
+        final Score copy = new Score();
 
-		copy.ratios.putAll(ratios);
-		copy.pows.putAll(pows);
+        copy.ratios.putAll(ratios);
+        copy.pows.putAll(pows);
 
-		return copy;
-	}
+        return copy;
+    }
 
-	public double getRatio(String[] ids) {
-		double res = 1.0;
+    public double getRatio(String[] ids) {
+        double res = 1.0;
 
-		for (final String id : ids) {
-			if (!contains(id)) {
-				continue;
-			}
-			res *= Math.pow(ratios.get(id), pows.get(id));
-		}
+        for (final String id : ids) {
+            if (!contains(id)) {
+                continue;
+            }
+            res *= Math.pow(ratios.get(id), pows.get(id));
+        }
 
-		return res;
-	}
+        return res;
+    }
 
-	public double computeRatio(FileSlot slot) {
-		double res = 1.0;
+    public double computeRatio(FileSlot slot) {
+        double res = 1.0;
 
-		for (final Criteria c : slot.getCriterias().values()) {
-			final String id = idFor(slot, c);
-			if (!contains(id)) {
-				continue;
-			}
-			res *= Math.pow(ratios.get(id), pows.get(id));
-		}
+        for (final Criteria c : slot.getCriterias().values()) {
+            final String id = idFor(slot, c);
+            if (!contains(id)) {
+                continue;
+            }
+            res *= Math.pow(ratios.get(id), pows.get(id));
+        }
 
-		return res;
-	}
+        return res;
+    }
 
-	public String idFor(FileSlot slot, Criteria c) {
-		return slot.getId() + "--" + c.getId();
-	}
+    public String idFor(FileSlot slot, Criteria c) {
+        return slot.getId() + "--" + c.getId();
+    }
 
-	private boolean contains(String id) {
-		return pows.containsKey(id) && ratios.containsKey(id);
-	}
+    private boolean contains(String id) {
+        return pows.containsKey(id) && ratios.containsKey(id);
+    }
 
-	public boolean containsAll(String[] ids) {
-		for (final String id : ids) {
-			if (!contains(id)) {
-				return false;
-			}
-		}
+    public boolean containsAll(String[] ids) {
+        for (final String id : ids) {
+            if (!contains(id)) {
+                return false;
+            }
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	public boolean contains(FileSlot slot, Criteria c) {
-		return contains(idFor(slot, c));
-	}
+    public boolean contains(FileSlot slot, Criteria c) {
+        return contains(idFor(slot, c));
+    }
 
-	public int getPow(FileSlot slot, Criteria c) {
-		return contains(slot, c) ? getPows().get(idFor(slot, c)) : 0;
-	}
+    public int getPow(FileSlot slot, Criteria c) {
+        return contains(slot, c) ? getPows().get(idFor(slot, c)) : 0;
+    }
 
-	public double getRatio(FileSlot slot, Criteria c) {
-		return contains(slot, c) ? getRatios().get(idFor(slot, c)) : 1;
-	}
+    public double getRatio(FileSlot slot, Criteria c) {
+        return contains(slot, c) ? getRatios().get(idFor(slot, c)) : 1;
+    }
 
-	@JsonIgnore
-	public ScoreTerm[] getTerms(TaskType aType, final boolean includeIdentity) {
-		final List<ScoreTerm> scoreTerms = new ArrayList<ScoreTerm>();
+    @JsonIgnore
+    public ScoreTerm[] getTerms(TaskType aType, final boolean includeIdentity) {
+        final List<ScoreTerm> scoreTerms = new ArrayList<ScoreTerm>();
 
-		for (FileSlot slot : aType.getFileSlots().values()) {
-			for (final Criteria c : slot.getCriterias().values()) {
-				final String id = idFor(slot, c);
-				if (contains(slot, c)) {
-					final Integer pow = pows.get(id);
-					final Double ratio = ratios.get(id);
-					final double termRatio = Math.pow(ratio, pow);
+        for (FileSlot slot : aType.getFileSlots().values()) {
+            for (final Criteria c : slot.getCriterias().values()) {
+                final String id = idFor(slot, c);
+                if (contains(slot, c)) {
+                    final Integer pow = pows.get(id);
+                    final Double ratio = ratios.get(id);
+                    final double termRatio = Math.pow(ratio, pow);
 
-					final ScoreTerm scoreTerm = new ScoreTerm(id, termRatio, pow, slot, c);
+                    final ScoreTerm scoreTerm = new ScoreTerm(id, termRatio, pow, slot, c);
 
-					if (scoreTerm.isIdentity() && !includeIdentity) {
-						continue;
-					}
+                    if (scoreTerm.isIdentity() && !includeIdentity) {
+                        continue;
+                    }
 
-					scoreTerms.add(scoreTerm);
-				}
-			}
-		}
+                    scoreTerms.add(scoreTerm);
+                }
+            }
+        }
 
-		return scoreTerms.toArray(new ScoreTerm[scoreTerms.size()]);
-	}
+        return scoreTerms.toArray(new ScoreTerm[scoreTerms.size()]);
+    }
 
     protected String[] extraPathElems = null;
 

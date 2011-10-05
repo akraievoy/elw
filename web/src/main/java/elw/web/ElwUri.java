@@ -23,91 +23,91 @@ import elw.dao.Ctx;
 import elw.vo.FileBase;
 
 public class ElwUri {
-	public static final String MODEL_KEY = "elw_uri";
+    public static final String MODEL_KEY = "elw_uri";
 
-	public String logPendingE(final String enrId) {
-		return "log?elw_ctx=e--" + enrId + "&f_scope=s--p--&f_due=twoweeks&f_mode=dd";
-	}
+    public String logPendingE(final String enrId) {
+        return "log?elw_ctx=e--" + enrId + "&f_scope=s--p--&f_due=twoweeks&f_mode=dd";
+    }
 
-	public String logOpenE(final String enrId) {
-		return "log?elw_ctx=e--" + enrId + "&f_scope=s--o--&f_due=twoweeks&f_mode=dd";
-	}
+    public String logOpenE(final String enrId) {
+        return "log?elw_ctx=e--" + enrId + "&f_scope=s--o--&f_due=twoweeks&f_mode=dd";
+    }
 
-	public String logCourseE(final String enrId) {
-		return "log?elw_ctx=e--" + enrId + "&f_scope=c--av--&f_due=any";
-	}
+    public String logCourseE(final String enrId) {
+        return "log?elw_ctx=e--" + enrId + "&f_scope=c--av--&f_due=any";
+    }
 
-	public String tasks(final String enrId) {
-		return "tasks?elw_ctx=e--" + enrId;
-	}
+    public String tasks(final String enrId) {
+        return "tasks?elw_ctx=e--" + enrId;
+    }
 
-	public String logPendingEA(final Ctx ctx) {
-		return "log?elw_ctx=e--" + ctx.getEnr().getId() + "&f_verId=" + ctx.getAss().getId() + "--&f_scope=s--p--&f_due=twoweeks&f_mode=dd";
-	}
+    public String logPendingEA(final Ctx ctx) {
+        return "log?elw_ctx=e--" + ctx.getEnr().getId() + "&f_verId=" + ctx.getAss().getId() + "--&f_scope=s--p--&f_due=twoweeks&f_mode=dd";
+    }
 
-	public String logOpenEA(final Ctx ctx) {
-		return "log?elw_ctx=e--" + ctx.getEnr().getId() + "&f_verId=" + ctx.getAss().getId() + "--&f_scope=s--o--&f_due=twoweeks&f_mode=dd";
-	}
+    public String logOpenEA(final Ctx ctx) {
+        return "log?elw_ctx=e--" + ctx.getEnr().getId() + "&f_verId=" + ctx.getAss().getId() + "--&f_scope=s--o--&f_due=twoweeks&f_mode=dd";
+    }
 
-	public String logCourseEA(final Ctx ctx) {
-		return "log?elw_ctx=e--" + ctx.getEnr().getId() + "&f_verId=" + ctx.getAss().getId() + "--&f_scope=c--av--&f_due=any";
-	}
+    public String logCourseEA(final Ctx ctx) {
+        return "log?elw_ctx=e--" + ctx.getEnr().getId() + "&f_verId=" + ctx.getAss().getId() + "--&f_scope=c--av--&f_due=any";
+    }
 
-	public String logPendingEAV(final Ctx ctx) {
-		return logEAV(ctx, "s--p--", "set") +"&f_mode=dd";
-	}
+    public String logPendingEAV(final Ctx ctx) {
+        return logEAV(ctx, "s--p--", "set") + "&f_mode=dd";
+    }
 
-	public String logAnyEAV(final Ctx ctx) {
-		return logEAV(ctx, "s--", "set") +"&f_mode=dd";
-	}
+    public String logAnyEAV(final Ctx ctx) {
+        return logEAV(ctx, "s--", "set") + "&f_mode=dd";
+    }
 
-	public String logOpenEAV(final Ctx ctx) {
-		return logEAV(ctx, "s--o--", "set") +"&f_mode=dd";
-	}
+    public String logOpenEAV(final Ctx ctx) {
+        return logEAV(ctx, "s--o--", "set") + "&f_mode=dd";
+    }
 
-	public String logCourseEAV(final Ctx ctx) {
-		return logEAV(ctx, "c--av--", "any");
-	}
+    public String logCourseEAV(final Ctx ctx) {
+        return logEAV(ctx, "c--av--", "any");
+    }
 
-	public String logEAV(Ctx ctx, String scope, String due) {
-		return "log?elw_ctx=e--" + ctx.getEnr().getId() + "&f_verId=" + ctx.getAss().getId() + "--" + ctx.getVer().getId() + "--&f_scope="+ scope +"&f_due="+ due;
-	}
+    public String logEAV(Ctx ctx, String scope, String due) {
+        return "log?elw_ctx=e--" + ctx.getEnr().getId() + "&f_verId=" + ctx.getAss().getId() + "--" + ctx.getVer().getId() + "--&f_scope=" + scope + "&f_due=" + due;
+    }
 
-	public String summary(final String enrId) {
-		return "summary?elw_ctx=e--" + enrId;
-	}
+    public String summary(final String enrId) {
+        return "summary?elw_ctx=e--" + enrId;
+    }
 
-	private String fileQuery(final Ctx ctx, final String scope, final String slotId, FileBase file) {
-		final String xferQuery = "?elw_ctx=" + ctx.toString() + "&s=" + scope + "&sId=" + slotId;
+    private String fileQuery(final Ctx ctx, final String scope, final String slotId, FileBase file) {
+        final String xferQuery = "?elw_ctx=" + ctx.toString() + "&s=" + scope + "&sId=" + slotId;
 
-		if (file != null && !Strings.isNullOrEmpty(file.getId())) {
-			return xferQuery + "&fId=" + file.getId();
-		}
+        if (file != null && !Strings.isNullOrEmpty(file.getId())) {
+            return xferQuery + "&fId=" + file.getId();
+        }
 
-		return xferQuery;
-	}
+        return xferQuery;
+    }
 
-	public String upload(final Ctx ctx, final String scope, final String slotId) {
-		return "ul" + fileQuery(ctx, scope, slotId, null);
-	}
+    public String upload(final Ctx ctx, final String scope, final String slotId) {
+        return "ul" + fileQuery(ctx, scope, slotId, null);
+    }
 
-	public String download(final Ctx ctx, final String scope, final String slotId, FileBase e, String nameNorm) {
-		if (e == null) {
-			return null;
-		}
+    public String download(final Ctx ctx, final String scope, final String slotId, FileBase e, String nameNorm) {
+        if (e == null) {
+            return null;
+        }
 
-		final String name = nameNorm == null ? e.getName() : nameNorm;
-		return "dl/" + name + fileQuery(ctx, scope, slotId, e);
-	}
+        final String name = nameNorm == null ? e.getName() : nameNorm;
+        return "dl/" + name + fileQuery(ctx, scope, slotId, e);
+    }
 
-	public String approve(final Ctx ctx, final String scope, final String slotId, FileBase e) {
-		if (e == null) {
-			return null;
-		}
-		return "approve" + fileQuery(ctx, scope, slotId, e);
-	}
+    public String approve(final Ctx ctx, final String scope, final String slotId, FileBase e) {
+        if (e == null) {
+            return null;
+        }
+        return "approve" + fileQuery(ctx, scope, slotId, e);
+    }
 
-	public String edit(final Ctx ctxVer, final String scope, final String slotId, final String fileId) {
-		return "edit?elw_ctx=" + ctxVer.toString() + "&s=" + scope + "&sId=" + slotId + "&fId=" + fileId;
-	}
+    public String edit(final Ctx ctxVer, final String scope, final String slotId, final String fileId) {
+        return "edit?elw_ctx=" + ctxVer.toString() + "&s=" + scope + "&sId=" + slotId + "&fId=" + fileId;
+    }
 }

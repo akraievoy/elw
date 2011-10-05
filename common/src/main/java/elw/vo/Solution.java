@@ -3,23 +3,23 @@ package elw.vo;
 import org.codehaus.jackson.annotate.JsonIgnore;
 
 public class Solution extends FileBase {
-	//	second pass properties, issued by validator (if any)
-	private int testsPassed;
+    //	second pass properties, issued by validator (if any)
+    private int testsPassed;
     public static final String SCOPE = "s";
 
     public int getTestsPassed() { return testsPassed; }
     public void setTestsPassed(int testsPassed) { this.testsPassed = testsPassed; }
 
-	private int testsFailed;
+    private int testsFailed;
     public int getTestsFailed() { return testsFailed; }
     public void setTestsFailed(int testsFailed) { this.testsFailed = testsFailed; }
 
-	private long validatorStamp;
+    private long validatorStamp;
     public long getValidatorStamp() { return validatorStamp; }
     public void setValidatorStamp(long validatorStamp) { this.validatorStamp = validatorStamp; }
 
-	//	injected via Queries
-	private Score score;
+    //	injected via Queries
+    private Score score;
     @JsonIgnore
     public Score getScore() { return score; }
     @JsonIgnore
@@ -65,24 +65,24 @@ public class Solution extends FileBase {
         };
     }
 
-	@JsonIgnore
-	public boolean isValidated() {
-		return validatorStamp > 0;
-	}
+    @JsonIgnore
+    public boolean isValidated() {
+        return validatorStamp > 0;
+    }
 
-	@JsonIgnore
-	public int getTotalTests() {
-		return testsPassed + testsFailed;
-	}
+    @JsonIgnore
+    public int getTotalTests() {
+        return testsPassed + testsFailed;
+    }
 
-	@JsonIgnore
-	public double getPassRatio() {
-		final double totalTests = 0.0 + getTotalTests();
+    @JsonIgnore
+    public double getPassRatio() {
+        final double totalTests = 0.0 + getTotalTests();
 
-		if (totalTests == 0) {
-			return 0.0;
-		}
+        if (totalTests == 0) {
+            return 0.0;
+        }
 
-		return testsPassed / totalTests;
-	}
+        return testsPassed / totalTests;
+    }
 }

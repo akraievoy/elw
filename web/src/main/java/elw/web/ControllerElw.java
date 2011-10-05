@@ -46,210 +46,214 @@ import org.springframework.web.servlet.support.RequestContextUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 public abstract class ControllerElw extends MultiActionController implements WebSymbols {
-	private static final Logger log = LoggerFactory.getLogger(ControllerElw.class);
+    private static final Logger log = LoggerFactory.getLogger(ControllerElw.class);
 
-	private static final DiskFileItemFactory fileItemFactory = createFileItemFactory();
-	protected final Core core;
+    private static final DiskFileItemFactory fileItemFactory = createFileItemFactory();
+    protected final Core core;
 
-	protected ControllerElw(Core core) {
-		this.core = core;
-	}
+    protected ControllerElw(Core core) {
+        this.core = core;
+    }
 
-	private static DiskFileItemFactory createFileItemFactory() {
-		DiskFileItemFactory fileItemFactory = new DiskFileItemFactory();
-		fileItemFactory.setRepository(new java.io.File(System.getProperty("java.io.tmpdir")));
-		fileItemFactory.setSizeThreshold(2 * 1024 * 1024);
+    private static DiskFileItemFactory createFileItemFactory() {
+        DiskFileItemFactory fileItemFactory = new DiskFileItemFactory();
+        fileItemFactory.setRepository(new java.io.File(System.getProperty("java.io.tmpdir")));
+        fileItemFactory.setSizeThreshold(2 * 1024 * 1024);
 
-		return fileItemFactory;
-	}
+        return fileItemFactory;
+    }
 
-	protected HashMap<String, Object> prepareDefaultModel(HttpServletRequest req) {
-		final HashMap<String, Object> model = new HashMap<String, Object>();
+    protected HashMap<String, Object> prepareDefaultModel(HttpServletRequest req) {
+        final HashMap<String, Object> model = new HashMap<String, Object>();
 
-		model.put(S_MESSAGES, Message.drainMessages(req));
-		model.put(FormatTool.MODEL_KEY, FormatTool.forLocale(RequestContextUtils.getLocale(req)));
-		model.put(VelocityTemplates.MODEL_KEY, core.getTemplates());
-		model.put(ElwUri.MODEL_KEY, core.getUri());
+        model.put(S_MESSAGES, Message.drainMessages(req));
+        model.put(FormatTool.MODEL_KEY, FormatTool.forLocale(RequestContextUtils.getLocale(req)));
+        model.put(VelocityTemplates.MODEL_KEY, core.getTemplates());
+        model.put(ElwUri.MODEL_KEY, core.getUri());
 
-		return model;
-	}
+        return model;
+    }
 
-	protected abstract HashMap<String, Object> auth(
-			final HttpServletRequest req,
-			final HttpServletResponse resp,
-			final String pathToRoot
-	) throws IOException;
+    protected abstract HashMap<String, Object> auth(
+            final HttpServletRequest req,
+            final HttpServletResponse resp,
+            final String pathToRoot
+    ) throws IOException;
 
     protected static interface WebMethodScore {
-		ModelAndView handleScore(
-				HttpServletRequest req, HttpServletResponse resp,
-				Ctx ctx, FileSlot slot, Solution file, Long stamp,
-				Map<String, Object> model
-		) throws IOException;
-	}
+        ModelAndView handleScore(
+                HttpServletRequest req, HttpServletResponse resp,
+                Ctx ctx, FileSlot slot, Solution file, Long stamp,
+                Map<String, Object> model
+        ) throws IOException;
+    }
 
-	//  FIXME some of file VT parameters are broken
+    //  FIXME some of file VT parameters are broken
     protected ModelAndView wmScore(
-			HttpServletRequest req, HttpServletResponse resp,
-			final String pathToRoot, final WebMethodScore wm
-	) throws IOException {
-		final HashMap<String, Object> model = auth(req, resp, pathToRoot);
-		if (model == null) {
-			return null;
-		}
+            HttpServletRequest req, HttpServletResponse resp,
+            final String pathToRoot, final WebMethodScore wm
+    ) throws IOException {
+        final HashMap<String, Object> model = auth(req, resp, pathToRoot);
+        if (model == null) {
+            return null;
+        }
 
-		final Ctx ctx = (Ctx) model.get(R_CTX);
-		if (!ctx.resolved(Ctx.STATE_EGSCIV)) {
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Path problem, please check the logs");
-			return null;
-		}
+        final Ctx ctx = (Ctx) model.get(R_CTX);
+        if (!ctx.resolved(Ctx.STATE_EGSCIV)) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Path problem, please check the logs");
+            return null;
+        }
 
-		final String slotId = req.getParameter("sId");
-		if ((slotId == null || slotId.trim().length() == 0)) {
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "no slotId (sId) defined");
-			return null;
-		}
+        final String slotId = req.getParameter("sId");
+        if ((slotId == null || slotId.trim().length() == 0)) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "no slotId (sId) defined");
+            return null;
+        }
 
         final FileSlot slot = ctx.getAssType().getFileSlots().get(slotId);
-		if (slot == null) {
-			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "slot for id " + slotId + " not found");
-			return null;
-		}
+        if (slot == null) {
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND, "slot for id " + slotId + " not found");
+            return null;
+        }
 
-		final String fileId = req.getParameter("fId");
-		if ((fileId == null || fileId.trim().length() == 0)) {
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "no fileId (fId) defined");
-			return null;
-		}
+        final String fileId = req.getParameter("fId");
+        if ((fileId == null || fileId.trim().length() == 0)) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "no fileId (fId) defined");
+            return null;
+        }
 
-		final Solution file = core.getQueries().solution(ctx, slotId, fileId);
-		if (file == null) {
-			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "file for id " + fileId + " not found");
-			return null;
-		}
+        final Solution file = core.getQueries().solution(ctx, slotId, fileId);
+        if (file == null) {
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND, "file for id " + fileId + " not found");
+            return null;
+        }
 
-		final Long stamp = G4Parse.parse(req.getParameter("stamp"), (Long) null);
+        final Long stamp = G4Parse.parse(req.getParameter("stamp"), (Long) null);
 
-		return wm.handleScore(req, resp, ctx, slot, file, stamp, model);
-	}
+        return wm.handleScore(req, resp, ctx, slot, file, stamp, model);
+    }
 
-	protected static abstract class WebMethodCtx {
-		protected HttpServletRequest req;
-		protected HttpServletResponse resp;
-		protected Ctx ctx;
-		protected Map<String, Object> model;
+    protected static abstract class WebMethodCtx {
+        protected HttpServletRequest req;
+        protected HttpServletResponse resp;
+        protected Ctx ctx;
+        protected Map<String, Object> model;
 
-		protected void init(HttpServletRequest req, HttpServletResponse resp, Ctx ctx, Map<String, Object> model) {
-			this.ctx = ctx;
-			this.model = model;
-			this.req = req;
-			this.resp = resp;
-		}
+        protected void init(HttpServletRequest req, HttpServletResponse resp, Ctx ctx, Map<String, Object> model) {
+            this.ctx = ctx;
+            this.model = model;
+            this.req = req;
+            this.resp = resp;
+        }
 
-		public abstract ModelAndView handleCtx() throws IOException;
-	}
+        public abstract ModelAndView handleCtx() throws IOException;
+    }
 
-	protected ModelAndView wmECGS(
-			HttpServletRequest req, HttpServletResponse resp,
-			final String pathToRoot, final WebMethodCtx wm
-	) throws IOException {
-		return wm(req, resp, pathToRoot, Ctx.STATE_ECGS, wm);
-	}
+    protected ModelAndView wmECGS(
+            HttpServletRequest req, HttpServletResponse resp,
+            final String pathToRoot, final WebMethodCtx wm
+    ) throws IOException {
+        return wm(req, resp, pathToRoot, Ctx.STATE_ECGS, wm);
+    }
 
-	protected ModelAndView wmECG(
-			HttpServletRequest req, HttpServletResponse resp,
-			final String pathToRoot, final WebMethodCtx wm
-	) throws IOException {
-		return wm(req, resp, pathToRoot, Ctx.STATE_ECG, wm);
-	}
+    protected ModelAndView wmECG(
+            HttpServletRequest req, HttpServletResponse resp,
+            final String pathToRoot, final WebMethodCtx wm
+    ) throws IOException {
+        return wm(req, resp, pathToRoot, Ctx.STATE_ECG, wm);
+    }
 
-	private ModelAndView wm(
-			HttpServletRequest req, HttpServletResponse resp,
-			final String pathToRoot, final String ctxResolveState, final WebMethodCtx wm
-	) throws IOException {
-		final HashMap<String, Object> model = auth(req, resp, pathToRoot);
-		if (model == null) {
-			return null;
-		}
+    private ModelAndView wm(
+            HttpServletRequest req, HttpServletResponse resp,
+            final String pathToRoot, final String ctxResolveState, final WebMethodCtx wm
+    ) throws IOException {
+        final HashMap<String, Object> model = auth(req, resp, pathToRoot);
+        if (model == null) {
+            return null;
+        }
 
-		final Ctx ctx = (Ctx) model.get(R_CTX);
-		if (!ctx.resolved(ctxResolveState)) {
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Path problem, please check the logs");
-			return null;
-		}
+        final Ctx ctx = (Ctx) model.get(R_CTX);
+        if (!ctx.resolved(ctxResolveState)) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Path problem, please check the logs");
+            return null;
+        }
 
-		wm.init(req, resp, ctx, model);
-		return wm.handleCtx();
-	}
+        wm.init(req, resp, ctx, model);
+        return wm.handleCtx();
+    }
 
-	protected ModelAndView wmFile(
-			HttpServletRequest req, HttpServletResponse resp, final String pathToRoot,
-			final String scopeForced, final WebMethodFile wm
-	) throws IOException {
-		final HashMap<String, Object> model = auth(req, resp, pathToRoot);
-		if (model == null) {
-			return null;
-		}
+    protected ModelAndView wmFile(
+            HttpServletRequest req, HttpServletResponse resp, final String pathToRoot,
+            final String scopeForced, final WebMethodFile wm
+    ) throws IOException {
+        final HashMap<String, Object> model = auth(req, resp, pathToRoot);
+        if (model == null) {
+            return null;
+        }
 
-		final Ctx ctx = (Ctx) model.get(R_CTX);
+        final Ctx ctx = (Ctx) model.get(R_CTX);
 
-		wm.init(req, resp, ctx, model);
-		wm.setScopeForced(scopeForced);
+        wm.init(req, resp, ctx, model);
+        wm.setScopeForced(scopeForced);
 
-		return wm.handleCtx();
-	}
+        return wm.handleCtx();
+    }
 
-	protected static abstract class WebMethodFile extends WebMethodCtx {
-		protected String scopeForced = null;
+    protected static abstract class WebMethodFile extends WebMethodCtx {
+        protected String scopeForced = null;
 
-		private void setScopeForced(String scopeForced) {
-			this.scopeForced = scopeForced;
-		}
+        private void setScopeForced(String scopeForced) {
+            this.scopeForced = scopeForced;
+        }
 
-		public ModelAndView handleCtx() throws IOException {
-			final String scope = scopeForced == null ? req.getParameter("s") : scopeForced;
-			if (scope == null) {
-				resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "scope not set");
-				return null;
-			}
+        public ModelAndView handleCtx() throws IOException {
+            final String scope = scopeForced == null ? req.getParameter("s") : scopeForced;
+            if (scope == null) {
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "scope not set");
+                return null;
+            }
 
             if (Attachment.SCOPE.equals(scope)) {
-				if (!ctx.resolved(Ctx.STATE_CTAV)) {
-					resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "context path problem, please check the logs");
-					return null;
-				}
-			} else if (Solution.SCOPE.equals(scope)) {
-				if (!ctx.resolved(Ctx.STATE_EGSCIV)) {
-					resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "context path problem, please check the logs");
-					return null;
-				}
-			} else {
-				resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "bad scope: " + scope);
-				return null;
-			}
+                if (!ctx.resolved(Ctx.STATE_CTAV)) {
+                    resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "context path problem, please check the logs");
+                    return null;
+                }
+            } else if (Solution.SCOPE.equals(scope)) {
+                if (!ctx.resolved(Ctx.STATE_EGSCIV)) {
+                    resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "context path problem, please check the logs");
+                    return null;
+                }
+            } else {
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "bad scope: " + scope);
+                return null;
+            }
 
-			final String slotId = req.getParameter("sId");
-			if (slotId == null || slotId.trim().length() == 0) {
-				resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "no slotId (sId) defined");
-				return null;
-			}
+            final String slotId = req.getParameter("sId");
+            if (slotId == null || slotId.trim().length() == 0) {
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "no slotId (sId) defined");
+                return null;
+            }
 
             final FileSlot slot = ctx.getAssType().getFileSlots().get(slotId);
-			if (slot == null) {
-				resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "slot '" + slotId + "' not found");
-				return null;
-			}
+            if (slot == null) {
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "slot '" + slotId + "' not found");
+                return null;
+            }
 
-			return handleFile(scope, slot);
-		}
+            return handleFile(scope, slot);
+        }
 
-		protected abstract ModelAndView handleFile(String scope, FileSlot slot) throws IOException;
+        protected abstract ModelAndView handleFile(String scope, FileSlot slot) throws IOException;
 
-		protected void retrieveFile(FileBase fileBase, final CouchDao couchDao) throws IOException {
+        protected void retrieveFile(FileBase fileBase, final CouchDao couchDao) throws IOException {
             final FileType fileType = IdNamed._.one(fileBase.getFileType());
             final String contentType;
             if (!fileType.getContentTypes().isEmpty()) {
@@ -261,7 +265,7 @@ public abstract class ControllerElw extends MultiActionController implements Web
             if (fileType.isBinary()) {
                 resp.setContentType(contentType);
             } else {
-                resp.setContentType(contentType+ "; charset=UTF-8");
+                resp.setContentType(contentType + "; charset=UTF-8");
                 resp.setCharacterEncoding("UTF-8");
             }
 
@@ -269,24 +273,24 @@ public abstract class ControllerElw extends MultiActionController implements Web
             resp.setHeader("Content-Disposition", "attachment;");
 
             ByteStreams.copy(couchDao.file(fileBase, FileBase.CONTENT), resp.getOutputStream());
-		}
+        }
 
-		public ModelAndView storeFile(
+        public ModelAndView storeFile(
                 FileSlot slot, String refreshUri, String failureUri, String authorName,
                 Queries queries, final FileBase file
         ) throws IOException {
             //  FIXME upload page should contain full listing of validation rules
             final SortedMap<String, FileType> allTypes = slot.getFileTypes();
             final SortedMap<String, FileType> validTypes = new TreeMap<String, FileType>(allTypes);
-			final boolean put = "PUT".equalsIgnoreCase(req.getMethod());
-			final int length = req.getContentLength();
+            final boolean put = "PUT".equalsIgnoreCase(req.getMethod());
+            final int length = req.getContentLength();
 
             file.setAuthor(authorName);
             file.setSourceAddress(W.resolveRemoteAddress(req));
 
             InputSupplier<? extends InputStream> inputSupplier = null;
             String contentType = null;
-			if (put) {
+            if (put) {
                 //  FIXME remove this extra variant with non-encoded put uploads
                 inputSupplier = supplierForRequest(req);
                 contentType = "text/plain";
@@ -364,7 +368,7 @@ public abstract class ControllerElw extends MultiActionController implements Web
             } else {
                 return fail(put, failureUri, result.getMessage());
             }
-		}
+        }
 
         protected static String extractNameFromPath(FileItemStream item) {
             final String name = item.getName();
@@ -397,23 +401,23 @@ public abstract class ControllerElw extends MultiActionController implements Web
         }
 
         protected static String fieldText(final FileItemStream item) throws IOException {
-			return CharStreams.toString(CharStreams.newReaderSupplier(supplierForFileItem(item), Charsets.UTF_8));
-		}
-	}
+            return CharStreams.toString(CharStreams.newReaderSupplier(supplierForFileItem(item), Charsets.UTF_8));
+        }
+    }
 
-	protected static InputSupplier<InputStream> supplierForRequest(final HttpServletRequest myReq) {
-		return new InputSupplier<InputStream>() {
-			public InputStream getInput() throws IOException {
-				return myReq.getInputStream();
-			}
-		};
-	}
+    protected static InputSupplier<InputStream> supplierForRequest(final HttpServletRequest myReq) {
+        return new InputSupplier<InputStream>() {
+            public InputStream getInput() throws IOException {
+                return myReq.getInputStream();
+            }
+        };
+    }
 
-	protected static InputSupplier<InputStream> supplierForFileItem(final FileItemStream item) {
-		return new InputSupplier<InputStream>() {
-			public InputStream getInput() throws IOException {
-				return item.openStream();
-			}
-		};
-	}
+    protected static InputSupplier<InputStream> supplierForFileItem(final FileItemStream item) {
+        return new InputSupplier<InputStream>() {
+            public InputStream getInput() throws IOException {
+                return item.openStream();
+            }
+        };
+    }
 }

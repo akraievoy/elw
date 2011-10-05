@@ -11,12 +11,12 @@ public class Group extends Squab implements IdNamed {
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
 
-	private SortedMap<String, Student> students = new TreeMap<String, Student>();
-	public Map<String, Student> getStudents() {
-		return Collections.unmodifiableSortedMap(students);
-	}
-	public void setStudents(SortedMap<String, Student> students) {
-		this.students.clear();
+    private SortedMap<String, Student> students = new TreeMap<String, Student>();
+    public Map<String, Student> getStudents() {
+        return Collections.unmodifiableSortedMap(students);
+    }
+    public void setStudents(SortedMap<String, Student> students) {
+        this.students.clear();
         if (students != null) {
             this.students.putAll(students);
         }

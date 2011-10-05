@@ -1,18 +1,19 @@
 package elw.dao;
 
 import com.google.common.base.Charsets;
-import com.google.common.base.Supplier;
 import com.google.common.collect.MapMaker;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.CharStreams;
 import com.google.common.io.InputSupplier;
-import elw.vo.*;
+import elw.vo.Squab;
 import org.apache.commons.codec.binary.Base64;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 
-import java.io.*;
-import java.lang.Class;
+import java.io.BufferedOutputStream;
+import java.io.FilterInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -25,11 +26,13 @@ import java.util.concurrent.TimeUnit;
  */
 public class CouchDao {
     private final ObjectMapper mapper = new ObjectMapper();
+
     {
         mapper.getSerializationConfig().enable(SerializationConfig.Feature.INDENT_OUTPUT);
     }
 
     protected String couchUrl = "http://localhost:5984/";
+
     public void setCouchUrl(String couchUrl) {
         if (!couchUrl.endsWith("/")) {
             throw new IllegalArgumentException("couchUrl '" + couchUrl + "' must end with '/'");
@@ -38,13 +41,22 @@ public class CouchDao {
     }
 
     protected String dbName = "elw-data";
-    public void setDbName(String dbName) { this.dbName = dbName; }
+
+    public void setDbName(String dbName) {
+        this.dbName = dbName;
+    }
 
     protected String username = "supercow";
-    public void setPassword(String password) { this.password = password; }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
     protected String password = "typical";
-    public void setUsername(String username) { this.username = username; }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
     private final MapMaker caches = new MapMaker().concurrencyLevel(3).expireAfterWrite(1L, TimeUnit.MINUTES);
     private final ConcurrentMap<Squab.Path, List<Squab.Path>> cachePaths = caches.makeMap();
@@ -53,7 +65,7 @@ public class CouchDao {
     private final ConcurrentMap<Squab.Path, SortedMap<Long, ? extends Squab.Stamped>> cacheStamped = caches.makeMap();
 
     private static final SortedMap<Long, ? extends Squab.Stamped> EMPTY_MAP =
-            Collections.unmodifiableSortedMap(new TreeMap<Long,Squab.Stamped>());
+            Collections.unmodifiableSortedMap(new TreeMap<Long, Squab.Stamped>());
 
     public CouchDao() { /* nothing to do here */ }
 
@@ -65,7 +77,7 @@ public class CouchDao {
     }
 
     protected void invalidate_(Squab.Path path, final Set<Squab.Path> paths) {
-        for (Iterator<Squab.Path> iterator = paths.iterator(); iterator.hasNext();) {
+        for (Iterator<Squab.Path> iterator = paths.iterator(); iterator.hasNext(); ) {
             if (iterator.next().intersects(path)) {
                 iterator.remove();
             }
@@ -90,7 +102,7 @@ public class CouchDao {
         final List<S> all = findAll(squabClass, path);
         if (all.isEmpty()) {
             throw new IllegalStateException(
-                    "no records: "+squabClass.getSimpleName()+" '" + Arrays.toString(path) + "'"
+                    "no records: " + squabClass.getSimpleName() + " '" + Arrays.toString(path) + "'"
             );
         }
         return all.get(0);
@@ -345,9 +357,9 @@ public class CouchDao {
         try {
             url = new URL(
                     couchUrl +
-                    dbName + "/" +
-                    URLEncoder.encode(path.id(), "UTF-8") + "/" +
-                    URLEncoder.encode(fileName, "UTF-8")
+                            dbName + "/" +
+                            URLEncoder.encode(path.id(), "UTF-8") + "/" +
+                            URLEncoder.encode(fileName, "UTF-8")
             );
 
             return new InputSupplier<InputStream>() {

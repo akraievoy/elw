@@ -114,7 +114,7 @@ public class Queries {
             couchFile.setContentType(contentType);
             couchFile.setLength((long) content.length);
 
-            final TreeMap<String, Squab.CouchFile> couchFiles = 
+            final TreeMap<String, Squab.CouchFile> couchFiles =
                     new TreeMap<String, Squab.CouchFile>();
             couchFiles.put(FileBase.CONTENT, couchFile);
 

@@ -21,95 +21,95 @@ package elw.web.core;
 import java.util.Map;
 
 public class Summary {
-	private final int openNum;
-	private final int pendingNum;
-	private final int approvedNum;
-	private final int declinedNum;
-	private final Long earliestDue;
+    private final int openNum;
+    private final int pendingNum;
+    private final int approvedNum;
+    private final int declinedNum;
+    private final Long earliestDue;
 
-	public Summary(int approvedNum, int declinedNum, int openNum, int pendingNum, Long earliestDue) {
-		this.approvedNum = approvedNum;
-		this.declinedNum = declinedNum;
-		this.openNum = openNum;
-		this.pendingNum = pendingNum;
-		this.earliestDue = earliestDue;
-	}
+    public Summary(int approvedNum, int declinedNum, int openNum, int pendingNum, Long earliestDue) {
+        this.approvedNum = approvedNum;
+        this.declinedNum = declinedNum;
+        this.openNum = openNum;
+        this.pendingNum = pendingNum;
+        this.earliestDue = earliestDue;
+    }
 
-	public int getApprovedNum() {
-		return approvedNum;
-	}
+    public int getApprovedNum() {
+        return approvedNum;
+    }
 
-	public int getDeclinedNum() {
-		return declinedNum;
-	}
+    public int getDeclinedNum() {
+        return declinedNum;
+    }
 
-	public int getOpenNum() {
-		return openNum;
-	}
+    public int getOpenNum() {
+        return openNum;
+    }
 
-	public int getPendingNum() {
-		return pendingNum;
-	}
+    public int getPendingNum() {
+        return pendingNum;
+    }
 
-	public Long getEarliestDue() {
-		return earliestDue;
-	}
+    public Long getEarliestDue() {
+        return earliestDue;
+    }
 
-	private Summary inc(Summary d) {
-		return new Summary(
-				this.approvedNum + d.approvedNum,
-				this.declinedNum + d.declinedNum,
-				this.openNum + d.openNum,
-				this.pendingNum + d.pendingNum,
-				minDue(earliestDue, d)
-		);
-	}
+    private Summary inc(Summary d) {
+        return new Summary(
+                this.approvedNum + d.approvedNum,
+                this.declinedNum + d.declinedNum,
+                this.openNum + d.openNum,
+                this.pendingNum + d.pendingNum,
+                minDue(earliestDue, d)
+        );
+    }
 
-	private Long minDue(final Long thisDue, Summary thatDue) {
-		if (thisDue != null && thatDue.earliestDue != null) {
-			return Math.min(thisDue, thatDue.earliestDue);
-		}
+    private Long minDue(final Long thisDue, Summary thatDue) {
+        if (thisDue != null && thatDue.earliestDue != null) {
+            return Math.min(thisDue, thatDue.earliestDue);
+        }
 
-		if (thisDue != null) {
-			return thisDue;
-		}
+        if (thisDue != null) {
+            return thisDue;
+        }
 
-		if (thatDue.earliestDue != null) {
-			return thatDue.earliestDue;
-		}
+        if (thatDue.earliestDue != null) {
+            return thatDue.earliestDue;
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	public static void increment(final Map<String, Summary> summaryMap, final String path, final Summary sum) {
-		if (summaryMap == null) {
-			return;
-		}
+    public static void increment(final Map<String, Summary> summaryMap, final String path, final Summary sum) {
+        if (summaryMap == null) {
+            return;
+        }
 
-		if (summaryMap.get(path) == null) {
-			summaryMap.put(path, sum);
-		} else  {
-			summaryMap.put(path, summaryMap.get(path).inc(sum));
-		}
-	}
+        if (summaryMap.get(path) == null) {
+            summaryMap.put(path, sum);
+        } else {
+            summaryMap.put(path, summaryMap.get(path).inc(sum));
+        }
+    }
 
-	protected static void increment(final Map<String, Double> stats, final String path, final double amt) {
-		if (stats.get(path) == null) {
-			stats.put(path, amt);
-		} else {
-			stats.put(path, stats.get(path) + amt);
-		}
-	}
+    protected static void increment(final Map<String, Double> stats, final String path, final double amt) {
+        if (stats.get(path) == null) {
+            stats.put(path, amt);
+        } else {
+            stats.put(path, stats.get(path) + amt);
+        }
+    }
 
-	public static Summary forScore(Long classDueStamp, Boolean approved) {
-		Summary sum;
-		if (Boolean.TRUE.equals(approved)) {
-			sum = new Summary(1, 0, 0, 0, null);
-		} else if (Boolean.FALSE.equals(approved)) {
-			sum = new Summary(0, 1, 0, 0, classDueStamp);
-		} else {
-			sum = new Summary(0, 0, 0, 1, null);
-		}
-		return sum;
-	}
+    public static Summary forScore(Long classDueStamp, Boolean approved) {
+        Summary sum;
+        if (Boolean.TRUE.equals(approved)) {
+            sum = new Summary(1, 0, 0, 0, null);
+        } else if (Boolean.FALSE.equals(approved)) {
+            sum = new Summary(0, 1, 0, 0, classDueStamp);
+        } else {
+            sum = new Summary(0, 0, 0, 1, null);
+        }
+        return sum;
+    }
 }

@@ -19,25 +19,25 @@
 package elw.web;
 
 public class VtTuple {
-	private final String text;
-	private final String classes;
-	private final String sort;
+    private final String text;
+    private final String classes;
+    private final String sort;
 
-	public VtTuple(String text, String classes, String sort) {
-		this.classes = classes;
-		this.sort = sort;
-		this.text = text;
-	}
+    public VtTuple(String text, String classes, String sort) {
+        this.classes = classes;
+        this.sort = sort;
+        this.text = text;
+    }
 
-	public String getClasses() {
-		return classes;
-	}
+    public String getClasses() {
+        return classes;
+    }
 
-	public String getSort() {
-		return sort;
-	}
+    public String getSort() {
+        return sort;
+    }
 
-	public String getText() {
-		return text;
-	}
+    public String getText() {
+        return text;
+    }
 }

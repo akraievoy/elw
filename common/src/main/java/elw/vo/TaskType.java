@@ -11,7 +11,7 @@ public class TaskType implements IdNamed {
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
 
-	private final SortedMap<String, Task> tasks = new TreeMap<String, Task>();
+    private final SortedMap<String, Task> tasks = new TreeMap<String, Task>();
     public SortedMap<String, Task> getTasks() {
         return Collections.unmodifiableSortedMap(tasks);
     }
@@ -22,7 +22,7 @@ public class TaskType implements IdNamed {
         }
     }
 
-	private final SortedMap<String, FileSlot> fileSlots = new TreeMap<String, FileSlot>();
+    private final SortedMap<String, FileSlot> fileSlots = new TreeMap<String, FileSlot>();
     public SortedMap<String, FileSlot> getFileSlots() {
         return Collections.unmodifiableSortedMap(fileSlots);
     }

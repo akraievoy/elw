@@ -16,7 +16,7 @@ public class FileType implements IdNamed {
     public long getLengthLimit() { return lengthLimit; }
     public void setLengthLimit(long lengthLimit) { this.lengthLimit = lengthLimit; }
 
-	private String nameRegex;
+    private String nameRegex;
     public String getNameRegex() { return nameRegex; }
     public void setNameRegex(String nameRegex) { this.nameRegex = nameRegex; }
 

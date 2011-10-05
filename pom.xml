@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<groupId>org.akraievoy.elw</groupId>
-	<artifactId>root</artifactId>
-	<name>elw :: root</name>
-	<version>1.3</version>
-	<packaging>pom</packaging>
+    <groupId>org.akraievoy.elw</groupId>
+    <artifactId>root</artifactId>
+    <name>elw :: root</name>
+    <version>1.3</version>
+    <packaging>pom</packaging>
 
-	<modules>
-		<module>common</module>
-		<module>server</module>
-		<module>datapath</module>
-		<module>datapath-gui</module>
-		<module>web</module>
-	</modules>
+    <modules>
+        <module>common</module>
+        <module>server</module>
+        <module>datapath</module>
+        <module>datapath-gui</module>
+        <module>web</module>
+    </modules>
 
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.5</source>
-					<target>1.5</target>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

@@ -20,32 +20,20 @@ package elw.vo;
 
 import java.util.Date;
 
+//  LATER this smells, presentations belong to web module
 public interface Format {
-	String formatSize(long size);
-
-	String format(Date date);
-
-	String format(long dateLong);
-
-	String format(Date date, String pattern);
-
-	String format(long dateLong, String pattern);
-
-	String format(Date date, String pattern, String patternWeek, String patternToday);
-
-	String format(long dateLong, String pattern, String patternWeek, String patternToday);
-
-	String formatAge(Date time);
-
-	String formatAge(long timeMillis);
-
-	String formatDuration(long timeMillis);
-
-	String json(Object o);
-
-	String esc(String str);
-
-	String lines(String text);
-
-	String format2(Double num);
+    String formatSize(long size);
+    String format(Date date);
+    String format(long dateLong);
+    String format(Date date, String pattern);
+    String format(long dateLong, String pattern);
+    String format(Date date, String pattern, String patternWeek, String patternToday);
+    String format(long dateLong, String pattern, String patternWeek, String patternToday);
+    String formatAge(Date time);
+    String formatAge(long timeMillis);
+    String formatDuration(long timeMillis);
+    String json(Object o);
+    String esc(String str);
+    String lines(String text);
+    String format2(Double num);
 }

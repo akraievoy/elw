@@ -12,13 +12,13 @@ public class Task extends Squab implements IdNamed {
     private String name;
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
-
-	private final SortedMap<String, Version> versions = new TreeMap<String, Version>();
-	public SortedMap<String, Version> getVersions() {
-		return Collections.unmodifiableSortedMap(versions);
-	}
-	public void setVersions(SortedMap<String, Version> versions) {
-		this.versions.clear();
+    
+    private final SortedMap<String, Version> versions = new TreeMap<String, Version>();
+    public SortedMap<String, Version> getVersions() {
+        return Collections.unmodifiableSortedMap(versions);
+    }
+    public void setVersions(SortedMap<String, Version> versions) {
+        this.versions.clear();
         if (versions != null) {
             this.versions.putAll(versions);
         }

@@ -8,8 +8,11 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface InstructionDesc {
-	String template();
-	String syntax();
-	String writeRegs();
-	boolean unsigned() default false;
+    String template();
+
+    String syntax();
+
+    String writeRegs();
+
+    boolean unsigned() default false;
 }

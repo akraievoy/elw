@@ -27,78 +27,82 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
 public class ViewJackson implements View {
-	public final static ObjectMapper MAPPER = createMapper();
-	private String contentType = "text/json";
+    public final static ObjectMapper MAPPER = createMapper();
+    private String contentType = "text/json";
 
-	private static ObjectMapper createMapper() {
-		final ObjectMapper mapper = new ObjectMapper();
+    private static ObjectMapper createMapper() {
+        final ObjectMapper mapper = new ObjectMapper();
 
-		mapper.getSerializationConfig().enable(SerializationConfig.Feature.INDENT_OUTPUT);
+        mapper.getSerializationConfig().enable(SerializationConfig.Feature.INDENT_OUTPUT);
 
-		return mapper;
-	}
+        return mapper;
+    }
 
-	private final State state;
+    private final State state;
 
-	private ViewJackson(State state) {
-		this.state = state;
-	}
+    private ViewJackson(State state) {
+        this.state = state;
+    }
 
-	@Deprecated
-	private ViewJackson(Object data) {
-		this(new State(true, null, data));
-	}
+    @Deprecated
+    private ViewJackson(Object data) {
+        this(new State(true, null, data));
+    }
 
-	@Deprecated
-	private ViewJackson(String message) {
-		this(new State(false, message, null));
-	}
+    @Deprecated
+    private ViewJackson(String message) {
+        this(new State(false, message, null));
+    }
 
-	public String getContentType() {
-		return contentType;
-	}
+    public String getContentType() {
+        return contentType;
+    }
 
-	public ViewJackson toContentType(String contentType) {
-		this.contentType = contentType;
-		return this;
-	}
+    public ViewJackson toContentType(String contentType) {
+        this.contentType = contentType;
+        return this;
+    }
 
-	public void render(Map model, HttpServletRequest request, HttpServletResponse resp) throws Exception {
-		resp.setContentType(getContentType() + "; charset=UTF-8");
-		resp.setCharacterEncoding("UTF-8");
+    public void render(Map model, HttpServletRequest request, HttpServletResponse resp) throws Exception {
+        resp.setContentType(getContentType() + "; charset=UTF-8");
+        resp.setCharacterEncoding("UTF-8");
 
-		resp.setHeader("Pragma", "no-cache");
-		resp.setHeader("Cache-Control", "no-cache");
-		resp.setDateHeader("Expires", System.currentTimeMillis());
+        resp.setHeader("Pragma", "no-cache");
+        resp.setHeader("Cache-Control", "no-cache");
+        resp.setDateHeader("Expires", System.currentTimeMillis());
 
-		MAPPER.writeValue(resp.getWriter(), state);
-	}
+        MAPPER.writeValue(resp.getWriter(), state);
+    }
 
-	public static ViewJackson success(Object data) {return new ViewJackson(data);}
+    public static ViewJackson success(Object data) {
+        return new ViewJackson(data);
+    }
 
-	public static ViewJackson failure(String message) {return new ViewJackson(message);}
+    public static ViewJackson failure(String message) {
+        return new ViewJackson(message);
+    }
 
-	public static class State {
-		protected final boolean success;
-		protected final String message;
-		protected final Object data;
+    public static class State {
+        protected final boolean success;
+        protected final String message;
+        protected final Object data;
 
-		private State(boolean success, String message, Object data) {
-			this.success = success;
-			this.message = message;
-			this.data = data;
-		}
+        private State(boolean success, String message, Object data) {
+            this.success = success;
+            this.message = message;
+            this.data = data;
+        }
 
-		public boolean isSuccess() {
-			return success;
-		}
+        public boolean isSuccess() {
+            return success;
+        }
 
-		public String getMessage() {
-			return message;
-		}
+        public String getMessage() {
+            return message;
+        }
 
-		public Object getData() {
-			return data;
-		}
-	}
+        public Object getData() {
+            return data;
+        }
+    }
 }

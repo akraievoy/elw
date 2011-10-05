@@ -4,109 +4,109 @@ import gnu.trove.TIntArrayList;
 import gnu.trove.TIntByteHashMap;
 import gnu.trove.TIntIntHashMap;
 
-import java.util.*;
+import java.util.Arrays;
 
 public class Memory {
-	private TIntByteHashMap contentMap = new TIntByteHashMap();
+    private TIntByteHashMap contentMap = new TIntByteHashMap();
 
-	private TIntArrayList readAdresses = new TIntArrayList();
-	private TIntArrayList writeAdresses = new TIntArrayList();
+    private TIntArrayList readAdresses = new TIntArrayList();
+    private TIntArrayList writeAdresses = new TIntArrayList();
 
-	public int getWord(int address) {
-		readAdresses.add(address);
+    public int getWord(int address) {
+        readAdresses.add(address);
 
-		return getWordInternal(address);
-	}
+        return getWordInternal(address);
+    }
 
-	public int getWordInternal(final int address) {
-		final byte byte0 = getByteInternal(address);
-		final byte byte1 = getByteInternal(address + 1);
-		final byte byte2 = getByteInternal(address + 2);
-		final byte byte3 = getByteInternal(address + 3);
+    public int getWordInternal(final int address) {
+        final byte byte0 = getByteInternal(address);
+        final byte byte1 = getByteInternal(address + 1);
+        final byte byte2 = getByteInternal(address + 2);
+        final byte byte3 = getByteInternal(address + 3);
 
-		return (byte0 << 24) | ((byte1 << 16) & 0xFF0000) | ((byte2 << 8) & 0xFF00) | ((int) byte3 & 0xFF);
-	}
+        return (byte0 << 24) | ((byte1 << 16) & 0xFF0000) | ((byte2 << 8) & 0xFF00) | ((int) byte3 & 0xFF);
+    }
 
-	public int setWord(int address, int newWord) {
-		writeAdresses.add(address);
-		writeAdresses.add(address + 1);
-		writeAdresses.add(address + 2);
-		writeAdresses.add(address + 3);
+    public int setWord(int address, int newWord) {
+        writeAdresses.add(address);
+        writeAdresses.add(address + 1);
+        writeAdresses.add(address + 2);
+        writeAdresses.add(address + 3);
 
-		return setWordInternal(address, newWord);
-	}
+        return setWordInternal(address, newWord);
+    }
 
-	private int setWordInternal(int address, int newWord) {
-		final int oldWord = getWordInternal(address);
+    private int setWordInternal(int address, int newWord) {
+        final int oldWord = getWordInternal(address);
 
-		setByteInternal(address, (byte) (newWord >> 24));
-		setByteInternal(address + 1, (byte) (newWord >> 16 & 0xFF));
-		setByteInternal(address + 2, (byte) (newWord >> 8 & 0xFF));
-		setByteInternal(address + 3, (byte) (newWord & 0xFF));
+        setByteInternal(address, (byte) (newWord >> 24));
+        setByteInternal(address + 1, (byte) (newWord >> 16 & 0xFF));
+        setByteInternal(address + 2, (byte) (newWord >> 8 & 0xFF));
+        setByteInternal(address + 3, (byte) (newWord & 0xFF));
 
-		return oldWord;
-	}
+        return oldWord;
+    }
 
-	public byte getByteInternal(final int address) {
-		return contentMap.get(address);
-	}
+    public byte getByteInternal(final int address) {
+        return contentMap.get(address);
+    }
 
-	private byte setByteInternal(int address, byte value) {
-		return contentMap.put(address, value);
-	}
+    private byte setByteInternal(int address, byte value) {
+        return contentMap.put(address, value);
+    }
 
-	public byte getByte(int address) {
-		readAdresses.add(address);
+    public byte getByte(int address) {
+        readAdresses.add(address);
 
-		return getByteInternal(address);
-	}
+        return getByteInternal(address);
+    }
 
-	public byte setByte(int address, byte newByte) {
-		writeAdresses.add(address);
+    public byte setByte(int address, byte newByte) {
+        writeAdresses.add(address);
 
-		return setByteInternal(address, newByte);
-	}
+        return setByteInternal(address, newByte);
+    }
 
-	public TIntArrayList getReadAdresses() {
-		return readAdresses;
-	}
+    public TIntArrayList getReadAdresses() {
+        return readAdresses;
+    }
 
-	public TIntArrayList getWriteAdresses() {
-		return writeAdresses;
-	}
+    public TIntArrayList getWriteAdresses() {
+        return writeAdresses;
+    }
 
-	public void resetAccess() {
-		readAdresses.clear();
-		writeAdresses.clear();
-	}
+    public void resetAccess() {
+        readAdresses.clear();
+        writeAdresses.clear();
+    }
 
-	public int getSize() {
-		return contentMap.size();
-	}
+    public int getSize() {
+        return contentMap.size();
+    }
 
-	public int getAddressAt(int index) {
-		//  LATER optimize this
-		final int[] keys = contentMap.keys();
-		Arrays.sort(keys);
+    public int getAddressAt(int index) {
+        //  LATER optimize this
+        final int[] keys = contentMap.keys();
+        Arrays.sort(keys);
 
-		return keys[index];
-	}
+        return keys[index];
+    }
 
-	public void setData(final TIntIntHashMap newData) {
-		resetAccess();
+    public void setData(final TIntIntHashMap newData) {
+        resetAccess();
 
-		contentMap.clear();
-		final int[] addresses = newData.keys();
-		for (final int addr : addresses) {
-			setWord(addr, newData.get(addr));
-		}
-	}
+        contentMap.clear();
+        final int[] addresses = newData.keys();
+        for (final int addr : addresses) {
+            setWord(addr, newData.get(addr));
+        }
+    }
 
-	public boolean hasWord(final int address) {
-		return hasByte(address) && hasByte(address + 1) && hasByte(address + 2) && hasByte(address + 3);
-	}
+    public boolean hasWord(final int address) {
+        return hasByte(address) && hasByte(address + 1) && hasByte(address + 2) && hasByte(address + 3);
+    }
 
-	private boolean hasByte(final int address) {
-		return contentMap.containsKey(address);
-	}
+    private boolean hasByte(final int address) {
+        return contentMap.containsKey(address);
+    }
 }

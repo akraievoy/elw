@@ -9,19 +9,19 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class IndexEntry {
-	private String[] path;
+    private String[] path;
     public String[] getPath() { return path; }
     public void setPath(String[] path) { this.path = path; }
 
-	private int scoreBudget;
+    private int scoreBudget;
     public int getScoreBudget() { return scoreBudget; }
     public void setScoreBudget(int scoreBudget) { this.scoreBudget = scoreBudget; }
 
-	private int classFrom;
+    private int classFrom;
     public int getClassFrom() { return classFrom; }
     public void setClassFrom(int classFrom) { this.classFrom = classFrom; }
 
-	private final Map<String, Integer> classDue = new TreeMap<String, Integer>();
+    private final Map<String, Integer> classDue = new TreeMap<String, Integer>();
     public Map<String, Integer> getClassDue() {
         return Collections.unmodifiableMap(classDue);
     }
@@ -32,59 +32,59 @@ public class IndexEntry {
         }
     }
 
-	//	TODO still not used
+    //	TODO still not used
     private boolean requireClean;
-	public boolean isRequireClean() { return requireClean; }
-	public void setRequireClean(boolean requireClean) { this.requireClean = requireClean; }
+    public boolean isRequireClean() { return requireClean; }
+    public void setRequireClean(boolean requireClean) { this.requireClean = requireClean; }
 
-	//	TODO pass Ctx to this place somehow
-	public String normName(final Enrollment enr, final Student stud, final Task ass, final Version ver,
-						   final FileSlot slot, final Solution meta, final Format format) {
-		try {
-			final String normName = enr.getName() + "-" + stud.getName() + "--" +
-					ass.getName() + (ver == null ? "" : "-" + ver.getName()) + "--" +
-					slot.getName() + "-" + format.format(meta.getStamp(), "MMdd-HHmm");
+    //	TODO pass Ctx to this place somehow
+    public String normName(final Enrollment enr, final Student stud, final Task ass, final Version ver,
+                           final FileSlot slot, final Solution meta, final Format format) {
+        try {
+            final String normName = enr.getName() + "-" + stud.getName() + "--" +
+                    ass.getName() + (ver == null ? "" : "-" + ver.getName()) + "--" +
+                    slot.getName() + "-" + format.format(meta.getStamp(), "MMdd-HHmm");
 
-			final String oriName = meta.getName();
-			final int oriLastDot = oriName.lastIndexOf(".");
-			final String oriExt = oriLastDot < 0 ? "" : oriName.substring(oriLastDot);
+            final String oriName = meta.getName();
+            final int oriLastDot = oriName.lastIndexOf(".");
+            final String oriExt = oriLastDot < 0 ? "" : oriName.substring(oriLastDot);
 
-			final String normNameNoWs = normName.replaceAll("[\\s\\\\/]+", "_") + oriExt;
+            final String normNameNoWs = normName.replaceAll("[\\s\\\\/]+", "_") + oriExt;
 
-			return URLEncoder.encode(
-					normNameNoWs,
-					"UTF-8"
-			);
-		} catch (UnsupportedEncodingException e) {
-			throw new IllegalStateException("UTF-8 is NOT supported?!");
-		}
-	}
+            return URLEncoder.encode(
+                    normNameNoWs,
+                    "UTF-8"
+            );
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalStateException("UTF-8 is NOT supported?!");
+        }
+    }
 
-	@JsonIgnore
-	public double computePoints(Score score, final FileSlot slot) {
-		if (Boolean.FALSE.equals(score.getApproved())) {
-			return 0.0;
-		}
-		return getScoreBudget() * slot.getScoreWeight() * score.computeRatio(slot);
-	}
+    @JsonIgnore
+    public double computePoints(Score score, final FileSlot slot) {
+        if (Boolean.FALSE.equals(score.getApproved())) {
+            return 0.0;
+        }
+        return getScoreBudget() * slot.getScoreWeight() * score.computeRatio(slot);
+    }
 
-	@JsonIgnore
-	public double computePoints(final FileSlot slot) {
-		return getScoreBudget() * slot.getScoreWeight();
-	}
+    @JsonIgnore
+    public double computePoints(final FileSlot slot) {
+        return getScoreBudget() * slot.getScoreWeight();
+    }
 
-	@JsonIgnore
-	public double getTotal(final TaskType aType, Score score) {
-		double result = 0.0;
+    @JsonIgnore
+    public double getTotal(final TaskType aType, Score score) {
+        double result = 0.0;
 
-		for (FileSlot slot : aType.getFileSlots().values()) {
-			if (!Boolean.TRUE.equals(score.getApproved())) {
-				continue;
-			}
+        for (FileSlot slot : aType.getFileSlots().values()) {
+            if (!Boolean.TRUE.equals(score.getApproved())) {
+                continue;
+            }
 
-			result += computePoints(score, slot);
-		}
+            result += computePoints(score, slot);
+        }
 
-		return result;
-	}
+        return result;
+    }
 }
