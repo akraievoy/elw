@@ -6,7 +6,6 @@ import com.google.common.io.ByteStreams;
 import com.google.common.io.CharStreams;
 import com.google.common.io.InputSupplier;
 import elw.vo.Squab;
-import org.apache.commons.codec.binary.Base64;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 
@@ -403,10 +402,12 @@ public class CouchDao {
                     "Content-Length",
                     Integer.toString(squabJSON.getBytes().length)
             );
+            //  use Base64 codec bundled with Jackson: bytes -> "base64"
+            final String base64Str = mapper.writeValueAsString((username + ":" + password).getBytes());
             connection.addRequestProperty(
                     "Authorization",
-                    //  some newline lurked in
-                    "Basic " + Base64.encodeBase64String((username + ":" + password).getBytes()).trim()
+                    //  drop first and last chars as those are JSON quotas
+                    "Basic " + base64Str.substring(1, base64Str.length() - 1)
             );
             connection.setUseCaches(false);
             connection.setDoInput(true);
