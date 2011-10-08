@@ -235,7 +235,7 @@ public class MipsAssembler {
                 Result.failure(log, resRef, prefixOn + "direct ref to $" + reg.toString());
                 return true;
             }
-            if (desc.writeRegs().indexOf(regId) >= 0 && G.contains(Reg.roRegs, reg)) {
+            if (desc.writeRegs().contains(regId) && G.contains(Reg.roRegs, reg)) {
                 Result.failure(log, resRef, prefixOn + "write to $" + reg.toString());
                 return true;
             }
@@ -419,40 +419,33 @@ public class MipsAssembler {
     }
 
     private static Reg parseReg(final String regToken, final Logger log, final Result[] resRef, final String prefix) {
-        final Reg reg;
-        if (regToken.startsWith("$")) {
-            final String regName = regToken.substring(1).toLowerCase();
-            final Reg regByName = Reg.getByName().get(regName);
-            if (regByName == null) {
-                if (!Data.isNum(regName, 5)) {
-                    Result.failure(log, resRef, prefix + "refers to unknown register '" + regName + "'");
-                    return null;
-                } else {
-                    return parseReg(regName, log, resRef, prefix);
-                }
-            }
-            reg = regByName;
-            return reg;
+        if (!regToken.startsWith("$")) {
+            Result.failure(log, resRef, prefix + "register token must be either $name or $number");
+            return null;
         }
 
-        if (Data.isNum(regToken, 5)) {
-            final long regNumLong = Data.parse(regToken);
-
-            if (regNumLong < 0) {
-                Result.failure(log, resRef, prefix + "refers to register with negative number '" + regNumLong + "'");
-                return null;
-            }
-            if (regNumLong > Reg.values().length) {
-                Result.failure(log, resRef, prefix + "refers to register with illegal number '" + regNumLong + "'");
-                return null;
-            }
-
-            reg = Reg.values()[(int) regNumLong];
-            return reg;
+        final String regName = regToken.substring(1).toLowerCase();
+        final Reg regByName = Reg.getByName().get(regName);
+        if (regByName != null) {
+            return regByName;
         }
 
-        Result.failure(log, resRef, prefix + "register token must be either $name or valid number");
-        return null;
+        if (!Data.isNum(regName, 5)) {
+            Result.failure(log, resRef, prefix + "refers to unknown register '" + regName + "'");
+            return null;
+        }
+
+        final long regNumLong = Data.parse(regName);
+        if (regNumLong < 0) {
+            Result.failure(log, resRef, prefix + "refers to register with negative number '" + regNumLong + "'");
+            return null;
+        }
+        if (regNumLong > Reg.values().length) {
+            Result.failure(log, resRef, prefix + "refers to register with illegal number '" + regNumLong + "'");
+            return null;
+        }
+
+        return Reg.values()[(int) regNumLong];
     }
 }
 
