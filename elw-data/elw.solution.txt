@@ -1,3 +1,36 @@
-Content-Type: multipart/mixed; boundary="==eeeaa33b3d2044db9bd7f313b8b3d33d=="
+Content-Type: multipart/mixed; boundary="==6537c1ee9cf544de92fd838a7a7f67ed=="
 
---==eeeaa33b3d2044db9bd7f313b8b3d33d==--
+--==6537c1ee9cf544de92fd838a7a7f67ed==
+Content-ID: Score-test-01-aos_w11-0-lr-lr1-3-code-upload.txt-gu4ildul-
+Content-Length: 881
+Content-MD5: XTkgUHdO/C/dlMh18WuYLQ==
+Content-Type: application/json;charset=utf-8
+ETag: "1-dda05643228bd53e4c561e32f384b11e"
+
+{"comment": null, "ratios": {"code--offsite": 0.99, "code--reuse": 0.6, "code--format": 0.9, "code--reuse.unsure": 0.8, "code--rapid": 1.2, "code--defend.withdrawn": 0.8, "code--defend.wrong": 0.9, "code--tests": 1.0, "code--ontime": 1.01, "code--content.missing": 0.75, "code--offtime": 0.98, "code--overdue": 0.995, "code--style": 0.95, "code--defend.pending": 0.85, "code--onsite": 1.02}, "stamp": 1319403191133, "pows": {"code--offsite": 1, "code--reuse": 0, "code--format": 0, "code--reuse.unsure": 0, "code--rapid": 0, "code--defend.withdrawn": 0, "code--defend.wrong": 0, "code--tests": 1, "code--ontime": 0, "code--content.missing": 0, "code--offtime": 1, "code--overdue": 0, "code--style": 0, "code--defend.pending": 0, "code--onsite": 0}, "_rev": "1-dda05643228bd53e4c561e32f384b11e", "_id": "Score-test-01-aos_w11-0-lr-lr1-3-code-upload.txt-gu4ildul-", "approved": true}
+--==6537c1ee9cf544de92fd838a7a7f67ed==
+Content-ID: Solution-test-01-aos_w11-0-lr-lr1-3-code-upload.txt-gu4fh05b-
+Content-Type: multipart/mixed; boundary="==10a4f8630b5644b8a787bbddc0c6173e=="
+ETag: "7-c43a554a2dfb36fc0604b578f59161a1"
+
+--==10a4f8630b5644b8a787bbddc0c6173e==
+Content-Length: 581
+Content-MD5: zYXDar3ghNEwVii6s8Jf0Q==
+Content-Type: application/json;charset=utf-8
+
+{"comment": null, "validatorStamp": 1319403191133, "name": "upload.txt", "author": "Anton Kraievoy", "testsPassed": 3, "_rev": "7-c43a554a2dfb36fc0604b578f59161a1", "stamp": 1319397947903, "testsFailed": 0, "id": "upload.txt", "_id": "Solution-test-01-aos_w11-0-lr-lr1-3-code-upload.txt-gu4fh05b-", "sourceAddress": "127.0.0.1", "fileType": {"mipscode": {"binary": false, "name": "Код MIPS", "viewer": null, "lengthLimit": 4096, "nameRegex": ".+\\.(txt|mips)", "headers": [], "contentTypes": ["text/plain"], "validator": null, "editor": "elw.web.EditorMips", "id": "mipscode"}}}
+--==10a4f8630b5644b8a787bbddc0c6173e==
+Content-ID: content
+Content-Length: 236
+Content-MD5: thZmFoK8mYIfuqadBZja3Q==
+Content-Type: text/plain
+
+# Дадати вміст регістрів $a0, $a1, $a2, 
+# помножити його на вміст регістру $a3 і 
+# записати результат в $v0.
+add $t0, $a0, $a1
+add $t0, $t0, $a2
+mult $t0, $a3
+mflo $v0
+--==10a4f8630b5644b8a787bbddc0c6173e==--
+--==6537c1ee9cf544de92fd838a7a7f67ed==--

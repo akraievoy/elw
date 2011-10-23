@@ -1,14 +1,14 @@
-Content-Type: multipart/mixed; boundary="==aeb29eb42b374db39f28d70ee2eff44f=="
+Content-Type: multipart/mixed; boundary="==1b65cf8203fc49f18713ab92dc72a8f1=="
 
---==aeb29eb42b374db39f28d70ee2eff44f==
+--==1b65cf8203fc49f18713ab92dc72a8f1==
 Content-ID: Course-aos_w11-
-Content-Length: 1570
-Content-MD5: me8X+ODhUOWZmpHXxIYgyA==
+Content-Length: 1755
+Content-MD5: AjccI3pYasaxxvqQBq4Ygg==
 Content-Type: application/json;charset=utf-8
-ETag: "1-efdfbdfe2ec88da3ed387d087c01ef24"
+ETag: "3-f5057247466d927dca892851aa41579e"
 
-{"_id": "Course-aos_w11-", "name": "Архитектура Вычислительных Систем", "template": "template", "criterias": {}, "_rev": "1-efdfbdfe2ec88da3ed387d087c01ef24", "taskTypes": {"lr": {"fileSlots": {"test": {"fileTypes": {"plaintext": null}, "name": "Тест"}, "docs": {"fileTypes": {"rtf": null, "markdown": null, "plaintext": null, "html": null, "archives": null, "images": null, "pdf": null}, "name": "Документы"}, "report": {"writable": true, "criterias": {"onsite.tracked": null, "style": null, "offtime.tracked": null, "reuse": null, "format": null, "content.wrong": null, "content.missing": null, "defend.wrong": null, "reuse.unsure": null, "rapid": null, "defend.withdrawn": null, "defend.pending": null, "offsite.tracked": null, "ontime.tracked": null, "overdue": null}, "fileTypes": {"markdown": null, "pdf": null, "rtf": null}, "name": "Отчеты", "scoreWeight": 0.35}, "code": {"writable": true, "criterias": {"onsite": null, "style": null, "rapid": null, "reuse": null, "ontime": null, "format": null, "offsite": null, "content.missing": null, "reuse.unsure": null, "tests": null, "defend.withdrawn": null, "offtime": null, "defend.pending": null, "defend.wrong": null, "overdue": null}, "fileTypes": {"plaintext": null}, "name": "Решение", "scoreWeight": 0.65}, "statement": {"fileTypes": {"plaintext": null, "html": null}, "name": "Условие"}}, "tasks": {"lr1": null, "lr3": null, "lr2": null, "lr5": null, "lr4": null, "lr6": null}, "name": "Лабораторная Работа"}}, "id": "aos_w11"}
---==aeb29eb42b374db39f28d70ee2eff44f==
+{"name": "Архитектура Вычислительных Систем", "criterias": {}, "_rev": "3-f5057247466d927dca892851aa41579e", "taskTypes": {"lr": {"fileSlots": {"test": {"fileTypes": {"plaintext": null}, "name": "Тест"}, "docs": {"fileTypes": {"rtf": null, "markdown": null, "plaintext": null, "html": null, "archives": null, "images": null, "pdf": null}, "name": "Документы"}, "report": {"writable": true, "criterias": {"onsite.tracked": null, "style": null, "offtime.tracked": null, "reuse": null, "format": null, "content.wrong": null, "content.missing": null, "defend.wrong": null, "reuse.unsure": null, "rapid": null, "defend.withdrawn": null, "defend.pending": null, "offsite.tracked": null, "ontime.tracked": null, "overdue": null}, "fileTypes": {"markdown": null, "pdf": null, "rtf": null}, "name": "Отчеты", "scoreWeight": 0.35}, "code": {"writable": true, "criterias": {"onsite": null, "style": null, "rapid": null, "reuse": null, "ontime": null, "format": null, "offsite": null, "content.missing": null, "reuse.unsure": null, "tests": null, "defend.withdrawn": null, "offtime": null, "defend.pending": null, "defend.wrong": null, "overdue": null}, "fileTypes": {"mipscode": null}, "name": "Решение", "scoreWeight": 0.65}, "statement": {"fileTypes": {"plaintext": null, "html": null}, "name": "Условие"}}, "tasks": {"lr1": null, "lr3": null, "lr2": null, "lr5": null, "lr4": null, "lr6": null}, "name": "Лабораторная Работа"}}, "template": "template", "_id": "Course-aos_w11-", "fileTypes": {"mipscode": {"binary": false, "name": "Код MIPS", "lengthLimit": 4096, "nameRegex": ".+\\.(txt|mips)", "contentTypes": ["text/plain"], "editor": "elw.web.EditorMips"}}, "id": "aos_w11"}
+--==1b65cf8203fc49f18713ab92dc72a8f1==
 Content-ID: Course-lans_w11-
 Content-Length: 1323
 Content-MD5: omO9uTH9nY6dPbFUu0Zkiw==
@@ -16,7 +16,7 @@ Content-Type: application/json;charset=utf-8
 ETag: "5-6ddbdff5fbc253e1902dc7e31a49f310"
 
 {"name": "Компьютерные Сети", "criterias": {}, "_rev": "5-6ddbdff5fbc253e1902dc7e31a49f310", "taskTypes": {"lr": {"fileSlots": {"report": {"writable": true, "criterias": {"onsite.tracked": null, "style": null, "offtime.tracked": null, "reuse": null, "format": null, "content.wrong": null, "content.missing": null, "defend.wrong": null, "reuse.unsure": null, "rapid": null, "defend.withdrawn": null, "defend.pending": null, "offsite.tracked": null, "ontime.tracked": null, "overdue": null}, "fileTypes": {"markdown": null, "pdf": null, "rtf": null}, "name": "Отчеты", "scoreWeight": 1}, "docs": {"fileTypes": {"rtf": null, "markdown": null, "plaintext": null, "html": null, "archives": null, "images": null, "pdf": null}, "name": "Документы"}, "data": {"writable": true, "fileTypes": {"rtf": null, "plaintext": null, "markdown": null, "images": null, "pdf": null, "wireshark": null}, "name": "Данные"}}, "tasks": {"lr1": null, "lr3": null, "lr2": null, "lr5": null, "lr4": null, "lr6": null}, "name": "Лабораторная Работа"}}, "template": "template", "_id": "Course-lans_w11-", "fileTypes": {"wireshark": {"binary": true, "contentTypes": ["application/octet-stream"], "name": "Wireshark Dumps", "lengthLimit": 2097152, "nameRegex": ".+\\.(pcap|pkt)"}}, "id": "lans_w11"}
---==aeb29eb42b374db39f28d70ee2eff44f==
+--==1b65cf8203fc49f18713ab92dc72a8f1==
 Content-ID: Course-template-
 Content-Length: 4124
 Content-MD5: nBHw55KejK1f4KbNL4ctZg==
@@ -24,55 +24,55 @@ Content-Type: application/json;charset=utf-8
 ETag: "10-488aa74c619b9cf317f86b5770d13965"
 
 {"name": "Шаблон, хранит определения типов файлов и критериев проверки", "criterias": {"defend.pending": {"powDef": "0", "ratio": "0.85", "name": "Защита: вопросы", "powMax": 5}, "content.missing": {"powDef": "0", "ratio": "0.75", "name": "Отсутствие раздела", "powMax": 5, "id": "content"}, "content.wrong": {"powDef": "0", "ratio": "0.85", "name": "Ошибки в разделе", "powMax": 5}, "offtime": {"powDef": "$offtime", "ratio": "0.98", "name": "Сдача не во время занятий", "powMax": 1}, "offsite.tracked": {"powDef": "$offsite", "ratio": "0.985", "name": "Удаленная отправка", "powMax": 1}, "onsite.tracked": {"powDef": "$onsite", "ratio": "1.5", "name": "Сдача в аудитории", "powMax": 1}, "style": {"powDef": "0", "ratio": "0.95", "name": "Ошибки в шрифтах, стилях", "powMax": 7, "id": "style"}, "rapid": {"powDef": "$rapid", "ratio": "1.2", "name": "Сдача на первом занятии", "powMax": 1}, "brute": {"powDef": "0", "ratio": "0.95", "name": "Примитивный алгоритм", "powMax": 3}, "eff": {"powDef": "0", "ratio": "1.25", "name": "Эффективный алгоритм", "powMax": 3}, "tests": {"powDef": "1", "ratio": "$passratio", "name": "Сломанные тесты", "powMax": 1}, "reuse": {"powDef": "0", "ratio": "0.6", "name": "Групповая работа", "powMax": 5}, "format": {"powDef": "0", "ratio": "0.9", "name": "Ошибка в оформлении", "powMax": 5, "id": "format"}, "defend.withdrawn": {"powDef": "0", "ratio": "0.8", "name": "Защита: вопросы отклонены", "powMax": 5}, "defend.wrong": {"powDef": "0", "ratio": "0.9", "name": "Защита: ответы некорректны", "powMax": 5}, "onsite": {"powDef": "$onsite", "ratio": "1.02", "name": "Сдача в аудитории", "powMax": 1}, "offtime.tracked": {"powDef": "$offtime", "ratio": "0.975", "name": "Сдача не во время занятий", "powMax": 1}, "ontime": {"powDef": "$ontime", "ratio": "1.01", "name": "Сдача во время занятия", "powMax": 1}, "offsite": {"powDef": "$offsite", "ratio": "0.99", "name": "Удаленная отправка", "powMax": 1}, "reuse.unsure": {"powDef": "0", "ratio": "0.8", "name": "Групповая работа (вероятная)", "powMax": 5}, "ontime.tracked": {"powDef": "$ontime", "ratio": "1.7", "name": "Сдача во время занятия", "powMax": 1}, "overdue": {"powDef": "$overdue", "ratio": "0.995", "name": "Задержка", "powMax": 120}}, "_rev": "10-488aa74c619b9cf317f86b5770d13965", "_id": "Course-template-", "fileTypes": {"rtf": {"binary": true, "contentTypes": ["application/octet-stream", "application/rtf", "application/msword"], "name": "RTF", "lengthLimit": 4194304, "nameRegex": ".+\\.(rtf)"}, "plaintext": {"binary": false, "contentTypes": ["text/plain"], "name": "Текстовые файлы", "lengthLimit": 65536, "nameRegex": ".+\\.(txt|log|err|in|out)"}, "mindmap": {"binary": false, "contentTypes": ["text/xml"], "name": "Карты Памяти", "lengthLimit": 2097152, "nameRegex": ".+\\.(mm)"}, "markdown": {"binary": false, "contentTypes": ["text/plain"], "name": "MarkDown", "lengthLimit": 524288, "nameRegex": ".+\\.(md)"}, "html": {"binary": false, "contentTypes": ["text/html"], "name": "HTML", "lengthLimit": 524288, "nameRegex": ".+\\.(html?)"}, "archives": {"binary": true, "contentTypes": ["application/zip", "application/octet-stream", "application/7z"], "name": "Archives", "lengthLimit": 20971520, "nameRegex": ".+\\.(zip|7z)"}, "images": {"binary": true, "contentTypes": ["application/octet-stream", "image/jpeg", "image/png", "image/gif", "image/bmp", "image/svg+xml"], "name": "Изображения", "lengthLimit": 2097152, "nameRegex": ".+\\.(png|gif|bmp|svg|jpg|jpeg)"}, "pdf": {"binary": true, "contentTypes": ["application/pdf", "application/octet-stream"], "name": "PDF", "lengthLimit": 4194304, "nameRegex": ".+\\.(pdf)"}}, "id": "template"}
---==aeb29eb42b374db39f28d70ee2eff44f==
-Content-ID: Task-aos_w11-lr-1-
-Content-Length: 570
-Content-MD5: vVFY5SAKoWY+dVP+wyfOwQ==
+--==1b65cf8203fc49f18713ab92dc72a8f1==
+Content-ID: Task-aos_w11-lr-lr1-
+Content-Length: 573
+Content-MD5: ZGcf7uvQzkBF2jFEQozLXw==
 Content-Type: application/json;charset=utf-8
-ETag: "13-f1b00c6e79d4dadc88db063915c80d4d"
+ETag: "2-b9bf16122d78c022f368be3e165386ad"
 
-{"id": "1", "_rev": "13-f1b00c6e79d4dadc88db063915c80d4d", "_id": "Task-aos_w11-lr-1-", "name": "ЛР №1", "versions": {"1": {"shared": false, "name": "Добуток та інкремент", "id": null}, "3": {"shared": false, "name": "Сума і добуток", "id": null}, "2": {"shared": false, "name": "Остача та декремент", "id": null}, "5": {"shared": false, "name": "Множення", "id": null}, "4": {"shared": false, "name": "Різниця і остача", "id": null}, "6": {"shared": false, "name": "Ділення", "id": null}}}
---==aeb29eb42b374db39f28d70ee2eff44f==
-Content-ID: Task-aos_w11-lr-2-
-Content-Length: 537
-Content-MD5: S1NTx4pCkFNCfZ4IJOsG8Q==
+{"id": "lr1", "_rev": "2-b9bf16122d78c022f368be3e165386ad", "_id": "Task-aos_w11-lr-lr1-", "name": "ЛР №1", "versions": {"1": {"shared": false, "name": "Добуток та інкремент", "id": null}, "3": {"shared": false, "name": "Сума і добуток", "id": null}, "2": {"shared": false, "name": "Остача та декремент", "id": null}, "5": {"shared": false, "name": "Множення", "id": null}, "4": {"shared": false, "name": "Різниця і остача", "id": null}, "6": {"shared": false, "name": "Ділення", "id": null}}}
+--==1b65cf8203fc49f18713ab92dc72a8f1==
+Content-ID: Task-aos_w11-lr-lr2-
+Content-Length: 540
+Content-MD5: Di1nuLphE5uJodqHW+4YHA==
 Content-Type: application/json;charset=utf-8
-ETag: "11-4e8e65aff9f3f2a09069f9ca4e721fdd"
+ETag: "2-995cc389d167e02255856a40978a0b49"
 
-{"id": "2", "_rev": "11-4e8e65aff9f3f2a09069f9ca4e721fdd", "_id": "Task-aos_w11-lr-2-", "name": "ЛР №2", "versions": {"1": {"shared": false, "name": "Сума та різниця", "id": null}, "3": {"shared": false, "name": "Інкремент", "id": null}, "2": {"shared": false, "name": "Усереднення", "id": null}, "5": {"shared": false, "name": "Добуток", "id": null}, "4": {"shared": false, "name": "Обмін", "id": null}, "6": {"shared": false, "name": "Подвійна адресація", "id": null}}}
---==aeb29eb42b374db39f28d70ee2eff44f==
-Content-ID: Task-aos_w11-lr-3-
-Content-Length: 578
-Content-MD5: s49z/GxTTOByj3+sNdmoig==
+{"id": "lr2", "_rev": "2-995cc389d167e02255856a40978a0b49", "_id": "Task-aos_w11-lr-lr2-", "name": "ЛР №2", "versions": {"1": {"shared": false, "name": "Сума та різниця", "id": null}, "3": {"shared": false, "name": "Інкремент", "id": null}, "2": {"shared": false, "name": "Усереднення", "id": null}, "5": {"shared": false, "name": "Добуток", "id": null}, "4": {"shared": false, "name": "Обмін", "id": null}, "6": {"shared": false, "name": "Подвійна адресація", "id": null}}}
+--==1b65cf8203fc49f18713ab92dc72a8f1==
+Content-ID: Task-aos_w11-lr-lr3-
+Content-Length: 581
+Content-MD5: oRTt2XWAoTIwDCzBV2vjQw==
 Content-Type: application/json;charset=utf-8
-ETag: "11-003ff59df19cbf96d326356e7c0a8f21"
+ETag: "2-396c11beb2886d6817f7fdddb9f49592"
 
-{"id": "3", "_rev": "11-003ff59df19cbf96d326356e7c0a8f21", "_id": "Task-aos_w11-lr-3-", "name": "ЛР №3", "versions": {"1": {"shared": false, "name": "Перевірка на рівність", "id": null}, "3": {"shared": false, "name": "Рівність слів памяті", "id": null}, "2": {"shared": false, "name": "Відсутність спільних бітів", "id": null}, "5": {"shared": false, "name": "Віднімання та нерівність", "id": null}, "4": {"shared": false, "name": "Інкремент і нерівність", "id": null}}}
---==aeb29eb42b374db39f28d70ee2eff44f==
-Content-ID: Task-aos_w11-lr-4-
-Content-Length: 672
-Content-MD5: Ubum1kWLNREkOAJ6MeoBUA==
+{"id": "lr3", "_rev": "2-396c11beb2886d6817f7fdddb9f49592", "_id": "Task-aos_w11-lr-lr3-", "name": "ЛР №3", "versions": {"1": {"shared": false, "name": "Перевірка на рівність", "id": null}, "3": {"shared": false, "name": "Рівність слів памяті", "id": null}, "2": {"shared": false, "name": "Відсутність спільних бітів", "id": null}, "5": {"shared": false, "name": "Віднімання та нерівність", "id": null}, "4": {"shared": false, "name": "Інкремент і нерівність", "id": null}}}
+--==1b65cf8203fc49f18713ab92dc72a8f1==
+Content-ID: Task-aos_w11-lr-lr4-
+Content-Length: 675
+Content-MD5: CtWmY7Tj1q3/gMwBbKQTug==
 Content-Type: application/json;charset=utf-8
-ETag: "11-23fcc2d1da6322fadb199b2f592e8db1"
+ETag: "2-53abd38c1f37bc42b3d2c82e93c1bbda"
 
-{"id": "4", "_rev": "11-23fcc2d1da6322fadb199b2f592e8db1", "_id": "Task-aos_w11-lr-4-", "name": "ЛР №4", "versions": {"1": {"shared": false, "name": "Визначення максимуму", "id": null}, "3": {"shared": false, "name": "Розкладання числа", "id": null}, "2": {"shared": false, "name": "Входження мінімуму масива", "id": null}, "5": {"shared": false, "name": "Додатна підпослідовність", "id": null}, "4": {"shared": false, "name": "Сума елементів з непарним індексом", "id": null}, "6": {"shared": false, "name": "Обернення масиву", "id": null}}}
---==aeb29eb42b374db39f28d70ee2eff44f==
-Content-ID: Task-aos_w11-lr-5-
-Content-Length: 738
-Content-MD5: 37ca8ITefiWECMgDw+RIrw==
+{"id": "lr4", "_rev": "2-53abd38c1f37bc42b3d2c82e93c1bbda", "_id": "Task-aos_w11-lr-lr4-", "name": "ЛР №4", "versions": {"1": {"shared": false, "name": "Визначення максимуму", "id": null}, "3": {"shared": false, "name": "Розкладання числа", "id": null}, "2": {"shared": false, "name": "Входження мінімуму масива", "id": null}, "5": {"shared": false, "name": "Додатна підпослідовність", "id": null}, "4": {"shared": false, "name": "Сума елементів з непарним індексом", "id": null}, "6": {"shared": false, "name": "Обернення масиву", "id": null}}}
+--==1b65cf8203fc49f18713ab92dc72a8f1==
+Content-ID: Task-aos_w11-lr-lr5-
+Content-Length: 741
+Content-MD5: IauHD1cP9Y6TCZpp7lymng==
 Content-Type: application/json;charset=utf-8
-ETag: "11-f744a5e7a72ad58e4ca442f9334e8277"
+ETag: "2-25230ff6f1fb5a5e10a7e3a34efb2b5b"
 
-{"id": "5", "_rev": "11-f744a5e7a72ad58e4ca442f9334e8277", "_id": "Task-aos_w11-lr-5-", "name": "ЛР №5", "versions": {"1": {"shared": false, "name": "Розширення встановлених бітів", "id": null}, "3": {"shared": false, "name": "Перестановка парних та непарних бітів", "id": null}, "2": {"shared": false, "name": "Розширення нульових бітів", "id": null}, "5": {"shared": false, "name": "Старший біт", "id": null}, "4": {"shared": false, "name": "Подільність на 2^n", "id": null}, "7": {"shared": false, "name": "Обмін байтів", "id": null}, "6": {"shared": false, "name": "Встановлені біти", "id": null}}}
---==aeb29eb42b374db39f28d70ee2eff44f==
-Content-ID: Task-aos_w11-lr-6-
-Content-Length: 646
-Content-MD5: dsS5lCwmozKh2fK9yzoJMA==
+{"id": "lr5", "_rev": "2-25230ff6f1fb5a5e10a7e3a34efb2b5b", "_id": "Task-aos_w11-lr-lr5-", "name": "ЛР №5", "versions": {"1": {"shared": false, "name": "Розширення встановлених бітів", "id": null}, "3": {"shared": false, "name": "Перестановка парних та непарних бітів", "id": null}, "2": {"shared": false, "name": "Розширення нульових бітів", "id": null}, "5": {"shared": false, "name": "Старший біт", "id": null}, "4": {"shared": false, "name": "Подільність на 2^n", "id": null}, "7": {"shared": false, "name": "Обмін байтів", "id": null}, "6": {"shared": false, "name": "Встановлені біти", "id": null}}}
+--==1b65cf8203fc49f18713ab92dc72a8f1==
+Content-ID: Task-aos_w11-lr-lr6-
+Content-Length: 649
+Content-MD5: 0+VWN7YKU7AJc2weWeye4w==
 Content-Type: application/json;charset=utf-8
-ETag: "11-73229ed58aa62a889f12a4ca07e8eeba"
+ETag: "2-51831ee803665bf43395afc8f5d72741"
 
-{"id": "6", "_rev": "11-73229ed58aa62a889f12a4ca07e8eeba", "_id": "Task-aos_w11-lr-6-", "name": "ЛР №6", "versions": {"1": {"shared": false, "name": "Найбільший спільний дільник", "id": null}, "3": {"shared": false, "name": "Число з ряду Фібоначі", "id": null}, "2": {"shared": false, "name": "Кількість нулів", "id": null}, "5": {"shared": false, "name": "Зсув масиву вліво", "id": null}, "4": {"shared": false, "name": "Видалення повторів", "id": null}, "6": {"shared": false, "name": "Число в оберненому порядку", "id": null}}}
---==aeb29eb42b374db39f28d70ee2eff44f==
+{"id": "lr6", "_rev": "2-51831ee803665bf43395afc8f5d72741", "_id": "Task-aos_w11-lr-lr6-", "name": "ЛР №6", "versions": {"1": {"shared": false, "name": "Найбільший спільний дільник", "id": null}, "3": {"shared": false, "name": "Число з ряду Фібоначі", "id": null}, "2": {"shared": false, "name": "Кількість нулів", "id": null}, "5": {"shared": false, "name": "Зсув масиву вліво", "id": null}, "4": {"shared": false, "name": "Видалення повторів", "id": null}, "6": {"shared": false, "name": "Число в оберненому порядку", "id": null}}}
+--==1b65cf8203fc49f18713ab92dc72a8f1==
 Content-ID: Task-lans_w11-lr-lr1-
 Content-Length: 180
 Content-MD5: 4S43xyWayzf9mKbmf7/LGQ==
@@ -80,7 +80,7 @@ Content-Type: application/json;charset=utf-8
 ETag: "1-5f1564c7c66dc50cbbd1bb38951794f5"
 
 {"_rev": "1-5f1564c7c66dc50cbbd1bb38951794f5", "_id": "Task-lans_w11-lr-lr1-", "name": "ЛР №1: Протокол HTTP", "versions": {"1": {"name": "Общий вариант"}}}
---==aeb29eb42b374db39f28d70ee2eff44f==
+--==1b65cf8203fc49f18713ab92dc72a8f1==
 Content-ID: Task-lans_w11-lr-lr2-
 Content-Length: 179
 Content-MD5: uKZeiPVGZmEGxK1lA8NGAA==
@@ -88,7 +88,7 @@ Content-Type: application/json;charset=utf-8
 ETag: "2-47e2c0f3ef5a2b62461124484fd54543"
 
 {"_rev": "2-47e2c0f3ef5a2b62461124484fd54543", "_id": "Task-lans_w11-lr-lr2-", "name": "ЛР №2: Протокол DNS", "versions": {"1": {"name": "Общий вариант"}}}
---==aeb29eb42b374db39f28d70ee2eff44f==
+--==1b65cf8203fc49f18713ab92dc72a8f1==
 Content-ID: Task-lans_w11-lr-lr3-
 Content-Length: 180
 Content-MD5: ocbOgm+j3/l1OhXMifAGMg==
@@ -96,7 +96,7 @@ Content-Type: application/json;charset=utf-8
 ETag: "2-d1b6ba60f99775b73f325d180d922a36"
 
 {"_rev": "2-d1b6ba60f99775b73f325d180d922a36", "_id": "Task-lans_w11-lr-lr3-", "name": "ЛР №3: Протокол ICMP", "versions": {"1": {"name": "Общий вариант"}}}
---==aeb29eb42b374db39f28d70ee2eff44f==
+--==1b65cf8203fc49f18713ab92dc72a8f1==
 Content-ID: Task-lans_w11-lr-lr4-
 Content-Length: 178
 Content-MD5: Hb68tqszH8XXX90EHVSFFw==
@@ -104,7 +104,7 @@ Content-Type: application/json;charset=utf-8
 ETag: "2-e82652075db772f0e152ee7ff588a596"
 
 {"_rev": "2-e82652075db772f0e152ee7ff588a596", "_id": "Task-lans_w11-lr-lr4-", "name": "ЛР №4: Протокол IP", "versions": {"1": {"name": "Общий вариант"}}}
---==aeb29eb42b374db39f28d70ee2eff44f==
+--==1b65cf8203fc49f18713ab92dc72a8f1==
 Content-ID: Task-lans_w11-lr-lr5-
 Content-Length: 204
 Content-MD5: tpwAz91gLrg7LjVSYA/UFw==
@@ -112,7 +112,7 @@ Content-Type: application/json;charset=utf-8
 ETag: "2-f533a8c4bba9c9a118474f615fa1088c"
 
 {"_rev": "2-f533a8c4bba9c9a118474f615fa1088c", "_id": "Task-lans_w11-lr-lr5-", "name": "ЛР №5: Протоколы маршрутизации", "versions": {"1": {"name": "Общий вариант"}}}
---==aeb29eb42b374db39f28d70ee2eff44f==
+--==1b65cf8203fc49f18713ab92dc72a8f1==
 Content-ID: Task-lans_w11-lr-lr6-
 Content-Length: 194
 Content-MD5: C2sGbN1+++ltcTG9hg2BSw==
@@ -120,4 +120,4 @@ Content-Type: application/json;charset=utf-8
 ETag: "2-a330f14a3585f2bbda6aa557bec00bce"
 
 {"_rev": "2-a330f14a3585f2bbda6aa557bec00bce", "_id": "Task-lans_w11-lr-lr6-", "name": "ЛР №6: Задачи оптимизации", "versions": {"1": {"name": "Общий вариант"}}}
---==aeb29eb42b374db39f28d70ee2eff44f==--
+--==1b65cf8203fc49f18713ab92dc72a8f1==--
