@@ -332,7 +332,7 @@ public class AdminController extends ControllerElw {
 
                         score.setComment(req.getParameter("comment"));
                         score.setupPathElems(ctx, slot, file);
-                        queries.updateScore(score);
+                        queries.createScore(score);
                     }
 
                     resp.sendRedirect(core.cmpForwardToEarliestPendingSince(ctx, slot, file.getStamp()));

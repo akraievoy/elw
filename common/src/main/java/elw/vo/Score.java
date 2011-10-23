@@ -138,7 +138,7 @@ public class Score extends Squab.Stamped implements Stamped {
 
     @Override
     protected String[] pathElems() {
-        if (extraPathElems == null || extraPathElems.length != 5) {
+        if (extraPathElems == null || extraPathElems.length != 9) {
             throw new IllegalStateException(
                     "pathElems: " +
                             "groupId" + PATH_SEP + // 0
@@ -149,14 +149,15 @@ public class Score extends Squab.Stamped implements Stamped {
                             "taskId" + PATH_SEP + // 5
                             "verId" + PATH_SEP + // 6
                             "slotId" + PATH_SEP + // 7
-                            "solutionId" + PATH_SEP + // 8
-                            "solutionStamp" // 9
+                            "solutionId" // 8
             );
         } else {
             return new String[] {
-                    extraPathElems[0], extraPathElems[1], extraPathElems[2], extraPathElems[3],
-                    extraPathElems[4], extraPathElems[5], extraPathElems[6], extraPathElems[7],
-                    extraPathElems[8], extraPathElems[9]
+                    extraPathElems[0], extraPathElems[1],
+                    extraPathElems[2], extraPathElems[3],
+                    extraPathElems[4], extraPathElems[5],
+                    extraPathElems[6], extraPathElems[7],
+                    extraPathElems[8]
             };
         }
     }
@@ -171,8 +172,7 @@ public class Score extends Squab.Stamped implements Stamped {
                 ctx.getAss().getId(),
                 ctx.getVer().getId(),
                 slot.getId(),
-                solution.getId(),
-                String.valueOf(solution.getStamp())
+                solution.getId()
         };
     }
 }

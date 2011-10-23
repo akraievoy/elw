@@ -319,7 +319,8 @@ public class StudentController extends ControllerElw {
             slotToScopeToFileId.put(slot.getId(), scopeToFileId);
 
             for (String scope : FileBase.SCOPES) {
-                final List<? extends FileBase> fileEntries = queries.files(scope, ctx, slot);
+                final List<? extends FileBase> fileEntries =
+                        queries.files(scope, ctx, slot);
                 final String[] fileIds = new String[fileEntries.size()];
 
                 for (int i = 0, filesLength = fileEntries.size(); i < filesLength; i++) {

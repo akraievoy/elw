@@ -192,7 +192,7 @@ public class MarkdownImport {
                 Task.class,
                 ctx.getCourse().getId(),
                 ctx.getAssType().getId(),
-                String.valueOf(lrNo)
+                String.valueOf("lr" + lrNo)
         );
 
         if (taskSome != null) {
@@ -204,7 +204,7 @@ public class MarkdownImport {
                     ctx.getAssType().getId()
                  }
             );
-            task.setId(String.valueOf(lrNo));
+            task.setId("lr" + lrNo);
         }
 
         final TreeMap<String, Version> versions =
@@ -233,7 +233,7 @@ public class MarkdownImport {
                     Attachment.class,
                     ctx.getCourse().getId(),
                     ctx.getAssType().getId(),
-                    String.valueOf(lrNo),
+                    "lr" + lrNo,
                     String.valueOf(verId),
                     "statement",
                     "statement.txt"
@@ -255,7 +255,7 @@ public class MarkdownImport {
 
 
                 final Version ver = new Version().withId(String.valueOf(verId));
-                final Task task = new Task().withId(String.valueOf(lrNo));
+                final Task task = new Task().withId("lr" + lrNo);
                 task.setVersions(IdNamed._.singleton(ver));
                 ctx.getAssType().setTasks(IdNamed._.singleton(task));
                 final Ctx ctxTask = ctx.extendTask(task);
@@ -292,7 +292,7 @@ public class MarkdownImport {
                     Attachment.class,
                     ctx.getCourse().getId(),
                     ctx.getAssType().getId(),
-                    String.valueOf(lrNo),
+                    "lr" + lrNo,
                     String.valueOf(verNo),
                     "test",
                     "test." + testId + ".txt"
@@ -316,7 +316,7 @@ public class MarkdownImport {
                 final Version ver = new Version().withId(
                         String.valueOf(verNo)
                 );
-                final Task task = new Task().withId(String.valueOf(lrNo));
+                final Task task = new Task().withId("lr" + lrNo);
                 task.setVersions(IdNamed._.singleton(ver));
                 ctx.getAssType().setTasks(IdNamed._.singleton(task));
                 final Ctx ctxTask = ctx.extendTask(task);

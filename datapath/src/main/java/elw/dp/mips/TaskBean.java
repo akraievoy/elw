@@ -32,16 +32,10 @@ public class TaskBean {
 
     private String statement;
     private java.util.List<String> tests = new ArrayList<String>();
-    private String solution;
 
-    public TaskBean(String statement, List<String> tests, String solution) {
-        this.solution = solution;
+    public TaskBean(String statement, List<String> tests) {
         this.statement = statement;
         this.tests = tests;
-    }
-
-    public String getSolution() {
-        return solution;
     }
 
     public String getStatement() {

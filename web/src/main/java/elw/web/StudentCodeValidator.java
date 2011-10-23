@@ -82,7 +82,10 @@ public class StudentCodeValidator extends G4Run.Task {
                     }
 
                     final String slotId = "code";
-                    final List<Solution> files = queries.solutions(ctxVer, slotId);
+                    final FileSlot slot =
+                            ctxVer.getAssType().getFileSlots().get(slotId);
+                    final List<Solution> files =
+                            queries.solutions(ctxVer, slot);
                     for (Solution f : files) {
                         if (f.getValidatorStamp() > 0 && f.getScore() != null) {
                             continue;
@@ -92,10 +95,13 @@ public class StudentCodeValidator extends G4Run.Task {
                         try {
                             final Result[] resRef = {new Result("unknown", false)};
                             final int[] passFailCounts = new int[2];
-                            final List<Attachment> allStatements = queries.attachments(ctxVer, "statement");
-                            final List<Attachment> allTests = queries.attachments(ctxVer, "test");
-                            final List<String> allTestsStr = new ArrayList<String>();
-                            for (int i = 0; i < allTestsStr.size(); i++) {
+                            final List<Attachment> allStatements =
+                                    queries.attachments(ctxVer, "statement");
+                            final List<Attachment> allTests =
+                                    queries.attachments(ctxVer, "test");
+                            final List<String> allTestsStr =
+                                    new ArrayList<String>();
+                            for (int i = 0; i < allTests.size(); i++) {
                                 allTestsStr.add(
                                     queries.fileText(
                                         allTests.get(i),
@@ -111,8 +117,7 @@ public class StudentCodeValidator extends G4Run.Task {
                                         ),
                                         FileBase.CONTENT
                                     ),
-                                    allTestsStr,
-                                    ""
+                                    allTestsStr
                             );
                             validator.batch(
                                 resRef,
@@ -134,20 +139,32 @@ public class StudentCodeValidator extends G4Run.Task {
                             }
                         } catch (Throwable t) {
                             log.warn(
-                                "exception while validating {} / {} / {}",
-                                new Object[]{ctxVer, f.getId(), f.getStamp()}
+                                "failed to validate {} / {} / {}: {}",
+                                new Object[]{
+                                        ctxVer, f.getId(), f.getStamp(),
+                                        String.valueOf(t)
+                                }
                             );
-                        } finally {
-                            f.setValidatorStamp(System.currentTimeMillis());
+                            log.debug("exception trace", t);
                         }
 
                         if (score != null) {
                             try {
+                                score.setupPathElems(ctxVer, slot, f);
+                                final long scoreStamp =
+                                        queries.createScore(score);
+
+                                f.setValidatorStamp(scoreStamp);
                                 queries.updateFile(f);
-                                score.setupPathElems(ctxVer, ctxVer.getAssType().getFileSlots().get(slotId), f);
-                                queries.updateScore(score);
                             } catch (Throwable t) {
-                                log.warn("exception while storing update {} / {} / {}", new Object[]{ctxVer, f.getId(), f.getStamp()});
+                                log.warn(
+                                    "failed to store update {} / {} / {}: {}",
+                                    new Object[]{
+                                            ctxVer, f.getId(), f.getStamp(),
+                                            String.valueOf(t)
+                                    }
+                                );
+                                log.debug("exception trace", t);
                             }
                         }
                     }

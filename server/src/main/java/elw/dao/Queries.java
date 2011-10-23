@@ -89,13 +89,13 @@ public class Queries {
                 new TreeMap<String, List<Solution>>();
 
         for (FileSlot slot : ctx.getAssType().getFileSlots().values()) {
-            slotIdToFiles.put(slot.getId(), solutions(ctx, slot.getId()));
+            slotIdToFiles.put(slot.getId(), solutions(ctx, slot));
         }
 
         return slotIdToFiles;
     }
 
-    public List<Solution> solutions(Ctx ctx, final String slotId) {
+    public List<Solution> solutions(Ctx ctx, final FileSlot slot) {
         final List<Solution> solutions = solutionDao.findAll(
                 Solution.class,
                 ctx.getGroup().getId(),
@@ -105,13 +105,17 @@ public class Queries {
                 ctx.getAssType().getId(),
                 ctx.getAss().getId(),
                 ctx.getVer().getId(),
-                slotId
+                slot.getId()
         );
+
+        for (Solution solution : solutions) {
+            solution.setScore(score(ctx, slot, solution));
+        }
 
         return resolveFileType(ctx, solutions);
     }
 
-    public Solution solution(Ctx ctx, String slotId, String fileId) {
+    public Solution solution(Ctx ctx, FileSlot slot, String fileId) {
         final Solution solution = solutionDao.findLast(
                 Solution.class,
                 ctx.getGroup().getId(),
@@ -121,9 +125,13 @@ public class Queries {
                 ctx.getAssType().getId(),
                 ctx.getAss().getId(),
                 ctx.getVer().getId(),
-                slotId,
+                slot.getId(),
                 fileId
         );
+
+        if (solution != null) {
+            solution.setScore(score(ctx, slot, solution));
+        }
 
         return resolveFileType(ctx, solution);
     }
@@ -193,7 +201,7 @@ public class Queries {
             return attachments(ctx, slot.getId());
         }
 
-        return solutions(ctx, slot.getId());
+        return solutions(ctx, slot);
     }
 
     public FileBase file(String scope, Ctx ctx, FileSlot slot, String id) {
@@ -201,7 +209,7 @@ public class Queries {
             return attachment(ctx, slot.getId(), id);
         }
 
-        return solution(ctx, slot.getId(), id);
+        return solution(ctx, slot, id);
     }
 
     public InputSupplier<InputStream> inputSupplier(
@@ -314,6 +322,21 @@ public class Queries {
         );
     }
 
+    public Score score(Ctx ctx, FileSlot slot, Solution file) {
+        return solutionDao.findLast(
+                Score.class,
+                ctx.getGroup().getId(),
+                ctx.getStudent().getId(),
+                ctx.getCourse().getId(),
+                String.valueOf(ctx.getIndex()),
+                ctx.getAssType().getId(),
+                ctx.getAss().getId(),
+                ctx.getVer().getId(),
+                slot.getId(),
+                file.getId()
+        );
+    }
+
     public Score score(Ctx ctx, FileSlot slot, Solution file, Long stamp) {
         return solutionDao.findByStamp(
                 stamp,
@@ -326,8 +349,7 @@ public class Queries {
                 ctx.getAss().getId(),
                 ctx.getVer().getId(),
                 slot.getId(),
-                file.getId(),
-                String.valueOf(file.getStamp())
+                file.getId()
         );
     }
 
@@ -405,12 +427,12 @@ public class Queries {
         return res;
     }
 
-    public void updateScore(Score score) {
-        solutionDao.update(score);
+    public long createScore(Score score) {
+        return solutionDao.update(score);
     }
 
     public void updateFile(Solution solution) {
-        solutionDao.update(solution);
+        solutionDao.update(solution, false);
     }
 
     public String fileText(
