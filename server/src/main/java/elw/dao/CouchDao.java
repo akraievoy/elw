@@ -85,9 +85,18 @@ public class CouchDao {
 
     //  Squab
     public Long update(Squab squab) {
+        return update(squab, true);
+    }
+
+    public Long update(Squab squab, final boolean updateStamp) {
         Long stamp = null;
         if (squab instanceof Squab.Stamped) {
-            stamp = ((Squab.Stamped) squab).updateStamp();
+            final Squab.Stamped stamped = (Squab.Stamped) squab;
+            if (!updateStamp && stamped.getStamp() != null) {
+                stamp = stamped.getStamp();
+            } else {
+                stamp = stamped.updateStamp();
+            }
         }
         couchPut(
                 squab.getCouchPath().id(),

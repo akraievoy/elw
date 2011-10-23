@@ -9,6 +9,7 @@ import org.akraievoy.gear.G4Parse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -22,24 +23,42 @@ import static elw.vo.IdNamed._.resolve;
 public class Queries {
     private static final Logger log = LoggerFactory.getLogger(Queries.class);
 
-    private final CouchDao couchDao;
-
-    public Queries(CouchDao couchDao) {
-        this.couchDao = couchDao;
+    private CouchDao metaDao;
+    public void setMetaDao(CouchDao metaDao) {
+        this.metaDao = metaDao;
     }
 
-    public CouchDao getCouchDao() {
-        return couchDao;
+    private CouchDao userDao;
+    public void setUserDao(CouchDao userDao) {
+        this.userDao = userDao;
+    }
+
+    private CouchDao attachmentDao;
+    public void setAttachmentDao(CouchDao attachmentDao) {
+        this.attachmentDao = attachmentDao;
+    }
+
+    private CouchDao solutionDao;
+    public void setSolutionDao(CouchDao solutionDao) {
+        this.solutionDao = solutionDao;
+    }
+
+    private CouchDao authDao;
+    public void setAuthDao(CouchDao authDao) {
+        this.authDao = authDao;
+    }
+
+    public Queries() {
     }
 
     public Group group(final String groupId) {
-        final Group group = couchDao.findOne(Group.class, groupId);
+        final Group group = userDao.findOne(Group.class, groupId);
         mark(group.getStudents());
         return group;
     }
 
     public List<Attachment> attachments(Ctx ctxVer, final String slotId) {
-        final List<Attachment> attachments = couchDao.findAll(
+        final List<Attachment> attachments = attachmentDao.findAll(
                 Attachment.class,
                 ctxVer.getCourse().getId(),
                 ctxVer.getAssType().getId(),
@@ -52,7 +71,7 @@ public class Queries {
     }
 
     public Attachment attachment(Ctx ctxVer, final String slotId, final String id) {
-        final Attachment attachment = couchDao.findLast(
+        final Attachment attachment = attachmentDao.findLast(
                 Attachment.class,
                 ctxVer.getCourse().getId(),
                 ctxVer.getAssType().getId(),
@@ -66,15 +85,18 @@ public class Queries {
     }
 
     public SortedMap<String, List<Solution>> solutions(Ctx ctx) {
-        final TreeMap<String, List<Solution>> slotIdToFiles = new TreeMap<String, List<Solution>>();
+        final TreeMap<String, List<Solution>> slotIdToFiles =
+                new TreeMap<String, List<Solution>>();
+
         for (FileSlot slot : ctx.getAssType().getFileSlots().values()) {
             slotIdToFiles.put(slot.getId(), solutions(ctx, slot.getId()));
         }
+
         return slotIdToFiles;
     }
 
     public List<Solution> solutions(Ctx ctx, final String slotId) {
-        final List<Solution> solutions = couchDao.findAll(
+        final List<Solution> solutions = solutionDao.findAll(
                 Solution.class,
                 ctx.getGroup().getId(),
                 ctx.getStudent().getId(),
@@ -90,7 +112,7 @@ public class Queries {
     }
 
     public Solution solution(Ctx ctx, String slotId, String fileId) {
-        final Solution solution = couchDao.findLast(
+        final Solution solution = solutionDao.findLast(
                 Solution.class,
                 ctx.getGroup().getId(),
                 ctx.getStudent().getId(),
@@ -106,7 +128,9 @@ public class Queries {
         return resolveFileType(ctx, solution);
     }
 
-    protected static <F extends FileBase> List<F> resolveFileType(Ctx ctx, List<F> files) {
+    protected static <F extends FileBase> List<F> resolveFileType(
+            Ctx ctx, List<F> files
+    ) {
         for (F file : files) {
             resolveFileType(ctx, file);
         }
@@ -118,13 +142,16 @@ public class Queries {
                 new TreeMap<String, FileType>(file.getFileType()),
                 ctx.getCourse().getFileTypes()
         ));
+
         return file;
     }
 
-    //	TODO jackson hacks to forfeit content-length reporting to ensure in-place streaming
+    //  TODO hack jackson to forfeit content-length reporting
+    //      to ensure in-place streaming
     public Result createFile(
             Ctx ctx, FileSlot slot,
-            FileBase file, InputSupplier<? extends InputStream> inputSupplier, final String contentType
+            FileBase file, InputSupplier<? extends InputStream> inputSupplier,
+            final String contentType
     ) {
         try {
             final Squab.CouchFile couchFile = new Squab.CouchFile();
@@ -141,12 +168,16 @@ public class Queries {
             file.setCouchFiles(couchFiles);
             file.setupPathElems(ctx, slot);
 
-            //  there's  no need to store full file type object, it's easily resolved on-load
-            final TreeMap<String, FileType> emptyMap = new TreeMap<String, FileType>();
+            //  there's  no need to store full file type object,
+            //      it's easily resolved on-load
+            final TreeMap<String, FileType> emptyMap =
+                    new TreeMap<String, FileType>();
             emptyMap.put(IdNamed._.one(file.getFileType()).getId(), null);
             file.setFileType(emptyMap);
 
-            couchDao.update(file);
+            final CouchDao targetDao =
+                    file instanceof Attachment ? attachmentDao : solutionDao;
+            targetDao.update(file);
 
             return new Result("File stored successfully", true);
         } catch (IOException e) {
@@ -155,7 +186,9 @@ public class Queries {
         }
     }
 
-    public List<? extends FileBase> files(String scope, Ctx ctx, FileSlot slot) {
+    public List<? extends FileBase> files(
+            String scope, Ctx ctx, FileSlot slot
+    ) {
         if (scope.equals(Attachment.SCOPE)) {
             return attachments(ctx, slot.getId());
         }
@@ -171,17 +204,36 @@ public class Queries {
         return solution(ctx, slot.getId(), id);
     }
 
+    public InputSupplier<InputStream> inputSupplier(
+            final @Nonnull Squab squab, @Nonnull String fileName
+    ) {
+        if (squab instanceof Attachment) {
+            return attachmentDao.couchFileGet(squab.getCouchPath(), fileName);
+        }
+        if (squab instanceof Solution) {
+            return solutionDao.couchFileGet(squab.getCouchPath(), fileName);
+        }
+
+        throw new IllegalArgumentException(
+                "no attachment streaming for: " + squab.getClass()
+        );
+    }
+
     public Course course(final String courseId) {
-        final Course course = couchDao.findOne(Course.class, courseId);
+        final Course course = metaDao.findOne(Course.class, courseId);
 
         final String templateId = course.getTemplate();
         if (templateId != null && templateId.length() > 0) {
             final Course template = course(templateId);
             course.setCriterias(mark(extend(
-                    template.getCriterias(), course.getCriterias(), new TreeMap<String, Criteria>()
+                    template.getCriterias(),
+                    course.getCriterias(),
+                    new TreeMap<String, Criteria>()
             )));
             course.setFileTypes(mark(extend(
-                    template.getFileTypes(), course.getFileTypes(), new TreeMap<String, FileType>()
+                    template.getFileTypes(),
+                    course.getFileTypes(),
+                    new TreeMap<String, FileType>()
             )));
         }
         mark(course.getTaskTypes());
@@ -190,17 +242,24 @@ public class Queries {
             mark(tType.getFileSlots());
             for (final FileSlot fSlot : tType.getFileSlots().values()) {
                 fSlot.setFileTypes(mark(resolve(
-                        new TreeMap<String, FileType>(fSlot.getFileTypes()), course.getFileTypes()
+                        new TreeMap<String, FileType>(fSlot.getFileTypes()),
+                        course.getFileTypes()
                 )));
                 fSlot.setCriterias(mark(resolve(
-                        new TreeMap<String, Criteria>(fSlot.getCriterias()), course.getCriterias()
+                        new TreeMap<String, Criteria>(fSlot.getCriterias()),
+                        course.getCriterias()
                 )));
             }
             tType.setTasks(mark(resolve(
                     new TreeMap<String, Task>(tType.getTasks()),
                     new IdNamed.Resolver<Task>() {
                         public Task resolve(String key) {
-                            final Task task = couchDao.findOne(Task.class, course.getId(), tType.getId(), key);
+                            final Task task = metaDao.findOne(
+                                    Task.class,
+                                    course.getId(),
+                                    tType.getId(),
+                                    key
+                            );
                             mark(task.getVersions());
                             return task;
                         }
@@ -214,11 +273,11 @@ public class Queries {
     }
 
     public Admin adminSome(String login) {
-        return couchDao.findSome(Admin.class, login);
+        return userDao.findSome(Admin.class, login);
     }
 
     public List<Group> groups() {
-        final List<Group> groups = couchDao.findAll(Group.class);
+        final List<Group> groups = userDao.findAll(Group.class);
 
         for (Group group : groups) {
             mark(group.getStudents());
@@ -228,19 +287,19 @@ public class Queries {
     }
 
     public List<Enrollment> enrollments() {
-        return couchDao.findAll(Enrollment.class);
+        return userDao.findAll(Enrollment.class);
     }
 
     public Enrollment enrollmentSome(final String id) {
-        return couchDao.findSome(Enrollment.class, null, null, id);
+        return userDao.findSome(Enrollment.class, null, null, id);
     }
 
     public List<Enrollment> enrollmentsForGroup(String groupId) {
-        return couchDao.findAll(Enrollment.class, groupId);
+        return userDao.findAll(Enrollment.class, groupId);
     }
 
     public SortedMap<Long, Score> scores(Ctx ctx, FileSlot slot, Solution file) {
-        return couchDao.findAllStamped(
+        return solutionDao.findAllStamped(
                 Score.class,
                 ctx.getGroup().getId(),
                 ctx.getStudent().getId(),
@@ -256,7 +315,7 @@ public class Queries {
     }
 
     public Score score(Ctx ctx, FileSlot slot, Solution file, Long stamp) {
-        return couchDao.findByStamp(
+        return solutionDao.findByStamp(
                 stamp,
                 Score.class,
                 ctx.getGroup().getId(),
@@ -283,14 +342,22 @@ public class Queries {
         return allScores;
     }
 
-    public static Score updateAutos(Ctx ctx, final String slotId, Solution file, final Score score) {
+    public static Score updateAutos(
+            Ctx ctx, final String slotId, Solution file, final Score score
+    ) {
         final Class classDue = ctx.cDue(slotId);
         final FileSlot slot = ctx.getAssType().getFileSlots().get(slotId);
 
         final Map<String, Double> vars = new TreeMap<String, Double>();
-        final double overDue = classDue == null ? 0.0 : (double) classDue.computeDaysOverdue(file);
+        final double overDue =
+                classDue == null ?
+                    0.0 :
+                    (double) classDue.computeDaysOverdue(file);
         final double onTime = ctx.getEnr().checkOnTime(file) ? 1.0 : 0.0;
-        final double onSite = ctx.cFrom().checkOnSite(file.getSourceAddress()) ? 1.0 : 0.0;
+        final double onSite =
+                ctx.cFrom().checkOnSite(file.getSourceAddress()) ?
+                        1.0 :
+                        0.0;
         vars.put("$overdue", overDue);
         vars.put("$ontime", onTime);
         vars.put("$onsite", onSite);
@@ -298,7 +365,8 @@ public class Queries {
         vars.put("$offsite", 1 - onSite);
         vars.put("$rapid", ctx.cFrom().checkOnTime(file) ? 1.0 : 0.0);
 
-        //	LATER the validator has to be wired via classname, not directly in spring context
+        //	LATER the validator has to be wired via classname,
+        //      not directly in spring context
         if (file.getTotalTests() > 0 || file.isValidated()) {
             vars.put("$passratio", file.getPassRatio());
         }
@@ -321,8 +389,10 @@ public class Queries {
             }
             if (ratio != null && powDef != null) {
                 final String id = res.idFor(slot, c);
-                final Map<String, Integer> pows = new TreeMap<String, Integer>(res.getPows());
-                final Map<String, Double> ratios = new TreeMap<String, Double>(res.getRatios());
+                final Map<String, Integer> pows =
+                        new TreeMap<String, Integer>(res.getPows());
+                final Map<String, Double> ratios =
+                        new TreeMap<String, Double>(res.getRatios());
 
                 pows.put(id, powDef);
                 ratios.put(id, ratio);
@@ -333,5 +403,33 @@ public class Queries {
         }
 
         return res;
+    }
+
+    public void updateScore(Score score) {
+        solutionDao.update(score);
+    }
+
+    public void updateFile(Solution solution) {
+        solutionDao.update(solution);
+    }
+
+    public String fileText(
+            FileBase file, final String attachment
+    ) throws IOException {
+        if (file instanceof Solution) {
+            return solutionDao.fileText(file, attachment);
+        }
+
+        return attachmentDao.fileText(file, attachment);
+    }
+
+    public List<String> fileLines(
+            FileBase file, final String attachment
+    ) throws IOException {
+        if (file instanceof Solution) {
+            return solutionDao.fileLines(file, attachment);
+        }
+
+        return attachmentDao.fileLines(file, attachment);
     }
 }

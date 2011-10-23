@@ -11,6 +11,7 @@ import org.akraievoy.gear.G;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -223,7 +224,11 @@ public class MipsAssembler {
         return false;
     }
 
-    private static boolean parseReg(final String regId, StringBuilder syntax, StringBuilder code, InstructionDesc desc, Instruction inst, Result[] resRef, String prefixOn) {
+    private static boolean parseReg(
+            final String regId, StringBuilder syntax, StringBuilder code,
+            InstructionDesc desc, Instruction inst,
+            Result[] resRef, String prefixOn
+    ) {
         if (syntax.indexOf(regId) == 0) {
             final String regToken = scanChunk(code, ",()");
             syntax.delete(0, regId.length());
@@ -300,117 +305,33 @@ public class MipsAssembler {
         return opName;
     }
 
-    public TIntIntHashMap[] loadData(final String[] dataLines, Result[] resRef) {
+    public TIntIntHashMap[] loadData(final Map<Integer,TaskBean.TestSpecMem> dataSpecs, Result[] resRef) {
         final TIntIntHashMap dataIn = new TIntIntHashMap();
         final TIntIntHashMap dataOut = new TIntIntHashMap();
 
-        for (int lineNum = 0, dataLinesLength = dataLines.length; lineNum < dataLinesLength; lineNum++) {
-            final String dataLine = dataLines[lineNum];
-            final String line = dataLine.replaceAll("\\s+", "");
-
-            if (line.trim().length() == 0 || line.trim().startsWith("#")) {
-                continue;
+        for (TaskBean.TestSpecMem specMem : dataSpecs.values()) {
+            if (specMem.before != null) {
+                dataIn.put(specMem.address, specMem.before);
             }
-
-            final String prefix = "Memory(line " + (lineNum + 1) + "): ";
-            final String[] tokens = line.split(":");
-            if (tokens.length != 3) {
-                Result.failure(log, resRef, prefix + "must be in format addr:valueIn:valueOut");
-                return null;
-            }
-
-            int address = 0;
-            for (int t = 0; t < 3; t++) {
-                final String token = tokens[t];
-
-                if (t > 0 && token.length() == 0) {
-                    continue;
-                }
-
-                if (!Data.isNum(token, 32)) {
-                    Result.failure(log, resRef, prefix + "token#'" + t + "' must be a 32-bit number");
-                    return null;
-                }
-
-                final long value = Data.parse(token);
-
-                if (t == 0) {
-                    if (value < 0) {
-                        Result.failure(log, resRef, prefix + "address must >= 0");
-                        return null;
-                    }
-                    if (value > Integer.MAX_VALUE) {
-                        final String maxHex = Integer.toString(Integer.MAX_VALUE, 16);
-                        Result.failure(log, resRef, prefix + "address '" + value + "' must be <= 0x" + maxHex);
-                        return null;
-                    }
-                    if (value % 4 > 0) {
-                        Result.failure(log, resRef, prefix + "address '" + value + "' must be word-aligned");
-                        return null;
-                    }
-
-                    address = (int) value;
-                }
-
-                (t == 1 ? dataIn : dataOut).put(address, (int) value);
+            if (specMem.after != null) {
+                dataIn.put(specMem.address, specMem.after);
             }
         }
 
-        Result.success(log, resRef, "Data validated and loaded fine");
+        Result.success(log, resRef, "Data loaded fine");
         return new TIntIntHashMap[]{dataIn, dataOut};
     }
 
-    public TIntIntHashMap[] loadRegs(final String[] regsLines, Result[] resRef) {
+    public TIntIntHashMap[] loadRegs(final Map<Reg,TaskBean.TestSpecReg> regsLines, Result[] resRef) {
         final TIntIntHashMap regsIn = new TIntIntHashMap();
         final TIntIntHashMap regsOut = new TIntIntHashMap();
 
-        for (int lineNum = 0, regsLinesLength = regsLines.length; lineNum < regsLinesLength; lineNum++) {
-            final String dataLine = regsLines[lineNum];
-            final String line = dataLine.replaceAll("\\s+", "");
-
-            if (line.trim().length() == 0 || line.trim().startsWith("#")) {
-                continue;
+        for (TaskBean.TestSpecReg spec : regsLines.values()) {
+            if (spec.before != null) {
+                regsIn.put(spec.reg.ordinal(), spec.before);
             }
-
-            final String prefix = "Registers(line " + (lineNum + 1) + "): ";
-            final String[] tokens = line.split(":");
-            if (tokens.length != 3) {
-                Result.failure(log, resRef, prefix + "must be in format register:valueIn:valueOut");
-                return null;
-            }
-
-            final String regToken = tokens[0];
-            final Reg reg = parseReg(regToken, log, resRef, prefix);
-            if (reg == null) {
-                return null;
-            }
-
-            if (!G.contains(Reg.publicRegs, reg) || G.contains(Reg.roRegs, reg)) {
-                Result.failure(log, resRef, prefix + "register $" + reg.toString() + " is reserved/read-only");
-                return null;
-            }
-            if (G.contains(Reg.autoRegs, reg)) {
-                Result.failure(log, resRef, prefix + "register $" + reg.toString() + " is set/verified automatically");
-                return null;
-            }
-            if (G.contains(Reg.tempRegs, reg)) {
-                Result.failure(log, resRef, prefix + "register $" + reg.toString() + " is temporary");
-                return null;
-            }
-
-            if (tokens[1].length() > 0) {
-                if (!Data.isNum(tokens[1], 32)) {
-                    Result.failure(log, resRef, prefix + "input value must be a 32-bit number");
-                    return null;
-                }
-                regsIn.put(reg.ordinal(), (int) Data.parse(tokens[1]));
-            }
-            if (tokens[2].length() > 0) {
-                if (!Data.isNum(tokens[2], 32)) {
-                    Result.failure(log, resRef, prefix + "output value must be a 32-bit number");
-                    return null;
-                }
-                regsOut.put(reg.ordinal(), (int) Data.parse(tokens[2]));
+            if (spec.after != null) {
+                regsOut.put(spec.reg.ordinal(), spec.after);
             }
         }
 
@@ -418,7 +339,7 @@ public class MipsAssembler {
         return new TIntIntHashMap[]{regsIn, regsOut};
     }
 
-    private static Reg parseReg(final String regToken, final Logger log, final Result[] resRef, final String prefix) {
+    public static Reg parseReg(final String regToken, @Nullable final Logger log, @Nullable final Result[] resRef, final String prefix) {
         if (!regToken.startsWith("$")) {
             Result.failure(log, resRef, prefix + "register token must be either $name or $number");
             return null;

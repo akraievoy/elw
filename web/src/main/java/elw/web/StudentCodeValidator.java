@@ -19,7 +19,6 @@
 package elw.web;
 
 import base.pattern.Result;
-import elw.dao.CouchDao;
 import elw.dao.Ctx;
 import elw.dao.Queries;
 import elw.dp.mips.MipsValidator;
@@ -37,17 +36,15 @@ public class StudentCodeValidator extends G4Run.Task {
     private static final Logger log = LoggerFactory.getLogger(StudentCodeValidator.class);
 
     private int periodMillis = 300000;
-    private final CouchDao couchDao;
-    private final Queries q;
+    private final Queries queries;
     private final MipsValidator validator;
 
     public StudentCodeValidator(
             ScheduledExecutorService executor,
-            CouchDao couchDao) {
+            Queries queries) {
         super(executor);
-        this.couchDao = couchDao;
         this.validator = new MipsValidator();
-        this.q = new Queries(couchDao);
+        this.queries = queries;
     }
 
     public void setPeriodMillis(int periodMillis) {
@@ -63,12 +60,12 @@ public class StudentCodeValidator extends G4Run.Task {
     }
 
     protected void runInternal() throws Throwable {
-        final List<Enrollment> enrs = q.enrollments();
+        final List<Enrollment> enrs = queries.enrollments();
         for (Enrollment enr : enrs) {
             final Ctx ctxEnr;
             {
-                final Course course = q.course(enr.getCourseId());
-                final Group group = q.group(enr.getGroupId());
+                final Course course = queries.course(enr.getCourseId());
+                final Group group = queries.group(enr.getGroupId());
                 ctxEnr = Ctx.forEnr(enr).extendCourse(course).extendGroup(group);
             }
 
@@ -85,7 +82,7 @@ public class StudentCodeValidator extends G4Run.Task {
                     }
 
                     final String slotId = "code";
-                    final List<Solution> files = q.solutions(ctxVer, slotId);
+                    final List<Solution> files = queries.solutions(ctxVer, slotId);
                     for (Solution f : files) {
                         if (f.getValidatorStamp() > 0 && f.getScore() != null) {
                             continue;
@@ -95,37 +92,60 @@ public class StudentCodeValidator extends G4Run.Task {
                         try {
                             final Result[] resRef = {new Result("unknown", false)};
                             final int[] passFailCounts = new int[2];
-                            final List<Attachment> allStatements = q.attachments(ctxVer, "statement");
-                            final List<Attachment> allTests = q.attachments(ctxVer, "test");
+                            final List<Attachment> allStatements = queries.attachments(ctxVer, "statement");
+                            final List<Attachment> allTests = queries.attachments(ctxVer, "test");
                             final List<String> allTestsStr = new ArrayList<String>();
                             for (int i = 0; i < allTestsStr.size(); i++) {
-                                allTestsStr.add(couchDao.fileText(allTests.get(i), FileBase.CONTENT));
+                                allTestsStr.add(
+                                    queries.fileText(
+                                        allTests.get(i),
+                                        FileBase.CONTENT
+                                    )
+                                );
                             }
                             final TaskBean taskBean = new TaskBean(
-                                    couchDao.fileText(allStatements.get(allStatements.size() - 1), FileBase.CONTENT),
+                                    queries.fileText(
+                                        allStatements.get(
+                                                //  FIXME why so?
+                                                allStatements.size() - 1
+                                        ),
+                                        FileBase.CONTENT
+                                    ),
                                     allTestsStr,
                                     ""
                             );
-                            validator.batch(resRef, taskBean, couchDao.fileLines(f, FileBase.CONTENT), passFailCounts);
+                            validator.batch(
+                                resRef,
+                                taskBean,
+                                queries.fileLines(f, FileBase.CONTENT),
+                                passFailCounts
+                            );
                             f.setTestsFailed(passFailCounts[1]);
                             f.setTestsPassed(passFailCounts[0]);
 
-                            score = Queries.updateAutos(ctxVer, slotId, f, null);
-                            final boolean passed = passFailCounts[1] == 0 && passFailCounts[0] > 0;
+                            score = Queries.updateAutos(
+                                    ctxVer, slotId, f, null
+                            );
+                            final boolean passed =
+                                    passFailCounts[1] == 0 &&
+                                            passFailCounts[0] > 0;
                             if (passed) {
                                 score.setApproved(passed);
                             }
                         } catch (Throwable t) {
-                            log.warn("exception while validating {} / {} / {}", new Object[]{ctxVer, f.getId(), f.getStamp()});
+                            log.warn(
+                                "exception while validating {} / {} / {}",
+                                new Object[]{ctxVer, f.getId(), f.getStamp()}
+                            );
                         } finally {
                             f.setValidatorStamp(System.currentTimeMillis());
                         }
 
                         if (score != null) {
                             try {
-                                couchDao.update(f);
+                                queries.updateFile(f);
                                 score.setupPathElems(ctxVer, ctxVer.getAssType().getFileSlots().get(slotId), f);
-                                couchDao.update(score);
+                                queries.updateScore(score);
                             } catch (Throwable t) {
                                 log.warn("exception while storing update {} / {} / {}", new Object[]{ctxVer, f.getId(), f.getStamp()});
                             }

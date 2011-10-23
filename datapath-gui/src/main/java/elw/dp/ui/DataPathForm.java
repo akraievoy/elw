@@ -13,7 +13,6 @@ public class DataPathForm {
     protected JButton sourceAssembleButton;
     protected JButton testRunButton;
     protected JButton testBatchButton;
-    protected JTextArea testMemTextArea;
     protected JTextArea testRegsTextArea;
     protected JButton testAddCustomButton;
     protected JTextArea clipTextArea;
@@ -117,10 +116,6 @@ public class DataPathForm {
 
     public JComboBox getTestComboBox() {
         return testComboBox;
-    }
-
-    public JTextArea getTestMemTextArea() {
-        return testMemTextArea;
     }
 
     public JTextArea getTestRegsTextArea() {
@@ -303,27 +298,14 @@ public class DataPathForm {
         testStatusLabel.setText("...");
         testStatusLabel.setToolTipText("Test pane status");
         panel6.add(testStatusLabel, BorderLayout.CENTER);
-        final JSplitPane splitPane2 = new JSplitPane();
-        splitPane2.setResizeWeight(0.5);
-        panel4.add(splitPane2, BorderLayout.CENTER);
         final JScrollPane scrollPane2 = new JScrollPane();
-        splitPane2.setRightComponent(scrollPane2);
-        testMemTextArea = new JTextArea();
-        testMemTextArea.setColumns(20);
-        testMemTextArea.setFont(new Font("Courier New", testMemTextArea.getFont().getStyle(), 13));
-        testMemTextArea.setLineWrap(false);
-        testMemTextArea.setRows(10);
-        testMemTextArea.setText("");
-        testMemTextArea.setToolTipText("<html>Memory Input/Output<br/><br/>Format:<br/>address:input:expected</html>");
-        scrollPane2.setViewportView(testMemTextArea);
-        final JScrollPane scrollPane3 = new JScrollPane();
-        splitPane2.setLeftComponent(scrollPane3);
+        panel4.add(scrollPane2, BorderLayout.CENTER);
         testRegsTextArea = new JTextArea();
         testRegsTextArea.setColumns(20);
         testRegsTextArea.setFont(new Font("Courier New", testRegsTextArea.getFont().getStyle(), 13));
         testRegsTextArea.setRows(10);
         testRegsTextArea.setToolTipText("<html>Register Input/Output<br/><br/>Format:<br/>$reg:input:expected</html>");
-        scrollPane3.setViewportView(testRegsTextArea);
+        scrollPane2.setViewportView(testRegsTextArea);
         final JPanel panel7 = new JPanel();
         panel7.setLayout(new BorderLayout(0, 0));
         strTabbedPane.addTab("Run", panel7);
@@ -379,59 +361,59 @@ public class DataPathForm {
         final JPanel panel10 = new JPanel();
         panel10.setLayout(new BorderLayout(0, 0));
         panel7.add(panel10, BorderLayout.CENTER);
-        final JSplitPane splitPane3 = new JSplitPane();
-        splitPane3.setDividerLocation(120);
-        splitPane3.setOrientation(0);
-        panel10.add(splitPane3, BorderLayout.CENTER);
-        final JScrollPane scrollPane4 = new JScrollPane();
-        splitPane3.setRightComponent(scrollPane4);
+        final JSplitPane splitPane2 = new JSplitPane();
+        splitPane2.setDividerLocation(120);
+        splitPane2.setOrientation(0);
+        panel10.add(splitPane2, BorderLayout.CENTER);
+        final JScrollPane scrollPane3 = new JScrollPane();
+        splitPane2.setRightComponent(scrollPane3);
         runInstructionsTable = new JTable();
-        scrollPane4.setViewportView(runInstructionsTable);
-        final JSplitPane splitPane4 = new JSplitPane();
-        splitPane4.setDividerLocation(180);
-        splitPane3.setLeftComponent(splitPane4);
-        final JScrollPane scrollPane5 = new JScrollPane();
-        splitPane4.setLeftComponent(scrollPane5);
+        scrollPane3.setViewportView(runInstructionsTable);
+        final JSplitPane splitPane3 = new JSplitPane();
+        splitPane3.setDividerLocation(180);
+        splitPane2.setLeftComponent(splitPane3);
+        final JScrollPane scrollPane4 = new JScrollPane();
+        splitPane3.setLeftComponent(scrollPane4);
         runRegsTable = new JTable();
-        scrollPane5.setViewportView(runRegsTable);
-        final JScrollPane scrollPane6 = new JScrollPane();
-        splitPane4.setRightComponent(scrollPane6);
+        scrollPane4.setViewportView(runRegsTable);
+        final JScrollPane scrollPane5 = new JScrollPane();
+        splitPane3.setRightComponent(scrollPane5);
         runMemTable = new JTable();
-        scrollPane6.setViewportView(runMemTable);
+        scrollPane5.setViewportView(runMemTable);
         pclTabbedPane = new JTabbedPane();
         pclTabbedPane.setToolTipText("Problem statement / Code snippets / System Log.");
         splitPane1.setRightComponent(pclTabbedPane);
         final JPanel panel11 = new JPanel();
         panel11.setLayout(new BorderLayout(0, 0));
         pclTabbedPane.addTab("Problem", panel11);
-        final JScrollPane scrollPane7 = new JScrollPane();
-        panel11.add(scrollPane7, BorderLayout.CENTER);
+        final JScrollPane scrollPane6 = new JScrollPane();
+        panel11.add(scrollPane6, BorderLayout.CENTER);
         problemTextPane = new JTextPane();
         problemTextPane.setEditable(false);
         problemTextPane.setToolTipText("Problem statement goes here...");
         problemTextPane.putClientProperty("JEditorPane.honorDisplayProperties", Boolean.TRUE);
-        scrollPane7.setViewportView(problemTextPane);
+        scrollPane6.setViewportView(problemTextPane);
         final JPanel panel12 = new JPanel();
         panel12.setLayout(new BorderLayout(0, 0));
         pclTabbedPane.addTab("Clipper", panel12);
-        final JScrollPane scrollPane8 = new JScrollPane();
-        panel12.add(scrollPane8, BorderLayout.CENTER);
+        final JScrollPane scrollPane7 = new JScrollPane();
+        panel12.add(scrollPane7, BorderLayout.CENTER);
         clipTextArea = new JTextArea();
         clipTextArea.setColumns(40);
         clipTextArea.setFont(new Font("Courier New", clipTextArea.getFont().getStyle(), 13));
         clipTextArea.setRows(10);
         clipTextArea.setToolTipText("Store your temp clips of text here");
-        scrollPane8.setViewportView(clipTextArea);
+        scrollPane7.setViewportView(clipTextArea);
         final JPanel panel13 = new JPanel();
         panel13.setLayout(new BorderLayout(0, 0));
         pclTabbedPane.addTab("Log", panel13);
-        final JScrollPane scrollPane9 = new JScrollPane();
-        panel13.add(scrollPane9, BorderLayout.CENTER);
+        final JScrollPane scrollPane8 = new JScrollPane();
+        panel13.add(scrollPane8, BorderLayout.CENTER);
         logTextPane = new JTextPane();
         logTextPane.setEditable(false);
         logTextPane.setFont(new Font("Courier New", logTextPane.getFont().getStyle(), 13));
         logTextPane.putClientProperty("JEditorPane.honorDisplayProperties", Boolean.TRUE);
-        scrollPane9.setViewportView(logTextPane);
+        scrollPane8.setViewportView(logTextPane);
     }
 
     /**

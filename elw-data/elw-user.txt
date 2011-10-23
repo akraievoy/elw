@@ -1,0 +1,27 @@
+Content-Type: multipart/mixed; boundary="==c3f57af26fce4b1dbb29085f132d5b7e=="
+
+--==c3f57af26fce4b1dbb29085f132d5b7e==
+Content-ID: Admin-iasa@akraievoy.org-
+Content-Length: 161
+Content-MD5: 3a6LvkBcpoKD9zf0jTvRtg==
+Content-Type: application/json;charset=utf-8
+ETag: "3-6ea990e67e098f2ddcd85ae5365f8e73"
+
+{"_rev": "3-6ea990e67e098f2ddcd85ae5365f8e73", "password": "couchtest", "id": "iasa@akraievoy.org", "name": "Anton Kraievoy", "_id": "Admin-iasa@akraievoy.org-"}
+--==c3f57af26fce4b1dbb29085f132d5b7e==
+Content-ID: Enrollment-ka84-lans_w11-1-
+Content-Length: 1752
+Content-MD5: NYb7Tzs0FLfBdRaaiwTVYg==
+Content-Type: application/json;charset=utf-8
+ETag: "9-1c8aebaf31de3783d282d5c55feaa602"
+
+{"index": [{"requireClean": false, "classFrom": 1, "scoreBudget": 2, "classDue": {"report": 2}, "path": ["lr", "lr1"]}, {"requireClean": false, "classFrom": 1, "scoreBudget": 2, "classDue": {"report": 2}, "path": ["lr", "lr2"]}, {"requireClean": false, "classFrom": 1, "scoreBudget": 2, "classDue": {"report": 3}, "path": ["lr", "lr3"]}, {"requireClean": false, "classFrom": 0, "scoreBudget": 0, "classDue": {"report": 5}, "path": ["lr", "lr4"]}, {"requireClean": false, "classFrom": 2, "scoreBudget": 7, "classDue": {"report": 6}, "path": ["lr", "lr5"]}, {"requireClean": false, "classFrom": 3, "scoreBudget": 8, "classDue": {"report": 7}, "path": ["lr", "lr6"]}], "name": "ka84 @ lans_w11", "courseId": "lans_w11", "_rev": "9-1c8aebaf31de3783d282d5c55feaa602", "groupId": "ka84", "classes": [{"onSite": ["10\\.14\\.1(7|8)\\..*"], "date": "2011-08-02", "fromTime": "14:00", "toTime": "18:00"}, {"onSite": ["10\\.14\\.1(7|8)\\..*"], "date": "2011-08-16", "fromTime": "14:00", "toTime": "18:00"}, {"onSite": ["10\\.14\\.1(7|8)\\..*"], "date": "2011-09-02", "fromTime": "14:00", "toTime": "18:00"}, {"onSite": ["10\\.14\\.1(7|8)\\..*"], "date": "2011-09-16", "fromTime": "14:00", "toTime": "18:00"}, {"onSite": ["10\\.14\\.1(7|8)\\..*"], "date": "2011-09-30", "fromTime": "14:00", "toTime": "18:00"}, {"onSite": ["10\\.14\\.1(7|8)\\..*"], "date": "2011-10-13", "fromTime": "14:00", "toTime": "18:00"}, {"onSite": ["10\\.14\\.1(7|8)\\..*"], "date": "2011-10-27", "fromTime": "14:00", "toTime": "18:00"}, {"onSite": ["10\\.14\\.1(7|8)\\..*"], "date": "2011-11-11", "fromTime": "14:00", "toTime": "18:00"}, {"onSite": ["10\\.14\\.1(7|8)\\..*"], "date": "2011-11-25", "fromTime": "14:00", "toTime": "18:00"}], "_id": "Enrollment-ka84-lans_w11-1-", "id": "1"}
+--==c3f57af26fce4b1dbb29085f132d5b7e==
+Content-ID: Group-ka84-
+Content-Length: 1244
+Content-MD5: Cgtoz73S2d4e3DpsFA3y+Q==
+Content-Type: application/json;charset=utf-8
+ETag: "8-6de540cc3b619deacd15a3b09bc1df84"
+
+{"students": {"11": {"email": "best_liska@mail.ru", "name": "Петивотова Алиса"}, "10": {"email": "yjdfrnfhfc@gmail.com", "name": "Новак Тарас"}, "13": {"email": "trilo.roman@gmail.com", "name": "Трило-Денисюк Роман"}, "12": {"email": "fenixknight@bigmir.net", "name": "Резунов Андрей"}, "06": {"email": "sg.korvin@gmail.com", "name": "Карпенко Сергей"}, "14": {"email": "lv.shmyg@rambler.ru", "name": "Шмыговская Ольга"}, "04": {"email": "magic_taffy@mail.ru", "name": "Гранаткина Тамара"}, "03": {"email": "kompasvrubel@inbox.ru", "name": "Головатюк Андрей"}, "08": {"email": "loseva_ov@mail.ru", "name": "Лосева Ольга"}, "02": {"email": "juliabura@gmail.com", "name": "Бура Юлия"}, "01": {"email": "score77@mail.ru", "name": "Баглай Дмитрий"}, "09": {"email": "moroz.alexander.a@gmail.com", "name": "Мороз Александр"}, "05": {"email": "kant.virgin@gmail.com", "name": "Заскалета Сергей"}, "07": {"email": "baron1505@i.ua", "name": "Коротаева Ирина"}}, "_rev": "8-6de540cc3b619deacd15a3b09bc1df84", "_id": "Group-ka84-", "name": "КА-84", "id": "ka84"}
+--==c3f57af26fce4b1dbb29085f132d5b7e==--

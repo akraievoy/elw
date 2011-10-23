@@ -18,8 +18,8 @@
 
 package elw.web;
 
-import elw.dao.CouchDao;
 import elw.dao.Ctx;
+import elw.dao.Queries;
 import elw.miniweb.Message;
 import elw.miniweb.ViewJackson;
 import elw.vo.*;
@@ -47,14 +47,14 @@ import java.util.*;
 public class StudentController extends ControllerElw {
     private static final Logger log = LoggerFactory.getLogger(StudentController.class);
 
-    private final CouchDao couchDao;
+    private Queries queries;
 
     public StudentController(
-            CouchDao couchDao,
+            Queries queries,
             Core core
     ) {
         super(core);
-        this.couchDao = couchDao;
+        this.queries = queries;
     }
 
     protected HashMap<String, Object> auth(final HttpServletRequest req, final HttpServletResponse resp, final String pathToRoot) throws IOException {
@@ -64,7 +64,7 @@ public class StudentController extends ControllerElw {
         //	admin impersonation
         final Admin admin = (Admin) session.getAttribute(S_ADMIN);
         if (admin != null) {
-            if (!ctx.resolve(couchDao).resolved(Ctx.STATE_GS)) {
+            if (!ctx.resolve(queries).resolved(Ctx.STATE_GS)) {
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "context path problem, please check the logs");
                 return null;
             }
@@ -79,7 +79,7 @@ public class StudentController extends ControllerElw {
         final Group group = (Group) session.getAttribute(S_GROUP);
         final Student student = (Student) session.getAttribute(S_STUD);
         if (group != null && student != null) {
-            ctx.resolve(couchDao);
+            ctx.resolve(queries);
             if (ctx.getGroup() == null) {
                 ctx = ctx.extendGroup(group);
             }
@@ -145,7 +145,7 @@ public class StudentController extends ControllerElw {
     public ModelAndView do_login(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
         final HashMap<String, Object> model = prepareDefaultModel(req);
 
-        model.put("groups", core.getQueries().groups());
+        model.put("groups", queries.groups());
         model.put("groupName", req.getSession(true).getAttribute("groupName"));
         model.put("studentName", req.getSession(true).getAttribute("studentName"));
 
@@ -165,7 +165,7 @@ public class StudentController extends ControllerElw {
                 ) {
             Message.addErr(req, "fields NOT set");
         } else {
-            final List<Group> groups = core.getQueries().groups();
+            final List<Group> groups = queries.groups();
             final Group group = IdNamed._.findByName(groups, groupName.trim(), true);
 
             if (group != null) {
@@ -180,7 +180,7 @@ public class StudentController extends ControllerElw {
                     session.removeAttribute("groupName");
                     session.removeAttribute("studentName");
 
-                    List<Enrollment> enrs = core.getQueries().enrollmentsForGroup(group.getId());
+                    List<Enrollment> enrs = queries.enrollmentsForGroup(group.getId());
                     if (enrs.size() == 1) {
                         resp.sendRedirect("tasks?elw_ctx=e--" + enrs.get(0).getId());
                     } else {
@@ -229,7 +229,7 @@ public class StudentController extends ControllerElw {
         }
 
         final Ctx ctx = (Ctx) model.get(R_CTX);
-        final List<Enrollment> enrolls = core.getQueries().enrollmentsForGroup(ctx.getGroup().getId());
+        final List<Enrollment> enrolls = queries.enrollmentsForGroup(ctx.getGroup().getId());
         final List<Object[]> indexData = core.index(enrolls);
 
         return new ModelAndView(ViewJackson.success(indexData));
@@ -319,7 +319,7 @@ public class StudentController extends ControllerElw {
             slotToScopeToFileId.put(slot.getId(), scopeToFileId);
 
             for (String scope : FileBase.SCOPES) {
-                final List<? extends FileBase> fileEntries = core.getQueries().files(scope, ctx, slot);
+                final List<? extends FileBase> fileEntries = queries.files(scope, ctx, slot);
                 final String[] fileIds = new String[fileEntries.size()];
 
                 for (int i = 0, filesLength = fileEntries.size(); i < filesLength; i++) {
@@ -347,13 +347,13 @@ public class StudentController extends ControllerElw {
                     return null;
                 }
 
-                final FileBase entry = core.getQueries().file(scope, ctx, slot, fileId);
+                final FileBase entry = queries.file(scope, ctx, slot, fileId);
                 if (entry == null) {
                     resp.sendError(HttpServletResponse.SC_NOT_FOUND, "no file found");
                     return null;
                 }
 
-                retrieveFile(entry, core.getQueries().getCouchDao());
+                retrieveFile(entry, queries);
 
                 return null;
             }
@@ -425,7 +425,7 @@ public class StudentController extends ControllerElw {
 
                 return storeFile(
                         slot, refreshUri, failureUri, ctx.getStudent().getName(),
-                        core.getQueries(), new Solution()
+                        queries, new Solution()
                 );
             }
         });
@@ -440,7 +440,7 @@ public class StudentController extends ControllerElw {
         }
 
         if (Solution.SCOPE.equals(scope)) {
-            final SortedMap<String, List<Solution>> filesStud = core.getQueries().solutions(ctx);
+            final SortedMap<String, List<Solution>> filesStud = queries.solutions(ctx);
             if (!ctx.checkRead(slot, filesStud)) {
                 resp.sendError(HttpServletResponse.SC_FORBIDDEN, "not readable yet");
                 return true;

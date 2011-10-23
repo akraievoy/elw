@@ -48,9 +48,6 @@
                           <rows value="8"/>
                           <toolTipText value="&lt;html&gt;Here your MIPS solution code goes.&lt;br/&gt;One instruction per line.&lt;/html&gt;"/>
                         </properties>
-                        <clientProperties>
-                          <caretAspectRatio class="java.lang.Float" value="0.04"/>
-                        </clientProperties>
                       </component>
                     </children>
                   </scrollpane>
@@ -222,59 +219,22 @@
                       </grid>
                     </children>
                   </grid>
-                  <splitpane id="3ffa0">
+                  <scrollpane id="6ab77">
                     <constraints border-constraint="Center"/>
-                    <properties>
-                      <resizeWeight value="0.5"/>
-                    </properties>
+                    <properties/>
                     <border type="none"/>
                     <children>
-                      <scrollpane id="dc813">
-                        <constraints>
-                          <splitpane position="right"/>
-                        </constraints>
-                        <properties/>
-                        <border type="none"/>
-                        <children>
-                          <component id="2fe19" class="javax.swing.JTextArea" binding="testMemTextArea">
-                            <constraints/>
-                            <properties>
-                              <columns value="20"/>
-                              <font name="Courier New" size="13"/>
-                              <lineWrap value="false"/>
-                              <rows value="10"/>
-                              <text value=""/>
-                              <toolTipText value="&lt;html&gt;Memory Input/Output&lt;br/&gt;&lt;br/&gt;Format:&lt;br/&gt;address:input:expected&lt;/html&gt;"/>
-                            </properties>
-                            <clientProperties>
-                              <caretAspectRatio class="java.lang.Float" value="0.04"/>
-                            </clientProperties>
-                          </component>
-                        </children>
-                      </scrollpane>
-                      <scrollpane id="6ab77">
-                        <constraints>
-                          <splitpane position="left"/>
-                        </constraints>
-                        <properties/>
-                        <border type="none"/>
-                        <children>
-                          <component id="ba032" class="javax.swing.JTextArea" binding="testRegsTextArea">
-                            <constraints/>
-                            <properties>
-                              <columns value="20"/>
-                              <font name="Courier New" size="13"/>
-                              <rows value="10"/>
-                              <toolTipText value="&lt;html&gt;Register Input/Output&lt;br/&gt;&lt;br/&gt;Format:&lt;br/&gt;$reg:input:expected&lt;/html&gt;"/>
-                            </properties>
-                            <clientProperties>
-                              <caretAspectRatio class="java.lang.Float" value="0.04"/>
-                            </clientProperties>
-                          </component>
-                        </children>
-                      </scrollpane>
+                      <component id="ba032" class="javax.swing.JTextArea" binding="testRegsTextArea">
+                        <constraints/>
+                        <properties>
+                          <columns value="20"/>
+                          <font name="Courier New" size="13"/>
+                          <rows value="10"/>
+                          <toolTipText value="&lt;html&gt;Register Input/Output&lt;br/&gt;&lt;br/&gt;Format:&lt;br/&gt;$reg:input:expected&lt;/html&gt;"/>
+                        </properties>
+                      </component>
                     </children>
-                  </splitpane>
+                  </scrollpane>
                 </children>
               </grid>
               <grid id="ac1c5" layout-manager="BorderLayout" hgap="0" vgap="0">
@@ -451,7 +411,6 @@
                         </properties>
                         <clientProperties>
                           <JEditorPane.honorDisplayProperties class="java.lang.Boolean" value="true"/>
-                          <caretAspectRatio class="java.lang.Float" value="0.04"/>
                         </clientProperties>
                       </component>
                     </children>
@@ -478,9 +437,6 @@
                           <rows value="10"/>
                           <toolTipText value="Store your temp clips of text here"/>
                         </properties>
-                        <clientProperties>
-                          <caretAspectRatio class="java.lang.Float" value="0.04"/>
-                        </clientProperties>
                       </component>
                     </children>
                   </scrollpane>
@@ -506,7 +462,6 @@
                         </properties>
                         <clientProperties>
                           <JEditorPane.honorDisplayProperties class="java.lang.Boolean" value="true"/>
-                          <caretAspectRatio class="java.lang.Float" value="0.04"/>
                         </clientProperties>
                       </component>
                     </children>

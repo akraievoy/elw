@@ -18,7 +18,6 @@
 
 package elw.web;
 
-import elw.dao.CouchDao;
 import elw.dao.Ctx;
 import elw.dao.Queries;
 import elw.miniweb.Message;
@@ -47,15 +46,15 @@ import java.util.*;
 public class AdminController extends ControllerElw {
     private static final Logger log = LoggerFactory.getLogger(AdminController.class);
 
-    private final CouchDao couchDao;
     private final SortedSet<String> validNonces = new TreeSet<String>();
+    private final Queries queries;
 
     public AdminController(
-            CouchDao couchDao,
+            Queries queries,
             Core core
     ) {
         super(core);
-        this.couchDao = couchDao;
+        this.queries = queries;
     }
 
     protected HashMap<String, Object> auth(final HttpServletRequest req, final HttpServletResponse resp, final String pathToRoot) throws IOException {
@@ -82,7 +81,10 @@ public class AdminController extends ControllerElw {
 
         final HashMap<String, Object> model = prepareDefaultModel(req);
         model.put(S_ADMIN, admin);
-        model.put(R_CTX, Ctx.fromString(req.getParameter(R_CTX)).resolve(couchDao));
+        model.put(
+                R_CTX,
+                Ctx.fromString(req.getParameter(R_CTX)).resolve(queries)
+        );
 
         return model;
     }
@@ -330,7 +332,7 @@ public class AdminController extends ControllerElw {
 
                         score.setComment(req.getParameter("comment"));
                         score.setupPathElems(ctx, slot, file);
-                        core.getQueries().getCouchDao().update(score);
+                        queries.updateScore(score);
                     }
 
                     resp.sendRedirect(core.cmpForwardToEarliestPendingSince(ctx, slot, file.getStamp()));
@@ -404,7 +406,7 @@ public class AdminController extends ControllerElw {
                     return null;
                 }
 
-                retrieveFile(entry, core.getQueries().getCouchDao());
+                retrieveFile(entry, core.getQueries());
 
                 return null;
             }

@@ -24,7 +24,6 @@ import com.google.common.base.Strings;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.CharStreams;
 import com.google.common.io.InputSupplier;
-import elw.dao.CouchDao;
 import elw.dao.Ctx;
 import elw.dao.Queries;
 import elw.miniweb.Message;
@@ -253,7 +252,9 @@ public abstract class ControllerElw extends MultiActionController implements Web
 
         protected abstract ModelAndView handleFile(String scope, FileSlot slot) throws IOException;
 
-        protected void retrieveFile(FileBase fileBase, final CouchDao couchDao) throws IOException {
+        protected void retrieveFile(
+                FileBase fileBase, final Queries queries
+        ) throws IOException {
             final FileType fileType = IdNamed._.one(fileBase.getFileType());
             final String contentType;
             if (!fileType.getContentTypes().isEmpty()) {
@@ -272,7 +273,9 @@ public abstract class ControllerElw extends MultiActionController implements Web
             resp.setContentLength(fileBase.getCouchFile(FileBase.CONTENT).getLength().intValue());
             resp.setHeader("Content-Disposition", "attachment;");
 
-            ByteStreams.copy(couchDao.file(fileBase, FileBase.CONTENT), resp.getOutputStream());
+            final InputSupplier<InputStream> fileInput =
+                    queries.inputSupplier(fileBase, FileBase.CONTENT);
+            ByteStreams.copy(fileInput, resp.getOutputStream());
         }
 
         public ModelAndView storeFile(

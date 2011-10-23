@@ -8,6 +8,7 @@ public class Task extends Squab implements IdNamed {
     private String id;
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
+    public Task withId(String id) { setId(id); return this; }
 
     private String name;
     public String getName() { return name; }

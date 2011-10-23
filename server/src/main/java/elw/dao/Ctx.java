@@ -199,7 +199,7 @@ public class Ctx implements elw.vo.Ctx {
         if (ass == null) {
             throw new IllegalArgumentException("ass is null");
         }
-        return forAssType(course, assType).extendAss(ass);
+        return forAssType(course, assType).extendTask(ass);
     }
 
     public String ei() {
@@ -210,16 +210,15 @@ public class Ctx implements elw.vo.Ctx {
         return norm("ecgs") + SEP + getEnr().getId() + SEP + getStudent().getId();
     }
 
-    public Ctx resolve(CouchDao couchDao) {
-        final Queries q = new Queries(couchDao);
+    public Ctx resolve(Queries queries) {
         if (enr.isPending()) {
-            extEnr(q.enrollmentSome(enr.getKey()));
+            extEnr(queries.enrollmentSome(enr.getKey()));
         }
         if (course.isPending()) {
-            extCourse(q.course(course.getKey()));
+            extCourse(queries.course(course.getKey()));
         }
         if (group.isPending()) {
-            extGroup(q.group(group.getKey()));
+            extGroup(queries.group(group.getKey()));
         }
 
         return resolve();
@@ -326,7 +325,7 @@ public class Ctx implements elw.vo.Ctx {
         return resolve();
     }
 
-    private Ctx extAss(final Task newTask) {
+    private Ctx extTask(final Task newTask) {
         if (!assType.isResolved()) {
             throw new IllegalStateException("taskType not set");
         }
@@ -368,8 +367,8 @@ public class Ctx implements elw.vo.Ctx {
         return copy().extAssType(newType);
     }
 
-    private Ctx extendAss(final Task newTask) {
-        return copy().extAss(newTask);
+    public Ctx extendTask(final Task newTask) {
+        return copy().extTask(newTask);
     }
 
     public Ctx extendVer(final Version newVer) {

@@ -19,7 +19,6 @@
 package elw.web.core;
 
 import com.google.common.base.Strings;
-import elw.dao.CouchDao;
 import elw.dao.Ctx;
 import elw.dao.Queries;
 import elw.vo.*;
@@ -33,15 +32,13 @@ import java.util.*;
 public class Core {
     private static final String CTX_TO_SCORE_TOTAL = "--total";
 
-    private final CouchDao couchDao;
     private final Queries queries;
 
     private final VelocityTemplates vt = VelocityTemplates.INSTANCE;
     private final ElwUri uri = new ElwUri();
 
-    public Core(CouchDao couchDao) {
-        this.couchDao = couchDao;
-        this.queries = new Queries(couchDao);
+    public Core(Queries queries) {
+        this.queries = queries;
     }
 
     public VelocityTemplates getTemplates() {
@@ -116,7 +113,7 @@ public class Core {
                 //	do the same, but across all enrollments
                 for (Enrollment enr : queries.enrollments()) {
                     if (enr.getCourseId().equals(ctx.getCourse().getId())) {
-                        final Ctx enrCtx = Ctx.forEnr(enr).resolve(couchDao);
+                        final Ctx enrCtx = Ctx.forEnr(enr).resolve(queries);
                         for (Student stud : enrCtx.getGroup().getStudents().values()) {
                             if (W.excluded(lf.getStudId(), stud.getId())) {
                                 continue;
@@ -649,7 +646,7 @@ public class Core {
         Solution epF = null;    //	earliest pending
         Ctx epCtx = null;
 
-        final Ctx ctxEnr = Ctx.forEnr(ctx.getEnr()).resolve(couchDao);
+        final Ctx ctxEnr = Ctx.forEnr(ctx.getEnr()).resolve(queries);
         //	LATER oh this pretty obviously looks like we REALLY need some rdbms from now on... :D
         for (Student stud : ctx.getGroup().getStudents().values()) {
             final Ctx ctxStud = ctxEnr.extendStudent(stud);

@@ -6,10 +6,12 @@ public class Version implements IdNamed {
     private String id;
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
+    public Version withId(String id) { setId(id); return this; }
 
     private String name;
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
+    public Version withName(String name) { setName(name); return this; }
 
     private boolean shared = false;
     public boolean isShared() { return shared; }

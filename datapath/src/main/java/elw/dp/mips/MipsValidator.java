@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MipsValidator {
     private static final Logger log = LoggerFactory.getLogger(MipsValidator.class);
@@ -50,19 +51,16 @@ public class MipsValidator {
     }
 
     public void loadTest(Result[] resRef, String test) {
-        final String[] regs = new String[1];
-        final String[] mem = new String[1];
-        if (!TaskBean.parseTest(test, regs, mem)) {
-            Result.failure(log, resRef, "test marks broken");
+        final TaskBean.Test testBean = TaskBean.parseTest(test);
+        final Map<Integer, List<String>> lineToErrors = testBean.parseErrors.getLineToErrors();
+        if (!lineToErrors.isEmpty()) {
+            Result.failure(log, resRef, testBean.errors(lineToErrors));
             return;
         }
 
-        final String[] regsLines = regs[0].split("\r|\n");
-
-        final TIntIntHashMap[] newRegs = assembler.loadRegs(regsLines, resRef);
+        final TIntIntHashMap[] newRegs = assembler.loadRegs(testBean.regs, resRef);
         if (newRegs != null && resRef[0].isSuccess()) {
-            final String[] memLines = mem[0].split("\r|\n");
-            final TIntIntHashMap[] newData = assembler.loadData(memLines, resRef);
+            final TIntIntHashMap[] newData = assembler.loadData(testBean.mem, resRef);
 
             if (newData != null && resRef[0].isSuccess()) {
                 this.regs = newRegs;

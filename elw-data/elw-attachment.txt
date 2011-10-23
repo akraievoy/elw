@@ -1,0 +1,3242 @@
+Content-Type: multipart/mixed; boundary="==9a5c747e479841128da83b270dd0702c=="
+
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-1-1-statement-statement.txt-gu46m4yo-
+Content-Type: multipart/mixed; boundary="==f25a22354a544054811256f14bf56921=="
+ETag: "4-924b8741744a3f9bc111e23b6fa3c914"
+
+--==f25a22354a544054811256f14bf56921==
+Content-Length: 304
+Content-MD5: jMVgD3OEH0owTGpkLlFBgg==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "statement.txt", "author": "akraievoy", "stamp": 1319383070880, "_rev": "4-924b8741744a3f9bc111e23b6fa3c914", "id": "statement.txt", "_id": "Attachment-aos_w11-lr-1-1-statement-statement.txt-gu46m4yo-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==f25a22354a544054811256f14bf56921==
+Content-ID: content
+Content-Length: 256
+Content-MD5: xV57ZUFLXpli6Cmgnl2b1g==
+Content-Type: text/plain
+
+Добуток значення регістру $a1, зменшеного на 3, та
+значення регістру $a2, збільшеного на 2, зберегти у регістр $v0. Збільшити
+вміст регістру $a0 на 2.
+--==f25a22354a544054811256f14bf56921==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-1-1-test-test.1.txt-gu46m2sf-
+Content-Type: multipart/mixed; boundary="==72cb8aa13cbc48cc91926780a7573c78=="
+ETag: "4-dba381edbffcc1a31c209c503256f387"
+
+--==72cb8aa13cbc48cc91926780a7573c78==
+Content-Length: 290
+Content-MD5: W/XiTaTRZ9SCyiqzPct2Jg==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.1.txt", "author": "akraievoy", "stamp": 1319383068063, "_rev": "4-dba381edbffcc1a31c209c503256f387", "id": "test.1.txt", "_id": "Attachment-aos_w11-lr-1-1-test-test.1.txt-gu46m2sf-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==72cb8aa13cbc48cc91926780a7573c78==
+Content-ID: content
+Content-Length: 38
+Content-MD5: 6w6B/wHUgDZnObAFqM/Ipw==
+Content-Type: text/plain
+
+$a0: 65 => 67
+$a1: 3
+$a2: -1
+$v0: => 0
+--==72cb8aa13cbc48cc91926780a7573c78==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-1-1-test-test.2.txt-gu46m331-
+Content-Type: multipart/mixed; boundary="==657a9a2ce1ea460987ce740f3da930a5=="
+ETag: "4-52ecb60e0854fe1401be4c85ad0fa23f"
+
+--==657a9a2ce1ea460987ce740f3da930a5==
+Content-Length: 290
+Content-MD5: Hb5jJ+IuPo8HQHW2FBODmw==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.2.txt", "author": "akraievoy", "stamp": 1319383068445, "_rev": "4-52ecb60e0854fe1401be4c85ad0fa23f", "id": "test.2.txt", "_id": "Attachment-aos_w11-lr-1-1-test-test.2.txt-gu46m331-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==657a9a2ce1ea460987ce740f3da930a5==
+Content-ID: content
+Content-Length: 37
+Content-MD5: kY6jqHHyLVl7ecP+KV2IDA==
+Content-Type: text/plain
+
+$a0: 9 => 11
+$a1: 5
+$a2: -2
+$v0: => 0
+--==657a9a2ce1ea460987ce740f3da930a5==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-1-1-test-test.3.txt-gu46m368-
+Content-Type: multipart/mixed; boundary="==6d2735a8de414dee9404e163e5d83b24=="
+ETag: "4-8bed0135c2f88362fa872287344877c7"
+
+--==6d2735a8de414dee9404e163e5d83b24==
+Content-Length: 290
+Content-MD5: K+dzaUT/OoVbjXTu+HRM3A==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.3.txt", "author": "akraievoy", "stamp": 1319383068560, "_rev": "4-8bed0135c2f88362fa872287344877c7", "id": "test.3.txt", "_id": "Attachment-aos_w11-lr-1-1-test-test.3.txt-gu46m368-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==6d2735a8de414dee9404e163e5d83b24==
+Content-ID: content
+Content-Length: 37
+Content-MD5: HeanJSh7gbfudcFTStgnLQ==
+Content-Type: text/plain
+
+$a0: 23 => 25
+$a1: 5
+$a2: 0
+$v0: => 4
+--==6d2735a8de414dee9404e163e5d83b24==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-1-2-statement-statement.txt-gu46m52k-
+Content-Type: multipart/mixed; boundary="==7e1039789de1494a93852fa43798e901=="
+ETag: "4-2ce5682b6aa5f646015e14d350b8e476"
+
+--==7e1039789de1494a93852fa43798e901==
+Content-Length: 304
+Content-MD5: rlYeK39ZoRHgUsyIhkpPLw==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "statement.txt", "author": "akraievoy", "stamp": 1319383071020, "_rev": "4-2ce5682b6aa5f646015e14d350b8e476", "id": "statement.txt", "_id": "Attachment-aos_w11-lr-1-2-statement-statement.txt-gu46m52k-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==7e1039789de1494a93852fa43798e901==
+Content-ID: content
+Content-Length: 281
+Content-MD5: 1CjnNN/V+QdQwcypJpleSQ==
+Content-Type: text/plain
+
+Зберегти у регістр $v0 остачу від ділення значення
+регістру $a1, збільшеного на 5, на значення регістру $a2, збільшеного вдвічі.
+Зменшити вміст регістра $a0 на 2.
+--==7e1039789de1494a93852fa43798e901==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-1-2-test-test.1.txt-gu46m39r-
+Content-Type: multipart/mixed; boundary="==92e77b245fd84bdcaa26c459e16079c6=="
+ETag: "4-e7a8f93f91fc4ff1d07271462afc86d9"
+
+--==92e77b245fd84bdcaa26c459e16079c6==
+Content-Length: 290
+Content-MD5: 80C+ZopRB0jaRsZKd2w28w==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.1.txt", "author": "akraievoy", "stamp": 1319383068687, "_rev": "4-e7a8f93f91fc4ff1d07271462afc86d9", "id": "test.1.txt", "_id": "Attachment-aos_w11-lr-1-2-test-test.1.txt-gu46m39r-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==92e77b245fd84bdcaa26c459e16079c6==
+Content-ID: content
+Content-Length: 37
+Content-MD5: 5w92oNno3NOub07RirzcLA==
+Content-Type: text/plain
+
+$a0: 65 => 63
+$a1: 5
+$a2: 3
+$v0: => 4
+--==92e77b245fd84bdcaa26c459e16079c6==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-1-2-test-test.2.txt-gu46m3cy-
+Content-Type: multipart/mixed; boundary="==19176f429f9c400ab38dfb190822907e=="
+ETag: "4-5c57128e6515ff840cc0c49bdc1ebf09"
+
+--==19176f429f9c400ab38dfb190822907e==
+Content-Length: 290
+Content-MD5: zbbN4jAQMqjy0QEhEoSMdw==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.2.txt", "author": "akraievoy", "stamp": 1319383068802, "_rev": "4-5c57128e6515ff840cc0c49bdc1ebf09", "id": "test.2.txt", "_id": "Attachment-aos_w11-lr-1-2-test-test.2.txt-gu46m3cy-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==19176f429f9c400ab38dfb190822907e==
+Content-ID: content
+Content-Length: 36
+Content-MD5: KzL3/mfXjk7oeuH/V4pXmA==
+Content-Type: text/plain
+
+$a0: 9 => 7
+$a1: 11
+$a2: 4
+$v0: => 0
+--==19176f429f9c400ab38dfb190822907e==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-1-2-test-test.3.txt-gu46m3g8-
+Content-Type: multipart/mixed; boundary="==12e85256a1af4c8da097017e5b576bf9=="
+ETag: "4-0d3c5794e04a22aeea865c0306588eb1"
+
+--==12e85256a1af4c8da097017e5b576bf9==
+Content-Length: 290
+Content-MD5: xJpHrmLlEUrd8nIZM+9KWg==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.3.txt", "author": "akraievoy", "stamp": 1319383068920, "_rev": "4-0d3c5794e04a22aeea865c0306588eb1", "id": "test.3.txt", "_id": "Attachment-aos_w11-lr-1-2-test-test.3.txt-gu46m3g8-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==12e85256a1af4c8da097017e5b576bf9==
+Content-ID: content
+Content-Length: 42
+Content-MD5: Ue2B5lrn/QZPlKiJMDaRCg==
+Content-Type: text/plain
+
+$a0: 23 => 21
+$a1: 102
+$a2: 64
+$v0: => 107
+--==12e85256a1af4c8da097017e5b576bf9==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-1-3-statement-statement.txt-gu46m55s-
+Content-Type: multipart/mixed; boundary="==db6a2424be1e4532a2d6050f408bd8b0=="
+ETag: "4-982435a901fcd88767ab5037d7b8c024"
+
+--==db6a2424be1e4532a2d6050f408bd8b0==
+Content-Length: 304
+Content-MD5: Y1M8mKr+yRPy1s8hqn8Q4Q==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "statement.txt", "author": "akraievoy", "stamp": 1319383071136, "_rev": "4-982435a901fcd88767ab5037d7b8c024", "id": "statement.txt", "_id": "Attachment-aos_w11-lr-1-3-statement-statement.txt-gu46m55s-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==db6a2424be1e4532a2d6050f408bd8b0==
+Content-ID: content
+Content-Length: 169
+Content-MD5: Wp1jQE9cxTIMTIChAzjwZg==
+Content-Type: text/plain
+
+Дадати вміст регістрів $a0, $a1, $a2, помножити його
+на вміст регістру $a3 і записати результат в $v0.
+--==db6a2424be1e4532a2d6050f408bd8b0==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-1-3-test-test.1.txt-gu46m3jv-
+Content-Type: multipart/mixed; boundary="==402f9a8a7f824b44b3c08d591b048e52=="
+ETag: "4-d82cee00ae2efe0dcc3baefae8d44a31"
+
+--==402f9a8a7f824b44b3c08d591b048e52==
+Content-Length: 290
+Content-MD5: 3Mv0zrNk07ukbrb/+VNgGQ==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.1.txt", "author": "akraievoy", "stamp": 1319383069051, "_rev": "4-d82cee00ae2efe0dcc3baefae8d44a31", "id": "test.1.txt", "_id": "Attachment-aos_w11-lr-1-3-test-test.1.txt-gu46m3jv-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==402f9a8a7f824b44b3c08d591b048e52==
+Content-ID: content
+Content-Length: 38
+Content-MD5: LKsK2kEvd0F5LkO+sfpKzg==
+Content-Type: text/plain
+
+$a0: 1
+$a1: 2
+$a2: 3
+$a3: 4
+$v0: => 24
+--==402f9a8a7f824b44b3c08d591b048e52==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-1-3-test-test.2.txt-gu46m3n9-
+Content-Type: multipart/mixed; boundary="==89f158aa53b24eec9029a3b1807a2fe4=="
+ETag: "4-442e39a5d17c0387d3be42e6dbaa58f1"
+
+--==89f158aa53b24eec9029a3b1807a2fe4==
+Content-Length: 290
+Content-MD5: xQVz7XepJ1dVnXLrd+smeg==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.2.txt", "author": "akraievoy", "stamp": 1319383069173, "_rev": "4-442e39a5d17c0387d3be42e6dbaa58f1", "id": "test.2.txt", "_id": "Attachment-aos_w11-lr-1-3-test-test.2.txt-gu46m3n9-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==89f158aa53b24eec9029a3b1807a2fe4==
+Content-ID: content
+Content-Length: 41
+Content-MD5: LY0Be2hSPmjZSrcB8BAjyg==
+Content-Type: text/plain
+
+$a0: 1
+$a1: -2
+$a2: 3
+$a3: -4
+$v0:  => -8
+--==89f158aa53b24eec9029a3b1807a2fe4==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-1-3-test-test.3.txt-gu46m3qa-
+Content-Type: multipart/mixed; boundary="==48abe688270f41288255fc16aa26fe3c=="
+ETag: "4-f1b811103a6cfa4f139be58231a7a4d1"
+
+--==48abe688270f41288255fc16aa26fe3c==
+Content-Length: 290
+Content-MD5: eD+oC37PUu0KTVKyXUxPIg==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.3.txt", "author": "akraievoy", "stamp": 1319383069282, "_rev": "4-f1b811103a6cfa4f139be58231a7a4d1", "id": "test.3.txt", "_id": "Attachment-aos_w11-lr-1-3-test-test.3.txt-gu46m3qa-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==48abe688270f41288255fc16aa26fe3c==
+Content-ID: content
+Content-Length: 44
+Content-MD5: q+dnD1rkhyAbbM3acnjj5g==
+Content-Type: text/plain
+
+$a0: 11
+$a1: 12
+$a2: 13
+$a3: 33
+$v0: => 1188
+--==48abe688270f41288255fc16aa26fe3c==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-1-4-statement-statement.txt-gu46m59e-
+Content-Type: multipart/mixed; boundary="==cefb7215e90c4121a668aa15da6f423c=="
+ETag: "4-df9ceb4fbd19b6f09662f3908a9d9cb0"
+
+--==cefb7215e90c4121a668aa15da6f423c==
+Content-Length: 304
+Content-MD5: cQ2Dioe5lroy5JCi7L+Nkw==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "statement.txt", "author": "akraievoy", "stamp": 1319383071266, "_rev": "4-df9ceb4fbd19b6f09662f3908a9d9cb0", "id": "statement.txt", "_id": "Attachment-aos_w11-lr-1-4-statement-statement.txt-gu46m59e-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==cefb7215e90c4121a668aa15da6f423c==
+Content-ID: content
+Content-Length: 223
+Content-MD5: So9E6s/UEPqua5jir1Hhew==
+Content-Type: text/plain
+
+Відняти вміст регістру $a1 від вмісту регістра $a0 і
+записати остачу від ділення результата на вміст регістру $a2 в регістр $v0.
+--==cefb7215e90c4121a668aa15da6f423c==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-1-4-test-test.1.txt-gu46m3ub-
+Content-Type: multipart/mixed; boundary="==cae5a9e17c17450aa6c538643ea45a2e=="
+ETag: "4-d1b5e50b317615f065503a036bfa05e6"
+
+--==cae5a9e17c17450aa6c538643ea45a2e==
+Content-Length: 290
+Content-MD5: U2f5KDwdOvVGcqdI1oNRIw==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.1.txt", "author": "akraievoy", "stamp": 1319383069427, "_rev": "4-d1b5e50b317615f065503a036bfa05e6", "id": "test.1.txt", "_id": "Attachment-aos_w11-lr-1-4-test-test.1.txt-gu46m3ub-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==cae5a9e17c17450aa6c538643ea45a2e==
+Content-ID: content
+Content-Length: 33
+Content-MD5: eeyHf7bhkYq0FoKLxJ8UQQ==
+Content-Type: text/plain
+
+$a0: 65
+$a1: 3
+$a2: 33
+$v0: => 29
+--==cae5a9e17c17450aa6c538643ea45a2e==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-1-4-test-test.2.txt-gu46m3xn-
+Content-Type: multipart/mixed; boundary="==6172f58ef67141b4a4c000ea4a052ddf=="
+ETag: "4-399dbb93cd6646eeb5970fa062aa7813"
+
+--==6172f58ef67141b4a4c000ea4a052ddf==
+Content-Length: 290
+Content-MD5: Tp/fr3IzucVjhywmJQd1pQ==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.2.txt", "author": "akraievoy", "stamp": 1319383069547, "_rev": "4-399dbb93cd6646eeb5970fa062aa7813", "id": "test.2.txt", "_id": "Attachment-aos_w11-lr-1-4-test-test.2.txt-gu46m3xn-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==6172f58ef67141b4a4c000ea4a052ddf==
+Content-ID: content
+Content-Length: 33
+Content-MD5: xkbcSz2D1s2I/GwlkPllRA==
+Content-Type: text/plain
+
+$a0: 65
+$a1: 65
+$a2: 33
+$v0: => 0
+--==6172f58ef67141b4a4c000ea4a052ddf==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-1-4-test-test.3.txt-gu46m40r-
+Content-Type: multipart/mixed; boundary="==a721562f8b6f4341bfdcba19a9b8e02f=="
+ETag: "4-80f77451d630b53115723ce274a42fb7"
+
+--==a721562f8b6f4341bfdcba19a9b8e02f==
+Content-Length: 290
+Content-MD5: /sfZlx6ZdYkyvXFyQ4zRPA==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.3.txt", "author": "akraievoy", "stamp": 1319383069659, "_rev": "4-80f77451d630b53115723ce274a42fb7", "id": "test.3.txt", "_id": "Attachment-aos_w11-lr-1-4-test-test.3.txt-gu46m40r-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==a721562f8b6f4341bfdcba19a9b8e02f==
+Content-ID: content
+Content-Length: 33
+Content-MD5: 6Zft3tsv2nq+xmXPRFPBdA==
+Content-Type: text/plain
+
+$a0: 65
+$a1: 32
+$a2: 33
+$v0: => 0
+--==a721562f8b6f4341bfdcba19a9b8e02f==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-1-5-statement-statement.txt-gu46m5dv-
+Content-Type: multipart/mixed; boundary="==ff3ff5356f8342759b1ab4998f65afcf=="
+ETag: "4-2b7ce09bb2609a6d77a163caab8bcaa4"
+
+--==ff3ff5356f8342759b1ab4998f65afcf==
+Content-Length: 304
+Content-MD5: CRtc36zSyIMtPb+DLqUacA==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "statement.txt", "author": "akraievoy", "stamp": 1319383071427, "_rev": "4-2b7ce09bb2609a6d77a163caab8bcaa4", "id": "statement.txt", "_id": "Attachment-aos_w11-lr-1-5-statement-statement.txt-gu46m5dv-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==ff3ff5356f8342759b1ab4998f65afcf==
+Content-ID: content
+Content-Length: 193
+Content-MD5: KpidxdzB5/eqeTryjbDEtw==
+Content-Type: text/plain
+
+Перемножити вміст регістрів $a0, $a1, $a2 та записати результат,
+зменшений на значення регістру $a3 у регістр $v0.
+--==ff3ff5356f8342759b1ab4998f65afcf==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-1-5-test-test.1.txt-gu46m448-
+Content-Type: multipart/mixed; boundary="==4df1b56dadef448690431fe891ad0d40=="
+ETag: "4-1f7b048c1ecb835fd846c34fedea2014"
+
+--==4df1b56dadef448690431fe891ad0d40==
+Content-Length: 290
+Content-MD5: FdUTZqzplmxL0BKxbZ3Sag==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.1.txt", "author": "akraievoy", "stamp": 1319383069784, "_rev": "4-1f7b048c1ecb835fd846c34fedea2014", "id": "test.1.txt", "_id": "Attachment-aos_w11-lr-1-5-test-test.1.txt-gu46m448-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==4df1b56dadef448690431fe891ad0d40==
+Content-ID: content
+Content-Length: 37
+Content-MD5: P+lF4a9HBNtOLgJxYZJ6Ig==
+Content-Type: text/plain
+
+$a0: 1
+$a1: 2
+$a2: 3
+$a3: 5
+$v0: => 1
+--==4df1b56dadef448690431fe891ad0d40==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-1-5-test-test.2.txt-gu46m47n-
+Content-Type: multipart/mixed; boundary="==54faef36193a40c7b442f6901a8b5c10=="
+ETag: "4-9537a9298a039f497ef3ce08e5c445f9"
+
+--==54faef36193a40c7b442f6901a8b5c10==
+Content-Length: 290
+Content-MD5: g/zfx1NaBhfJ6A7dVCn/cA==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.2.txt", "author": "akraievoy", "stamp": 1319383069907, "_rev": "4-9537a9298a039f497ef3ce08e5c445f9", "id": "test.2.txt", "_id": "Attachment-aos_w11-lr-1-5-test-test.2.txt-gu46m47n-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==54faef36193a40c7b442f6901a8b5c10==
+Content-ID: content
+Content-Length: 41
+Content-MD5: IBWcRYQz/+Cb92fasVfsEQ==
+Content-Type: text/plain
+
+$a0: 11
+$a1: 12
+$a2: 2
+$a3: 264
+$v0: => 0
+--==54faef36193a40c7b442f6901a8b5c10==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-1-5-test-test.3.txt-gu46m4bg-
+Content-Type: multipart/mixed; boundary="==5ac89f3bcbf341518bfff22da5b031d1=="
+ETag: "4-13cbb6f0e4838e938ffdd991e2cacb9c"
+
+--==5ac89f3bcbf341518bfff22da5b031d1==
+Content-Length: 290
+Content-MD5: Befzdt7q5AvXopOPhMvS0Q==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.3.txt", "author": "akraievoy", "stamp": 1319383070044, "_rev": "4-13cbb6f0e4838e938ffdd991e2cacb9c", "id": "test.3.txt", "_id": "Attachment-aos_w11-lr-1-5-test-test.3.txt-gu46m4bg-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==5ac89f3bcbf341518bfff22da5b031d1==
+Content-ID: content
+Content-Length: 38
+Content-MD5: reuYGeVrzAC0ivX2mygeEw==
+Content-Type: text/plain
+
+$a0: 5
+$a1: 4
+$a2: 0
+$a3: -8
+$v0: => 8
+--==5ac89f3bcbf341518bfff22da5b031d1==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-1-6-statement-statement.txt-gu46m5h6-
+Content-Type: multipart/mixed; boundary="==f23c2b894a634473bbf1c89cd863897b=="
+ETag: "4-e7ed7e953736d049dd38583899d93596"
+
+--==f23c2b894a634473bbf1c89cd863897b==
+Content-Length: 304
+Content-MD5: /2HrJzpYVoPbTrt8OQebqQ==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "statement.txt", "author": "akraievoy", "stamp": 1319383071546, "_rev": "4-e7ed7e953736d049dd38583899d93596", "id": "statement.txt", "_id": "Attachment-aos_w11-lr-1-6-statement-statement.txt-gu46m5h6-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==f23c2b894a634473bbf1c89cd863897b==
+Content-ID: content
+Content-Length: 322
+Content-MD5: yQ8ftpMRKkO4xJdbmReYxw==
+Content-Type: text/plain
+
+Остачу від ділення вмісту регістру $a0 на вміст регістру $a1
+використати як дільник при обчисленні цілої частини при діленні значення
+регістру $a2. Результат зберегти у регістр $v0.
+--==f23c2b894a634473bbf1c89cd863897b==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-1-6-test-test.1.txt-gu46m4f9-
+Content-Type: multipart/mixed; boundary="==4c305aca6e10433a9098bd890c8aba4a=="
+ETag: "4-9bf85c34a5fa0a400668b437d9eddbdb"
+
+--==4c305aca6e10433a9098bd890c8aba4a==
+Content-Length: 290
+Content-MD5: OXQoS4ZhA9RVS8dr/0tv/A==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.1.txt", "author": "akraievoy", "stamp": 1319383070181, "_rev": "4-9bf85c34a5fa0a400668b437d9eddbdb", "id": "test.1.txt", "_id": "Attachment-aos_w11-lr-1-6-test-test.1.txt-gu46m4f9-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==4c305aca6e10433a9098bd890c8aba4a==
+Content-ID: content
+Content-Length: 30
+Content-MD5: bPf2jU4UstzHSuKG4eBT5g==
+Content-Type: text/plain
+
+$a0: 3
+$a1: 2
+$a2: 5
+$v0: => 5
+--==4c305aca6e10433a9098bd890c8aba4a==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-1-6-test-test.2.txt-gu46m4lh-
+Content-Type: multipart/mixed; boundary="==9342cc7beb5145e8bc38243bf2f26ec5=="
+ETag: "4-f077941f9133f6f94a4232467a06607a"
+
+--==9342cc7beb5145e8bc38243bf2f26ec5==
+Content-Length: 290
+Content-MD5: 7LLtgUxg26nfwyWKxG0isg==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.2.txt", "author": "akraievoy", "stamp": 1319383070405, "_rev": "4-f077941f9133f6f94a4232467a06607a", "id": "test.2.txt", "_id": "Attachment-aos_w11-lr-1-6-test-test.2.txt-gu46m4lh-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==9342cc7beb5145e8bc38243bf2f26ec5==
+Content-ID: content
+Content-Length: 33
+Content-MD5: QNNrJSqwhr1l3qNF3tiI8Q==
+Content-Type: text/plain
+
+$a0: 13
+$a1: 8
+$a2: 55
+$v0: => 11
+--==9342cc7beb5145e8bc38243bf2f26ec5==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-1-6-test-test.3.txt-gu46m4o6-
+Content-Type: multipart/mixed; boundary="==fa97f18adf7d40fc84afabdfcf424cc2=="
+ETag: "4-fc92061dc201a76e8fc04d1b578e21ab"
+
+--==fa97f18adf7d40fc84afabdfcf424cc2==
+Content-Length: 290
+Content-MD5: OkMYUyXzYUBiJI9rWVjvTg==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.3.txt", "author": "akraievoy", "stamp": 1319383070502, "_rev": "4-fc92061dc201a76e8fc04d1b578e21ab", "id": "test.3.txt", "_id": "Attachment-aos_w11-lr-1-6-test-test.3.txt-gu46m4o6-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==fa97f18adf7d40fc84afabdfcf424cc2==
+Content-ID: content
+Content-Length: 39
+Content-MD5: hIJqwCPPPSuBHQgaSSnhGg==
+Content-Type: text/plain
+
+$a0: 1023
+$a1: 1024
+$a2: 1022
+$v0: => 0
+--==fa97f18adf7d40fc84afabdfcf424cc2==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-2-1-statement-statement.txt-gu46m7h4-
+Content-Type: multipart/mixed; boundary="==8cdaa352a0844964a726900d6ec053a7=="
+ETag: "4-7b2db046f87ba7519fe3200fdb109c6e"
+
+--==8cdaa352a0844964a726900d6ec053a7==
+Content-Length: 304
+Content-MD5: ScZd37TYRU35u+JvYZQq8A==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "statement.txt", "author": "akraievoy", "stamp": 1319383074136, "_rev": "4-7b2db046f87ba7519fe3200fdb109c6e", "id": "statement.txt", "_id": "Attachment-aos_w11-lr-2-1-statement-statement.txt-gu46m7h4-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==8cdaa352a0844964a726900d6ec053a7==
+Content-ID: content
+Content-Length: 337
+Content-MD5: Ou6QXZhnGWxaplGgnM5OXA==
+Content-Type: text/plain
+
+Скласти вміст двух комірок памяті за адресами із
+регістрів $a0 та $a1, відняти від суми вміст комірки памяті за адресою із
+регістра $a2 з урахуванням зсуву на 12 байт, результат записати у $v0.
+--==8cdaa352a0844964a726900d6ec053a7==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-2-1-test-test.1.txt-gu46m5l1-
+Content-Type: multipart/mixed; boundary="==07fce40ccc8c4af1bb9dabd25fdaf464=="
+ETag: "4-1e7612ef4ac2964c6327b49be684344b"
+
+--==07fce40ccc8c4af1bb9dabd25fdaf464==
+Content-Length: 290
+Content-MD5: 1ITWsu1Dp0zNPEdmxfFutg==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.1.txt", "author": "akraievoy", "stamp": 1319383071685, "_rev": "4-1e7612ef4ac2964c6327b49be684344b", "id": "test.1.txt", "_id": "Attachment-aos_w11-lr-2-1-test-test.1.txt-gu46m5l1-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==07fce40ccc8c4af1bb9dabd25fdaf464==
+Content-ID: content
+Content-Length: 72
+Content-MD5: cyuB1YAhqEc8XONjPOxeGA==
+Content-Type: text/plain
+
+$a0: 0x100
+$a1: 0x104
+$a2: 0x0FC
+0x100: 17
+0x104: 13
+0x108: 5
+$v0: => 25
+--==07fce40ccc8c4af1bb9dabd25fdaf464==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-2-1-test-test.2.txt-gu46m5oa-
+Content-Type: multipart/mixed; boundary="==4d4e0545c0cf496896a77e520dcc3e2a=="
+ETag: "4-15003800a63caf443f3c5bb3c06c1bff"
+
+--==4d4e0545c0cf496896a77e520dcc3e2a==
+Content-Length: 290
+Content-MD5: 45ODAGQCgriX3ZS2Zdop3Q==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.2.txt", "author": "akraievoy", "stamp": 1319383071802, "_rev": "4-15003800a63caf443f3c5bb3c06c1bff", "id": "test.2.txt", "_id": "Attachment-aos_w11-lr-2-1-test-test.2.txt-gu46m5oa-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==4d4e0545c0cf496896a77e520dcc3e2a==
+Content-ID: content
+Content-Length: 70
+Content-MD5: Jw/DnOWQKoRl8LXbV1EIUQ==
+Content-Type: text/plain
+
+$a0: 0x100
+$a1: 0x104
+$a2: 0x108
+0x100: 9
+0x104: -3
+0x114: 6
+$v0: => 0
+--==4d4e0545c0cf496896a77e520dcc3e2a==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-2-1-test-test.3.txt-gu46m5rl-
+Content-Type: multipart/mixed; boundary="==2075112366d64580b2949c11fc6af98c=="
+ETag: "4-2711fbf90f4fbd625c7a034eb92e05b1"
+
+--==2075112366d64580b2949c11fc6af98c==
+Content-Length: 290
+Content-MD5: tNbj4uIA8sQFQNZZp2zDPQ==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.3.txt", "author": "akraievoy", "stamp": 1319383071921, "_rev": "4-2711fbf90f4fbd625c7a034eb92e05b1", "id": "test.3.txt", "_id": "Attachment-aos_w11-lr-2-1-test-test.3.txt-gu46m5rl-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==2075112366d64580b2949c11fc6af98c==
+Content-ID: content
+Content-Length: 73
+Content-MD5: HAER+kBXl3LehPZxsDboVA==
+Content-Type: text/plain
+
+$a0: 0x104
+$a1: 0x100
+$a2: 0x200
+0x100: -5
+0x104: 1
+0x20C: -14
+$v0: => 10
+--==2075112366d64580b2949c11fc6af98c==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-2-2-statement-statement.txt-gu46m7kn-
+Content-Type: multipart/mixed; boundary="==e76c89ab87684a11b71b1a10db0df987=="
+ETag: "4-9d4c094060d56408e2b1844ec3023c34"
+
+--==e76c89ab87684a11b71b1a10db0df987==
+Content-Length: 304
+Content-MD5: ewjXs/4KdAf4NM1yheRvpg==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "statement.txt", "author": "akraievoy", "stamp": 1319383074263, "_rev": "4-9d4c094060d56408e2b1844ec3023c34", "id": "statement.txt", "_id": "Attachment-aos_w11-lr-2-2-statement-statement.txt-gu46m7kn-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==e76c89ab87684a11b71b1a10db0df987==
+Content-ID: content
+Content-Length: 359
+Content-MD5: z7MBtqbbxLGGFkPLBiTAnA==
+Content-Type: text/plain
+
+Скласти вміст п’яти слів памяті, що знаходяться за адресою
+із регістра $a0, у діапазоні адреса-8..адреса+8, суму записати у $v0,
+середнє арифметичне записати у комірку пам’яті за адресою із регістра $a0.
+--==e76c89ab87684a11b71b1a10db0df987==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-2-2-test-test.1.txt-gu46m5vd-
+Content-Type: multipart/mixed; boundary="==2d4bd1dbe69b48eaa576d3164e1eef5f=="
+ETag: "4-37e00dece3ad5047d8011fc0f6e50db1"
+
+--==2d4bd1dbe69b48eaa576d3164e1eef5f==
+Content-Length: 290
+Content-MD5: tzK3ksh05Jq/Zuaz0XnvRg==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.1.txt", "author": "akraievoy", "stamp": 1319383072057, "_rev": "4-37e00dece3ad5047d8011fc0f6e50db1", "id": "test.1.txt", "_id": "Attachment-aos_w11-lr-2-2-test-test.1.txt-gu46m5vd-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==2d4bd1dbe69b48eaa576d3164e1eef5f==
+Content-ID: content
+Content-Length: 66
+Content-MD5: BXDOoJHQfhKfYSe4l47r8A==
+Content-Type: text/plain
+
+$a0: 0x108
+0x100: 1
+0x104: 2
+0x108: 3
+0x10C: 4
+0x110: 5
+$v0: => 15
+--==2d4bd1dbe69b48eaa576d3164e1eef5f==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-2-2-test-test.2.txt-gu46m5ys-
+Content-Type: multipart/mixed; boundary="==4d62601b43d74beebc236e35bcdca81b=="
+ETag: "4-52bdd6f3fdba436be403da663850cd8c"
+
+--==4d62601b43d74beebc236e35bcdca81b==
+Content-Length: 290
+Content-MD5: 4dsLPH/jxv/VPnfiSe24VQ==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.2.txt", "author": "akraievoy", "stamp": 1319383072180, "_rev": "4-52bdd6f3fdba436be403da663850cd8c", "id": "test.2.txt", "_id": "Attachment-aos_w11-lr-2-2-test-test.2.txt-gu46m5ys-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==4d62601b43d74beebc236e35bcdca81b==
+Content-ID: content
+Content-Length: 72
+Content-MD5: gNrxNw8UPYIaPOLpMErEjA==
+Content-Type: text/plain
+
+$a0: 0x108
+0x100: 2
+0x104: 1
+0x108: 4 => 0
+0x10C: -1
+0x110: -2
+$v0: => 4
+--==4d62601b43d74beebc236e35bcdca81b==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-2-2-test-test.3.txt-gu46m635-
+Content-Type: multipart/mixed; boundary="==a97ed2327588489ea75a68ca5d7806ae=="
+ETag: "4-a139ed072c46dbc1fe1ba3fdd438ca75"
+
+--==a97ed2327588489ea75a68ca5d7806ae==
+Content-Length: 290
+Content-MD5: qEaNf5Y1u6Zmx1VGiNVcXw==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.3.txt", "author": "akraievoy", "stamp": 1319383072337, "_rev": "4-a139ed072c46dbc1fe1ba3fdd438ca75", "id": "test.3.txt", "_id": "Attachment-aos_w11-lr-2-2-test-test.3.txt-gu46m635-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==a97ed2327588489ea75a68ca5d7806ae==
+Content-ID: content
+Content-Length: 74
+Content-MD5: kKwze5yWSUVQrk+Q2P35oA==
+Content-Type: text/plain
+
+$a0: 0x208
+0x200: 3
+0x204: 5
+0x208: 8 => 10
+0x20C: 13
+0x210: 21
+$v0: => 50
+--==a97ed2327588489ea75a68ca5d7806ae==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-2-3-statement-statement.txt-gu46m7or-
+Content-Type: multipart/mixed; boundary="==ac362f2095d543698af4fc5124ae87ba=="
+ETag: "4-b3ce7e40339eb4e64487a63ed6911c3d"
+
+--==ac362f2095d543698af4fc5124ae87ba==
+Content-Length: 304
+Content-MD5: 2POztciTT7L8Jet+kAW0pg==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "statement.txt", "author": "akraievoy", "stamp": 1319383074411, "_rev": "4-b3ce7e40339eb4e64487a63ed6911c3d", "id": "statement.txt", "_id": "Attachment-aos_w11-lr-2-3-statement-statement.txt-gu46m7or-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==ac362f2095d543698af4fc5124ae87ba==
+Content-ID: content
+Content-Length: 260
+Content-MD5: vTH9xxty7yj2qUzeAnu8SA==
+Content-Type: text/plain
+
+Збільшити значення у пам’яті за адресами з регістрів $a0
+(застосувати зсув +8 байт) та $a1 (зсув -8 байт), на значення з регістрів $a2
+та $a3 відповідно.
+--==ac362f2095d543698af4fc5124ae87ba==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-2-3-test-test.1.txt-gu46m68i-
+Content-Type: multipart/mixed; boundary="==53d8dd1286e44050b8a4316f54608375=="
+ETag: "4-b2d15717411311976a8e2b33c0847fb6"
+
+--==53d8dd1286e44050b8a4316f54608375==
+Content-Length: 290
+Content-MD5: ZWeiLk057n111029dF5n5Q==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.1.txt", "author": "akraievoy", "stamp": 1319383072530, "_rev": "4-b2d15717411311976a8e2b33c0847fb6", "id": "test.1.txt", "_id": "Attachment-aos_w11-lr-2-3-test-test.1.txt-gu46m68i-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==53d8dd1286e44050b8a4316f54608375==
+Content-ID: content
+Content-Length: 65
+Content-MD5: 8slrkG/k/3EiLOdAiNh/xA==
+Content-Type: text/plain
+
+$a0: 0x0F8
+$a1: 0x208
+$a2: 1
+$a3: -1
+0x100: 0 => 1
+0x200: 0 => -1
+--==53d8dd1286e44050b8a4316f54608375==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-2-3-test-test.2.txt-gu46m6bv-
+Content-Type: multipart/mixed; boundary="==2c8b5357b0a4452cb45b37f5e578c702=="
+ETag: "4-60514fe0039e1e98bd2954bd56be681b"
+
+--==2c8b5357b0a4452cb45b37f5e578c702==
+Content-Length: 290
+Content-MD5: iLFCq3cDe6dPGi9c6FvbEw==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.2.txt", "author": "akraievoy", "stamp": 1319383072651, "_rev": "4-60514fe0039e1e98bd2954bd56be681b", "id": "test.2.txt", "_id": "Attachment-aos_w11-lr-2-3-test-test.2.txt-gu46m6bv-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==2c8b5357b0a4452cb45b37f5e578c702==
+Content-ID: content
+Content-Length: 65
+Content-MD5: bpeukvC1DuuSeM0rIwHEaQ==
+Content-Type: text/plain
+
+$a0: 0x200
+$a1: 0x200
+$a2: 1
+$a3: -1
+0x208: 0 => 1
+0x1F8: 0 => -1
+--==2c8b5357b0a4452cb45b37f5e578c702==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-2-3-test-test.3.txt-gu46m6fa-
+Content-Type: multipart/mixed; boundary="==ba7cf4a06cfc4373b13e68c4556741d8=="
+ETag: "4-5c4ea993ce8388bb8f56b12780ca7676"
+
+--==ba7cf4a06cfc4373b13e68c4556741d8==
+Content-Length: 290
+Content-MD5: 6rHGI1bl4JbeyikNHmdBIA==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.3.txt", "author": "akraievoy", "stamp": 1319383072774, "_rev": "4-5c4ea993ce8388bb8f56b12780ca7676", "id": "test.3.txt", "_id": "Attachment-aos_w11-lr-2-3-test-test.3.txt-gu46m6fa-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==ba7cf4a06cfc4373b13e68c4556741d8==
+Content-ID: content
+Content-Length: 52
+Content-MD5: bwYOKxeWX/r29ahohH/qzA==
+Content-Type: text/plain
+
+$a0: 0x1F8
+$a1: 0x208
+$a2: 128
+$a3: -128
+0x200: 1024
+--==ba7cf4a06cfc4373b13e68c4556741d8==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-2-4-statement-statement.txt-gu46m7s8-
+Content-Type: multipart/mixed; boundary="==83bd3139f94e464cb484259f382ba355=="
+ETag: "4-6eded320bf25090a16a763f042b72bdc"
+
+--==83bd3139f94e464cb484259f382ba355==
+Content-Length: 304
+Content-MD5: r/t6gQnftQhTsmkRxZS3/w==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "statement.txt", "author": "akraievoy", "stamp": 1319383074536, "_rev": "4-6eded320bf25090a16a763f042b72bdc", "id": "statement.txt", "_id": "Attachment-aos_w11-lr-2-4-statement-statement.txt-gu46m7s8-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==83bd3139f94e464cb484259f382ba355==
+Content-ID: content
+Content-Length: 270
+Content-MD5: xVRSjULz9g8o3u9e6poB6Q==
+Content-Type: text/plain
+
+Обміняти місцями у пам’яті значення за адресами з
+регістрів $a0 та $a1, застосувавши зсув обох адрес на -16 байт. Добуток
+значень помістити у регістр $v0.
+--==83bd3139f94e464cb484259f382ba355==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-2-4-test-test.1.txt-gu46m6iv-
+Content-Type: multipart/mixed; boundary="==59936f41c06e4f398989880c6d9de332=="
+ETag: "4-39a9d4aa722f0e089f241fa6a1f88a03"
+
+--==59936f41c06e4f398989880c6d9de332==
+Content-Length: 290
+Content-MD5: OipZE3//TANS+3OCdxgk/Q==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.1.txt", "author": "akraievoy", "stamp": 1319383072903, "_rev": "4-39a9d4aa722f0e089f241fa6a1f88a03", "id": "test.1.txt", "_id": "Attachment-aos_w11-lr-2-4-test-test.1.txt-gu46m6iv-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==59936f41c06e4f398989880c6d9de332==
+Content-ID: content
+Content-Length: 59
+Content-MD5: gvtwTHGFB5eKl18A2Wq13g==
+Content-Type: text/plain
+
+$a0: 0x110
+$a1: 0x210
+0x100: 2 => 1
+0x200: 1 => 2
+$v0: => 2
+--==59936f41c06e4f398989880c6d9de332==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-2-4-test-test.2.txt-gu46m6ma-
+Content-Type: multipart/mixed; boundary="==30783f093b0845f6af2f27c18fa7e16a=="
+ETag: "4-ebf18e62cdde760db1febe674ca80d2d"
+
+--==30783f093b0845f6af2f27c18fa7e16a==
+Content-Length: 290
+Content-MD5: DEfxwcqRD/KyMtRkGx3Ouw==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.2.txt", "author": "akraievoy", "stamp": 1319383073026, "_rev": "4-ebf18e62cdde760db1febe674ca80d2d", "id": "test.2.txt", "_id": "Attachment-aos_w11-lr-2-4-test-test.2.txt-gu46m6ma-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==30783f093b0845f6af2f27c18fa7e16a==
+Content-ID: content
+Content-Length: 41
+Content-MD5: qqzdnG46A9mIbUd4w0sTEg==
+Content-Type: text/plain
+
+$a0: 0x110
+$a1: 0x110
+0x100: 5
+$v0: => 25
+--==30783f093b0845f6af2f27c18fa7e16a==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-2-4-test-test.3.txt-gu46m6ph-
+Content-Type: multipart/mixed; boundary="==34d4421bb3754ecca5b4b2fa08594238=="
+ETag: "4-97b83b9e31103b36fab05203d3529bba"
+
+--==34d4421bb3754ecca5b4b2fa08594238==
+Content-Length: 290
+Content-MD5: v+x5nzMJZLSJLYk2kGuI2A==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.3.txt", "author": "akraievoy", "stamp": 1319383073141, "_rev": "4-97b83b9e31103b36fab05203d3529bba", "id": "test.3.txt", "_id": "Attachment-aos_w11-lr-2-4-test-test.3.txt-gu46m6ph-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==34d4421bb3754ecca5b4b2fa08594238==
+Content-ID: content
+Content-Length: 63
+Content-MD5: 0VhlBMwSSBg3Zsn3rCVWwg==
+Content-Type: text/plain
+
+$a0: 0x110
+$a1: 0x210
+0x100: 0 => 768
+0x200: 768 => 0
+$v0: => 0
+--==34d4421bb3754ecca5b4b2fa08594238==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-2-5-statement-statement.txt-gu46m7vg-
+Content-Type: multipart/mixed; boundary="==7448f3aabeac4822bdd37a3fbf72e949=="
+ETag: "4-58fd855f59a2585d1afe6de4becf2018"
+
+--==7448f3aabeac4822bdd37a3fbf72e949==
+Content-Length: 304
+Content-MD5: ngLOpe8p3NQPHeQxpjMMBQ==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "statement.txt", "author": "akraievoy", "stamp": 1319383074652, "_rev": "4-58fd855f59a2585d1afe6de4becf2018", "id": "statement.txt", "_id": "Attachment-aos_w11-lr-2-5-statement-statement.txt-gu46m7vg-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==7448f3aabeac4822bdd37a3fbf72e949==
+Content-ID: content
+Content-Length: 264
+Content-MD5: 0QFIH4qpAZeGq8yvg/zI1g==
+Content-Type: text/plain
+
+Обчислити добуток значень, розташованих за адресами у регістрах
+$a0, $a1 та $a2, зі зсувами -4, 0 та 4 байти відповідно, результат помістити
+у регістр $v0.
+--==7448f3aabeac4822bdd37a3fbf72e949==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-2-5-test-test.1.txt-gu46m6tr-
+Content-Type: multipart/mixed; boundary="==069d7331851148a1be4a806cf4a7bed1=="
+ETag: "4-70ca8c835c2eeff95bda20e85750972e"
+
+--==069d7331851148a1be4a806cf4a7bed1==
+Content-Length: 290
+Content-MD5: VTgJQ2yoMPDm9u9lD7nfJQ==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.1.txt", "author": "akraievoy", "stamp": 1319383073295, "_rev": "4-70ca8c835c2eeff95bda20e85750972e", "id": "test.1.txt", "_id": "Attachment-aos_w11-lr-2-5-test-test.1.txt-gu46m6tr-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==069d7331851148a1be4a806cf4a7bed1==
+Content-ID: content
+Content-Length: 70
+Content-MD5: UXI/VTbU0j3shZXzfiQWvQ==
+Content-Type: text/plain
+
+$a0: 0x100
+$a1: 0x100
+$a2: 0x100
+0x0FC: 2
+0x100: 3
+0x104: 5
+$v0: => 30
+--==069d7331851148a1be4a806cf4a7bed1==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-2-5-test-test.2.txt-gu46m6x5-
+Content-Type: multipart/mixed; boundary="==c7d11753686543d8aa20cf62a18f3e81=="
+ETag: "4-a38c003701d063a1027143a1708695bd"
+
+--==c7d11753686543d8aa20cf62a18f3e81==
+Content-Length: 290
+Content-MD5: SRgT1r/KpEE6XuzW0LYVjA==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.2.txt", "author": "akraievoy", "stamp": 1319383073417, "_rev": "4-a38c003701d063a1027143a1708695bd", "id": "test.2.txt", "_id": "Attachment-aos_w11-lr-2-5-test-test.2.txt-gu46m6x5-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==c7d11753686543d8aa20cf62a18f3e81==
+Content-ID: content
+Content-Length: 52
+Content-MD5: +hc2lEYsZ66myhh571s41A==
+Content-Type: text/plain
+
+$a0: 0x104
+$a1: 0x100
+$a2: 0x0FC
+0x100: 3
+$v0: => 27
+--==c7d11753686543d8aa20cf62a18f3e81==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-2-5-test-test.3.txt-gu46m704-
+Content-Type: multipart/mixed; boundary="==2c28df1904b549d0bba67051507487d6=="
+ETag: "4-1182e40205fd6b5fbbbf7a63baeaedd2"
+
+--==2c28df1904b549d0bba67051507487d6==
+Content-Length: 290
+Content-MD5: yUBGjxEh+0Ft7sFUUq9t3A==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.3.txt", "author": "akraievoy", "stamp": 1319383073524, "_rev": "4-1182e40205fd6b5fbbbf7a63baeaedd2", "id": "test.3.txt", "_id": "Attachment-aos_w11-lr-2-5-test-test.3.txt-gu46m704-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==2c28df1904b549d0bba67051507487d6==
+Content-ID: content
+Content-Length: 72
+Content-MD5: kiVCRvsTb0gSFiR6MAoAUg==
+Content-Type: text/plain
+
+$a0: 0x200
+$a1: 0x200
+$a2: 0x200
+0x1FC: 2
+0x200: -3
+0x204: 5
+$v0: => -30
+--==2c28df1904b549d0bba67051507487d6==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-2-6-statement-statement.txt-gu46m7yq-
+Content-Type: multipart/mixed; boundary="==7d076b093be8491282400033f1f78b5d=="
+ETag: "4-2afe4306494a257faecb0fcccc178f64"
+
+--==7d076b093be8491282400033f1f78b5d==
+Content-Length: 304
+Content-MD5: uEsmVLKXhMvIQ1meAe+3jw==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "statement.txt", "author": "akraievoy", "stamp": 1319383074770, "_rev": "4-2afe4306494a257faecb0fcccc178f64", "id": "statement.txt", "_id": "Attachment-aos_w11-lr-2-6-statement-statement.txt-gu46m7yq-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==7d076b093be8491282400033f1f78b5d==
+Content-ID: content
+Content-Length: 278
+Content-MD5: Pvr1IRc07xCSH5+9g5DGhg==
+Content-Type: text/plain
+
+Обчислити суму значень, адреси яких розташовані за
+адресами у регістрах $a0, $a1 та $a2, зі зсувами -4, 0 та 4 байти відповідно,
+результат помістити у регістр $v0.
+--==7d076b093be8491282400033f1f78b5d==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-2-6-test-test.1.txt-gu46m73s-
+Content-Type: multipart/mixed; boundary="==2b6cac8a92e24e04baf83bb582aa51ec=="
+ETag: "4-888d9eff841cc986a2bd4e3838f970ff"
+
+--==2b6cac8a92e24e04baf83bb582aa51ec==
+Content-Length: 290
+Content-MD5: 6mPLuLhPxLlLm15dwVuMgQ==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.1.txt", "author": "akraievoy", "stamp": 1319383073656, "_rev": "4-888d9eff841cc986a2bd4e3838f970ff", "id": "test.1.txt", "_id": "Attachment-aos_w11-lr-2-6-test-test.1.txt-gu46m73s-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==2b6cac8a92e24e04baf83bb582aa51ec==
+Content-ID: content
+Content-Length: 108
+Content-MD5: kgImXknYIwaIboz1SUi2mQ==
+Content-Type: text/plain
+
+$a0: 0x100
+$a1: 0x100
+$a2: 0x100
+0x0FC: 0x200
+0x100: 0x204
+0x104: 0x208
+0x200: 1
+0x204: 2
+0x208: 4
+$v0: => 7
+--==2b6cac8a92e24e04baf83bb582aa51ec==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-2-6-test-test.2.txt-gu46m76v-
+Content-Type: multipart/mixed; boundary="==34c779d219d74cb78304a82314e7d426=="
+ETag: "4-d66ffbe3e304acb2b72e01ca01b8cd0b"
+
+--==34c779d219d74cb78304a82314e7d426==
+Content-Length: 290
+Content-MD5: iJw6nfMrUkJWaOTc//7maA==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.2.txt", "author": "akraievoy", "stamp": 1319383073767, "_rev": "4-d66ffbe3e304acb2b72e01ca01b8cd0b", "id": "test.2.txt", "_id": "Attachment-aos_w11-lr-2-6-test-test.2.txt-gu46m76v-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==34c779d219d74cb78304a82314e7d426==
+Content-ID: content
+Content-Length: 64
+Content-MD5: 3kP/geg+AWUZgVO/LUqBGQ==
+Content-Type: text/plain
+
+$a0: 0x104
+$a1: 0x100
+$a2: 0x0FC
+0x100: 0x200
+0x200: 1
+$v0: => 3
+--==34c779d219d74cb78304a82314e7d426==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-2-6-test-test.3.txt-gu46m79v-
+Content-Type: multipart/mixed; boundary="==009690e350fe4cdab4afa2ac0a0cf4b7=="
+ETag: "4-41bf1d237a71449361f4bc4dc4fbb669"
+
+--==009690e350fe4cdab4afa2ac0a0cf4b7==
+Content-Length: 290
+Content-MD5: 65Gc8Z/O8NKxAaf2p2ZLYw==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.3.txt", "author": "akraievoy", "stamp": 1319383073875, "_rev": "4-41bf1d237a71449361f4bc4dc4fbb669", "id": "test.3.txt", "_id": "Attachment-aos_w11-lr-2-6-test-test.3.txt-gu46m79v-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==009690e350fe4cdab4afa2ac0a0cf4b7==
+Content-ID: content
+Content-Length: 111
+Content-MD5: bBkwMbPLbmPkjdrsxgcfCw==
+Content-Type: text/plain
+
+$a0: 0x100
+$a1: 0x200
+$a2: 0x300
+0x0FC: 0x408
+0x200: 0x404
+0x304: 0x400
+0x400: -1
+0x404: 2
+0x408: -4
+$v0: => -3
+--==009690e350fe4cdab4afa2ac0a0cf4b7==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-3-1-statement-statement.txt-gu46ma8w-
+Content-Type: multipart/mixed; boundary="==b1e20cf0606240f6a0dd1ba6fffbeb4e=="
+ETag: "4-a828c470ca5a69babe0f142159937cdf"
+
+--==b1e20cf0606240f6a0dd1ba6fffbeb4e==
+Content-Length: 304
+Content-MD5: JlWz3zF7lztS4uKHWiyJ8w==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "statement.txt", "author": "akraievoy", "stamp": 1319383077728, "_rev": "4-a828c470ca5a69babe0f142159937cdf", "id": "statement.txt", "_id": "Attachment-aos_w11-lr-3-1-statement-statement.txt-gu46ma8w-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==b1e20cf0606240f6a0dd1ba6fffbeb4e==
+Content-ID: content
+Content-Length: 163
+Content-MD5: MrxBrXUf5Io2b7pAor3TZg==
+Content-Type: text/plain
+
+Присвоїти $v0 значення 1, якщо регістри $a0 та
+$a1 рівні, в іншому випадку присвоїти значення 0.
+--==b1e20cf0606240f6a0dd1ba6fffbeb4e==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-3-1-test-test.1.txt-gu46m84e-
+Content-Type: multipart/mixed; boundary="==98e802af6a154802836ff21afb594452=="
+ETag: "4-fdb77cc86242384ee567c47fba5fe832"
+
+--==98e802af6a154802836ff21afb594452==
+Content-Length: 290
+Content-MD5: lnSz7AKhPaLSlXeRjDIv9A==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.1.txt", "author": "akraievoy", "stamp": 1319383074974, "_rev": "4-fdb77cc86242384ee567c47fba5fe832", "id": "test.1.txt", "_id": "Attachment-aos_w11-lr-3-1-test-test.1.txt-gu46m84e-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==98e802af6a154802836ff21afb594452==
+Content-ID: content
+Content-Length: 26
+Content-MD5: R4SX0iRPzo69HCA320ybRw==
+Content-Type: text/plain
+
+$a0: 19
+$a1: 19
+$v0:  => 1
+--==98e802af6a154802836ff21afb594452==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-3-1-test-test.2.txt-gu46m88b-
+Content-Type: multipart/mixed; boundary="==1648bc2eebad4cb8b2476d3a276af1b0=="
+ETag: "4-11cf99a07d5cd90f6aacf2621e12ca7b"
+
+--==1648bc2eebad4cb8b2476d3a276af1b0==
+Content-Length: 290
+Content-MD5: NHhoqXI4/U0jJB3wWB59jA==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.2.txt", "author": "akraievoy", "stamp": 1319383075115, "_rev": "4-11cf99a07d5cd90f6aacf2621e12ca7b", "id": "test.2.txt", "_id": "Attachment-aos_w11-lr-3-1-test-test.2.txt-gu46m88b-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==1648bc2eebad4cb8b2476d3a276af1b0==
+Content-ID: content
+Content-Length: 24
+Content-MD5: R+7GgZK9ipgjrmm6aNwixw==
+Content-Type: text/plain
+
+$a0: 25
+$a1: 2
+$v0: => 0
+--==1648bc2eebad4cb8b2476d3a276af1b0==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-3-1-test-test.3.txt-gu46m8dc-
+Content-Type: multipart/mixed; boundary="==2c7158ad288d4e2fba4882ea15dcb4d1=="
+ETag: "4-b2724a0c9fab5cc1b1ef4ea34e65e5a2"
+
+--==2c7158ad288d4e2fba4882ea15dcb4d1==
+Content-Length: 290
+Content-MD5: pwoDjEu0T0WmxJxi2oI+kw==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.3.txt", "author": "akraievoy", "stamp": 1319383075296, "_rev": "4-b2724a0c9fab5cc1b1ef4ea34e65e5a2", "id": "test.3.txt", "_id": "Attachment-aos_w11-lr-3-1-test-test.3.txt-gu46m8dc-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==2c7158ad288d4e2fba4882ea15dcb4d1==
+Content-ID: content
+Content-Length: 26
+Content-MD5: cZup26cvyF06lOora48POQ==
+Content-Type: text/plain
+
+$a0: 14
+$a1: -14
+$v0: => 0
+--==2c7158ad288d4e2fba4882ea15dcb4d1==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-3-2-statement-statement.txt-gu46madc-
+Content-Type: multipart/mixed; boundary="==9d2b35ea762c45999e330de323334d57=="
+ETag: "4-c33d3a008b289f891b846d960aae70ff"
+
+--==9d2b35ea762c45999e330de323334d57==
+Content-Length: 304
+Content-MD5: Sv/gwIZ8GMHhbNPgXqyw9A==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "statement.txt", "author": "akraievoy", "stamp": 1319383077888, "_rev": "4-c33d3a008b289f891b846d960aae70ff", "id": "statement.txt", "_id": "Attachment-aos_w11-lr-3-2-statement-statement.txt-gu46madc-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==9d2b35ea762c45999e330de323334d57==
+Content-ID: content
+Content-Length: 199
+Content-MD5: dt4vtxOOxJ9Zycr2lP7ngA==
+Content-Type: text/plain
+
+Виконати «логічне і» регістрів $a0 та $a1,
+у випадку, якщо результат рівний 0, то записати в $v0 1, інакше записати 0.
+--==9d2b35ea762c45999e330de323334d57==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-3-2-test-test.1.txt-gu46m8k4-
+Content-Type: multipart/mixed; boundary="==a25244d2e7cd45fd89e0760e96eae37a=="
+ETag: "4-803bc6d416ba1c10aef34e26a4651cd0"
+
+--==a25244d2e7cd45fd89e0760e96eae37a==
+Content-Length: 290
+Content-MD5: uU8AE/AykEvTQKsdZ5ZDVg==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.1.txt", "author": "akraievoy", "stamp": 1319383075540, "_rev": "4-803bc6d416ba1c10aef34e26a4651cd0", "id": "test.1.txt", "_id": "Attachment-aos_w11-lr-3-2-test-test.1.txt-gu46m8k4-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==a25244d2e7cd45fd89e0760e96eae37a==
+Content-ID: content
+Content-Length: 26
+Content-MD5: BpJ/WVmO3fGCaZhNRlAZlA==
+Content-Type: text/plain
+
+$a0: 12
+$a1: 48
+$v0:  => 1
+--==a25244d2e7cd45fd89e0760e96eae37a==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-3-2-test-test.2.txt-gu46m8o2-
+Content-Type: multipart/mixed; boundary="==6c0aaa0a755545618fc554b093825c83=="
+ETag: "4-f6c474ec7956fa5c1a7073c939d436b5"
+
+--==6c0aaa0a755545618fc554b093825c83==
+Content-Length: 290
+Content-MD5: 7jQz7SB+Maq03w2C1BFKjw==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.2.txt", "author": "akraievoy", "stamp": 1319383075682, "_rev": "4-f6c474ec7956fa5c1a7073c939d436b5", "id": "test.2.txt", "_id": "Attachment-aos_w11-lr-3-2-test-test.2.txt-gu46m8o2-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==6c0aaa0a755545618fc554b093825c83==
+Content-ID: content
+Content-Length: 25
+Content-MD5: LjKe/Bzbp9ZlSX1TkNyX8A==
+Content-Type: text/plain
+
+$a0: 10
+$a1: 5
+$v0:  => 1
+--==6c0aaa0a755545618fc554b093825c83==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-3-2-test-test.3.txt-gu46m8s0-
+Content-Type: multipart/mixed; boundary="==ef5504f3da634c509d9eff034e1be521=="
+ETag: "4-eb5757c6743ca303d552f746c89fbc85"
+
+--==ef5504f3da634c509d9eff034e1be521==
+Content-Length: 290
+Content-MD5: U4XGWdxQTYHa1OdSchYJ3g==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.3.txt", "author": "akraievoy", "stamp": 1319383075824, "_rev": "4-eb5757c6743ca303d552f746c89fbc85", "id": "test.3.txt", "_id": "Attachment-aos_w11-lr-3-2-test-test.3.txt-gu46m8s0-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==ef5504f3da634c509d9eff034e1be521==
+Content-ID: content
+Content-Length: 26
+Content-MD5: 6lenO99RxkYjN0BEzFd1wg==
+Content-Type: text/plain
+
+$a0: 111
+$a1: 2
+$v0:  => 0
+--==ef5504f3da634c509d9eff034e1be521==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-3-3-statement-statement.txt-gu46majs-
+Content-Type: multipart/mixed; boundary="==7987babeeab247ae828e2c4c2ee3ba76=="
+ETag: "4-721968b111367c1ba5217f7350169d3f"
+
+--==7987babeeab247ae828e2c4c2ee3ba76==
+Content-Length: 304
+Content-MD5: sqHhr1yyYYjylQ+6mfrOOw==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "statement.txt", "author": "akraievoy", "stamp": 1319383078120, "_rev": "4-721968b111367c1ba5217f7350169d3f", "id": "statement.txt", "_id": "Attachment-aos_w11-lr-3-3-statement-statement.txt-gu46majs-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==7987babeeab247ae828e2c4c2ee3ba76==
+Content-ID: content
+Content-Length: 180
+Content-MD5: 8Cdpf1e0tXdgc0yuBTQhjQ==
+Content-Type: text/plain
+
+Встановити $v0 в 1, якщо дані слів памяті за
+адресами із рестрів $a0 та $a1 рівні, інакше встановити $v0в 0.
+--==7987babeeab247ae828e2c4c2ee3ba76==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-3-3-test-test.1.txt-gu46m8yf-
+Content-Type: multipart/mixed; boundary="==975c083891af4d3fa3eb9af9952832ca=="
+ETag: "4-785b73f2b41e6703632e29ced3c06219"
+
+--==975c083891af4d3fa3eb9af9952832ca==
+Content-Length: 290
+Content-MD5: /zMvbZ+UMAQxpFdc6Jdf3A==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.1.txt", "author": "akraievoy", "stamp": 1319383076055, "_rev": "4-785b73f2b41e6703632e29ced3c06219", "id": "test.1.txt", "_id": "Attachment-aos_w11-lr-3-3-test-test.1.txt-gu46m8yf-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==975c083891af4d3fa3eb9af9952832ca==
+Content-ID: content
+Content-Length: 51
+Content-MD5: qXbhlNrcHBHY/A1VgynUfA==
+Content-Type: text/plain
+
+$a0: 0x100
+$a1: 0x104
+$v0: => 1
+0x100: 25
+0x104: 25
+--==975c083891af4d3fa3eb9af9952832ca==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-3-3-test-test.2.txt-gu46m91n-
+Content-Type: multipart/mixed; boundary="==2419cb9e8efc49e0a6b708a499c4c7a7=="
+ETag: "4-adde1f659c12548a8fe168614fda4aee"
+
+--==2419cb9e8efc49e0a6b708a499c4c7a7==
+Content-Length: 290
+Content-MD5: ynRFj8znglSjVwIChkwHxA==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.2.txt", "author": "akraievoy", "stamp": 1319383076171, "_rev": "4-adde1f659c12548a8fe168614fda4aee", "id": "test.2.txt", "_id": "Attachment-aos_w11-lr-3-3-test-test.2.txt-gu46m91n-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==2419cb9e8efc49e0a6b708a499c4c7a7==
+Content-ID: content
+Content-Length: 50
+Content-MD5: /DxGEqO9Maxav4brLgK0xQ==
+Content-Type: text/plain
+
+$a0: 0x100
+$a1: 0x104
+$v0: => 0
+0x100: 0
+0x104: 10
+--==2419cb9e8efc49e0a6b708a499c4c7a7==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-3-3-test-test.3.txt-gu46m94x-
+Content-Type: multipart/mixed; boundary="==faec4e5f13a84bc4981251ad3838337e=="
+ETag: "4-8adcf0249845bcaca0cd44e42883824c"
+
+--==faec4e5f13a84bc4981251ad3838337e==
+Content-Length: 290
+Content-MD5: 7pn3zncGJEc4HAght892Rw==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.3.txt", "author": "akraievoy", "stamp": 1319383076289, "_rev": "4-8adcf0249845bcaca0cd44e42883824c", "id": "test.3.txt", "_id": "Attachment-aos_w11-lr-3-3-test-test.3.txt-gu46m94x-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==faec4e5f13a84bc4981251ad3838337e==
+Content-ID: content
+Content-Length: 53
+Content-MD5: L8asNpjUQQw2c+iLf7cj/A==
+Content-Type: text/plain
+
+$a0: 0x400
+$a1: 0x800
+$v0: => 1
+0x400: 117
+0x800: 117
+--==faec4e5f13a84bc4981251ad3838337e==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-3-4-statement-statement.txt-gu46maqn-
+Content-Type: multipart/mixed; boundary="==2e3ba52196cb46c0987792fe72f89e15=="
+ETag: "4-5cd9139376fe28329bd33ac37ef7ec88"
+
+--==2e3ba52196cb46c0987792fe72f89e15==
+Content-Length: 304
+Content-MD5: ac/OOd+B7UMrSASzVHqmbA==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "statement.txt", "author": "akraievoy", "stamp": 1319383078367, "_rev": "4-5cd9139376fe28329bd33ac37ef7ec88", "id": "statement.txt", "_id": "Attachment-aos_w11-lr-3-4-statement-statement.txt-gu46maqn-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==2e3ba52196cb46c0987792fe72f89e15==
+Content-ID: content
+Content-Length: 181
+Content-MD5: UmqtYf+GxoHpDnKx3UIZjw==
+Content-Type: text/plain
+
+Збільшити вміст регістра $a0 на 2, у випадку,
+якщо результат більше 0, записати в $v0 1, інакше записати 0.
+--==2e3ba52196cb46c0987792fe72f89e15==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-3-4-test-test.1.txt-gu46m993-
+Content-Type: multipart/mixed; boundary="==715102d7177f41b59e135b220815b31f=="
+ETag: "4-a0fe0765905826e04e503e417d7bd662"
+
+--==715102d7177f41b59e135b220815b31f==
+Content-Length: 290
+Content-MD5: G6HYP5SMuLefzEA9KKAXPQ==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.1.txt", "author": "akraievoy", "stamp": 1319383076439, "_rev": "4-a0fe0765905826e04e503e417d7bd662", "id": "test.1.txt", "_id": "Attachment-aos_w11-lr-3-4-test-test.1.txt-gu46m993-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==715102d7177f41b59e135b220815b31f==
+Content-ID: content
+Content-Length: 22
+Content-MD5: iTpIMSsrPSHPQMUlcI0qmg==
+Content-Type: text/plain
+
+$a0: 5 => 7
+$v0:  => 1
+--==715102d7177f41b59e135b220815b31f==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-3-4-test-test.2.txt-gu46m9cr-
+Content-Type: multipart/mixed; boundary="==b644f4c14f8f40cbaf8723767aa9d64a=="
+ETag: "4-210e1dd76e1e36e585f33db243f1b788"
+
+--==b644f4c14f8f40cbaf8723767aa9d64a==
+Content-Length: 290
+Content-MD5: 5FtJ/kqFc7D26I0e9KN+BQ==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.2.txt", "author": "akraievoy", "stamp": 1319383076571, "_rev": "4-210e1dd76e1e36e585f33db243f1b788", "id": "test.2.txt", "_id": "Attachment-aos_w11-lr-3-4-test-test.2.txt-gu46m9cr-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==b644f4c14f8f40cbaf8723767aa9d64a==
+Content-ID: content
+Content-Length: 23
+Content-MD5: mur1AFIZyh/c6Ns8vpuocg==
+Content-Type: text/plain
+
+$a0: -2 => 0
+$v0:  => 0
+--==b644f4c14f8f40cbaf8723767aa9d64a==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-3-4-test-test.3.txt-gu46m9gf-
+Content-Type: multipart/mixed; boundary="==d88af398afe44af3a274418fad6b0671=="
+ETag: "4-8a72790ec6c195e3172c4a5797503413"
+
+--==d88af398afe44af3a274418fad6b0671==
+Content-Length: 290
+Content-MD5: 5FW5cYwrnZIGqAFwRX8l+g==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.3.txt", "author": "akraievoy", "stamp": 1319383076703, "_rev": "4-8a72790ec6c195e3172c4a5797503413", "id": "test.3.txt", "_id": "Attachment-aos_w11-lr-3-4-test-test.3.txt-gu46m9gf-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==d88af398afe44af3a274418fad6b0671==
+Content-ID: content
+Content-Length: 24
+Content-MD5: lcWSWX2H24KB5aOud8NBvw==
+Content-Type: text/plain
+
+$a0: -8 => -6
+$v0:  => 0
+--==d88af398afe44af3a274418fad6b0671==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-3-5-statement-statement.txt-gu46mavk-
+Content-Type: multipart/mixed; boundary="==b9124dd6024c40c59a79dc37f41ccf76=="
+ETag: "4-1a13d570aaca818e72553488790c4f83"
+
+--==b9124dd6024c40c59a79dc37f41ccf76==
+Content-Length: 304
+Content-MD5: iWMrciRn/twHok07JNmq3g==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "statement.txt", "author": "akraievoy", "stamp": 1319383078544, "_rev": "4-1a13d570aaca818e72553488790c4f83", "id": "statement.txt", "_id": "Attachment-aos_w11-lr-3-5-statement-statement.txt-gu46mavk-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==b9124dd6024c40c59a79dc37f41ccf76==
+Content-ID: content
+Content-Length: 249
+Content-MD5: UvT/hCPG/F+ThSDnRgwU/w==
+Content-Type: text/plain
+
+Зменшити вміст регістра $a0 на значення
+регістру $a1, в випадку, якщо результат менше значення регістру $a1, записати
+в $v0 1, інакше записати 0.
+--==b9124dd6024c40c59a79dc37f41ccf76==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-3-5-test-test.1.txt-gu46m9ky-
+Content-Type: multipart/mixed; boundary="==81b70cf12a7841eb88a71aacd30de834=="
+ETag: "4-0a2ff1eb8f4682c38d951fd8245727bf"
+
+--==81b70cf12a7841eb88a71aacd30de834==
+Content-Length: 290
+Content-MD5: MeB5S7dLZYOZKT0shmkSMg==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.1.txt", "author": "akraievoy", "stamp": 1319383076866, "_rev": "4-0a2ff1eb8f4682c38d951fd8245727bf", "id": "test.1.txt", "_id": "Attachment-aos_w11-lr-3-5-test-test.1.txt-gu46m9ky-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==81b70cf12a7841eb88a71aacd30de834==
+Content-ID: content
+Content-Length: 30
+Content-MD5: 9WKXfvBApJwUWTajHMcIVw==
+Content-Type: text/plain
+
+$a0: 2 => -1
+$a1: 3
+$v0:  => 1
+--==81b70cf12a7841eb88a71aacd30de834==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-3-5-test-test.2.txt-gu46m9o9-
+Content-Type: multipart/mixed; boundary="==bddc91c20c354c1aa55520743af6bded=="
+ETag: "4-270c110bc69ca3ebd86800f53ac73ef7"
+
+--==bddc91c20c354c1aa55520743af6bded==
+Content-Length: 290
+Content-MD5: lwFtE9yjIn5nlr4IQDgy+Q==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.2.txt", "author": "akraievoy", "stamp": 1319383076985, "_rev": "4-270c110bc69ca3ebd86800f53ac73ef7", "id": "test.2.txt", "_id": "Attachment-aos_w11-lr-3-5-test-test.2.txt-gu46m9o9-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==bddc91c20c354c1aa55520743af6bded==
+Content-ID: content
+Content-Length: 29
+Content-MD5: odeLb/Xib7Q2QVB7gFyBIg==
+Content-Type: text/plain
+
+$a0: 3 => 0
+$a1: 0
+$v0:  => 0
+--==bddc91c20c354c1aa55520743af6bded==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-3-5-test-test.3.txt-gu46m9v9-
+Content-Type: multipart/mixed; boundary="==37abd8eafa5c4668abeeb0a5561d33ec=="
+ETag: "4-780a8911364f09073f5c35a6212f0bee"
+
+--==37abd8eafa5c4668abeeb0a5561d33ec==
+Content-Length: 290
+Content-MD5: noJwmcZCcVq5cRZYhj2klw==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.3.txt", "author": "akraievoy", "stamp": 1319383077237, "_rev": "4-780a8911364f09073f5c35a6212f0bee", "id": "test.3.txt", "_id": "Attachment-aos_w11-lr-3-5-test-test.3.txt-gu46m9v9-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==37abd8eafa5c4668abeeb0a5561d33ec==
+Content-ID: content
+Content-Length: 34
+Content-MD5: rfnQ1FOm1SpZOW6aAJZWbQ==
+Content-Type: text/plain
+
+$a0: -25 => -22
+$a1: -3
+$v0:  => 1
+--==37abd8eafa5c4668abeeb0a5561d33ec==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-4-1-statement-statement.txt-gu46mczx-
+Content-Type: multipart/mixed; boundary="==303f6535c64d450486e0d87c73d36ff2=="
+ETag: "4-157ff6e4d81340bb8ba2bb8af36dcae5"
+
+--==303f6535c64d450486e0d87c73d36ff2==
+Content-Length: 304
+Content-MD5: 3iaXeeaslsqTo82oa0GWdw==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "statement.txt", "author": "akraievoy", "stamp": 1319383081293, "_rev": "4-157ff6e4d81340bb8ba2bb8af36dcae5", "id": "statement.txt", "_id": "Attachment-aos_w11-lr-4-1-statement-statement.txt-gu46mczx-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==303f6535c64d450486e0d87c73d36ff2==
+Content-ID: content
+Content-Length: 249
+Content-MD5: 63jDs0DO+RRYDREU/gjzwg==
+Content-Type: text/plain
+
+Задано цілочисельний масив (адреса нульового
+елемента в $a0, довжина масива в $a1). Помістити значення максимального
+елемента в регістр $v0).
+--==303f6535c64d450486e0d87c73d36ff2==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-4-1-test-test.1.txt-gu46mb14-
+Content-Type: multipart/mixed; boundary="==b000b7589de34030a88dc958675a2700=="
+ETag: "4-f94cf43219e0b4d5767e7f313783f12a"
+
+--==b000b7589de34030a88dc958675a2700==
+Content-Length: 290
+Content-MD5: zT2oEwsok0tiJgDZ8pE5lg==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.1.txt", "author": "akraievoy", "stamp": 1319383078744, "_rev": "4-f94cf43219e0b4d5767e7f313783f12a", "id": "test.1.txt", "_id": "Attachment-aos_w11-lr-4-1-test-test.1.txt-gu46mb14-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==b000b7589de34030a88dc958675a2700==
+Content-ID: content
+Content-Length: 72
+Content-MD5: jWEXyIL/vy3RTdI2xXPzBw==
+Content-Type: text/plain
+
+$a0: 0x100
+$a1: 5
+$v0: => 5
+0x100: 1
+0x104: 2
+0x108: 3
+0x10C: 4
+0x110: 5
+--==b000b7589de34030a88dc958675a2700==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-4-1-test-test.2.txt-gu46mb4o-
+Content-Type: multipart/mixed; boundary="==879fff4f49b243e98bbed3808347fe88=="
+ETag: "4-03f164b8a33df8b5632b05751b57726e"
+
+--==879fff4f49b243e98bbed3808347fe88==
+Content-Length: 290
+Content-MD5: wWZJqFcUAR7Xlg5v/CcMRw==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.2.txt", "author": "akraievoy", "stamp": 1319383078872, "_rev": "4-03f164b8a33df8b5632b05751b57726e", "id": "test.2.txt", "_id": "Attachment-aos_w11-lr-4-1-test-test.2.txt-gu46mb4o-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==879fff4f49b243e98bbed3808347fe88==
+Content-ID: content
+Content-Length: 98
+Content-MD5: NG5RB1LC4oIt0eop03kxlw==
+Content-Type: text/plain
+
+$a0: 0x100
+$a1: 7
+$v0: => 0
+0x100: -1
+0x104: -2
+0x108: -7
+0x10C: 0
+0x110: -11
+0x114: -16
+0x118: -9
+--==879fff4f49b243e98bbed3808347fe88==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-4-1-test-test.3.txt-gu46mb8g-
+Content-Type: multipart/mixed; boundary="==11eeec6838654aecb79136ad9a64668a=="
+ETag: "4-a06c43cad8a4cc35c86003ac2c01d5d1"
+
+--==11eeec6838654aecb79136ad9a64668a==
+Content-Length: 290
+Content-MD5: 9Qnk6OtunVysFmL0CS2ggg==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.3.txt", "author": "akraievoy", "stamp": 1319383079008, "_rev": "4-a06c43cad8a4cc35c86003ac2c01d5d1", "id": "test.3.txt", "_id": "Attachment-aos_w11-lr-4-1-test-test.3.txt-gu46mb8g-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==11eeec6838654aecb79136ad9a64668a==
+Content-ID: content
+Content-Length: 100
+Content-MD5: JQ1D67WBN66dHIiO0aPyTw==
+Content-Type: text/plain
+
+$a0: 0x100
+$a1: 7
+$v0: => -1
+0x100: -4
+0x104: -3
+0x108: -7
+0x10C: -12
+0x110: -1
+0x114: -21
+0x118: -9
+--==11eeec6838654aecb79136ad9a64668a==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-4-2-statement-statement.txt-gu46md2s-
+Content-Type: multipart/mixed; boundary="==25a4392c23bb4c4aab6edcb7eaf27ef7=="
+ETag: "4-533f9cfe4783af254a2962616d97d81d"
+
+--==25a4392c23bb4c4aab6edcb7eaf27ef7==
+Content-Length: 304
+Content-MD5: R99trcLM+EI3XpFurFyFMA==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "statement.txt", "author": "akraievoy", "stamp": 1319383081396, "_rev": "4-533f9cfe4783af254a2962616d97d81d", "id": "statement.txt", "_id": "Attachment-aos_w11-lr-4-2-statement-statement.txt-gu46md2s-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==25a4392c23bb4c4aab6edcb7eaf27ef7==
+Content-ID: content
+Content-Length: 334
+Content-MD5: Jl3CktUla4RfnTRlhSe8nw==
+Content-Type: text/plain
+
+Задано цілочисельний масив (адреса нульового
+елемента в $a0, довжина масива в $a1). Підрахувати скільки раз в ньому
+зустрічається мінімальний елемент і помістити відповідь у регістр $v0).
+--==25a4392c23bb4c4aab6edcb7eaf27ef7==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-4-2-test-test.1.txt-gu46mbek-
+Content-Type: multipart/mixed; boundary="==54ce3cdfd8064ce9a4f5e90dd5e97eb9=="
+ETag: "4-dce5738f3c9a100dac0c2c2cd582d8d0"
+
+--==54ce3cdfd8064ce9a4f5e90dd5e97eb9==
+Content-Length: 290
+Content-MD5: f3vPHgvKxw/B4vth+t4H3w==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.1.txt", "author": "akraievoy", "stamp": 1319383079228, "_rev": "4-dce5738f3c9a100dac0c2c2cd582d8d0", "id": "test.1.txt", "_id": "Attachment-aos_w11-lr-4-2-test-test.1.txt-gu46mbek-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==54ce3cdfd8064ce9a4f5e90dd5e97eb9==
+Content-ID: content
+Content-Length: 72
+Content-MD5: KZuI7xbU7MudV90oQKkIEw==
+Content-Type: text/plain
+
+$a0: 0x100
+$a1: 5
+$v0: => 1
+0x100: 1
+0x104: 2
+0x108: 3
+0x10C: 8
+0x110: 5
+--==54ce3cdfd8064ce9a4f5e90dd5e97eb9==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-4-2-test-test.2.txt-gu46mbiz-
+Content-Type: multipart/mixed; boundary="==66a23cb70e8d4368a9e71f5ffc94a5e6=="
+ETag: "4-2fd5f4ba0c0ebcae85efeb11f62e7869"
+
+--==66a23cb70e8d4368a9e71f5ffc94a5e6==
+Content-Length: 290
+Content-MD5: ZgEUEyi0flidVd1V6uTT2g==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.2.txt", "author": "akraievoy", "stamp": 1319383079387, "_rev": "4-2fd5f4ba0c0ebcae85efeb11f62e7869", "id": "test.2.txt", "_id": "Attachment-aos_w11-lr-4-2-test-test.2.txt-gu46mbiz-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==66a23cb70e8d4368a9e71f5ffc94a5e6==
+Content-ID: content
+Content-Length: 84
+Content-MD5: 5Zc8mMpUoylWUbJCvoHNXQ==
+Content-Type: text/plain
+
+$a0: 0x100
+$a1: 6
+$v0: => 3
+0x100: -1
+0x104: 2
+0x108: 3
+0x10C: -1
+0x110: 5
+0x114: -1
+--==66a23cb70e8d4368a9e71f5ffc94a5e6==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-4-2-test-test.3.txt-gu46mbn5-
+Content-Type: multipart/mixed; boundary="==b4116d9a397d41f3835df58e18bf5fbc=="
+ETag: "4-41f7e20a494a317c099fc0ee072391ad"
+
+--==b4116d9a397d41f3835df58e18bf5fbc==
+Content-Length: 290
+Content-MD5: xQyDo1620EBO5tzyBZM+/Q==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.3.txt", "author": "akraievoy", "stamp": 1319383079537, "_rev": "4-41f7e20a494a317c099fc0ee072391ad", "id": "test.3.txt", "_id": "Attachment-aos_w11-lr-4-2-test-test.3.txt-gu46mbn5-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==b4116d9a397d41f3835df58e18bf5fbc==
+Content-ID: content
+Content-Length: 81
+Content-MD5: VHWXS5XBoP+x6mJLpKQe0A==
+Content-Type: text/plain
+
+$a0: 0x100
+$a1: 6
+$v0: => 6
+0x100: 8
+0x104: 8
+0x108: 8
+0x10C: 8
+0x110: 8
+0x114: 8
+--==b4116d9a397d41f3835df58e18bf5fbc==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-4-3-statement-statement.txt-gu46md5w-
+Content-Type: multipart/mixed; boundary="==9df8491fcb21499dae7fa48d00a61b33=="
+ETag: "4-b5f39125fa58e6e16f7efc3bb11a0770"
+
+--==9df8491fcb21499dae7fa48d00a61b33==
+Content-Length: 304
+Content-MD5: COzHAIjbc9Ihh0xiQQjuBg==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "statement.txt", "author": "akraievoy", "stamp": 1319383081508, "_rev": "4-b5f39125fa58e6e16f7efc3bb11a0770", "id": "statement.txt", "_id": "Attachment-aos_w11-lr-4-3-statement-statement.txt-gu46md5w-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==9df8491fcb21499dae7fa48d00a61b33==
+Content-ID: content
+Content-Length: 499
+Content-MD5: lrNTyO4P2C/hqVRbnpa5WQ==
+Content-Type: text/plain
+
+Число задається цілочисельним масивом цифр (адреса
+нульового елемента в $a0, довжина масива в $a1), молодші розряди записані у
+початку масива. Реалізувати алгоритм переведення числа із системи числення з
+основою р (регістр $a2) в безпосереднє значення і зберегти результат у $v0.
+--==9df8491fcb21499dae7fa48d00a61b33==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-4-3-test-test.1.txt-gu46mbrn-
+Content-Type: multipart/mixed; boundary="==a51563d0cce2403ab6ff839f03c11bc5=="
+ETag: "4-211df82c608507dba83f0747c8f5e4ba"
+
+--==a51563d0cce2403ab6ff839f03c11bc5==
+Content-Length: 290
+Content-MD5: d26eFEvFgk+uXfFRa4fX3A==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.1.txt", "author": "akraievoy", "stamp": 1319383079699, "_rev": "4-211df82c608507dba83f0747c8f5e4ba", "id": "test.1.txt", "_id": "Attachment-aos_w11-lr-4-3-test-test.1.txt-gu46mbrn-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==a51563d0cce2403ab6ff839f03c11bc5==
+Content-ID: content
+Content-Length: 81
+Content-MD5: clBLvafDjPx1nRTju1xNHg==
+Content-Type: text/plain
+
+$a0: 0x100
+$a1: 5
+$a2: 3
+$v0: => 102
+0x100: 0
+0x104: 1
+0x108: 2
+0x10C: 0
+0x110: 1
+--==a51563d0cce2403ab6ff839f03c11bc5==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-4-3-test-test.2.txt-gu46mbuu-
+Content-Type: multipart/mixed; boundary="==171b953cd93c437dbe38e13f6790b088=="
+ETag: "4-56d506d3a5293d56e407302416c9a38f"
+
+--==171b953cd93c437dbe38e13f6790b088==
+Content-Length: 290
+Content-MD5: KLyK4NURZJaqcx128or/Hg==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.2.txt", "author": "akraievoy", "stamp": 1319383079814, "_rev": "4-56d506d3a5293d56e407302416c9a38f", "id": "test.2.txt", "_id": "Attachment-aos_w11-lr-4-3-test-test.2.txt-gu46mbuu-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==171b953cd93c437dbe38e13f6790b088==
+Content-ID: content
+Content-Length: 81
+Content-MD5: yMItl7aDA3PcBWbcQpcNYw==
+Content-Type: text/plain
+
+$a0: 0x100
+$a1: 5
+$a2: 4
+$v0: => 708
+0x100: 0
+0x104: 1
+0x108: 0
+0x10C: 3
+0x110: 2
+--==171b953cd93c437dbe38e13f6790b088==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-4-3-test-test.3.txt-gu46mby4-
+Content-Type: multipart/mixed; boundary="==556d2e58d5c8431ebffd71d81660e3e7=="
+ETag: "4-b6b601e2465b013dcf468d2a38756b14"
+
+--==556d2e58d5c8431ebffd71d81660e3e7==
+Content-Length: 290
+Content-MD5: cUqTgZah3zKTJAecsUPKUQ==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.3.txt", "author": "akraievoy", "stamp": 1319383079932, "_rev": "4-b6b601e2465b013dcf468d2a38756b14", "id": "test.3.txt", "_id": "Attachment-aos_w11-lr-4-3-test-test.3.txt-gu46mby4-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==556d2e58d5c8431ebffd71d81660e3e7==
+Content-ID: content
+Content-Length: 74
+Content-MD5: u0K2zJhfrboPOjEE3fteig==
+Content-Type: text/plain
+
+$a0: 0x100
+$a1: 4
+$a2: 10
+$v0: => 2193
+0x100: 3
+0x104: 9
+0x108: 1
+0x10C: 2
+--==556d2e58d5c8431ebffd71d81660e3e7==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-4-4-statement-statement.txt-gu46md92-
+Content-Type: multipart/mixed; boundary="==c7d401bc92814739bd5d533647c3064a=="
+ETag: "4-6aae9ac70e065e80d0966f3c5bafc8de"
+
+--==c7d401bc92814739bd5d533647c3064a==
+Content-Length: 304
+Content-MD5: LI1s40uTHrQ2pdQ33h2KnQ==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "statement.txt", "author": "akraievoy", "stamp": 1319383081622, "_rev": "4-6aae9ac70e065e80d0966f3c5bafc8de", "id": "statement.txt", "_id": "Attachment-aos_w11-lr-4-4-statement-statement.txt-gu46md92-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==c7d401bc92814739bd5d533647c3064a==
+Content-ID: content
+Content-Length: 363
+Content-MD5: j9rbFdXNOxkSg162yqYJCQ==
+Content-Type: text/plain
+
+Задано цілочисельний масив (адреса
+нульового елемента в $a0, довжина масива в $a1). Знайти суму елементів масива
+з непарним індексом і зберегти результат у $v0. Індексування елементів
+починається з нуля.
+--==c7d401bc92814739bd5d533647c3064a==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-4-4-test-test.1.txt-gu46mc27-
+Content-Type: multipart/mixed; boundary="==358d901b2dac4935aff80e8dc468c74f=="
+ETag: "4-43cd60c9291018b116eec47a0c566905"
+
+--==358d901b2dac4935aff80e8dc468c74f==
+Content-Length: 290
+Content-MD5: /W983kYRReD6xbHI+1I3QQ==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.1.txt", "author": "akraievoy", "stamp": 1319383080079, "_rev": "4-43cd60c9291018b116eec47a0c566905", "id": "test.1.txt", "_id": "Attachment-aos_w11-lr-4-4-test-test.1.txt-gu46mc27-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==358d901b2dac4935aff80e8dc468c74f==
+Content-ID: content
+Content-Length: 100
+Content-MD5: sIsDMVR7oWcs7FgaOr1rKQ==
+Content-Type: text/plain
+
+$a0: 0x100
+$a1: 8
+$v0: => 19
+0x100: 1
+0x104: 2
+0x108: 3
+0x10C: 3
+0x110: 7
+0x114: 5
+0x118: 2
+0x11C: 9
+--==358d901b2dac4935aff80e8dc468c74f==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-4-4-test-test.2.txt-gu46mc7v-
+Content-Type: multipart/mixed; boundary="==126b8efc2923411cba4c4fa4cc267533=="
+ETag: "4-71bc53dffd705064cf26402b4b7aec9c"
+
+--==126b8efc2923411cba4c4fa4cc267533==
+Content-Length: 290
+Content-MD5: TGA3XdNpqOJK5d4zOxHy2w==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.2.txt", "author": "akraievoy", "stamp": 1319383080283, "_rev": "4-71bc53dffd705064cf26402b4b7aec9c", "id": "test.2.txt", "_id": "Attachment-aos_w11-lr-4-4-test-test.2.txt-gu46mc7v-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==126b8efc2923411cba4c4fa4cc267533==
+Content-ID: content
+Content-Length: 81
+Content-MD5: nYxMOj6pxyL5KZMSy9r2sw==
+Content-Type: text/plain
+
+$a0: 0x100
+$a1: 6
+$v0: => 9
+0x100: 4
+0x104: 0
+0x108: 2
+0x10C: 8
+0x110: 7
+0x114: 1
+--==126b8efc2923411cba4c4fa4cc267533==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-4-4-test-test.3.txt-gu46mcb2-
+Content-Type: multipart/mixed; boundary="==cfa4ad05fe994477ba793c00a6b57b04=="
+ETag: "4-0bb65f3aa4b37eb39c68c7b914b653ee"
+
+--==cfa4ad05fe994477ba793c00a6b57b04==
+Content-Length: 290
+Content-MD5: T1xFVSxjrqyn82RGAly5iA==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.3.txt", "author": "akraievoy", "stamp": 1319383080398, "_rev": "4-0bb65f3aa4b37eb39c68c7b914b653ee", "id": "test.3.txt", "_id": "Attachment-aos_w11-lr-4-4-test-test.3.txt-gu46mcb2-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==cfa4ad05fe994477ba793c00a6b57b04==
+Content-ID: content
+Content-Length: 110
+Content-MD5: kyzkV7iohMyAPfPyNPufiQ==
+Content-Type: text/plain
+
+$a0: 0x100
+$a1: 9
+$v0: => 4
+0x100: 1
+0x104: 1
+0x108: 5
+0x10C: -8
+0x110: 3
+0x114: 2
+0x118: 0
+0x11C: 9
+0x120: -7
+--==cfa4ad05fe994477ba793c00a6b57b04==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-4-5-statement-statement.txt-gu46mdcc-
+Content-Type: multipart/mixed; boundary="==77a96794760b432294c7876fd45f8fe6=="
+ETag: "4-de26b89e1e4743d3e273e16d89b803f8"
+
+--==77a96794760b432294c7876fd45f8fe6==
+Content-Length: 304
+Content-MD5: 8q8Rk5P86Wb3Vx9GjssKmw==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "statement.txt", "author": "akraievoy", "stamp": 1319383081740, "_rev": "4-de26b89e1e4743d3e273e16d89b803f8", "id": "statement.txt", "_id": "Attachment-aos_w11-lr-4-5-statement-statement.txt-gu46mdcc-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==77a96794760b432294c7876fd45f8fe6==
+Content-ID: content
+Content-Length: 335
+Content-MD5: S92NNfpmZ2xrUzjnkSWfDQ==
+Content-Type: text/plain
+
+Задано цілочисельний масив (адреса нульового
+елемента в $a0, довжина масива в $a1). Підрахувати найбільшу кількість
+розташованих послідовно додатніх елементів і зберегти результат у $v0.
+--==77a96794760b432294c7876fd45f8fe6==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-4-5-test-test.1.txt-gu46mceq-
+Content-Type: multipart/mixed; boundary="==ed9dca4bc71745209fc2e6715d7888ae=="
+ETag: "4-49dec5dd27581ce2eb3fae5a8e1b5ce9"
+
+--==ed9dca4bc71745209fc2e6715d7888ae==
+Content-Length: 290
+Content-MD5: cXr8KMKHSDxrOQiGs3qpJg==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.1.txt", "author": "akraievoy", "stamp": 1319383080530, "_rev": "4-49dec5dd27581ce2eb3fae5a8e1b5ce9", "id": "test.1.txt", "_id": "Attachment-aos_w11-lr-4-5-test-test.1.txt-gu46mceq-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==ed9dca4bc71745209fc2e6715d7888ae==
+Content-ID: content
+Content-Length: 83
+Content-MD5: HKmO8X2RreKazYDKibIchw==
+Content-Type: text/plain
+
+$a0: 0x100
+$a1: 6
+$v0: => 2
+0x100: -1
+0x104: 1
+0x108: 1
+0x10C: 0
+0x110: 1
+0x114: -1
+--==ed9dca4bc71745209fc2e6715d7888ae==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-4-5-test-test.2.txt-gu46mci1-
+Content-Type: multipart/mixed; boundary="==52c92a465dc547bd8f6384ab1b3ca715=="
+ETag: "4-e3960ba0b2dc7d9242df40509f96c7b2"
+
+--==52c92a465dc547bd8f6384ab1b3ca715==
+Content-Length: 290
+Content-MD5: QVnjazXSWCtnG3juePZpwQ==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.2.txt", "author": "akraievoy", "stamp": 1319383080649, "_rev": "4-e3960ba0b2dc7d9242df40509f96c7b2", "id": "test.2.txt", "_id": "Attachment-aos_w11-lr-4-5-test-test.2.txt-gu46mci1-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==52c92a465dc547bd8f6384ab1b3ca715==
+Content-ID: content
+Content-Length: 84
+Content-MD5: D6vC4tpwZ7HDUs61QWOjyA==
+Content-Type: text/plain
+
+$a0: 0x100
+$a1: 6
+$v0: => 4
+0x100: 7
+0x104: 1
+0x108: 1
+0x10C: 4
+0x110: -4
+0x114: -18
+--==52c92a465dc547bd8f6384ab1b3ca715==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-4-5-test-test.3.txt-gu46mckv-
+Content-Type: multipart/mixed; boundary="==341563959783413dacfbcedf38542746=="
+ETag: "4-9655ddbe76a6d15b4fd6a9259e842a4d"
+
+--==341563959783413dacfbcedf38542746==
+Content-Length: 290
+Content-MD5: FYRlJk18esTCRUXtrzT2ZA==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.3.txt", "author": "akraievoy", "stamp": 1319383080751, "_rev": "4-9655ddbe76a6d15b4fd6a9259e842a4d", "id": "test.3.txt", "_id": "Attachment-aos_w11-lr-4-5-test-test.3.txt-gu46mckv-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==341563959783413dacfbcedf38542746==
+Content-ID: content
+Content-Length: 91
+Content-MD5: blqu6d5G3vnv1jFnezFMtg==
+Content-Type: text/plain
+
+$a0: 0x100
+$a1: 7
+$v0: => 3
+0x100: 0
+0x104: 1
+0x108: 1
+0x10C: -5
+0x110: 1
+0x114: 2
+0x118: 9
+--==341563959783413dacfbcedf38542746==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-4-6-statement-statement.txt-gu46mdfm-
+Content-Type: multipart/mixed; boundary="==7e923626208649dc89c357686b6edc90=="
+ETag: "4-45d6a7812490c6e181f1a7274ef1eec5"
+
+--==7e923626208649dc89c357686b6edc90==
+Content-Length: 304
+Content-MD5: A/zeZF/ac7b/hLDX7lyz0g==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "statement.txt", "author": "akraievoy", "stamp": 1319383081858, "_rev": "4-45d6a7812490c6e181f1a7274ef1eec5", "id": "statement.txt", "_id": "Attachment-aos_w11-lr-4-6-statement-statement.txt-gu46mdfm-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==7e923626208649dc89c357686b6edc90==
+Content-ID: content
+Content-Length: 286
+Content-MD5: Fx4+S/ucd+mX5A+Aw9BIjA==
+Content-Type: text/plain
+
+Задано масив натуральних чисел (адреса нульового
+елемента в $a0, довжина масива в $a1). Змінити міцями перший елемент з останнім,
+другий – з передостаннім і т.д.
+--==7e923626208649dc89c357686b6edc90==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-4-6-test-test.1.txt-gu46mcnu-
+Content-Type: multipart/mixed; boundary="==7dc99769801d40f5afb8a4676116a424=="
+ETag: "4-5df67af0f2004cc8cdf84fb644a60a8c"
+
+--==7dc99769801d40f5afb8a4676116a424==
+Content-Length: 290
+Content-MD5: RZy4dxSyg0sqMdGKdcj3GA==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.1.txt", "author": "akraievoy", "stamp": 1319383080858, "_rev": "4-5df67af0f2004cc8cdf84fb644a60a8c", "id": "test.1.txt", "_id": "Attachment-aos_w11-lr-4-6-test-test.1.txt-gu46mcnu-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==7dc99769801d40f5afb8a4676116a424==
+Content-ID: content
+Content-Length: 82
+Content-MD5: T9KWHmkywSrUIHxXSyCu+g==
+Content-Type: text/plain
+
+$a0: 0x100
+$a1: 5
+0x100: 5 => 1
+0x104: 4 => 2
+0x108: 3
+0x10C: 2 => 4
+0x110: 1 => 5
+--==7dc99769801d40f5afb8a4676116a424==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-4-6-test-test.2.txt-gu46mcqn-
+Content-Type: multipart/mixed; boundary="==00cbfc252455407392e4d08a98125860=="
+ETag: "4-33417da16f12a0b661d503ab8a17457d"
+
+--==00cbfc252455407392e4d08a98125860==
+Content-Length: 290
+Content-MD5: KjA8zAseKagLDcxeAfvftw==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.2.txt", "author": "akraievoy", "stamp": 1319383080959, "_rev": "4-33417da16f12a0b661d503ab8a17457d", "id": "test.2.txt", "_id": "Attachment-aos_w11-lr-4-6-test-test.2.txt-gu46mcqn-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==00cbfc252455407392e4d08a98125860==
+Content-ID: content
+Content-Length: 103
+Content-MD5: 7YLp1VQsdqhlEm09tv0kvg==
+Content-Type: text/plain
+
+$a0: 0x100
+$a1: 6
+0x100: 6 => 11
+0x104: 2 => 3
+0x108: 1 => 4
+0x10C: 4 => 1
+0x110: 3 => 2
+0x114: 11 => 6
+--==00cbfc252455407392e4d08a98125860==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-4-6-test-test.3.txt-gu46mcte-
+Content-Type: multipart/mixed; boundary="==3c2aed66d1c5449997d221e43e4c928d=="
+ETag: "4-300b4333d65ff609f51eae42ab22390d"
+
+--==3c2aed66d1c5449997d221e43e4c928d==
+Content-Length: 290
+Content-MD5: uWp+up2g2Q90xoaNlr9pHg==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.3.txt", "author": "akraievoy", "stamp": 1319383081058, "_rev": "4-300b4333d65ff609f51eae42ab22390d", "id": "test.3.txt", "_id": "Attachment-aos_w11-lr-4-6-test-test.3.txt-gu46mcte-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==3c2aed66d1c5449997d221e43e4c928d==
+Content-ID: content
+Content-Length: 26
+Content-MD5: i0p5J6C13qok5TPAEXKluA==
+Content-Type: text/plain
+
+$a0: 0x100
+$a1: 1
+0x100: 5
+--==3c2aed66d1c5449997d221e43e4c928d==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-5-1-statement-statement.txt-gu46mfkw-
+Content-Type: multipart/mixed; boundary="==ba8920da9929497895694bed5ef60005=="
+ETag: "4-37d1dd11e89815d0b8442c70806a28f0"
+
+--==ba8920da9929497895694bed5ef60005==
+Content-Length: 304
+Content-MD5: hKrQh71RNCRFq1YtcF5pNg==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "statement.txt", "author": "akraievoy", "stamp": 1319383084640, "_rev": "4-37d1dd11e89815d0b8442c70806a28f0", "id": "statement.txt", "_id": "Attachment-aos_w11-lr-5-1-statement-statement.txt-gu46mfkw-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==ba8920da9929497895694bed5ef60005==
+Content-ID: content
+Content-Length: 261
+Content-MD5: 5+fkSkZvefgXAKOvwrpWEg==
+Content-Type: text/plain
+
+Встановити в 1 всі біти, які знаходяться
+поряд з хоча б одним вже встановленим в 1 в заданому в регістрі $a0 числі,
+результат записати в регістр $v0.
+--==ba8920da9929497895694bed5ef60005==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-5-1-test-test.1.txt-gu46mdj4-
+Content-Type: multipart/mixed; boundary="==9a72773b2bd34d1ea4e4632d61d9d3f2=="
+ETag: "4-f49c77f1a6aeec0f7804b412d695e8eb"
+
+--==9a72773b2bd34d1ea4e4632d61d9d3f2==
+Content-Length: 290
+Content-MD5: +HWmJrnvMm9ZBobkpFhnwQ==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.1.txt", "author": "akraievoy", "stamp": 1319383081984, "_rev": "4-f49c77f1a6aeec0f7804b412d695e8eb", "id": "test.1.txt", "_id": "Attachment-aos_w11-lr-5-1-test-test.1.txt-gu46mdj4-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==9a72773b2bd34d1ea4e4632d61d9d3f2==
+Content-ID: content
+Content-Length: 18
+Content-MD5: IS3c6eWnLkf6z7CNaSVeVg==
+Content-Type: text/plain
+
+$a0: 17
+$v0: => 59
+--==9a72773b2bd34d1ea4e4632d61d9d3f2==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-5-1-test-test.2.txt-gu46mdmp-
+Content-Type: multipart/mixed; boundary="==c5e297dfb3404d4db2d9f7ee6c7e89d5=="
+ETag: "4-51dd1b629a8f7d903f52e5b71f982549"
+
+--==c5e297dfb3404d4db2d9f7ee6c7e89d5==
+Content-Length: 290
+Content-MD5: EyR1LCvU4v3rrvfJ/p5Xag==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.2.txt", "author": "akraievoy", "stamp": 1319383082113, "_rev": "4-51dd1b629a8f7d903f52e5b71f982549", "id": "test.2.txt", "_id": "Attachment-aos_w11-lr-5-1-test-test.2.txt-gu46mdmp-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==c5e297dfb3404d4db2d9f7ee6c7e89d5==
+Content-ID: content
+Content-Length: 18
+Content-MD5: lQd1TJeExK0qJoIYLd3vPQ==
+Content-Type: text/plain
+
+$a0: 21
+$v0: => 63
+--==c5e297dfb3404d4db2d9f7ee6c7e89d5==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-5-1-test-test.3.txt-gu46mdq8-
+Content-Type: multipart/mixed; boundary="==76e3708ffb5d455795a990b2b242f42e=="
+ETag: "4-b6c238d9aecd15bef81d7c71f44dbc9d"
+
+--==76e3708ffb5d455795a990b2b242f42e==
+Content-Length: 290
+Content-MD5: wFvslC2Oefu2ioy92hFYow==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.3.txt", "author": "akraievoy", "stamp": 1319383082240, "_rev": "4-b6c238d9aecd15bef81d7c71f44dbc9d", "id": "test.3.txt", "_id": "Attachment-aos_w11-lr-5-1-test-test.3.txt-gu46mdq8-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==76e3708ffb5d455795a990b2b242f42e==
+Content-ID: content
+Content-Length: 18
+Content-MD5: Z3UCmJdlEJU28cfqAiZEKQ==
+Content-Type: text/plain
+
+$a0: 12
+$v0: => 30
+--==76e3708ffb5d455795a990b2b242f42e==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-5-2-statement-statement.txt-gu46mfo0-
+Content-Type: multipart/mixed; boundary="==1e414837a205470d99d1da5fcd948389=="
+ETag: "4-c08a55965575a1c139b1f240b4c57700"
+
+--==1e414837a205470d99d1da5fcd948389==
+Content-Length: 304
+Content-MD5: eYVvtIAeQz+mjwfpJgklnA==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "statement.txt", "author": "akraievoy", "stamp": 1319383084752, "_rev": "4-c08a55965575a1c139b1f240b4c57700", "id": "statement.txt", "_id": "Attachment-aos_w11-lr-5-2-statement-statement.txt-gu46mfo0-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==1e414837a205470d99d1da5fcd948389==
+Content-ID: content
+Content-Length: 258
+Content-MD5: oaw29RvlseWZHZaMN73IDw==
+Content-Type: text/plain
+
+Встановити всі біти в нуль, які суміжні
+одночасно з двома встановленими в нуль в заданому в регистрі $a0 числі,
+результат записати в регістр $v0.
+--==1e414837a205470d99d1da5fcd948389==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-5-2-test-test.1.txt-gu46mdtp-
+Content-Type: multipart/mixed; boundary="==071aa33e92624f30a846e312818f5029=="
+ETag: "4-3b71bb9a1211310c24bffd71cf74e248"
+
+--==071aa33e92624f30a846e312818f5029==
+Content-Length: 290
+Content-MD5: FCiUTB4junY+mk6x82sTug==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.1.txt", "author": "akraievoy", "stamp": 1319383082365, "_rev": "4-3b71bb9a1211310c24bffd71cf74e248", "id": "test.1.txt", "_id": "Attachment-aos_w11-lr-5-2-test-test.1.txt-gu46mdtp-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==071aa33e92624f30a846e312818f5029==
+Content-ID: content
+Content-Length: 17
+Content-MD5: OjnOoloqf0hQPPUVHHZvFg==
+Content-Type: text/plain
+
+$a0: 70
+$v0: => 6
+--==071aa33e92624f30a846e312818f5029==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-5-2-test-test.2.txt-gu46mdwt-
+Content-Type: multipart/mixed; boundary="==2271770f937344658584421ae4db16cf=="
+ETag: "4-91396a9a5ff0798fe6b012d876da786a"
+
+--==2271770f937344658584421ae4db16cf==
+Content-Length: 290
+Content-MD5: wmkqRPctceOOE7TJ9OX8Pg==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.2.txt", "author": "akraievoy", "stamp": 1319383082477, "_rev": "4-91396a9a5ff0798fe6b012d876da786a", "id": "test.2.txt", "_id": "Attachment-aos_w11-lr-5-2-test-test.2.txt-gu46mdwt-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==2271770f937344658584421ae4db16cf==
+Content-ID: content
+Content-Length: 17
+Content-MD5: kUFS6G58pAznEjO0ep+SOA==
+Content-Type: text/plain
+
+$a0: 17
+$v0: => 0
+--==2271770f937344658584421ae4db16cf==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-5-2-test-test.3.txt-gu46mdzs-
+Content-Type: multipart/mixed; boundary="==e0068329d4ee488cb9df443993ba2c87=="
+ETag: "4-8b7b479f564ecf1421046d5f4f6ede18"
+
+--==e0068329d4ee488cb9df443993ba2c87==
+Content-Length: 290
+Content-MD5: 8kHsE2+HbzEwb4oCM3FrBA==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.3.txt", "author": "akraievoy", "stamp": 1319383082584, "_rev": "4-8b7b479f564ecf1421046d5f4f6ede18", "id": "test.3.txt", "_id": "Attachment-aos_w11-lr-5-2-test-test.3.txt-gu46mdzs-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==e0068329d4ee488cb9df443993ba2c87==
+Content-ID: content
+Content-Length: 18
+Content-MD5: fJ+SkAga/xzB8XHMU72n2g==
+Content-Type: text/plain
+
+$a0: 31
+$v0: => 31
+--==e0068329d4ee488cb9df443993ba2c87==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-5-3-statement-statement.txt-gu46mfr0-
+Content-Type: multipart/mixed; boundary="==caade03caa8042c7a1437ffc184189c4=="
+ETag: "4-afcec8d5f025bdaa3c07d45241bd0d98"
+
+--==caade03caa8042c7a1437ffc184189c4==
+Content-Length: 304
+Content-MD5: zFDXHF+fmFNidblpJrCMGA==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "statement.txt", "author": "akraievoy", "stamp": 1319383084860, "_rev": "4-afcec8d5f025bdaa3c07d45241bd0d98", "id": "statement.txt", "_id": "Attachment-aos_w11-lr-5-3-statement-statement.txt-gu46mfr0-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==caade03caa8042c7a1437ffc184189c4==
+Content-ID: content
+Content-Length: 211
+Content-MD5: R4sCwGO1ElkAWRWdLUgULQ==
+Content-Type: text/plain
+
+Поміняти місцями парні та непарні
+біти в 32-розрядному числі, заданому в регістрі $a0, результат записати
+в регістр $v0.
+--==caade03caa8042c7a1437ffc184189c4==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-5-3-test-test.1.txt-gu46me37-
+Content-Type: multipart/mixed; boundary="==fe7ed99196a5416e9d2d027519b46744=="
+ETag: "4-326fd64ca451db9187aced0f6a90df04"
+
+--==fe7ed99196a5416e9d2d027519b46744==
+Content-Length: 290
+Content-MD5: bC+AsZkdOtzV31jROWspOQ==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.1.txt", "author": "akraievoy", "stamp": 1319383082707, "_rev": "4-326fd64ca451db9187aced0f6a90df04", "id": "test.1.txt", "_id": "Attachment-aos_w11-lr-5-3-test-test.1.txt-gu46me37-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==fe7ed99196a5416e9d2d027519b46744==
+Content-ID: content
+Content-Length: 17
+Content-MD5: vzxqxAHwIBKpd8q1izd89A==
+Content-Type: text/plain
+
+$a0: 5
+$v0: => 10
+--==fe7ed99196a5416e9d2d027519b46744==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-5-3-test-test.2.txt-gu46me6n-
+Content-Type: multipart/mixed; boundary="==54eec5396559410d836bb0bce3c9aa78=="
+ETag: "4-3e6b851569847d4ff050e4a03ad0cc67"
+
+--==54eec5396559410d836bb0bce3c9aa78==
+Content-Length: 290
+Content-MD5: zBm1zbQbsv7fATUMscdBPA==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.2.txt", "author": "akraievoy", "stamp": 1319383082831, "_rev": "4-3e6b851569847d4ff050e4a03ad0cc67", "id": "test.2.txt", "_id": "Attachment-aos_w11-lr-5-3-test-test.2.txt-gu46me6n-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==54eec5396559410d836bb0bce3c9aa78==
+Content-ID: content
+Content-Length: 19
+Content-MD5: 1CV8P+J4iYYhmyq+h2lSWA==
+Content-Type: text/plain
+
+$a0: 130
+$v0: => 65
+--==54eec5396559410d836bb0bce3c9aa78==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-5-3-test-test.3.txt-gu46me9d-
+Content-Type: multipart/mixed; boundary="==be8e91e2b43a4bcf9a5df01dccbb0665=="
+ETag: "4-ccc241d466ea07241ff7c0b960ef10bf"
+
+--==be8e91e2b43a4bcf9a5df01dccbb0665==
+Content-Length: 290
+Content-MD5: t7vBWdskIeLoauKEzvpsPg==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.3.txt", "author": "akraievoy", "stamp": 1319383082929, "_rev": "4-ccc241d466ea07241ff7c0b960ef10bf", "id": "test.3.txt", "_id": "Attachment-aos_w11-lr-5-3-test-test.3.txt-gu46me9d-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==be8e91e2b43a4bcf9a5df01dccbb0665==
+Content-ID: content
+Content-Length: 19
+Content-MD5: BM37BM07Yrp6olmvZFS5pg==
+Content-Type: text/plain
+
+$a0: 73
+$v0: => 134
+--==be8e91e2b43a4bcf9a5df01dccbb0665==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-5-4-statement-statement.txt-gu46mfty-
+Content-Type: multipart/mixed; boundary="==00d44b69d4cb4fb79f7f43308bda212b=="
+ETag: "4-941c52f7a137b3b4d639e59333b3c86a"
+
+--==00d44b69d4cb4fb79f7f43308bda212b==
+Content-Length: 304
+Content-MD5: 7hbZbOVy75TYVN6nAjiqFQ==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "statement.txt", "author": "akraievoy", "stamp": 1319383084966, "_rev": "4-941c52f7a137b3b4d639e59333b3c86a", "id": "statement.txt", "_id": "Attachment-aos_w11-lr-5-4-statement-statement.txt-gu46mfty-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==00d44b69d4cb4fb79f7f43308bda212b==
+Content-ID: content
+Content-Length: 277
+Content-MD5: 4qh9FUH7PwHMNwCe4JcfZA==
+Content-Type: text/plain
+
+Якщо число, представлене в регістрі $a0 ділиться
+без остачі на 2^n, де значення n >= 0 задається в регістрі $a1, вивести в
+регістр $v0 значення 1, інакше вивести 0.
+--==00d44b69d4cb4fb79f7f43308bda212b==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-5-4-test-test.1.txt-gu46mecl-
+Content-Type: multipart/mixed; boundary="==4c70a45cfd544ec2be171042816fc89c=="
+ETag: "4-f51548e99b3166fd66f4c6d1ff39c786"
+
+--==4c70a45cfd544ec2be171042816fc89c==
+Content-Length: 290
+Content-MD5: dYRXjjTgX4JcR4OoWjkmGg==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.1.txt", "author": "akraievoy", "stamp": 1319383083045, "_rev": "4-f51548e99b3166fd66f4c6d1ff39c786", "id": "test.1.txt", "_id": "Attachment-aos_w11-lr-5-4-test-test.1.txt-gu46mecl-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==4c70a45cfd544ec2be171042816fc89c==
+Content-ID: content
+Content-Length: 24
+Content-MD5: wdP2XRP4sx0bAo6AB2W71Q==
+Content-Type: text/plain
+
+$a0: 64
+$a1: 6
+$v0: => 1
+--==4c70a45cfd544ec2be171042816fc89c==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-5-4-test-test.2.txt-gu46mef9-
+Content-Type: multipart/mixed; boundary="==a64e8873ba024014b901df13e256e7b1=="
+ETag: "4-115304f202be96634a9f786fa6641be5"
+
+--==a64e8873ba024014b901df13e256e7b1==
+Content-Length: 290
+Content-MD5: qOTQDYhB0IMgHc03hdPLGg==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.2.txt", "author": "akraievoy", "stamp": 1319383083141, "_rev": "4-115304f202be96634a9f786fa6641be5", "id": "test.2.txt", "_id": "Attachment-aos_w11-lr-5-4-test-test.2.txt-gu46mef9-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==a64e8873ba024014b901df13e256e7b1==
+Content-ID: content
+Content-Length: 25
+Content-MD5: 6v4NT8j7/HFcsyFT9hkvIw==
+Content-Type: text/plain
+
+$a0: 129
+$a1: 4
+$v0: => 0
+--==a64e8873ba024014b901df13e256e7b1==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-5-4-test-test.3.txt-gu46meij-
+Content-Type: multipart/mixed; boundary="==fbf59f20e02e42008ce0b266ada075ea=="
+ETag: "4-c5f76c5a5485b70b3102df68b84c2d68"
+
+--==fbf59f20e02e42008ce0b266ada075ea==
+Content-Length: 290
+Content-MD5: di274Y8+sPO2WrUSCkEVtw==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.3.txt", "author": "akraievoy", "stamp": 1319383083259, "_rev": "4-c5f76c5a5485b70b3102df68b84c2d68", "id": "test.3.txt", "_id": "Attachment-aos_w11-lr-5-4-test-test.3.txt-gu46meij-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==fbf59f20e02e42008ce0b266ada075ea==
+Content-ID: content
+Content-Length: 25
+Content-MD5: sDRjTe0EkcXrkQCJmqw3Cg==
+Content-Type: text/plain
+
+$a0: 123
+$a1: 0
+$v0: => 1
+--==fbf59f20e02e42008ce0b266ada075ea==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-5-5-statement-statement.txt-gu46mfwz-
+Content-Type: multipart/mixed; boundary="==5df95222a56f48df8a2b854d34b09842=="
+ETag: "4-ef804d7b43411b1e931e0c39127e15ad"
+
+--==5df95222a56f48df8a2b854d34b09842==
+Content-Length: 304
+Content-MD5: MI4NCfgXE9A5PoxQ6USJzA==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "statement.txt", "author": "akraievoy", "stamp": 1319383085075, "_rev": "4-ef804d7b43411b1e931e0c39127e15ad", "id": "statement.txt", "_id": "Attachment-aos_w11-lr-5-5-statement-statement.txt-gu46mfwz-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==5df95222a56f48df8a2b854d34b09842==
+Content-ID: content
+Content-Length: 232
+Content-MD5: bogwj5y+xA25nI3mlSW6MQ==
+Content-Type: text/plain
+
+Визначити номер старшого біта додатнього числа,
+заданого в регістрі $a0, результат вивести в регістр $v0. Біти номеруються
+з нуля.
+--==5df95222a56f48df8a2b854d34b09842==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-5-5-test-test.1.txt-gu46meon-
+Content-Type: multipart/mixed; boundary="==a5a074a1963a4daba7797918930c9780=="
+ETag: "4-ac24681d526932233a93de09d01bacd1"
+
+--==a5a074a1963a4daba7797918930c9780==
+Content-Length: 290
+Content-MD5: +YVOAk87VXU0KY3ruxad9Q==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.1.txt", "author": "akraievoy", "stamp": 1319383083479, "_rev": "4-ac24681d526932233a93de09d01bacd1", "id": "test.1.txt", "_id": "Attachment-aos_w11-lr-5-5-test-test.1.txt-gu46meon-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==a5a074a1963a4daba7797918930c9780==
+Content-ID: content
+Content-Length: 17
+Content-MD5: 61Z4+YrscbSK5vsmgU9CMw==
+Content-Type: text/plain
+
+$a0: 65
+$v0: => 6
+--==a5a074a1963a4daba7797918930c9780==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-5-5-test-test.2.txt-gu46mesh-
+Content-Type: multipart/mixed; boundary="==466c837ce84e48858525425ef7ebbbbb=="
+ETag: "4-6e968e064af22caaaf4415b1a266a6c8"
+
+--==466c837ce84e48858525425ef7ebbbbb==
+Content-Length: 290
+Content-MD5: PaGR8CcCO6ZCBYUNoAG1LQ==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.2.txt", "author": "akraievoy", "stamp": 1319383083617, "_rev": "4-6e968e064af22caaaf4415b1a266a6c8", "id": "test.2.txt", "_id": "Attachment-aos_w11-lr-5-5-test-test.2.txt-gu46mesh-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==466c837ce84e48858525425ef7ebbbbb==
+Content-ID: content
+Content-Length: 16
+Content-MD5: BIyg70A+K/uOTiqMyPv8JA==
+Content-Type: text/plain
+
+$a0: 9
+$v0: => 3
+--==466c837ce84e48858525425ef7ebbbbb==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-5-5-test-test.3.txt-gu46mew0-
+Content-Type: multipart/mixed; boundary="==498b76d440a24ce88399145ecea81db7=="
+ETag: "4-24871d47640af99e8f4a8ccc75f23bc1"
+
+--==498b76d440a24ce88399145ecea81db7==
+Content-Length: 290
+Content-MD5: +pCvnCBf36/4OuX9m0orug==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.3.txt", "author": "akraievoy", "stamp": 1319383083744, "_rev": "4-24871d47640af99e8f4a8ccc75f23bc1", "id": "test.3.txt", "_id": "Attachment-aos_w11-lr-5-5-test-test.3.txt-gu46mew0-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==498b76d440a24ce88399145ecea81db7==
+Content-ID: content
+Content-Length: 16
+Content-MD5: wkAGmOAZFx5dDAWJUrU+0A==
+Content-Type: text/plain
+
+$a0: 1
+$v0: => 0
+--==498b76d440a24ce88399145ecea81db7==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-5-6-statement-statement.txt-gu46mg2a-
+Content-Type: multipart/mixed; boundary="==94dd0f6a36a145b1aba673f85e65292c=="
+ETag: "4-9da2ae6627dfd0113457b69579958887"
+
+--==94dd0f6a36a145b1aba673f85e65292c==
+Content-Length: 304
+Content-MD5: 8I5yhSVeMp9QhSUXZJglHw==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "statement.txt", "author": "akraievoy", "stamp": 1319383085266, "_rev": "4-9da2ae6627dfd0113457b69579958887", "id": "statement.txt", "_id": "Attachment-aos_w11-lr-5-6-statement-statement.txt-gu46mg2a-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==94dd0f6a36a145b1aba673f85e65292c==
+Content-ID: content
+Content-Length: 222
+Content-MD5: mWyuccf1x6Oev7tcxwLP7Q==
+Content-Type: text/plain
+
+В регістрі $a0 задано натуральне число n. Потрібно
+підрахувати кількість встановлених біт і вивести результат в регістр $v0.
+--==94dd0f6a36a145b1aba673f85e65292c==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-5-6-test-test.1.txt-gu46mezb-
+Content-Type: multipart/mixed; boundary="==16fab79fd4b04f2784d3f8e66919a20d=="
+ETag: "4-dee6437c93c303edadccfc6125d738f2"
+
+--==16fab79fd4b04f2784d3f8e66919a20d==
+Content-Length: 290
+Content-MD5: bvu+6Luvs061bD0YR8YCUA==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.1.txt", "author": "akraievoy", "stamp": 1319383083863, "_rev": "4-dee6437c93c303edadccfc6125d738f2", "id": "test.1.txt", "_id": "Attachment-aos_w11-lr-5-6-test-test.1.txt-gu46mezb-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==16fab79fd4b04f2784d3f8e66919a20d==
+Content-ID: content
+Content-Length: 16
+Content-MD5: c5YU5sYTHo+EYZ2+r2E0aQ==
+Content-Type: text/plain
+
+$a0: 0
+$v0: => 0
+--==16fab79fd4b04f2784d3f8e66919a20d==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-5-6-test-test.2.txt-gu46mf2l-
+Content-Type: multipart/mixed; boundary="==92779a6beb614d68bc7229968d5c41bb=="
+ETag: "4-6893ba5f59876592535f74343753ea37"
+
+--==92779a6beb614d68bc7229968d5c41bb==
+Content-Length: 290
+Content-MD5: 7y2/0AtmgUDBotKEunYFwA==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.2.txt", "author": "akraievoy", "stamp": 1319383083981, "_rev": "4-6893ba5f59876592535f74343753ea37", "id": "test.2.txt", "_id": "Attachment-aos_w11-lr-5-6-test-test.2.txt-gu46mf2l-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==92779a6beb614d68bc7229968d5c41bb==
+Content-ID: content
+Content-Length: 18
+Content-MD5: PisrBC6SuBfAoKjqxFFS/A==
+Content-Type: text/plain
+
+$a0: 127
+$v0: => 7
+--==92779a6beb614d68bc7229968d5c41bb==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-5-6-test-test.3.txt-gu46mf5z-
+Content-Type: multipart/mixed; boundary="==e7556b515c4649f1bf746c308eed9049=="
+ETag: "4-31e131eb538fb8674dadc902f59a0d18"
+
+--==e7556b515c4649f1bf746c308eed9049==
+Content-Length: 290
+Content-MD5: 7UoW7WknSb4Wa7+wKBy2Tw==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.3.txt", "author": "akraievoy", "stamp": 1319383084103, "_rev": "4-31e131eb538fb8674dadc902f59a0d18", "id": "test.3.txt", "_id": "Attachment-aos_w11-lr-5-6-test-test.3.txt-gu46mf5z-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==e7556b515c4649f1bf746c308eed9049==
+Content-ID: content
+Content-Length: 19
+Content-MD5: AFnufTzgqHXo65R0etAjCA==
+Content-Type: text/plain
+
+$a0: 5894
+$v0: => 6
+--==e7556b515c4649f1bf746c308eed9049==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-5-7-statement-statement.txt-gu46mg5u-
+Content-Type: multipart/mixed; boundary="==6d07975d1da945129fc82c4575e84c1b=="
+ETag: "4-0d578f7ef3419fe7dd2b397eda2bf0cb"
+
+--==6d07975d1da945129fc82c4575e84c1b==
+Content-Length: 304
+Content-MD5: IGiRvFxAif4g2PsjBdoc4g==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "statement.txt", "author": "akraievoy", "stamp": 1319383085394, "_rev": "4-0d578f7ef3419fe7dd2b397eda2bf0cb", "id": "statement.txt", "_id": "Attachment-aos_w11-lr-5-7-statement-statement.txt-gu46mg5u-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==6d07975d1da945129fc82c4575e84c1b==
+Content-ID: content
+Content-Length: 215
+Content-MD5: wnTOXA/m7Ra2SYtEG+4w8g==
+Content-Type: text/plain
+
+Поміняти місцями парні та непарні байти в 32-розрядному
+числі, заданому в регістрі $a0, результат зберігти в регістрі $v0.
+--==6d07975d1da945129fc82c4575e84c1b==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-5-7-test-test.1.txt-gu46mf95-
+Content-Type: multipart/mixed; boundary="==3caf13a0a460457681be792b11acddb8=="
+ETag: "4-9d2398f47eaaa842fd1862efef01e69a"
+
+--==3caf13a0a460457681be792b11acddb8==
+Content-Length: 290
+Content-MD5: 4TsTJAYp01fSkva3zPtWTA==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.1.txt", "author": "akraievoy", "stamp": 1319383084217, "_rev": "4-9d2398f47eaaa842fd1862efef01e69a", "id": "test.1.txt", "_id": "Attachment-aos_w11-lr-5-7-test-test.1.txt-gu46mf95-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==3caf13a0a460457681be792b11acddb8==
+Content-ID: content
+Content-Length: 34
+Content-MD5: CiNdIRCt0Ga4GpthrCr/pA==
+Content-Type: text/plain
+
+$a0: 0x01020304
+$v0: => 0x02010403
+--==3caf13a0a460457681be792b11acddb8==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-5-7-test-test.2.txt-gu46mfbs-
+Content-Type: multipart/mixed; boundary="==9656df06b1ad4fb692609bd7b5da92c0=="
+ETag: "4-879f03199428d179668be77c5e323347"
+
+--==9656df06b1ad4fb692609bd7b5da92c0==
+Content-Length: 290
+Content-MD5: JzLQG+QacezHF7OoIIc87Q==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.2.txt", "author": "akraievoy", "stamp": 1319383084312, "_rev": "4-879f03199428d179668be77c5e323347", "id": "test.2.txt", "_id": "Attachment-aos_w11-lr-5-7-test-test.2.txt-gu46mfbs-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==9656df06b1ad4fb692609bd7b5da92c0==
+Content-ID: content
+Content-Length: 34
+Content-MD5: HvNxgbeOT3QiNx17rbPKuA==
+Content-Type: text/plain
+
+$a0: 0x12345678
+$v0: => 0x34127856
+--==9656df06b1ad4fb692609bd7b5da92c0==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-5-7-test-test.3.txt-gu46mfel-
+Content-Type: multipart/mixed; boundary="==bae899ab1afd44558585adde7cfe37cf=="
+ETag: "4-4f0f26a12b155fec518a50cf510b33ed"
+
+--==bae899ab1afd44558585adde7cfe37cf==
+Content-Length: 290
+Content-MD5: nN8uLAt4XXcauiyfy8zUzA==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.3.txt", "author": "akraievoy", "stamp": 1319383084413, "_rev": "4-4f0f26a12b155fec518a50cf510b33ed", "id": "test.3.txt", "_id": "Attachment-aos_w11-lr-5-7-test-test.3.txt-gu46mfel-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==bae899ab1afd44558585adde7cfe37cf==
+Content-ID: content
+Content-Length: 34
+Content-MD5: CHV0dlBPDs0dvD2sFjmO0g==
+Content-Type: text/plain
+
+$a0: 0x00110110
+$v0: => 0x11001001
+--==bae899ab1afd44558585adde7cfe37cf==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-6-1-statement-statement.txt-gu46mi10-
+Content-Type: multipart/mixed; boundary="==68891902f98542a4859a784b51338977=="
+ETag: "4-cacf22a83efae5057a12242026181896"
+
+--==68891902f98542a4859a784b51338977==
+Content-Length: 304
+Content-MD5: o6pdREaweWYfDGosdcwL2w==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "statement.txt", "author": "akraievoy", "stamp": 1319383087812, "_rev": "4-cacf22a83efae5057a12242026181896", "id": "statement.txt", "_id": "Attachment-aos_w11-lr-6-1-statement-statement.txt-gu46mi10-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==68891902f98542a4859a784b51338977==
+Content-ID: content
+Content-Length: 165
+Content-MD5: 1yoACmIqYv+GsSUniBEUhg==
+Content-Type: text/plain
+
+Знайти та зберегти у $v0 найбільший спільний
+дільник двох заданих у регістрах $a0 та $a1 чисел.
+--==68891902f98542a4859a784b51338977==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-6-1-test-test.1.txt-gu46mgaa-
+Content-Type: multipart/mixed; boundary="==90118d205bc849e0b16be0195378c385=="
+ETag: "4-f2cd0966663f3f25123f349cf3a7314c"
+
+--==90118d205bc849e0b16be0195378c385==
+Content-Length: 290
+Content-MD5: is/rKNXuxM2GEvShWbnd1Q==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.1.txt", "author": "akraievoy", "stamp": 1319383085554, "_rev": "4-f2cd0966663f3f25123f349cf3a7314c", "id": "test.1.txt", "_id": "Attachment-aos_w11-lr-6-1-test-test.1.txt-gu46mgaa-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==90118d205bc849e0b16be0195378c385==
+Content-ID: content
+Content-Length: 25
+Content-MD5: H1U4OfX/tFfntyg0yKAXIA==
+Content-Type: text/plain
+
+$a0: 12
+$a1: 18
+$v0: => 6
+--==90118d205bc849e0b16be0195378c385==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-6-1-test-test.2.txt-gu46mgd8-
+Content-Type: multipart/mixed; boundary="==d019ede3ce7745e287c2b78744661837=="
+ETag: "4-0ec5db8abb721faba5c8d0512fda795b"
+
+--==d019ede3ce7745e287c2b78744661837==
+Content-Length: 290
+Content-MD5: 60Mwrj4NXSQ+R29zQEvMjQ==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.2.txt", "author": "akraievoy", "stamp": 1319383085660, "_rev": "4-0ec5db8abb721faba5c8d0512fda795b", "id": "test.2.txt", "_id": "Attachment-aos_w11-lr-6-1-test-test.2.txt-gu46mgd8-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==d019ede3ce7745e287c2b78744661837==
+Content-ID: content
+Content-Length: 26
+Content-MD5: 5iNKP6olz1ixPp+sTydxaA==
+Content-Type: text/plain
+
+$a0: 36
+$a1: 54
+$v0: => 18
+--==d019ede3ce7745e287c2b78744661837==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-6-1-test-test.3.txt-gu46mgg8-
+Content-Type: multipart/mixed; boundary="==6490ab2884ea41b6bb5c02a933d112bd=="
+ETag: "4-9858ff17b5943018b51147ffc172d9f0"
+
+--==6490ab2884ea41b6bb5c02a933d112bd==
+Content-Length: 290
+Content-MD5: I23kKmetdfNVmIem5zZP2g==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.3.txt", "author": "akraievoy", "stamp": 1319383085768, "_rev": "4-9858ff17b5943018b51147ffc172d9f0", "id": "test.3.txt", "_id": "Attachment-aos_w11-lr-6-1-test-test.3.txt-gu46mgg8-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==6490ab2884ea41b6bb5c02a933d112bd==
+Content-ID: content
+Content-Length: 25
+Content-MD5: yNSwPHw0ioWdfxB3vcB8Cw==
+Content-Type: text/plain
+
+$a0: 117
+$a1: 1
+$v0: => 1
+--==6490ab2884ea41b6bb5c02a933d112bd==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-6-2-statement-statement.txt-gu46mi5s-
+Content-Type: multipart/mixed; boundary="==ee0917cb0e4348a0ac0de6d5898226ed=="
+ETag: "4-2888631daaf7384babf608d22cddaf1b"
+
+--==ee0917cb0e4348a0ac0de6d5898226ed==
+Content-Length: 304
+Content-MD5: 8Y22sHxOYWYzcoKFkZ8RRA==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "statement.txt", "author": "akraievoy", "stamp": 1319383087984, "_rev": "4-2888631daaf7384babf608d22cddaf1b", "id": "statement.txt", "_id": "Attachment-aos_w11-lr-6-2-statement-statement.txt-gu46mi5s-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==ee0917cb0e4348a0ac0de6d5898226ed==
+Content-ID: content
+Content-Length: 311
+Content-MD5: r3my7ozjeFrp2Rl8Of4Biw==
+Content-Type: text/plain
+
+Підрахувати сумарну кількість нулів в запису числа
+N в системі числення з основою q. N задається в регістрі $a0, q задається в
+регістрі $a1, результат зберігається в регістр $v0.
+--==ee0917cb0e4348a0ac0de6d5898226ed==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-6-2-test-test.1.txt-gu46mgj3-
+Content-Type: multipart/mixed; boundary="==4a1ce82a9288470d8e22a1fefb179c71=="
+ETag: "4-f6713ea3011bba7db4b40a5e6a535c46"
+
+--==4a1ce82a9288470d8e22a1fefb179c71==
+Content-Length: 290
+Content-MD5: Cvo7C3GPw+DaIjWzr1YAZw==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.1.txt", "author": "akraievoy", "stamp": 1319383085871, "_rev": "4-f6713ea3011bba7db4b40a5e6a535c46", "id": "test.1.txt", "_id": "Attachment-aos_w11-lr-6-2-test-test.1.txt-gu46mgj3-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==4a1ce82a9288470d8e22a1fefb179c71==
+Content-ID: content
+Content-Length: 24
+Content-MD5: X9WALH13BSff2dDsHij/vQ==
+Content-Type: text/plain
+
+$a0: 16
+$a1: 2
+$v0: => 4
+--==4a1ce82a9288470d8e22a1fefb179c71==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-6-2-test-test.2.txt-gu46mgov-
+Content-Type: multipart/mixed; boundary="==dd52f01b3f6a4435ba4d73e258afef44=="
+ETag: "4-e60d5feb7c3ad1c2366386d6bf2a3874"
+
+--==dd52f01b3f6a4435ba4d73e258afef44==
+Content-Length: 290
+Content-MD5: 9Jm7Nh28vAnx8FrM/saLPw==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.2.txt", "author": "akraievoy", "stamp": 1319383086079, "_rev": "4-e60d5feb7c3ad1c2366386d6bf2a3874", "id": "test.2.txt", "_id": "Attachment-aos_w11-lr-6-2-test-test.2.txt-gu46mgov-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==dd52f01b3f6a4435ba4d73e258afef44==
+Content-ID: content
+Content-Length: 27
+Content-MD5: Om/QQRuwI6JmHqIo8SFgsw==
+Content-Type: text/plain
+
+$a0: 13131
+$a1: 2
+$v0: => 5
+--==dd52f01b3f6a4435ba4d73e258afef44==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-6-2-test-test.3.txt-gu46mgsn-
+Content-Type: multipart/mixed; boundary="==5ca4c531802940c1b0b81a00fc499cb9=="
+ETag: "4-b311076b8b35d7d4ae38d2d02e10eada"
+
+--==5ca4c531802940c1b0b81a00fc499cb9==
+Content-Length: 290
+Content-MD5: RIMEkCFa+VwVls5khOvgjA==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.3.txt", "author": "akraievoy", "stamp": 1319383086215, "_rev": "4-b311076b8b35d7d4ae38d2d02e10eada", "id": "test.3.txt", "_id": "Attachment-aos_w11-lr-6-2-test-test.3.txt-gu46mgsn-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==5ca4c531802940c1b0b81a00fc499cb9==
+Content-ID: content
+Content-Length: 24
+Content-MD5: K8o+L1g4dPbbsvm2k/DseA==
+Content-Type: text/plain
+
+$a0: 15
+$a1: 2
+$v0: => 0
+--==5ca4c531802940c1b0b81a00fc499cb9==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-6-3-statement-statement.txt-gu46mibo-
+Content-Type: multipart/mixed; boundary="==075ae58428f148178313dcd4dfcf8881=="
+ETag: "4-a2c2522d964c8726b416ec4cbb06eba8"
+
+--==075ae58428f148178313dcd4dfcf8881==
+Content-Length: 304
+Content-MD5: jivLrYMwJeh3aL7NwJNpAQ==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "statement.txt", "author": "akraievoy", "stamp": 1319383088196, "_rev": "4-a2c2522d964c8726b416ec4cbb06eba8", "id": "statement.txt", "_id": "Attachment-aos_w11-lr-6-3-statement-statement.txt-gu46mibo-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==075ae58428f148178313dcd4dfcf8881==
+Content-ID: content
+Content-Length: 295
+Content-MD5: LfUXE8JPZ6GI9r8ptGw36A==
+Content-Type: text/plain
+
+По заданому числу nзнайти число з ряду Фібоначі
+(1 1 2 3 5 8 13 21 34 55 і.т.д) Числа ряду номеруютьс з одиниці. Номер задається
+в регістрі $a0, відповідь зберегти в регістр $v0.
+--==075ae58428f148178313dcd4dfcf8881==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-6-3-test-test.1.txt-gu46mgw1-
+Content-Type: multipart/mixed; boundary="==02f641039f0a484090e07d2b932bfa46=="
+ETag: "4-d79fd0d6733e2802983b13db52086723"
+
+--==02f641039f0a484090e07d2b932bfa46==
+Content-Length: 290
+Content-MD5: /CycfNiyRwYxFxQZnv1C1A==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.1.txt", "author": "akraievoy", "stamp": 1319383086337, "_rev": "4-d79fd0d6733e2802983b13db52086723", "id": "test.1.txt", "_id": "Attachment-aos_w11-lr-6-3-test-test.1.txt-gu46mgw1-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==02f641039f0a484090e07d2b932bfa46==
+Content-ID: content
+Content-Length: 17
+Content-MD5: L5eFWei/KKXxoQNpwfkpbQ==
+Content-Type: text/plain
+
+$a0: 9
+$v0: => 34
+--==02f641039f0a484090e07d2b932bfa46==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-6-3-test-test.2.txt-gu46mgz5-
+Content-Type: multipart/mixed; boundary="==7d8bf6cd92fd451d98434653cc6e0314=="
+ETag: "4-0eea0b71b870e499ffc8a4b330cc6613"
+
+--==7d8bf6cd92fd451d98434653cc6e0314==
+Content-Length: 290
+Content-MD5: C0A/STn73kr+yPBsZNumQA==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.2.txt", "author": "akraievoy", "stamp": 1319383086449, "_rev": "4-0eea0b71b870e499ffc8a4b330cc6613", "id": "test.2.txt", "_id": "Attachment-aos_w11-lr-6-3-test-test.2.txt-gu46mgz5-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==7d8bf6cd92fd451d98434653cc6e0314==
+Content-ID: content
+Content-Length: 18
+Content-MD5: k453U0IDHB6qf99YMJSuNQ==
+Content-Type: text/plain
+
+$a0: 10
+$v0: => 55
+--==7d8bf6cd92fd451d98434653cc6e0314==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-6-3-test-test.3.txt-gu46mh2g-
+Content-Type: multipart/mixed; boundary="==85a1f8c1148a45bb9195e4e24fe75bf4=="
+ETag: "4-a11dd5e420bc5caaaf0e2293978adcbf"
+
+--==85a1f8c1148a45bb9195e4e24fe75bf4==
+Content-Length: 290
+Content-MD5: JsgrD8yPl4+mRZTfnJQ2Lg==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.3.txt", "author": "akraievoy", "stamp": 1319383086568, "_rev": "4-a11dd5e420bc5caaaf0e2293978adcbf", "id": "test.3.txt", "_id": "Attachment-aos_w11-lr-6-3-test-test.3.txt-gu46mh2g-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==85a1f8c1148a45bb9195e4e24fe75bf4==
+Content-ID: content
+Content-Length: 16
+Content-MD5: oswfNmaCjupQD2a2HEOjCg==
+Content-Type: text/plain
+
+$a0: 3
+$v0: => 2
+--==85a1f8c1148a45bb9195e4e24fe75bf4==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-6-4-statement-statement.txt-gu46miex-
+Content-Type: multipart/mixed; boundary="==c478c2c7b06349fdb6fb1ee979b9fa39=="
+ETag: "4-77811ffda2430340d398e685a04dd556"
+
+--==c478c2c7b06349fdb6fb1ee979b9fa39==
+Content-Length: 304
+Content-MD5: VVYfXIToTnTCYRFwNG7OHA==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "statement.txt", "author": "akraievoy", "stamp": 1319383088313, "_rev": "4-77811ffda2430340d398e685a04dd556", "id": "statement.txt", "_id": "Attachment-aos_w11-lr-6-4-statement-statement.txt-gu46miex-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==c478c2c7b06349fdb6fb1ee979b9fa39==
+Content-ID: content
+Content-Length: 595
+Content-MD5: cLZr6voQD+5J3vRLN+cCmA==
+Content-Type: text/plain
+
+Задано цілочисельний масив: адреса нульового
+елемента в $a0, довжина масива в $a1. В вихідний масив (адреса нульового
+елемента в регістрі $a2) потрібно вивести ті ж числа, видаливши всі
+повтори. Тобто з тих, які зустрічаються 2 або більше раз, потрібно залишити
+тільки перше входження. В регістр $v0 вивести довжину отриманого масива.
+--==c478c2c7b06349fdb6fb1ee979b9fa39==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-6-4-test-test.1.txt-gu46mh65-
+Content-Type: multipart/mixed; boundary="==aca83062f518465891f151e69401aee1=="
+ETag: "4-1413e45af3532c896d5f149f8bc5c1e3"
+
+--==aca83062f518465891f151e69401aee1==
+Content-Length: 290
+Content-MD5: ZTgMY0SC/2ojcm7tmknnUQ==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.1.txt", "author": "akraievoy", "stamp": 1319383086701, "_rev": "4-1413e45af3532c896d5f149f8bc5c1e3", "id": "test.1.txt", "_id": "Attachment-aos_w11-lr-6-4-test-test.1.txt-gu46mh65-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==aca83062f518465891f151e69401aee1==
+Content-ID: content
+Content-Length: 163
+Content-MD5: gc43kYwXCiSRBf346EdTcw==
+Content-Type: text/plain
+
+$a0: 0x100
+$a1: 7
+$a2: 0x200
+$v0: => 5
+0x100: 1
+0x104: 7
+0x108: 2
+0x10C: 1
+0x110: 30
+0x114: 7
+0x118: 3
+0x200: => 1
+0x204: => 7
+0x208: => 2
+0x20C: => 30
+0x210: => 3
+--==aca83062f518465891f151e69401aee1==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-6-4-test-test.2.txt-gu46mh9d-
+Content-Type: multipart/mixed; boundary="==0e8416e86e3c4a86816ff214e1ab849c=="
+ETag: "4-a6d48bf438d0f20a5f31c8c4cc711181"
+
+--==0e8416e86e3c4a86816ff214e1ab849c==
+Content-Length: 290
+Content-MD5: Pzki8lR6oSbTm2FGi/4hnQ==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.2.txt", "author": "akraievoy", "stamp": 1319383086817, "_rev": "4-a6d48bf438d0f20a5f31c8c4cc711181", "id": "test.2.txt", "_id": "Attachment-aos_w11-lr-6-4-test-test.2.txt-gu46mh9d-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==0e8416e86e3c4a86816ff214e1ab849c==
+Content-ID: content
+Content-Length: 128
+Content-MD5: t8He/xAx5uz5qkPUsRjH6A==
+Content-Type: text/plain
+
+$a0: 0x400
+$a1: 6
+$a2: 0x800
+$v0: => 3
+0x400: 2
+0x404: 3
+0x408: 0
+0x40C: 0
+0x410: 0
+0x414: 2
+0x800: => 2
+0x804: => 3
+0x808: => 0
+--==0e8416e86e3c4a86816ff214e1ab849c==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-6-4-test-test.3.txt-gu46mhcj-
+Content-Type: multipart/mixed; boundary="==0ed67b07faf94bf4897641ac11161a2c=="
+ETag: "4-d45c7f3a751366409d0bade022663df5"
+
+--==0ed67b07faf94bf4897641ac11161a2c==
+Content-Length: 290
+Content-MD5: GR1j0lcwgTUBpwWjlWwj1Q==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.3.txt", "author": "akraievoy", "stamp": 1319383086931, "_rev": "4-d45c7f3a751366409d0bade022663df5", "id": "test.3.txt", "_id": "Attachment-aos_w11-lr-6-4-test-test.3.txt-gu46mhcj-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==0ed67b07faf94bf4897641ac11161a2c==
+Content-ID: content
+Content-Length: 104
+Content-MD5: JilRevfANwZDdyE4rKY2AA==
+Content-Type: text/plain
+
+$a0: 0x300
+$a1: 6
+$a2: 0x600
+$v0: => 1
+0x300: 2
+0x304: 2
+0x308: 2
+0x30C: 2
+0x310: 2
+0x314: 2
+0x600: => 2
+--==0ed67b07faf94bf4897641ac11161a2c==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-6-5-statement-statement.txt-gu46mii8-
+Content-Type: multipart/mixed; boundary="==67ee4942449f4ef4b44be92d4f212d2c=="
+ETag: "4-8593f0d5314a182774485211f37f2ea2"
+
+--==67ee4942449f4ef4b44be92d4f212d2c==
+Content-Length: 304
+Content-MD5: MpTFaqxrS5ymO3z6Yy+UEQ==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "statement.txt", "author": "akraievoy", "stamp": 1319383088432, "_rev": "4-8593f0d5314a182774485211f37f2ea2", "id": "statement.txt", "_id": "Attachment-aos_w11-lr-6-5-statement-statement.txt-gu46mii8-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==67ee4942449f4ef4b44be92d4f212d2c==
+Content-ID: content
+Content-Length: 251
+Content-MD5: Xl5eGxmSsFSVjRF6uhCV5Q==
+Content-Type: text/plain
+
+Задано цілочисельний масив: адреса нульового елемента
+в $a0, довжина масива в $a1. Провести циклічний зсув його елементів на k
+позицій вліво.
+--==67ee4942449f4ef4b44be92d4f212d2c==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-6-5-test-test.1.txt-gu46mhg6-
+Content-Type: multipart/mixed; boundary="==c71f1aa7dd2e4d1fb3807ce4d56726c1=="
+ETag: "4-2050c2c2fad561f507787de64df31cdb"
+
+--==c71f1aa7dd2e4d1fb3807ce4d56726c1==
+Content-Length: 290
+Content-MD5: Eqb3/LRnNgvwO9ihhX3pXQ==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.1.txt", "author": "akraievoy", "stamp": 1319383087062, "_rev": "4-2050c2c2fad561f507787de64df31cdb", "id": "test.1.txt", "_id": "Attachment-aos_w11-lr-6-5-test-test.1.txt-gu46mhg6-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==c71f1aa7dd2e4d1fb3807ce4d56726c1==
+Content-ID: content
+Content-Length: 94
+Content-MD5: ykqkkojCZ7AQInOg8S0vxg==
+Content-Type: text/plain
+
+$a0: 0x100
+$a1: 5
+$a2: 2
+0x100: 1 => 5
+0x104: 3 => 7
+0x108: 5 => 9
+0x10C: 7 => 1
+0x110: 9 => 3
+--==c71f1aa7dd2e4d1fb3807ce4d56726c1==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-6-5-test-test.2.txt-gu46mhkh-
+Content-Type: multipart/mixed; boundary="==1279d5ba0b2043159cb9c507c07ef3b7=="
+ETag: "4-1936e15ac3f65c93c40ae5d002999877"
+
+--==1279d5ba0b2043159cb9c507c07ef3b7==
+Content-Length: 290
+Content-MD5: Q1vpMMEKADYnSKKxUUoZNA==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.2.txt", "author": "akraievoy", "stamp": 1319383087217, "_rev": "4-1936e15ac3f65c93c40ae5d002999877", "id": "test.2.txt", "_id": "Attachment-aos_w11-lr-6-5-test-test.2.txt-gu46mhkh-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==1279d5ba0b2043159cb9c507c07ef3b7==
+Content-ID: content
+Content-Length: 96
+Content-MD5: b+6X0UTrurLHa3TahdMYEg==
+Content-Type: text/plain
+
+$a0: 0x300
+$a1: 5
+$a2: 3
+0x300: 0 => 6
+0x304: 2 => 4
+0x308: -1 => 0
+0x30C: 6 => 2
+0x310: 4 => -1
+--==1279d5ba0b2043159cb9c507c07ef3b7==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-6-5-test-test.3.txt-gu46mhn9-
+Content-Type: multipart/mixed; boundary="==ffc3ee1fcacf46bcade13ab3f95d89c9=="
+ETag: "4-8e363e1459a71e7367a3120e75aa9b53"
+
+--==ffc3ee1fcacf46bcade13ab3f95d89c9==
+Content-Length: 290
+Content-MD5: +P5e5YG89+slvMCVso/p+A==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.3.txt", "author": "akraievoy", "stamp": 1319383087317, "_rev": "4-8e363e1459a71e7367a3120e75aa9b53", "id": "test.3.txt", "_id": "Attachment-aos_w11-lr-6-5-test-test.3.txt-gu46mhn9-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==ffc3ee1fcacf46bcade13ab3f95d89c9==
+Content-ID: content
+Content-Length: 142
+Content-MD5: HjQenuWEeC2unlEOQldWtw==
+Content-Type: text/plain
+
+$a0: 0x800
+$a1: 8
+$a2: 5
+0x800: 3 => 8
+0x804: 27 => 11
+0x808: 9 => 13
+0x80C: 0 => 3
+0x810: 1 => 27
+0x814: 8 => 9
+0x818: 11 => 0
+0x81C: 13 => 1
+--==ffc3ee1fcacf46bcade13ab3f95d89c9==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-6-6-statement-statement.txt-gu46milk-
+Content-Type: multipart/mixed; boundary="==77a6637ec3f64f13891c03dc3b43cac4=="
+ETag: "4-99623e01a5f44a34b866d7d60067a2c6"
+
+--==77a6637ec3f64f13891c03dc3b43cac4==
+Content-Length: 304
+Content-MD5: KjOM9D/4eLVn7TSfI0oocw==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "statement.txt", "author": "akraievoy", "stamp": 1319383088552, "_rev": "4-99623e01a5f44a34b866d7d60067a2c6", "id": "statement.txt", "_id": "Attachment-aos_w11-lr-6-6-statement-statement.txt-gu46milk-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==77a6637ec3f64f13891c03dc3b43cac4==
+Content-ID: content
+Content-Length: 277
+Content-MD5: Ojt3r50pwaxmpSLZtGczOw==
+Content-Type: text/plain
+
+Ціле додатнє число m записуємо в двійковій
+системі числення і розряди в цьому записі мають бути представлені в оберненому
+порядку. Знайти задане число.
+--==77a6637ec3f64f13891c03dc3b43cac4==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-6-6-test-test.1.txt-gu46mhq4-
+Content-Type: multipart/mixed; boundary="==ef8e3d30ea0a493eb0638fd70ee9f069=="
+ETag: "4-dc19dd3b9e2079675d9e63bd143afe9f"
+
+--==ef8e3d30ea0a493eb0638fd70ee9f069==
+Content-Length: 290
+Content-MD5: WVq0wqxMbqarM9FXXHWQtw==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.1.txt", "author": "akraievoy", "stamp": 1319383087420, "_rev": "4-dc19dd3b9e2079675d9e63bd143afe9f", "id": "test.1.txt", "_id": "Attachment-aos_w11-lr-6-6-test-test.1.txt-gu46mhq4-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==ef8e3d30ea0a493eb0638fd70ee9f069==
+Content-ID: content
+Content-Length: 18
+Content-MD5: AxdcKdECXAJQMFuVQRYDbg==
+Content-Type: text/plain
+
+$a0: 512
+$v0: => 1
+--==ef8e3d30ea0a493eb0638fd70ee9f069==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-6-6-test-test.2.txt-gu46mhst-
+Content-Type: multipart/mixed; boundary="==7da0efabd70b4f0cbe368d71f7fdbbfe=="
+ETag: "4-80452136df594e2c2248eee313524251"
+
+--==7da0efabd70b4f0cbe368d71f7fdbbfe==
+Content-Length: 290
+Content-MD5: NW+B7rnztHEjZCxLaEoWxQ==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.2.txt", "author": "akraievoy", "stamp": 1319383087517, "_rev": "4-80452136df594e2c2248eee313524251", "id": "test.2.txt", "_id": "Attachment-aos_w11-lr-6-6-test-test.2.txt-gu46mhst-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==7da0efabd70b4f0cbe368d71f7fdbbfe==
+Content-ID: content
+Content-Length: 20
+Content-MD5: tnxq8R/JQtbL/0fYHiGVtw==
+Content-Type: text/plain
+
+$a0: 513
+$v0: => 513
+--==7da0efabd70b4f0cbe368d71f7fdbbfe==--
+--==9a5c747e479841128da83b270dd0702c==
+Content-ID: Attachment-aos_w11-lr-6-6-test-test.3.txt-gu46ph6v-
+Content-Type: multipart/mixed; boundary="==d9364d651b28462a805641df9e4a79fb=="
+ETag: "3-2e24f6066e8ac7ed7a45df47dcd06156"
+
+--==d9364d651b28462a805641df9e4a79fb==
+Content-Length: 290
+Content-MD5: 6n5DmQ6hRWWIymhv8kUYJQ==
+Content-Type: application/json;charset=utf-8
+
+{"comment": "Import from markdown", "name": "test.3.txt", "author": "akraievoy", "stamp": 1319383226695, "_rev": "3-2e24f6066e8ac7ed7a45df47dcd06156", "id": "test.3.txt", "_id": "Attachment-aos_w11-lr-6-6-test-test.3.txt-gu46ph6v-", "sourceAddress": "lynx", "fileType": {"plaintext": null}}
+--==d9364d651b28462a805641df9e4a79fb==
+Content-ID: content
+Content-Length: 44
+Content-MD5: rEZt0lvRN5LV04Ar1WqGXw==
+Content-Type: text/plain
+
+$a0: 514
+$v0: => 257
+# Література:
+--==d9364d651b28462a805641df9e4a79fb==--
+--==9a5c747e479841128da83b270dd0702c==--

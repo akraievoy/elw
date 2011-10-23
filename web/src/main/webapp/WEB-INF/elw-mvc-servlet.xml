@@ -37,17 +37,57 @@
 	</bean>
 	<context:component-scan base-package="elw.web"/>
 
-    <bean id="couchDao" class="elw.dao.CouchDao">
+    <!--
+        LATER: but we have separate cache for each dao,
+            so invalidations are not that obvious now
+            not sure this breaks anything though
+    -->
+    <bean id="metaDao" class="elw.dao.CouchDao">
         <property name="couchUrl" value="http://localhost:5984/"/>
         <property name="dbName" value="elw-data"/>
         <property name="username" value="supercow"/>
         <property name="password" value="typical"/>
     </bean>
 
-	<bean id="core" class="elw.web.core.Core">
-		<constructor-arg type="elw.dao.CouchDao" ref="couchDao"/>
-	</bean>
+    <bean id="attachmentDao" class="elw.dao.CouchDao">
+        <property name="couchUrl" value="http://localhost:5984/"/>
+        <property name="dbName" value="elw-attachment"/>
+        <property name="username" value="supercow"/>
+        <property name="password" value="typical"/>
+    </bean>
 
+    <bean id="solutionDao" class="elw.dao.CouchDao">
+        <property name="couchUrl" value="http://localhost:5984/"/>
+        <property name="dbName" value="elw-solution"/>
+        <property name="username" value="supercow"/>
+        <property name="password" value="typical"/>
+    </bean>
+
+    <bean id="userDao" class="elw.dao.CouchDao">
+        <property name="couchUrl" value="http://localhost:5984/"/>
+        <property name="dbName" value="elw-user"/>
+        <property name="username" value="supercow"/>
+        <property name="password" value="typical"/>
+    </bean>
+
+    <bean id="authDao" class="elw.dao.CouchDao">
+        <property name="couchUrl" value="http://localhost:5984/"/>
+        <property name="dbName" value="elw-auth"/>
+        <property name="username" value="supercow"/>
+        <property name="password" value="typical"/>
+    </bean>
+
+    <bean id="queries" class="elw.dao.Queries">
+        <property name="metaDao" ref="metaDao"/>
+        <property name="attachmentDao" ref="attachmentDao"/>
+        <property name="solutionDao" ref="solutionDao"/>
+        <property name="userDao" ref="userDao"/>
+        <property name="authDao" ref="authDao"/>
+    </bean>
+
+	<bean id="core" class="elw.web.core.Core">
+		<constructor-arg type="elw.dao.Queries" ref="queries"/>
+	</bean>
 
 	<bean id="daemonThreadFactory" class="org.akraievoy.gear.G4Run$ThreadFactory">
 		<constructor-arg type="boolean" value="true"/>

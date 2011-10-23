@@ -215,17 +215,14 @@ public class Controller implements ControllerSetup, RunnableLoadTask.Callback {
     private void selectTest(int i) {
         testComboModel.setSelectedItem(testComboModel.getElementAt(i));
 
-        final String[] regsText = new String[1];
-        final String[] memText = new String[1];
-        if (!TaskBean.parseTest(task.getTests().get(i), regsText, memText)) {
+        final String testSource = task.getTests().get(i);
+        final TaskBean.Test testBean = TaskBean.parseTest(testSource);
+        if (!testBean.parseErrors.getLineToErrors().isEmpty()) {
             log.warn("marks broken, not loading test");
             return;
         }
 
-        view.getTestRegsTextArea().setText(regsText[0]);
-        view.getTestMemTextArea().setText(memText[0]);
-
-        view.getTestMemTextArea().setEditable(false);
+        view.getTestRegsTextArea().setText(testSource);
         view.getTestRegsTextArea().setEditable(false);
 
         setupStatus(view.getTestStatusLabel());
