@@ -32,6 +32,14 @@ public class IndexEntry {
         }
     }
 
+    private int verAnchor = 0;
+    public int getVerAnchor() { return verAnchor; }
+    public void setVerAnchor(int verAnchor) { this.verAnchor = verAnchor; }
+
+    private int verStep = 1;
+    public int getVerStep() { return verStep; }
+    public void setVerStep(int verStep) { this.verStep = verStep; }
+
     //	TODO still not used
     private boolean requireClean;
     public boolean isRequireClean() { return requireClean; }

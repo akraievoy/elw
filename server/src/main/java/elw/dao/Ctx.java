@@ -252,13 +252,18 @@ public class Ctx implements elw.vo.Ctx {
         }
 
         if (student.isResolved() && ass.isResolved()) {
-            final String salt = student.getValue().getName() + ":" + ass.getValue().getName();
-            final BigInteger shaNum = new BigInteger(digest(salt), 16);
-            //  FIXME less brutal version assignment, please
-            final List<Version> versions = new ArrayList<Version>(ass.getValue().getVersions().values());
-            final int verIdx = shaNum.mod(BigInteger.valueOf(versions.size())).intValue();
+            final List<Version> versionsEff = prepareVersions();
+            final int anchor = indexEntry.getValue().getVerAnchor();
+            final int step = indexEntry.getValue().getVerStep();
+            final int studIdx =
+                new ArrayList<Student>(
+                        group.getValue().getStudents().values()
+                ).indexOf(student.getValue());
 
-            ver.setKey(versions.get(verIdx).getId());
+            final int vSize = versionsEff.size();
+            final int verIdx = (anchor + (vSize + step) * studIdx) % vSize;
+
+            ver.setKey(versionsEff.get(verIdx).getId());
         }
 
         if (ass.isResolved() && ver.isPending()) {
@@ -266,6 +271,33 @@ public class Ctx implements elw.vo.Ctx {
         }
 
         return this;
+    }
+
+    protected List<Version> prepareVersions() {
+        if (ass.getValue().getVersions().isEmpty()) {
+            throw new IllegalStateException(
+                    "task has no versions: " +
+                    course.getKey() + "-" + assType.getKey() + "-" +
+                    ass.getKey()
+            );
+        }
+
+        final List<Version> versions = new ArrayList<Version>(
+            ass.getValue().getVersions().values()
+        );
+        final List<Version> versionsPriv = new ArrayList<Version>(
+                versions
+        );
+        for (
+            Iterator<Version> verIt = versionsPriv.iterator();
+            verIt.hasNext();
+        ) {
+            if (verIt.next().isShared()) {
+                verIt.remove();
+            }
+        }
+
+        return versionsPriv.isEmpty() ? versions : versionsPriv;
     }
 
     private Ctx extEnr(final Enrollment newEnr) {
