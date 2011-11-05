@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.akraievoy.couch.Squab;
+
 public class Task extends Squab implements IdNamed {
     private String id;
     public String getId() { return id; }

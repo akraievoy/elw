@@ -22,6 +22,11 @@
             <url>file://${project.basedir}/../ext/repo</url>
         </repository>
         <repository>
+            <id>github-akraievoy-mvn_repo</id>
+            <name>github-akraievoy-mvn_repo</name>
+            <url>https://github.com/akraievoy/mvn_repo/raw/master/releases/</url>
+        </repository>
+        <repository>
             <id>codehaus</id>
             <name>codehaus repo</name>
             <layout>default</layout>
@@ -52,6 +57,11 @@
             <scope>test</scope>
         </dependency>
 
+	<dependency>
+            <groupId>org.akraievoy</groupId>
+            <artifactId>couch</artifactId>
+            <version>1.3.2</version>
+	</dependency>
         <dependency>
             <groupId>org.akraievoy</groupId>
             <artifactId>base</artifactId>

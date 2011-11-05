@@ -5,6 +5,8 @@ import java.util.TreeMap;
 
 import static java.util.Collections.unmodifiableSortedMap;
 
+import org.akraievoy.couch.Squab;
+
 public abstract class FileBase extends Squab.Stamped implements IdNamed, Stamped {
     public static final String CONTENT = "content";
 

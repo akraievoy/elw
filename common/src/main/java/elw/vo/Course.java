@@ -4,6 +4,8 @@ import java.util.*;
 
 import static java.util.Collections.unmodifiableSortedMap;
 
+import org.akraievoy.couch.Squab;
+
 public class Course extends Squab implements IdNamed {
     private String id;
     public String getId() { return id; }

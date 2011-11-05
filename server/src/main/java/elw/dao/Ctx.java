@@ -13,6 +13,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
+import org.akraievoy.couch.CouchDao;
+
 public class Ctx implements elw.vo.Ctx {
     private static final Logger log = LoggerFactory.getLogger(Ctx.class);
 

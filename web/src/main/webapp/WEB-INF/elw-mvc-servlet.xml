@@ -42,35 +42,35 @@
             so invalidations are not that obvious now
             not sure this breaks anything though
     -->
-    <bean id="metaDao" class="elw.dao.CouchDao">
+    <bean id="metaDao" class="org.akraievoy.couch.CouchDao">
         <property name="couchUrl" value="http://localhost:5984/"/>
         <property name="dbName" value="elw-data"/>
         <property name="username" value="supercow"/>
         <property name="password" value="typical"/>
     </bean>
 
-    <bean id="attachmentDao" class="elw.dao.CouchDao">
+    <bean id="attachmentDao" class="org.akraievoy.couch.CouchDao">
         <property name="couchUrl" value="http://localhost:5984/"/>
         <property name="dbName" value="elw-attachment"/>
         <property name="username" value="supercow"/>
         <property name="password" value="typical"/>
     </bean>
 
-    <bean id="solutionDao" class="elw.dao.CouchDao">
+    <bean id="solutionDao" class="org.akraievoy.couch.CouchDao">
         <property name="couchUrl" value="http://localhost:5984/"/>
         <property name="dbName" value="elw-solution"/>
         <property name="username" value="supercow"/>
         <property name="password" value="typical"/>
     </bean>
 
-    <bean id="userDao" class="elw.dao.CouchDao">
+    <bean id="userDao" class="org.akraievoy.couch.CouchDao">
         <property name="couchUrl" value="http://localhost:5984/"/>
         <property name="dbName" value="elw-user"/>
         <property name="username" value="supercow"/>
         <property name="password" value="typical"/>
     </bean>
 
-    <bean id="authDao" class="elw.dao.CouchDao">
+    <bean id="authDao" class="org.akraievoy.couch.CouchDao">
         <property name="couchUrl" value="http://localhost:5984/"/>
         <property name="dbName" value="elw-auth"/>
         <property name="username" value="supercow"/>

@@ -4,6 +4,8 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 
 import java.util.*;
 
+import org.akraievoy.couch.Squab;
+
 public class Score extends Squab.Stamped implements Stamped {
     private Boolean approved;
     public Boolean getApproved() { return approved; }

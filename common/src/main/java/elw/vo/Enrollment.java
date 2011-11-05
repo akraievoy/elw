@@ -2,6 +2,8 @@ package elw.vo;
 
 import java.util.*;
 
+import org.akraievoy.couch.Squab;
+
 public class Enrollment extends Squab implements IdNamed {
     private String id;
     public String getId() { return id; }

@@ -17,6 +17,9 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.akraievoy.couch.CouchDao;
+import org.akraievoy.couch.Squab;
+
 import static elw.vo.IdNamed._.*;
 import static elw.vo.IdNamed._.resolve;
 

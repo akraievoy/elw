@@ -18,6 +18,8 @@
 
 package elw.vo;
 
+import org.akraievoy.couch.Squab;
+
 //  FIXME this plain-text password stored in the couch is... well.. LAME
 public class Admin extends Squab implements IdNamed {
     private String id;
