@@ -44,7 +44,7 @@ public class EditorMips implements Editor {
         out.write("\t\t\t\tcode=\"elw.dp.ui.Applet\"");
         out.write("\t\t\t\tarchive=\"../code/" + cacheBustingToken + "/datapath-gui-1.3-full.jar\"");
         out.write("\t\t\t\tupHeader=\"" + upHeader + "\"");
-        out.write("\t\t\t\telw_ctx=\"" + ctx + "\"");
+        out.write("\t\t\t\telw_ctx=\"" + ctx + "\">");
         out.write("\t\t\t<noembed>");
         out.write("\t\t\t\tNo Java Support.");
         out.write("\t\t\t</noembed>");
