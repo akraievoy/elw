@@ -314,7 +314,7 @@ public class MipsAssembler {
                 dataIn.put(specMem.address, specMem.before);
             }
             if (specMem.after != null) {
-                dataIn.put(specMem.address, specMem.after);
+                dataOut.put(specMem.address, specMem.after);
             }
         }
 
