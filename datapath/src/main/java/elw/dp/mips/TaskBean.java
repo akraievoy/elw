@@ -97,8 +97,8 @@ public class TaskBean {
 
             final Integer before = parseBeforeAfter("before", beforeStr, line);
             final Integer after = parseBeforeAfter("after", afterStr, line);
-            if (before == null || after == null) {
-                line.addError("before or after not specified");
+            if (before == null && after == null) {
+                line.addError("both before and after are not specified");
             }
 
             if (what.startsWith("$")) {
