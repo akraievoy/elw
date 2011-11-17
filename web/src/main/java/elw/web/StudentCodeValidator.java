@@ -117,7 +117,8 @@ public class StudentCodeValidator extends G4Run.Task {
                                         ),
                                         FileBase.CONTENT
                                     ),
-                                    allTestsStr
+                                    allTestsStr,
+                                    ""
                             );
                             validator.batch(
                                 resRef,
