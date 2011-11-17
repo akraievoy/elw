@@ -30,6 +30,7 @@ import elw.miniweb.Message;
 import elw.vo.*;
 import elw.web.core.Core;
 import elw.web.core.W;
+import org.akraievoy.couch.Squab;
 import org.akraievoy.gear.G4Parse;
 import org.akraievoy.gear.G4mat;
 import org.apache.commons.fileupload.FileItemIterator;
@@ -297,7 +298,11 @@ public abstract class ControllerElw extends MultiActionController implements Web
                 //  FIXME remove this extra variant with non-encoded put uploads
                 inputSupplier = supplierForRequest(req);
                 contentType = "text/plain";
-                file.setName("upload.txt");
+                //  urgent fix: code uploads collide on the name
+                final String stamp = Long.toString(
+                        Squab.Stamped.genStamp(), 36
+                );
+                file.setName("upload_" + stamp + ".txt");
             } else {
                 try {
                     final ServletFileUpload sfu = new ServletFileUpload(fileItemFactory);
