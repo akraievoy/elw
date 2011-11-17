@@ -32,10 +32,16 @@ public class TaskBean {
 
     private String statement;
     private java.util.List<String> tests = new ArrayList<String>();
+    private String solution;
 
-    public TaskBean(String statement, List<String> tests) {
+    public TaskBean(String statement, List<String> tests, String solution) {
+        this.solution = solution;
         this.statement = statement;
         this.tests = tests;
+    }
+
+    public String getSolution() {
+        return solution;
     }
 
     public String getStatement() {
@@ -91,8 +97,8 @@ public class TaskBean {
 
             final Integer before = parseBeforeAfter("before", beforeStr, line);
             final Integer after = parseBeforeAfter("after", afterStr, line);
-            if (before == null && after == null) {
-                line.addError("both before and after are not specified");
+            if (before == null || after == null) {
+                line.addError("before or after not specified");
             }
 
             if (what.startsWith("$")) {

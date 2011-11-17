@@ -176,7 +176,7 @@ class RunnableLoadTask implements Runnable {
 
         callback.updateStatus("load sequence complete", null);
         callback.setTask(new TaskBean(
-                statement, tests
+                statement, tests, solution
         ));
 
         SwingUtilities.invokeLater(

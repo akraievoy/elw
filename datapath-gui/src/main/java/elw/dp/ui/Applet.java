@@ -20,7 +20,13 @@ public class Applet extends JApplet {
         }
 
         final Controller controller = new Controller();
-        controller.setBaseUrl(getCodeBase().toString());
+        final String codebaseOverride = getParameter("codebaseOverride");
+        final String baseUrl =
+                codebaseOverride != null ?
+                        codebaseOverride :
+                        getCodeBase().toString();
+
+        controller.setBaseUrl(baseUrl);
         controller.setUploadHeader(getParameter("upHeader"));
         controller.setElwCtx(getParameter("elw_ctx"));
 

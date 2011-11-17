@@ -146,7 +146,7 @@ public class Controller implements ControllerSetup, RunnableLoadTask.Callback {
         view.getProblemTextPane().setText(task.getStatement());
         view.getTestComboBox().setModel(testComboModel);
 
-        //  TODO hide this
+        view.getSourceTextArea().setText(task.getSolution());
         view.getSourceTextArea().getDocument().addDocumentListener(new SourceDocumentListener());
 
         view.getSourceAssembleButton().setAction(aAssemble);
