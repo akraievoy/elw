@@ -75,7 +75,7 @@ public class Instruction {
             final String mask = tokenToMask.get(token);
             final int maskStart = res.indexOf(mask);
             if (maskStart >= 0) {
-                res.replace(maskStart, maskStart + mask.length(), Data.str(getBits(token), 2, getWidth(token)));
+                res.replace(maskStart, maskStart + mask.length(), Data.strTwosComplement(getBits(token), getWidth(token)));
             }
         }
 
