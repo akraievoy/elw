@@ -26,6 +26,8 @@ import static elw.vo.IdNamed._.resolve;
 public class Queries {
     private static final Logger log = LoggerFactory.getLogger(Queries.class);
 
+    private final Object courseResolutionMonitor = new Object();
+
     private CouchDao metaDao;
     public void setMetaDao(CouchDao metaDao) {
         this.metaDao = metaDao;
@@ -233,54 +235,66 @@ public class Queries {
     public Course course(final String courseId) {
         final Course course = metaDao.findOne(Course.class, courseId);
 
-        final String templateId = course.getTemplate();
-        if (templateId != null && templateId.length() > 0) {
-            final Course template = course(templateId);
-            course.setCriterias(mark(extend(
-                    template.getCriterias(),
-                    course.getCriterias(),
-                    new TreeMap<String, Criteria>()
-            )));
-            course.setFileTypes(mark(extend(
-                    template.getFileTypes(),
-                    course.getFileTypes(),
-                    new TreeMap<String, FileType>()
-            )));
-        }
-        mark(course.getTaskTypes());
+        synchronized (courseResolutionMonitor) {
+            //  oh, that one was already resolved and published, so we bail
+            if (course.isResolved()) {
+                return course;
+            }
 
-        for (final TaskType tType : course.getTaskTypes().values()) {
-            mark(tType.getFileSlots());
-            for (final FileSlot fSlot : tType.getFileSlots().values()) {
-                fSlot.setFileTypes(mark(resolve(
-                        new TreeMap<String, FileType>(fSlot.getFileTypes()),
-                        course.getFileTypes()
+            //  freshly loaded objects are not marked, hence
+            //      not yet visible to http workers and safe to resolve without
+            //      surprising any http workers unaware of our evilish design
+            final String templateId = course.getTemplate();
+            if (templateId != null && templateId.length() > 0) {
+                final Course template = course(templateId);
+                course.setCriterias(mark(extend(
+                        template.getCriterias(),
+                        course.getCriterias(),
+                        new TreeMap<String, Criteria>()
                 )));
-                fSlot.setCriterias(mark(resolve(
-                        new TreeMap<String, Criteria>(fSlot.getCriterias()),
-                        course.getCriterias()
+                course.setFileTypes(mark(extend(
+                        template.getFileTypes(),
+                        course.getFileTypes(),
+                        new TreeMap<String, FileType>()
                 )));
             }
-            tType.setTasks(mark(resolve(
-                    new TreeMap<String, Task>(tType.getTasks()),
-                    new IdNamed.Resolver<Task>() {
-                        public Task resolve(String key) {
-                            final Task task = metaDao.findOne(
-                                    Task.class,
-                                    course.getId(),
-                                    tType.getId(),
-                                    key
-                            );
-                            mark(task.getVersions());
-                            return task;
+            mark(course.getTaskTypes());
+
+            for (final TaskType tType : course.getTaskTypes().values()) {
+                mark(tType.getFileSlots());
+                for (final FileSlot fSlot : tType.getFileSlots().values()) {
+                    fSlot.setFileTypes(mark(resolve(
+                            new TreeMap<String, FileType>(fSlot.getFileTypes()),
+                            course.getFileTypes()
+                    )));
+                    fSlot.setCriterias(mark(resolve(
+                            new TreeMap<String, Criteria>(fSlot.getCriterias()),
+                            course.getCriterias()
+                    )));
+                }
+                tType.setTasks(mark(resolve(
+                        new TreeMap<String, Task>(tType.getTasks()),
+                        new IdNamed.Resolver<Task>() {
+                            public Task resolve(String key) {
+                                final Task task = metaDao.findOne(
+                                        Task.class,
+                                        course.getId(),
+                                        tType.getId(),
+                                        key
+                                );
+                                mark(task.getVersions());
+                                return task;
+                            }
                         }
-                    }
-            )));
+                )));
 
-            //  FIXME for each task iterate over versions and pull the files
+                //  FIXME for each task iterate over versions and pull the files
+            }
+
+            course.setResolved(true);
+
+            return course;
         }
-
-        return course;
     }
 
     public Admin adminSome(String login) {
@@ -357,7 +371,8 @@ public class Queries {
     }
 
     public SortedMap<Long, Score> scoresAuto(Ctx ctx, FileSlot slot, Solution file) {
-        final SortedMap<Long, Score> allScores = scores(ctx, slot, file);
+        final SortedMap<Long, Score> allScores =
+                new TreeMap<Long, Score>(scores(ctx, slot, file));
 
         final Score newScore = updateAutos(ctx, slot.getId(), file, null);
         newScore.updateStamp();
