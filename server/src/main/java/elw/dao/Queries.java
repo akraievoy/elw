@@ -334,8 +334,7 @@ public class Queries {
                 ctx.getAss().getId(),
                 ctx.getVer().getId(),
                 slot.getId(),
-                file.getId(),
-                String.valueOf(file.getStamp())
+                file.getId()
         );
     }
 
