@@ -9,7 +9,7 @@ import javax.swing.table.AbstractTableModel;
 
 public class InstructionsTableModel extends AbstractTableModel {
     public static final String COL_ADDR = "Addr";
-    private static final String COL_BIN = "Hex";
+    private static final String COL_BIN = "Bin";
     private static final String COL_LABELS = "Labels";
     public static final String COL_CODE = "Code";
     public static final String COL_ACC = "rw";
