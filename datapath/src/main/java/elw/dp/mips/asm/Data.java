@@ -195,6 +195,16 @@ public class Data {
 
         return str.toString();
     }
+    
+    public static String strTwosComplement(final long val, final int digits) {
+        final StringBuffer str = new StringBuffer(Long.toBinaryString(val));
+        final char paddingChar = val < 0 ? '1' : '0';
+        while (str.length() < digits) {
+            str.insert(0, paddingChar);
+        }
+
+        return str.substring(str.length() - digits);
+    }
 
     public static long comp(long val, int digits) {
         return val < 0 ? (2 << digits) - val : val;
