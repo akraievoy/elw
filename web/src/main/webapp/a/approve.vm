@@ -107,17 +107,18 @@
       )
     );
 
-    jQuery("#" + criId + "--slider").slider({
+    jQuery("div[id='" + criId + "--slider']").slider({
      "min": 0,
      "max": $cri.powMax,
      "range": "min",
      "value": $score.getPow($slot, $cri),
      "slide": function( event, ui ) {
-      jQuery("#" + criId).val(ui.value);
+      jQuery("select[id='" + criId + "']").val(ui.value);
      }
     });
-    jQuery("#" + criId).change(function() {
-     jQuery("#" + criId + "--slider").slider("value", this.selectedIndex);
+    jQuery("select[id='" + criId + "']").change(function() {
+     jQuery("div[id='" + criId + "--slider']")
+       .slider("value", this.selectedIndex);
     }).val($score.getPow($slot, $cri));
    })();
   #end

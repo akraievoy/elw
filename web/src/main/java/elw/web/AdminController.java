@@ -318,6 +318,11 @@ public class AdminController extends ControllerElw {
                     if ("approve".equalsIgnoreCase(action) || "decline".equalsIgnoreCase(action)) {
                         score.setApproved("approve".equalsIgnoreCase(action));
 
+                        final Map<String, Integer> pows =
+                                new TreeMap<String, Integer>(score.getPows());
+                        final Map<String, Double> ratios =
+                                new TreeMap<String, Double>(score.getRatios());
+
                         for (Criteria cri : slot.getCriterias().values()) {
                             final int powDef = score.getPow(slot, cri);
                             final double ratioDef = score.getRatio(slot, cri);
@@ -326,10 +331,12 @@ public class AdminController extends ControllerElw {
                             final String powReq = req.getParameter(idFor);
                             final String ratioReq = req.getParameter(idFor + "--ratio");
 
-                            score.getPows().put(idFor, G4Parse.parse(powReq, powDef));
-                            score.getRatios().put(idFor, G4Parse.parse(ratioReq, ratioDef));
+                            pows.put(idFor, G4Parse.parse(powReq, powDef));
+                            ratios.put(idFor, G4Parse.parse(ratioReq, ratioDef));
                         }
 
+                        score.setPows(pows);
+                        score.setRatios(ratios);
                         score.setComment(req.getParameter("comment"));
                         score.setupPathElems(ctx, slot, file);
                         queries.createScore(score);
