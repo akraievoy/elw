@@ -33,6 +33,7 @@ public class MipsAssembler {
         map.put(Pattern.compile(" ?: ?"), ":");
         map.put(Pattern.compile(" ?\\( ?"), "(");
         map.put(Pattern.compile(" ?\\) ?"), ")");
+        map.put(Pattern.compile("#.*"), ""); //added to throw away comments at the end of code lines
 
         return map;
     }
