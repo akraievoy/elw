@@ -38,43 +38,58 @@
 	<context:component-scan base-package="elw.web"/>
 
     <!--
-        LATER: but we have separate cache for each dao,
+        LATER: but we have separate caches for each dao,
             so invalidations are not that obvious now
             not sure this breaks anything though
     -->
     <bean id="metaDao" class="org.akraievoy.couch.CouchDao">
-        <property name="couchUrl" value="http://localhost:5984/"/>
+        <constructor-arg type="boolean" value="false"/>
+        <property name="couchUrl" value="http://127.0.0.1:5984/"/>
         <property name="dbName" value="elw-data"/>
         <property name="username" value="supercow"/>
         <property name="password" value="typical"/>
+        <property name="cacheValidityMinutes" value="32"/>
+        <property name="concurrencyLevel" value="8"/>
     </bean>
 
     <bean id="attachmentDao" class="org.akraievoy.couch.CouchDao">
-        <property name="couchUrl" value="http://localhost:5984/"/>
+        <constructor-arg type="boolean" value="false"/>
+        <property name="couchUrl" value="http://127.0.0.1:5984/"/>
         <property name="dbName" value="elw-attachment"/>
         <property name="username" value="supercow"/>
         <property name="password" value="typical"/>
+        <property name="cacheValidityMinutes" value="32"/>
+        <property name="concurrencyLevel" value="8"/>
     </bean>
 
     <bean id="solutionDao" class="org.akraievoy.couch.CouchDao">
-        <property name="couchUrl" value="http://localhost:5984/"/>
+        <constructor-arg type="boolean" value="false"/>
+        <property name="couchUrl" value="http://127.0.0.1:5984/"/>
         <property name="dbName" value="elw-solution"/>
         <property name="username" value="supercow"/>
         <property name="password" value="typical"/>
+        <property name="cacheValidityMinutes" value="8"/>
+        <property name="concurrencyLevel" value="8"/>
     </bean>
 
     <bean id="userDao" class="org.akraievoy.couch.CouchDao">
-        <property name="couchUrl" value="http://localhost:5984/"/>
+        <constructor-arg type="boolean" value="false"/>
+        <property name="couchUrl" value="http://127.0.0.1:5984/"/>
         <property name="dbName" value="elw-user"/>
         <property name="username" value="supercow"/>
         <property name="password" value="typical"/>
+        <property name="cacheValidityMinutes" value="4"/>
+        <property name="concurrencyLevel" value="4"/>
     </bean>
 
     <bean id="authDao" class="org.akraievoy.couch.CouchDao">
-        <property name="couchUrl" value="http://localhost:5984/"/>
+        <constructor-arg type="boolean" value="false"/>
+        <property name="couchUrl" value="http://127.0.0.1:5984/"/>
         <property name="dbName" value="elw-auth"/>
         <property name="username" value="supercow"/>
         <property name="password" value="typical"/>
+        <property name="cacheValidityMinutes" value="1"/>
+        <property name="concurrencyLevel" value="4"/>
     </bean>
 
     <bean id="queries" class="elw.dao.Queries">
