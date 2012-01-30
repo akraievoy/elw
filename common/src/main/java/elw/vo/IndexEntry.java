@@ -8,7 +8,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class IndexEntry {
+public class IndexEntry implements Cloneable {
     private String[] path;
     public String[] getPath() { return path; }
     public void setPath(String[] path) { this.path = path; }
@@ -21,7 +21,7 @@ public class IndexEntry {
     public int getClassFrom() { return classFrom; }
     public void setClassFrom(int classFrom) { this.classFrom = classFrom; }
 
-    private final Map<String, Integer> classDue = new TreeMap<String, Integer>();
+    private Map<String, Integer> classDue = new TreeMap<String, Integer>();
     public Map<String, Integer> getClassDue() {
         return Collections.unmodifiableMap(classDue);
     }
@@ -94,5 +94,15 @@ public class IndexEntry {
         }
 
         return result;
+    }
+
+    @Override
+    public IndexEntry clone() throws CloneNotSupportedException {
+        IndexEntry clone = (IndexEntry) super.clone();
+        
+        clone.classDue = new TreeMap<String, Integer>(this.classDue);
+        clone.path = this.path.clone();
+        
+        return clone;
     }
 }

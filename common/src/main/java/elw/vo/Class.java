@@ -9,7 +9,7 @@ import org.joda.time.format.DateTimeFormatter;
 import java.util.regex.Pattern;
 
 //  LATER think of some other name for this entity, collision with java.lang smells
-public class Class {
+public class Class implements Cloneable {
     private static final DateTimeFormatter FMT_DATE = DateTimeFormat.forPattern("yyyy-MM-dd");
     private static final DateTimeFormatter FMT_DATE_NICE = DateTimeFormat.forPattern("EEE MMM dd");
     private static final DateTimeFormatter FMT_TIME = DateTimeFormat.forPattern("HH:mm");
@@ -78,7 +78,7 @@ public class Class {
         return fromDateTime.isBeforeNow() && fromDateTime.plusDays(1).isAfterNow();
     }
 
-    private String getDate() {
+    public String getDate() {
         return date;
     }
 
@@ -132,7 +132,7 @@ public class Class {
         this.date = date;
     }
 
-    private String getFromTime() {
+    public String getFromTime() {
         return fromTime;
     }
 
@@ -148,7 +148,7 @@ public class Class {
         this.onSite = ipMasks;
     }
 
-    private String getToTime() {
+    public String getToTime() {
         return toTime;
     }
 
@@ -197,5 +197,14 @@ public class Class {
         final int lateTolerance = 30 * 60 * 1000;
 
         return min <= instant && instant <= max + lateTolerance;
+    }
+
+    @Override
+    public Class clone() throws CloneNotSupportedException {
+        Class clone = (Class) super.clone();
+
+        clone.onSite = this.onSite.clone();
+
+        return clone;
     }
 }

@@ -92,7 +92,7 @@
         <property name="concurrencyLevel" value="4"/>
     </bean>
 
-    <bean id="queries" class="elw.dao.Queries">
+    <bean id="queries" class="elw.dao.QueriesImpl">
         <property name="metaDao" ref="metaDao"/>
         <property name="attachmentDao" ref="attachmentDao"/>
         <property name="solutionDao" ref="solutionDao"/>
@@ -101,7 +101,7 @@
     </bean>
 
 	<bean id="core" class="elw.web.core.Core">
-		<constructor-arg type="elw.dao.Queries" ref="queries"/>
+		<constructor-arg type="elw.dao.QueriesImpl" ref="queries"/>
 	</bean>
 
 	<bean id="daemonThreadFactory" class="org.akraievoy.gear.G4Run$ThreadFactory">

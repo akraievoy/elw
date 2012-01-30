@@ -21,6 +21,7 @@ package elw.web;
 import base.pattern.Result;
 import elw.dao.Ctx;
 import elw.dao.Queries;
+import elw.dao.QueriesImpl;
 import elw.dp.mips.MipsValidator;
 import elw.dp.mips.TaskBean;
 import elw.vo.*;
@@ -129,7 +130,7 @@ public class StudentCodeValidator extends G4Run.Task {
                             f.setTestsFailed(passFailCounts[1]);
                             f.setTestsPassed(passFailCounts[0]);
 
-                            score = Queries.updateAutos(
+                            score = QueriesImpl.updateAutos(
                                     ctxVer, slotId, f, null
                             );
                             final boolean passed =

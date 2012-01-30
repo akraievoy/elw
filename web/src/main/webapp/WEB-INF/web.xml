@@ -65,6 +65,10 @@
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>elw-mvc</servlet-name>
+		<url-pattern>/rest/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>elw-mvc</servlet-name>
 		<url-pattern>/err/*</url-pattern>
 	</servlet-mapping>
 
