@@ -3,7 +3,9 @@ package elw.dao;
 import base.pattern.Result;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.InputSupplier;
+import elw.dao.ctx.Classes;
 import elw.dao.ctx.Scores;
+import elw.dao.ctx.Slots;
 import elw.dao.ctx.Solutions;
 import elw.dao.rest.*;
 import elw.vo.*;
@@ -51,38 +53,38 @@ public class QueriesImpl implements Queries {
 
         final EnrScores enrScores = new EnrScores();
         for (String studId : studIds) {
+            final Student student = group.getStudents().get(studId);
+            
+            final Classes classes = new Classes(enr, course, student, group);
+
             final List<IndexEntry> index = enr.getIndex();
             for (
                     int idxPos = 0, idxSize = index.size();
                     idxPos < idxSize;
                     idxPos++
             ) {
-                final IndexEntry idxEntry = index.get(idxPos);
-                final String[] path = idxEntry.getPath();
-                final String taskTypeId = path[0];
-                final String taskId = path[1];
-
-                final TaskType taskType = course.getTaskTypes().get(taskTypeId);
-                final Task task = taskType.getTasks().get(taskId);
-                final Version ver = Nav.resolveVersion(
-                        task, idxEntry, group, studId
-                );
+                final Slots slots = classes.slots(idxPos);
 
                 for (
                         Map.Entry<String, FileSlot> fsEntry :
-                        taskType.getFileSlots().entrySet()
+                        slots.tType.getFileSlots().entrySet()
                 ) {
+
                     if (fsEntry.getValue().getScoreWeight() > 0) {
+                        Solutions solutions =
+                                slots.solutions(fsEntry.getValue());
                         elw.dao.rest.Score score = new elw.dao.rest.Score();
                         
-                        score.setTaskTypeId(taskType.getId());
-                        score.setTaskTypeName(taskType.getName());
+                        score.setTaskTypeId(solutions.tType.getId());
+                        score.setTaskTypeName(solutions.tType.getName());
 
-                        score.setTaskId(task.getId());
-                        score.setTaskName(task.getName());
+                        score.setTaskId(solutions.task.getId());
+                        score.setTaskName(solutions.task.getName());
                         
-                        score.setVersionId(ver.getId());
-                        score.setVersionName(ver.getName());
+                        score.setVersionId(solutions.ver.getId());
+                        score.setVersionName(solutions.ver.getName());
+
+                        solutions(solutions);
 
 //                        solutions()
 

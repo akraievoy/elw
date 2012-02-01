@@ -9,6 +9,7 @@ public class Scores extends Solutions {
     public final Solution solution;
     
     public Scores(
+            Enrollment enr,
             Group group,
             Student student,
             Course course,
@@ -19,7 +20,7 @@ public class Scores extends Solutions {
             FileSlot slot,
             Solution solution
     ) {
-        super(group, student, course, idx, task, tType, ver, slot);
+        super(enr, group, student, course, idx, task, tType, ver, slot);
         this.solution = solution;
     }
 }

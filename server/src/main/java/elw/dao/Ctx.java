@@ -709,7 +709,7 @@ public class Ctx implements elw.vo.Ctx {
     
     public Solutions solutions(final FileSlot slot) {
         return new Solutions(
-                getGroup(), getStudent(), getCourse(),
+                getEnr(), getGroup(), getStudent(), getCourse(),
                 indexEntry.getKey(),
                 getAss(), getAssType(), getVer(),
                 slot
