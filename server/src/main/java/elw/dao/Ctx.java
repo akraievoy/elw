@@ -1,5 +1,6 @@
 package elw.dao;
 
+import elw.dao.ctx.Solutions;
 import elw.vo.Class;
 import elw.vo.*;
 import org.akraievoy.gear.G4Parse;
@@ -7,13 +8,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
-
-import org.akraievoy.couch.CouchDao;
 
 public class Ctx implements elw.vo.Ctx {
     private static final Logger log = LoggerFactory.getLogger(Ctx.class);
@@ -254,18 +252,14 @@ public class Ctx implements elw.vo.Ctx {
         }
 
         if (student.isResolved() && ass.isResolved()) {
-            final List<Version> versionsEff = prepareVersions();
-            final int anchor = indexEntry.getValue().getVerAnchor();
-            final int step = indexEntry.getValue().getVerStep();
-            final int studIdx =
-                new ArrayList<Student>(
-                        group.getValue().getStudents().values()
-                ).indexOf(student.getValue());
+            final String verId = Nav.resolveVersion(
+                    ass.getValue(),
+                    indexEntry.getValue(),
+                    group.getValue(),
+                    student.getValue().getId()
+            ).getId();
 
-            final int vSize = versionsEff.size();
-            final int verIdx = (anchor + (vSize + step) * studIdx) % vSize;
-
-            ver.setKey(versionsEff.get(verIdx).getId());
+            ver.setKey(verId);
         }
 
         if (ass.isResolved() && ver.isPending()) {
@@ -273,33 +267,6 @@ public class Ctx implements elw.vo.Ctx {
         }
 
         return this;
-    }
-
-    protected List<Version> prepareVersions() {
-        if (ass.getValue().getVersions().isEmpty()) {
-            throw new IllegalStateException(
-                    "task has no versions: " +
-                    course.getKey() + "-" + assType.getKey() + "-" +
-                    ass.getKey()
-            );
-        }
-
-        final List<Version> versions = new ArrayList<Version>(
-            ass.getValue().getVersions().values()
-        );
-        final List<Version> versionsPriv = new ArrayList<Version>(
-                versions
-        );
-        for (
-            Iterator<Version> verIt = versionsPriv.iterator();
-            verIt.hasNext();
-        ) {
-            if (verIt.next().isShared()) {
-                verIt.remove();
-            }
-        }
-
-        return versionsPriv.isEmpty() ? versions : versionsPriv;
     }
 
     private Ctx extEnr(final Enrollment newEnr) {
@@ -738,6 +705,15 @@ public class Ctx implements elw.vo.Ctx {
 
         final Solution f = files.get(files.size() - 1);
         return f.getScore() == null;
+    }
+    
+    public Solutions solutions(final FileSlot slot) {
+        return new Solutions(
+                getGroup(), getStudent(), getCourse(),
+                indexEntry.getKey(),
+                getAss(), getAssType(), getVer(),
+                slot
+        );
     }
 
     protected class KeyVal<KeyType, ValueType> {

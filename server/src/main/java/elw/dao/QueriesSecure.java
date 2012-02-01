@@ -2,6 +2,9 @@ package elw.dao;
 
 import base.pattern.Result;
 import com.google.common.io.InputSupplier;
+import elw.dao.ctx.Scores;
+import elw.dao.ctx.Solutions;
+import elw.dao.rest.EnrScores;
 import elw.vo.*;
 import org.akraievoy.couch.Squab;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
@@ -15,6 +18,27 @@ public class QueriesSecure implements Queries {
     private final QueriesImpl queries;
 
     private final Auth auth;
+
+    public EnrScores enrScores(String enrId, Collection<String> studentIds) {
+        if (auth.isAdm()) {
+            return queries.enrScores(enrId, studentIds);
+        }
+
+        if (!enrollmentIds().contains(enrId)) {
+            return null;
+        }
+        
+        final TreeSet<String> studIds = new TreeSet<String>();
+        final Enrollment enr = enrollment(enrId);
+        final Group group = group(enr.getGroupId());
+        studIds.add(Nav.findStudent(group, auth.getId()).getId());
+        if (studentIds != null) {
+            studIds.retainAll(studentIds);
+        }
+
+        return queries.enrScores(enrId, studIds);
+    }
+
     public Auth getAuth() { return auth; }
 
     public QueriesSecure(QueriesImpl queries, Auth auth) {
@@ -38,11 +62,15 @@ public class QueriesSecure implements Queries {
         return null;  //	TODO review
     }
 
-    public List<Solution> solutions(Ctx ctx, FileSlot slot) {
+    public Score score(Scores ctx) {
         return null;  //	TODO review
     }
 
-    public Solution solution(Ctx ctx, FileSlot slot, String fileId) {
+    public List<Solution> solutions(Solutions ctx) {
+        return null;  //	TODO review
+    }
+
+    public Score score(Scores ctx, Long stamp) {
         return null;  //	TODO review
     }
 
@@ -127,17 +155,7 @@ public class QueriesSecure implements Queries {
                 groupIt.hasNext();
         ) {
             final Group group = groupIt.next();
-
-            boolean found = false;
-
-            for (Student student : group.getStudents().values()) {
-                if (auth.getId().equalsIgnoreCase(student.getEmail())) {
-                    found = true;
-                    break;
-                }
-            }
-
-            if (!found) {
+            if (Nav.findStudent(group, auth.getId()) == null) {
                 groupIt.remove();
             }
         }
@@ -321,14 +339,6 @@ public class QueriesSecure implements Queries {
     }
 
     public SortedMap<Long, Score> scores(Ctx ctx, FileSlot slot, Solution file) {
-        return null;  //	TODO review
-    }
-
-    public Score score(Ctx ctx, FileSlot slot, Solution file) {
-        return null;  //	TODO review
-    }
-
-    public Score score(Ctx ctx, FileSlot slot, Solution file, Long stamp) {
         return null;  //	TODO review
     }
 

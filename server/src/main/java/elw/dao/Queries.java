@@ -2,12 +2,16 @@ package elw.dao;
 
 import base.pattern.Result;
 import com.google.common.io.InputSupplier;
+import elw.dao.ctx.Scores;
+import elw.dao.ctx.Solutions;
+import elw.dao.rest.EnrScores;
 import elw.vo.*;
 import org.akraievoy.couch.Squab;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.List;
 import java.util.SortedMap;
 
@@ -24,9 +28,7 @@ public interface Queries {
 
     SortedMap<String, List<Solution>> solutions(Ctx ctx);
 
-    List<Solution> solutions(Ctx ctx, FileSlot slot);
-
-    Solution solution(Ctx ctx, FileSlot slot, String fileId);
+    List<Solution> solutions(Solutions ctx);
 
     //  TODO hack jackson to forfeit content-length reporting
     //      to ensure in-place streaming
@@ -56,15 +58,16 @@ public interface Queries {
 
     List<Enrollment> enrollments();
 
+    //  LATER all methods should be some-ish, as ReST is OK with returning 404s
     Enrollment enrollmentSome(String id);
 
     List<Enrollment> enrollmentsForGroup(String groupId);
 
     SortedMap<Long, Score> scores(Ctx ctx, FileSlot slot, Solution file);
 
-    Score score(Ctx ctx, FileSlot slot, Solution file);
+    Score score(Scores ctx);
 
-    Score score(Ctx ctx, FileSlot slot, Solution file, Long stamp);
+    Score score(Scores ctx, Long stamp);
 
     SortedMap<Long, Score> scoresAuto(Ctx ctx, FileSlot slot, Solution file);
 
@@ -85,4 +88,6 @@ public interface Queries {
     List<String> enrollmentIds();
 
     Enrollment enrollment(String id);
+
+    EnrScores enrScores(String enrId, Collection<String> studentIds);
 }

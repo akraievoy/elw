@@ -3,8 +3,12 @@ package elw.dao;
 import base.pattern.Result;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.InputSupplier;
+import elw.dao.ctx.Scores;
+import elw.dao.ctx.Solutions;
+import elw.dao.rest.*;
 import elw.vo.*;
 import elw.vo.Class;
+import elw.vo.Score;
 import org.akraievoy.gear.G4Parse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,10 +16,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 
 import org.akraievoy.couch.CouchDao;
 import org.akraievoy.couch.Squab;
@@ -29,6 +30,78 @@ public class QueriesImpl implements Queries {
     private final Object courseResolutionMonitor = new Object();
 
     private CouchDao metaDao;
+
+    public EnrScores enrScores(String enrId, Collection<String> studentIds) {
+        final Enrollment enr = enrollment(enrId);
+
+        if (enr == null) {
+            return null;
+        }
+
+        final Group group = group(enr.getGroupId());
+
+        final Collection<String> studIds;
+        if (studentIds == null) {
+            studIds = group.getStudents().keySet();
+        } else {
+            studIds = studentIds;
+        }
+
+        final Course course = course(enr.getCourseId());
+
+        final EnrScores enrScores = new EnrScores();
+        for (String studId : studIds) {
+            final List<IndexEntry> index = enr.getIndex();
+            for (
+                    int idxPos = 0, idxSize = index.size();
+                    idxPos < idxSize;
+                    idxPos++
+            ) {
+                final IndexEntry idxEntry = index.get(idxPos);
+                final String[] path = idxEntry.getPath();
+                final String taskTypeId = path[0];
+                final String taskId = path[1];
+
+                final TaskType taskType = course.getTaskTypes().get(taskTypeId);
+                final Task task = taskType.getTasks().get(taskId);
+                final Version ver = Nav.resolveVersion(
+                        task, idxEntry, group, studId
+                );
+
+                for (
+                        Map.Entry<String, FileSlot> fsEntry :
+                        taskType.getFileSlots().entrySet()
+                ) {
+                    if (fsEntry.getValue().getScoreWeight() > 0) {
+                        elw.dao.rest.Score score = new elw.dao.rest.Score();
+                        
+                        score.setTaskTypeId(taskType.getId());
+                        score.setTaskTypeName(taskType.getName());
+
+                        score.setTaskId(task.getId());
+                        score.setTaskName(task.getName());
+                        
+                        score.setVersionId(ver.getId());
+                        score.setVersionName(ver.getName());
+
+//                        solutions()
+
+                        //  FIXME choose best file
+
+                        enrScores.register(
+                                studId,
+                                String.valueOf(idxPos),
+                                fsEntry.getKey(),
+                                score
+                        );
+                    }
+                }
+            }
+        }
+
+        return enrScores;
+    }
+
     public void setMetaDao(CouchDao metaDao) {
         this.metaDao = metaDao;
     }
@@ -76,7 +149,7 @@ public class QueriesImpl implements Queries {
                 slotId
         );
 
-        return resolveFileType(ctxVer, attachments);
+        return Nav.resolveFileType(attachments, ctxVer.getCourse().getFileTypes());
     }
 
     public Attachment attachment(Ctx ctxVer, final String slotId, final String id) {
@@ -90,7 +163,7 @@ public class QueriesImpl implements Queries {
                 id
         );
 
-        return resolveFileType(ctxVer, attachment);
+        return Nav.resolveFileType(attachment, ctxVer.getCourse().getFileTypes());
     }
 
     public SortedMap<String, List<Solution>> solutions(Ctx ctx) {
@@ -98,69 +171,51 @@ public class QueriesImpl implements Queries {
                 new TreeMap<String, List<Solution>>();
 
         for (FileSlot slot : ctx.getAssType().getFileSlots().values()) {
-            slotIdToFiles.put(slot.getId(), solutions(ctx, slot));
+            slotIdToFiles.put(slot.getId(), solutions(ctx.solutions(slot)));
         }
 
         return slotIdToFiles;
     }
 
-    public List<Solution> solutions(Ctx ctx, final FileSlot slot) {
+    public List<Solution> solutions(Solutions ctx) {
         final List<Solution> solutions = solutionDao.findAll(
                 Solution.class,
-                ctx.getGroup().getId(),
-                ctx.getStudent().getId(),
-                ctx.getCourse().getId(),
-                String.valueOf(ctx.getIndex()),
-                ctx.getAssType().getId(),
-                ctx.getAss().getId(),
-                ctx.getVer().getId(),
-                slot.getId()
+                ctx.group.getId(),
+                ctx.student.getId(),
+                ctx.course.getId(),
+                String.valueOf(ctx.idx),
+                ctx.tType.getId(),
+                ctx.task.getId(),
+                ctx.ver.getId(),
+                ctx.slot.getId()
         );
 
         for (Solution solution : solutions) {
-            solution.setScore(score(ctx, slot, solution));
+            solution.setScore(score(ctx.scores(solution)));
         }
 
-        return resolveFileType(ctx, solutions);
+        return Nav.resolveFileType(solutions, ctx.course.getFileTypes());
     }
 
-    public Solution solution(Ctx ctx, FileSlot slot, String fileId) {
+    public Solution solution(Solutions ctx, String fileId) {
         final Solution solution = solutionDao.findLast(
                 Solution.class,
-                ctx.getGroup().getId(),
-                ctx.getStudent().getId(),
-                ctx.getCourse().getId(),
-                String.valueOf(ctx.getIndex()),
-                ctx.getAssType().getId(),
-                ctx.getAss().getId(),
-                ctx.getVer().getId(),
-                slot.getId(),
+                ctx.group.getId(),
+                ctx.student.getId(),
+                ctx.course.getId(),
+                String.valueOf(ctx.idx),
+                ctx.tType.getId(),
+                ctx.task.getId(),
+                ctx.ver.getId(),
+                ctx.slot.getId(),
                 fileId
         );
 
         if (solution != null) {
-            solution.setScore(score(ctx, slot, solution));
+            solution.setScore(score(ctx.scores(solution)));
         }
 
-        return resolveFileType(ctx, solution);
-    }
-
-    protected static <F extends FileBase> List<F> resolveFileType(
-            Ctx ctx, List<F> files
-    ) {
-        for (F file : files) {
-            resolveFileType(ctx, file);
-        }
-        return files;
-    }
-
-    protected static <F extends FileBase> F resolveFileType(Ctx ctx, F file) {
-        file.setFileType(resolve(
-                new TreeMap<String, FileType>(file.getFileType()),
-                ctx.getCourse().getFileTypes()
-        ));
-
-        return file;
+        return Nav.resolveFileType(solution, ctx.course.getFileTypes());
     }
 
     //  TODO hack jackson to forfeit content-length reporting
@@ -210,7 +265,7 @@ public class QueriesImpl implements Queries {
             return attachments(ctx, slot.getId());
         }
 
-        return solutions(ctx, slot);
+        return solutions(ctx.solutions(slot));
     }
 
     public FileBase file(String scope, Ctx ctx, FileSlot slot, String id) {
@@ -218,7 +273,7 @@ public class QueriesImpl implements Queries {
             return attachment(ctx, slot.getId(), id);
         }
 
-        return solution(ctx, slot, id);
+        return solution(ctx.solutions(slot), id);
     }
 
     public InputSupplier<InputStream> inputSupplier(
@@ -376,34 +431,34 @@ public class QueriesImpl implements Queries {
         );
     }
 
-    public Score score(Ctx ctx, FileSlot slot, Solution file) {
+    public Score score(Scores ctx) {
         return solutionDao.findLast(
                 Score.class,
-                ctx.getGroup().getId(),
-                ctx.getStudent().getId(),
-                ctx.getCourse().getId(),
-                String.valueOf(ctx.getIndex()),
-                ctx.getAssType().getId(),
-                ctx.getAss().getId(),
-                ctx.getVer().getId(),
-                slot.getId(),
-                file.getId()
+                ctx.group.getId(),
+                ctx.student.getId(),
+                ctx.course.getId(),
+                String.valueOf(ctx.idx),
+                ctx.tType.getId(),
+                ctx.task.getId(),
+                ctx.ver.getId(),
+                ctx.slot.getId(),
+                ctx.solution.getId()
         );
     }
 
-    public Score score(Ctx ctx, FileSlot slot, Solution file, Long stamp) {
+    public Score score(Scores ctx, Long stamp) {
         return solutionDao.findByStamp(
                 stamp,
                 Score.class,
-                ctx.getGroup().getId(),
-                ctx.getStudent().getId(),
-                ctx.getCourse().getId(),
-                String.valueOf(ctx.getIndex()),
-                ctx.getAssType().getId(),
-                ctx.getAss().getId(),
-                ctx.getVer().getId(),
-                slot.getId(),
-                file.getId()
+                ctx.group.getId(),
+                ctx.student.getId(),
+                ctx.course.getId(),
+                String.valueOf(ctx.idx),
+                ctx.tType.getId(),
+                ctx.task.getId(),
+                ctx.ver.getId(),
+                ctx.slot.getId(),
+                ctx.solution.getId()
         );
     }
 

@@ -1,7 +1,7 @@
 package elw.web;
 
-import elw.dao.Queries;
-import elw.dao.QueriesSecure;
+import elw.dao.*;
+import elw.dao.rest.EnrScores;
 import elw.miniweb.ViewJackson;
 import elw.vo.Course;
 import elw.vo.Enrollment;
@@ -23,8 +23,6 @@ import java.io.IOException;
 import java.util.*;
 
 /*
-* TODO: error responses contain JSON details (check against couchdb api)
-*
 * /myauth
 *
 * /auth    //  LATER specify
@@ -161,7 +159,7 @@ public class ControllerRest extends ControllerElw {
         if (queriesSecure == null) {
             queriesSecure = core.getQueries().secure(auth);
         }
-        
+
         final HashMap<String, Object> model = prepareDefaultModel(req);
 
         model.put(MODEL_AUTH, auth);
@@ -295,7 +293,7 @@ public class ControllerRest extends ControllerElw {
                 (Queries) model.get(MODEL_QUERIES);
 
         final Group group = queries.group(groupId);
-        
+
         if (group == null) {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             return null;
@@ -353,6 +351,33 @@ public class ControllerRest extends ControllerElw {
         final Queries queries =
                 (Queries) model.get(MODEL_QUERIES);
 
+        final EnrScores enrScores = queries.enrScores(enrId, null);
+
+        if (enrScores == null) {
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return null;
+        }
+
+        return new ModelAndView(ViewJackson.data(enrScores));
+    }
+
+    @RequestMapping(
+            value = "enrollment/{enrId}/scoring",
+            method = RequestMethod.GET
+    )
+    public ModelAndView do_enrollmentScoresGet(
+            final HttpServletRequest req,
+            final HttpServletResponse resp,
+            @PathVariable("enrId") final String enrId
+    ) throws IOException {
+        final HashMap<String, Object> model = auth(req, resp, null);
+        if (model == null) {
+            return null;
+        }
+
+        final Queries queries =
+                (Queries) model.get(MODEL_QUERIES);
+
         final Enrollment enrollment = queries.enrollment(enrId);
 
         if (enrollment == null) {
@@ -360,6 +385,10 @@ public class ControllerRest extends ControllerElw {
             return null;
         }
 
+
+        
+        //  return a map of maps of maps:
+        //      studId -> indexEntry -> slotId -> score
         return new ModelAndView(ViewJackson.data(enrollment));
     }
 

@@ -310,7 +310,7 @@ public class AdminController extends ControllerElw {
                 if (stamp == null) {
                     scoreByStamp = null;
                 } else {
-                    scoreByStamp = core.getQueries().score(ctx, slot, file, stamp);
+                    scoreByStamp = core.getQueries().score(ctx.solutions(slot).scores(file), stamp);
                 }
                 final Score score = QueriesImpl.updateAutos(ctx, slot.getId(), file, scoreByStamp);
 

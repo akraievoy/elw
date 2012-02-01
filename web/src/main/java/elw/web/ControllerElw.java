@@ -130,7 +130,7 @@ public abstract class ControllerElw extends MultiActionController implements Web
             return null;
         }
 
-        final Solution file = core.getQueries().solution(ctx, slot, fileId);
+        final Solution file = core.getQueries().solution(ctx.solutions(slot), fileId);
         if (file == null) {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND, "file for id " + fileId + " not found");
             return null;

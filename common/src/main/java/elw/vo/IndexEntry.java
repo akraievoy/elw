@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class IndexEntry implements Cloneable {
+    //  FIXME add the index property
+
     private String[] path;
     public String[] getPath() { return path; }
     public void setPath(String[] path) { this.path = path; }
