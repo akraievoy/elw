@@ -7,10 +7,10 @@ import elw.vo.Class;
 /**
  * Parameter Object, storing the full Solution context.
  */
-public class Solutions extends Slots {
+public class SolutionsOfSlot extends SlotsOfTask {
     public final FileSlot slot;
 
-    public Solutions(
+    public SolutionsOfSlot(
             Enrollment enr,
             Group group,
             Student student,
@@ -26,8 +26,8 @@ public class Solutions extends Slots {
         this.slot = slot;
     }
     
-    public Scores scores(final Solution solution) {
-        return new Scores(
+    public ScoresOfSolution scores(final Solution solution) {
+        return new ScoresOfSolution(
                 enr, group, student, course,
                 idx, task, tType, ver,
                 slot, solution

@@ -5,10 +5,10 @@ import elw.vo.*;
 /**
  * Relatively harmless parameter object, storing the full Score context.
  */
-public class Scores extends Solutions {
+public class ScoresOfSolution extends SolutionsOfSlot {
     public final Solution solution;
     
-    public Scores(
+    public ScoresOfSolution(
             Enrollment enr,
             Group group,
             Student student,

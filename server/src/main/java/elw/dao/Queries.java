@@ -2,8 +2,8 @@ package elw.dao;
 
 import base.pattern.Result;
 import com.google.common.io.InputSupplier;
-import elw.dao.ctx.Scores;
-import elw.dao.ctx.Solutions;
+import elw.dao.ctx.ScoresOfSolution;
+import elw.dao.ctx.SolutionsOfSlot;
 import elw.dao.rest.EnrScores;
 import elw.vo.*;
 import org.akraievoy.couch.Squab;
@@ -28,7 +28,7 @@ public interface Queries {
 
     SortedMap<String, List<Solution>> solutions(Ctx ctx);
 
-    List<Solution> solutions(Solutions ctx);
+    List<Solution> solutions(SolutionsOfSlot ctx);
 
     //  TODO hack jackson to forfeit content-length reporting
     //      to ensure in-place streaming
@@ -65,9 +65,9 @@ public interface Queries {
 
     SortedMap<Long, Score> scores(Ctx ctx, FileSlot slot, Solution file);
 
-    Score score(Scores ctx);
+    Score score(ScoresOfSolution ctx);
 
-    Score score(Scores ctx, Long stamp);
+    Score score(ScoresOfSolution ctx, Long stamp);
 
     SortedMap<Long, Score> scoresAuto(Ctx ctx, FileSlot slot, Solution file);
 

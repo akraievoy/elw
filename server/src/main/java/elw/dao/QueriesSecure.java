@@ -2,8 +2,8 @@ package elw.dao;
 
 import base.pattern.Result;
 import com.google.common.io.InputSupplier;
-import elw.dao.ctx.Scores;
-import elw.dao.ctx.Solutions;
+import elw.dao.ctx.ScoresOfSolution;
+import elw.dao.ctx.SolutionsOfSlot;
 import elw.dao.rest.EnrScores;
 import elw.vo.*;
 import org.akraievoy.couch.Squab;
@@ -62,15 +62,15 @@ public class QueriesSecure implements Queries {
         return null;  //	TODO review
     }
 
-    public Score score(Scores ctx) {
+    public Score score(ScoresOfSolution ctx) {
         return null;  //	TODO review
     }
 
-    public List<Solution> solutions(Solutions ctx) {
+    public List<Solution> solutions(SolutionsOfSlot ctx) {
         return null;  //	TODO review
     }
 
-    public Score score(Scores ctx, Long stamp) {
+    public Score score(ScoresOfSolution ctx, Long stamp) {
         return null;  //	TODO review
     }
 

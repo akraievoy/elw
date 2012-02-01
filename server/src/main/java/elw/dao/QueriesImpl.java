@@ -3,10 +3,10 @@ package elw.dao;
 import base.pattern.Result;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.InputSupplier;
-import elw.dao.ctx.Classes;
-import elw.dao.ctx.Scores;
-import elw.dao.ctx.Slots;
-import elw.dao.ctx.Solutions;
+import elw.dao.ctx.ClassesOfStudent;
+import elw.dao.ctx.ScoresOfSolution;
+import elw.dao.ctx.SlotsOfTask;
+import elw.dao.ctx.SolutionsOfSlot;
 import elw.dao.rest.*;
 import elw.vo.*;
 import elw.vo.Class;
@@ -55,7 +55,7 @@ public class QueriesImpl implements Queries {
         for (String studId : studIds) {
             final Student student = group.getStudents().get(studId);
             
-            final Classes classes = new Classes(enr, course, student, group);
+            final ClassesOfStudent classesOfStudent = new ClassesOfStudent(enr, course, student, group);
 
             final List<IndexEntry> index = enr.getIndex();
             for (
@@ -63,19 +63,19 @@ public class QueriesImpl implements Queries {
                     idxPos < idxSize;
                     idxPos++
             ) {
-                final Slots slots = classes.slots(idxPos);
+                final SlotsOfTask slotsOfTask = classesOfStudent.slots(idxPos);
 
                 for (
                         Map.Entry<String, FileSlot> fsEntry :
-                        slots.tType.getFileSlots().entrySet()
+                        slotsOfTask.tType.getFileSlots().entrySet()
                 ) {
 
                     if (fsEntry.getValue().getScoreWeight() > 0) {
-                        Solutions solutions =
-                                slots.solutions(fsEntry.getValue());
-                        elw.dao.rest.Score score = elw.dao.rest.Score.create(solutions);
+                        SolutionsOfSlot solutionsOfSlot =
+                                slotsOfTask.solutions(fsEntry.getValue());
+                        elw.dao.rest.Score score = elw.dao.rest.Score.create(solutionsOfSlot);
 
-                        solutions(solutions);
+                        solutions(solutionsOfSlot);
 
 //                        solutions()
 
@@ -170,7 +170,7 @@ public class QueriesImpl implements Queries {
         return slotIdToFiles;
     }
 
-    public List<Solution> solutions(Solutions ctx) {
+    public List<Solution> solutions(SolutionsOfSlot ctx) {
         final List<Solution> solutions = solutionDao.findAll(
                 Solution.class,
                 ctx.group.getId(),
@@ -190,7 +190,7 @@ public class QueriesImpl implements Queries {
         return Nav.resolveFileType(solutions, ctx.course.getFileTypes());
     }
 
-    public Solution solution(Solutions ctx, String fileId) {
+    public Solution solution(SolutionsOfSlot ctx, String fileId) {
         final Solution solution = solutionDao.findLast(
                 Solution.class,
                 ctx.group.getId(),
@@ -424,7 +424,7 @@ public class QueriesImpl implements Queries {
         );
     }
 
-    public Score score(Scores ctx) {
+    public Score score(ScoresOfSolution ctx) {
         return solutionDao.findLast(
                 Score.class,
                 ctx.group.getId(),
@@ -439,7 +439,7 @@ public class QueriesImpl implements Queries {
         );
     }
 
-    public Score score(Scores ctx, Long stamp) {
+    public Score score(ScoresOfSolution ctx, Long stamp) {
         return solutionDao.findByStamp(
                 stamp,
                 Score.class,

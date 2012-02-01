@@ -6,20 +6,20 @@ import elw.vo.*;
 /**
  *  Parameter Object, storing the full enrollment context.
  */
-public class Classes {
+public class ClassesOfStudent {
     public final Enrollment enr;
     public final Group group;
     public final Student student;
     public final Course course;
 
-    public Classes(Enrollment enr, Course course, Student student, Group group) {
+    public ClassesOfStudent(Enrollment enr, Course course, Student student, Group group) {
         this.enr = enr;
         this.course = course;
         this.student = student;
         this.group = group;
     }
     
-    public Slots slots(final int idxPos) {
+    public SlotsOfTask slots(final int idxPos) {
         final IndexEntry idxEntry = enr.getIndex().get(idxPos);
         final String[] path = idxEntry.getPath();
         final String taskTypeId = path[0];
@@ -31,11 +31,11 @@ public class Classes {
                 task, idxEntry, group, student.getId()
         );
 
-        final Slots slots = new Slots(
+        final SlotsOfTask slotsOfTask = new SlotsOfTask(
                 enr, course, group, student,
                 idxPos, task, taskType, ver
         );
 
-        return slots;
+        return slotsOfTask;
     }
 }

@@ -7,14 +7,14 @@ import elw.vo.Class;
 /**
  * Parameter Object, storing the full Class/Task/Version context.
  */
-public class Slots extends Classes {    //  FIXME rename
+public class SlotsOfTask extends ClassesOfStudent {
     public final int idx;
     public final IndexEntry idxEntry;
     public final TaskType tType;
     public final Task task;
     public final Version ver;
 
-    public Slots(
+    public SlotsOfTask(
             Enrollment enr,
             Course course,
             Group group,
@@ -33,14 +33,14 @@ public class Slots extends Classes {    //  FIXME rename
         this.ver = ver;
     }
     
-    public Solutions solutions(final FileSlot slot) {
-        final Solutions solutions = new Solutions(
+    public SolutionsOfSlot solutions(final FileSlot slot) {
+        final SolutionsOfSlot solutionsOfSlot = new SolutionsOfSlot(
                 enr, group, student, course,
                 idx, task, tType, ver,
                 slot
         );
 
-        return solutions;
+        return solutionsOfSlot;
     }
     
     public long openMillis() {

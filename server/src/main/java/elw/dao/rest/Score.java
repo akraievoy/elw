@@ -1,32 +1,32 @@
 package elw.dao.rest;
 
-import elw.dao.ctx.Solutions;
+import elw.dao.ctx.SolutionsOfSlot;
 
 /**
  * Complete ReST-view of score for one particular Task / Version / FileSlot.
  */
 public class Score {
     /**
-     * @see Score#create(elw.dao.ctx.Solutions)
+     * @see Score#create(elw.dao.ctx.SolutionsOfSlot)
      */
     public Score() {
         //  nothing to do here
     }
 
-    public static Score create(Solutions solutions) {
+    public static Score create(SolutionsOfSlot solutionsOfSlot) {
         final Score score = new Score();
 
-        score.setTaskTypeId(solutions.tType.getId());
-        score.setTaskTypeName(solutions.tType.getName());
+        score.setTaskTypeId(solutionsOfSlot.tType.getId());
+        score.setTaskTypeName(solutionsOfSlot.tType.getName());
 
-        score.setTaskId(solutions.task.getId());
-        score.setTaskName(solutions.task.getName());
+        score.setTaskId(solutionsOfSlot.task.getId());
+        score.setTaskName(solutionsOfSlot.task.getName());
 
-        score.setVersionId(solutions.ver.getId());
-        score.setVersionName(solutions.ver.getName());
+        score.setVersionId(solutionsOfSlot.ver.getId());
+        score.setVersionName(solutionsOfSlot.ver.getName());
 
-        score.setOpenMillis(solutions.openMillis());
-        score.setDueMillis(solutions.dueMillis());
+        score.setOpenMillis(solutionsOfSlot.openMillis());
+        score.setDueMillis(solutionsOfSlot.dueMillis());
 
         return score;
     }
