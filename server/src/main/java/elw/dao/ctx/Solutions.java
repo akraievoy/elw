@@ -1,6 +1,8 @@
 package elw.dao.ctx;
 
+import elw.dao.Nav;
 import elw.vo.*;
+import elw.vo.Class;
 
 /**
  * Parameter Object, storing the full Solution context.
@@ -31,4 +33,11 @@ public class Solutions extends Slots {
                 slot, solution
         );
     }
+
+    public long dueMillis() {
+        final Class classDue = Nav.classDue(enr, idxEntry, slot);
+
+        return classDue.getToDateTime().getMillis();
+    }
+
 }

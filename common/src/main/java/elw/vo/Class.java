@@ -37,24 +37,20 @@ public class Class implements Cloneable {
 
     @JsonIgnore
     public DateTime getFromDateTime() {
-        final DateTime fromDate = FMT_DATE.parseDateTime(getDate());
-        final DateTime fromTime = FMT_TIME.parseDateTime(getFromTime());
-        final DateTime dateExact = new DateTime(
-                fromDate.getYear(), fromDate.getMonthOfYear(), fromDate.getDayOfMonth(),
-                fromTime.getHourOfDay(), fromTime.getMinuteOfHour(),
-                0, 0
-        );
-
-        return dateExact;
+        return parseDateTime(getDate(), getFromTime());
     }
 
     @JsonIgnore
     public DateTime getToDateTime() {
-        final DateTime fromDate = FMT_DATE.parseDateTime(getDate());
-        final DateTime toTime = FMT_TIME.parseDateTime(getToTime());
+        return parseDateTime(getDate(), getToTime());
+    }
+
+    private static DateTime parseDateTime(String dateStr, String timeStr) {
+        final DateTime date = FMT_DATE.parseDateTime(dateStr);
+        final DateTime time = FMT_TIME.parseDateTime(timeStr);
         final DateTime dateExact = new DateTime(
-                fromDate.getYear(), fromDate.getMonthOfYear(), fromDate.getDayOfMonth(),
-                toTime.getHourOfDay(), toTime.getMinuteOfHour(),
+                date.getYear(), date.getMonthOfYear(), date.getDayOfMonth(),
+                time.getHourOfDay(), time.getMinuteOfHour(),
                 0, 0
         );
 

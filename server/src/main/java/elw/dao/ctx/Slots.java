@@ -1,11 +1,13 @@
 package elw.dao.ctx;
 
+import elw.dao.Nav;
 import elw.vo.*;
+import elw.vo.Class;
 
 /**
  * Parameter Object, storing the full Class/Task/Version context.
  */
-public class Slots extends Classes {
+public class Slots extends Classes {    //  FIXME rename
     public final int idx;
     public final IndexEntry idxEntry;
     public final TaskType tType;
@@ -23,7 +25,7 @@ public class Slots extends Classes {
             Version ver
     ) {
         super(enr, course, student, group);
-        //  LATER simplify this
+        //  LATER simplify idx/indexEntry
         this.idx = idx;
         this.idxEntry = enr.getIndex().get(idx);
         this.tType = tType;
@@ -40,4 +42,11 @@ public class Slots extends Classes {
 
         return solutions;
     }
+    
+    public long openMillis() {
+        final Class classFrom = Nav.classFrom(enr, idxEntry);
+
+        return classFrom.getFromDateTime().getMillis();
+    }
+
 }

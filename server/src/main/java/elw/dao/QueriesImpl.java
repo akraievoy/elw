@@ -73,16 +73,7 @@ public class QueriesImpl implements Queries {
                     if (fsEntry.getValue().getScoreWeight() > 0) {
                         Solutions solutions =
                                 slots.solutions(fsEntry.getValue());
-                        elw.dao.rest.Score score = new elw.dao.rest.Score();
-                        
-                        score.setTaskTypeId(solutions.tType.getId());
-                        score.setTaskTypeName(solutions.tType.getName());
-
-                        score.setTaskId(solutions.task.getId());
-                        score.setTaskName(solutions.task.getName());
-                        
-                        score.setVersionId(solutions.ver.getId());
-                        score.setVersionName(solutions.ver.getName());
+                        elw.dao.rest.Score score = elw.dao.rest.Score.create(solutions);
 
                         solutions(solutions);
 

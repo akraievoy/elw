@@ -1,23 +1,48 @@
 package elw.dao.rest;
 
+import elw.dao.ctx.Solutions;
+
 /**
- * Complete rest-view of score for one particular solution.
+ * Complete ReST-view of score for one particular Task / Version / FileSlot.
  */
 public class Score {
+    /**
+     * @see Score#create(elw.dao.ctx.Solutions)
+     */
+    public Score() {
+        //  nothing to do here
+    }
+
+    public static Score create(Solutions solutions) {
+        final Score score = new Score();
+
+        score.setTaskTypeId(solutions.tType.getId());
+        score.setTaskTypeName(solutions.tType.getName());
+
+        score.setTaskId(solutions.task.getId());
+        score.setTaskName(solutions.task.getName());
+
+        score.setVersionId(solutions.ver.getId());
+        score.setVersionName(solutions.ver.getName());
+
+        score.setOpenMillis(solutions.openMillis());
+        score.setDueMillis(solutions.dueMillis());
+
+        return score;
+    }
+
     //  TODO populate
     private SolutionState state;
     public SolutionState getState() { return state; }
     public void setState(SolutionState state) { this.state = state; }
 
-    //  TODO populate
-    private long dueMillis;
-    public long getDueMillis() { return dueMillis; }
-    public void setDueMillis(long dueMillis) { this.dueMillis = dueMillis; }
-
-    //  TODO populate
     private long openMillis;
     public long getOpenMillis() { return openMillis; }
     public void setOpenMillis(long openMillis) { this.openMillis = openMillis; }
+
+    private long dueMillis;
+    public long getDueMillis() { return dueMillis; }
+    public void setDueMillis(long dueMillis) { this.dueMillis = dueMillis; }
 
     //  TODO populate
     private int daysOverdue;
