@@ -77,8 +77,8 @@ public class QueriesImpl implements Queries {
                         final List<Solution> solutions =
                                 solutions(solutionsOfSlot);
 
-                        final elw.dao.rest.Score score =
-                                elw.dao.rest.Score.create(
+                        final SlotScore slotScore =
+                                SlotScore.create(
                                         solutionsOfSlot,
                                         solutions
                                 );
@@ -87,7 +87,7 @@ public class QueriesImpl implements Queries {
                                 studId,
                                 String.valueOf(idxPos),
                                 fsEntry.getKey(),
-                                score
+                                slotScore
                         );
                     }
                 }

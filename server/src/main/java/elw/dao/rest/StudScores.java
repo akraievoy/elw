@@ -8,30 +8,30 @@ import java.util.TreeMap;
  * All scores for student's solutions.
  */
 public class StudScores {
-    private final SortedMap<String, SortedMap<String, Score>> indexToSlotToScore =
-            new TreeMap<String, SortedMap<String, Score>>();
+    private final SortedMap<String, SortedMap<String, SlotScore>> indexToSlotToScore =
+            new TreeMap<String, SortedMap<String, SlotScore>>();
 
     public void register(
             String index,
             String slotId,
-            Score score
+            SlotScore slotScore
     ) {
-        final SortedMap<String, Score> slotToScoreExisting =
+        final SortedMap<String, SlotScore> slotToScoreExisting =
                 indexToSlotToScore.get(index);
-        final SortedMap<String, Score> slotToScoreUpdated;
+        final SortedMap<String, SlotScore> slotToScoreUpdated;
         if (slotToScoreExisting == null) {
-            final SortedMap<String, Score> slotToScoreCreated =
-                    new TreeMap<String, Score>();
+            final SortedMap<String, SlotScore> slotToScoreCreated =
+                    new TreeMap<String, SlotScore>();
             indexToSlotToScore.put(index, slotToScoreCreated);
             slotToScoreUpdated = slotToScoreCreated;
         } else {
             slotToScoreUpdated = slotToScoreExisting;
         }
 
-        slotToScoreUpdated.put(slotId, score);
+        slotToScoreUpdated.put(slotId, slotScore);
     }
 
-    public SortedMap<String, SortedMap<String, Score>> getIndexToSlotToScore() {
+    public SortedMap<String, SortedMap<String, SlotScore>> getIndexToSlotToScore() {
         return Collections.unmodifiableSortedMap(indexToSlotToScore);
     }
 

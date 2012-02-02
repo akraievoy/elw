@@ -15,7 +15,7 @@ public class EnrScores {
             final String studentId,
             final String index,
             final String slotId,
-            final Score score
+            final SlotScore slotScore
     ) {
         final StudScores updated;
         final StudScores existing = studentToScore.get(studentId);
@@ -27,7 +27,7 @@ public class EnrScores {
             updated = created;
         }
 
-        updated.register(index, slotId, score);
+        updated.register(index, slotId, slotScore);
     }
 
     public SortedMap<String, StudScores> getStudentToScore() {

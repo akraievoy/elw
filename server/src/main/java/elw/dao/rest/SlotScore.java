@@ -8,42 +8,42 @@ import java.util.List;
 /**
  * Complete ReST-view of score for one particular Task / Version / FileSlot.
  */
-public class Score {
+public class SlotScore {
     /**
-     * @see Score#create(elw.dao.ctx.SolutionsOfSlot, java.util.List
+     * @see SlotScore#create(elw.dao.ctx.SolutionsOfSlot, java.util.List
      */
-    public Score() {
+    public SlotScore() {
         //  nothing to do here
     }
 
-    public static Score create(SolutionsOfSlot solutionsOfSlot, List<Solution> solutions) {
-        final Score score = new Score();
+    public static SlotScore create(SolutionsOfSlot solutionsOfSlot, List<Solution> solutions) {
+        final SlotScore slotScore = new SlotScore();
 
-        score.taskTypeId = solutionsOfSlot.tType.getId();
-        score.taskTypeName = solutionsOfSlot.tType.getName();
+        slotScore.taskTypeId = solutionsOfSlot.tType.getId();
+        slotScore.taskTypeName = solutionsOfSlot.tType.getName();
 
-        score.taskId = solutionsOfSlot.task.getId();
-        score.taskName = solutionsOfSlot.task.getName();
+        slotScore.taskId = solutionsOfSlot.task.getId();
+        slotScore.taskName = solutionsOfSlot.task.getName();
 
-        score.versionId = solutionsOfSlot.ver.getId();
-        score.versionName = solutionsOfSlot.ver.getName();
+        slotScore.versionId = solutionsOfSlot.ver.getId();
+        slotScore.versionName = solutionsOfSlot.ver.getName();
 
-        score.openMillis = solutionsOfSlot.openMillis();
-        score.dueMillis = solutionsOfSlot.dueMillis();
+        slotScore.openMillis = solutionsOfSlot.openMillis();
+        slotScore.dueMillis = solutionsOfSlot.dueMillis();
 
         if (!solutionsOfSlot.isOpen()) {
-            score.state = SolutionState.CLOSED;
+            slotScore.state = SolutionState.CLOSED;
         } else if (solutions.isEmpty()) {
-            score.state = SolutionState.OPEN;
+            slotScore.state = SolutionState.OPEN;
         } else if (solutionsOfSlot.isSomeApproved(solutions)) {
-            score.state = SolutionState.APPROVED;
+            slotScore.state = SolutionState.APPROVED;
         } else if (solutionsOfSlot.isAllDeclined(solutions)) {
-            score.state = SolutionState.DECLINED;
+            slotScore.state = SolutionState.DECLINED;
         } else {
-            score.state = SolutionState.PENDING;
+            slotScore.state = SolutionState.PENDING;
         }
 
-        return score;
+        return slotScore;
     }
 
     private SolutionState state;
