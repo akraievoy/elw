@@ -6,6 +6,7 @@ import java.util.*;
 
 import org.akraievoy.couch.Squab;
 
+//  TODO mixing Slot and SlotId with Score is not quite ok with me
 public class Score extends Squab.Stamped implements Stamped {
     private Boolean approved;
     public Boolean getApproved() { return approved; }
@@ -80,7 +81,7 @@ public class Score extends Squab.Stamped implements Stamped {
         return res;
     }
 
-    public String idFor(FileSlot slot, Criteria c) {
+    public static String idFor(FileSlot slot, Criteria c) {
         return slot.getId() + "--" + c.getId();
     }
 
@@ -108,6 +109,15 @@ public class Score extends Squab.Stamped implements Stamped {
 
     public double getRatio(FileSlot slot, Criteria c) {
         return contains(slot, c) ? getRatios().get(idFor(slot, c)) : 1;
+    }
+
+    public void register(
+            final FileSlot slot, final Criteria c,
+            final Double ratio, final Integer powDef
+    ) {
+        final String id = idFor(slot, c);
+        pows.put(id, powDef);
+        ratios.put(id, ratio);
     }
 
     @JsonIgnore

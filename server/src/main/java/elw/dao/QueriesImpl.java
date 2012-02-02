@@ -71,15 +71,17 @@ public class QueriesImpl implements Queries {
                 ) {
 
                     if (fsEntry.getValue().getScoreWeight() > 0) {
-                        SolutionsOfSlot solutionsOfSlot =
+                        final SolutionsOfSlot solutionsOfSlot =
                                 slotsOfTask.solutions(fsEntry.getValue());
-                        elw.dao.rest.Score score = elw.dao.rest.Score.create(solutionsOfSlot);
 
-                        solutions(solutionsOfSlot);
+                        final List<Solution> solutions =
+                                solutions(solutionsOfSlot);
 
-//                        solutions()
-
-                        //  FIXME choose best file
+                        final elw.dao.rest.Score score =
+                                elw.dao.rest.Score.create(
+                                        solutionsOfSlot,
+                                        solutions
+                                );
 
                         enrScores.register(
                                 studId,
@@ -184,7 +186,20 @@ public class QueriesImpl implements Queries {
         );
 
         for (Solution solution : solutions) {
-            solution.setScore(score(ctx.scores(solution)));
+            final ScoresOfSolution scores = ctx.scores(solution);
+
+            //  fetch last of previously fixed scores for a given solution
+            final Score fixedScore = score(scores);
+
+            final Score currentScore;
+            if (fixedScore == null) {
+                //  okay, nothing yet set, compute preliminary one
+                currentScore = scores.preliminary();
+            } else {
+                currentScore = fixedScore;
+            }
+
+            solution.setScore(currentScore);
         }
 
         return Nav.resolveFileType(solutions, ctx.course.getFileTypes());
@@ -513,7 +528,7 @@ public class QueriesImpl implements Queries {
                 powDef = c.resolvePowDef(vars);
             }
             if (ratio != null && powDef != null) {
-                final String id = res.idFor(slot, c);
+                final String id = Score.idFor(slot, c);
                 final Map<String, Integer> pows =
                         new TreeMap<String, Integer>(res.getPows());
                 final Map<String, Double> ratios =

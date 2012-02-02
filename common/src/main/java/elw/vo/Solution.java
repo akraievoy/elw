@@ -3,6 +3,7 @@ package elw.vo;
 import org.codehaus.jackson.annotate.JsonIgnore;
 
 public class Solution extends FileBase {
+    //	LATER mixing test results with the file entity itself
     //	second pass properties, issued by validator (if any)
     private int testsPassed;
     public static final String SCOPE = "s";

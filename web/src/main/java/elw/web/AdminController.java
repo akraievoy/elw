@@ -328,7 +328,7 @@ public class AdminController extends ControllerElw {
                             final int powDef = score.getPow(slot, cri);
                             final double ratioDef = score.getRatio(slot, cri);
 
-                            final String idFor = score.idFor(slot, cri);
+                            final String idFor = Score.idFor(slot, cri);
                             final String powReq = req.getParameter(idFor);
                             final String ratioReq = req.getParameter(idFor + "--ratio");
 

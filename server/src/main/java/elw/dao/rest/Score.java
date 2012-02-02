@@ -1,37 +1,51 @@
 package elw.dao.rest;
 
 import elw.dao.ctx.SolutionsOfSlot;
+import elw.vo.Solution;
+
+import java.util.List;
 
 /**
  * Complete ReST-view of score for one particular Task / Version / FileSlot.
  */
 public class Score {
     /**
-     * @see Score#create(elw.dao.ctx.SolutionsOfSlot)
+     * @see Score#create(elw.dao.ctx.SolutionsOfSlot, java.util.List
      */
     public Score() {
         //  nothing to do here
     }
 
-    public static Score create(SolutionsOfSlot solutionsOfSlot) {
+    public static Score create(SolutionsOfSlot solutionsOfSlot, List<Solution> solutions) {
         final Score score = new Score();
 
-        score.setTaskTypeId(solutionsOfSlot.tType.getId());
-        score.setTaskTypeName(solutionsOfSlot.tType.getName());
+        score.taskTypeId = solutionsOfSlot.tType.getId();
+        score.taskTypeName = solutionsOfSlot.tType.getName();
 
-        score.setTaskId(solutionsOfSlot.task.getId());
-        score.setTaskName(solutionsOfSlot.task.getName());
+        score.taskId = solutionsOfSlot.task.getId();
+        score.taskName = solutionsOfSlot.task.getName();
 
-        score.setVersionId(solutionsOfSlot.ver.getId());
-        score.setVersionName(solutionsOfSlot.ver.getName());
+        score.versionId = solutionsOfSlot.ver.getId();
+        score.versionName = solutionsOfSlot.ver.getName();
 
-        score.setOpenMillis(solutionsOfSlot.openMillis());
-        score.setDueMillis(solutionsOfSlot.dueMillis());
+        score.openMillis = solutionsOfSlot.openMillis();
+        score.dueMillis = solutionsOfSlot.dueMillis();
+
+        if (!solutionsOfSlot.isOpen()) {
+            score.state = SolutionState.CLOSED;
+        } else if (solutions.isEmpty()) {
+            score.state = SolutionState.OPEN;
+        } else if (solutionsOfSlot.isSomeApproved(solutions)) {
+            score.state = SolutionState.APPROVED;
+        } else if (solutionsOfSlot.isAllDeclined(solutions)) {
+            score.state = SolutionState.DECLINED;
+        } else {
+            score.state = SolutionState.PENDING;
+        }
 
         return score;
     }
 
-    //  TODO populate
     private SolutionState state;
     public SolutionState getState() { return state; }
     public void setState(SolutionState state) { this.state = state; }
