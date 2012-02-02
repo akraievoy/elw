@@ -10,13 +10,16 @@ import java.util.List;
  */
 public class SlotScore {
     /**
-     * @see SlotScore#create(elw.dao.ctx.SolutionsOfSlot, java.util.List
+     * @see SlotScore#create(elw.dao.ctx.SolutionsOfSlot, java.util.List)
      */
     public SlotScore() {
         //  nothing to do here
     }
 
-    public static SlotScore create(SolutionsOfSlot solutionsOfSlot, List<Solution> solutions) {
+    public static SlotScore create(
+            SolutionsOfSlot solutionsOfSlot,
+            List<Solution> solutions
+    ) {
         final SlotScore slotScore = new SlotScore();
 
         slotScore.taskTypeId = solutionsOfSlot.tType.getId();
@@ -42,6 +45,9 @@ public class SlotScore {
         } else {
             slotScore.state = SolutionState.PENDING;
         }
+
+        //  FIXME proceed with lastPending / bestApproved
+        //  FIXME move solution-specific props to score or some wrapper hereof
 
         return slotScore;
     }
