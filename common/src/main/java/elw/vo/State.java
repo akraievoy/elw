@@ -1,9 +1,9 @@
-package elw.dao.rest;
+package elw.vo;
 
 /**
  * Enumerating possible states of student solution.
  */
-public enum SolutionState {
+public enum State {
     CLOSED,
     OPEN,
     PENDING,

@@ -2,10 +2,12 @@ package elw.vo;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.Days;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+import java.util.TimeZone;
 import java.util.regex.Pattern;
 
 //  LATER think of some other name for this entity, collision with java.lang smells
@@ -107,7 +109,7 @@ public class Class implements Cloneable {
             return Days.daysBetween(toMidnight, time).getDays();
         }
     }
-
+    
     private int getDayDiff(final DateTime toDate) {
         final DateTime date = getFromDateTime();
         final DateTime dateMidnight = new DateTime(

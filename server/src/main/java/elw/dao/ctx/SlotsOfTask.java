@@ -1,6 +1,5 @@
 package elw.dao.ctx;
 
-import elw.dao.Nav;
 import elw.vo.*;
 import elw.vo.Class;
 
@@ -32,7 +31,7 @@ public class SlotsOfTask extends ClassesOfStudent {
         this.task = task;
         this.ver = ver;
     }
-    
+
     public SolutionsOfSlot solutions(final FileSlot slot) {
         final SolutionsOfSlot solutionsOfSlot = new SolutionsOfSlot(
                 enr, group, student, course,
@@ -42,11 +41,25 @@ public class SlotsOfTask extends ClassesOfStudent {
 
         return solutionsOfSlot;
     }
-    
-    public long openMillis() {
-        final Class classFrom = Nav.classFrom(enr, idxEntry);
 
-        return classFrom.getFromDateTime().getMillis();
+    public Class openClass() {
+        final int classFromIndex =
+                idxEntry.getClassFrom();
+
+        final Class classFrom =
+                enr.getClasses().get(classFromIndex);
+
+        return classFrom;
     }
 
+    public long openMillis() {
+        final Class classOpen = openClass();
+
+        return classOpen.getFromDateTime().getMillis();
+    }
+
+    public boolean open() {
+        long now = System.currentTimeMillis();
+        return openMillis() <= now;
+    }
 }

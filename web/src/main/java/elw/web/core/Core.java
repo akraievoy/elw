@@ -673,7 +673,7 @@ public class Core {
                                     epCtx = ctxVer;
                                 }
                                 break;    //	don't look into earlier pending versions before this one is approved
-                            } else if (Boolean.TRUE.equals(f.getScore().getApproved())) {
+                            } else if (f.getScore().state() == State.APPROVED) {
                                 break;    //	don't look into earlier pending versions after this one is approved
                             }
                         }

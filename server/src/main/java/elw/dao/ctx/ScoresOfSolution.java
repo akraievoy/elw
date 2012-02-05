@@ -1,6 +1,5 @@
 package elw.dao.ctx;
 
-import elw.dao.Nav;
 import elw.vo.*;
 import elw.vo.Class;
 
@@ -8,7 +7,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * Relatively harmless parameter object, storing the full Score context.
+ * Parameter Object, storing the full Score context.
  */
 public class ScoresOfSolution extends SolutionsOfSlot {
     public final Solution solution;
@@ -28,10 +27,22 @@ public class ScoresOfSolution extends SolutionsOfSlot {
         super(enr, group, student, course, idx, task, tType, ver, slot);
         this.solution = solution;
     }
+    
+    public ScoreOfSolution lastScore() {
+        return new ScoreOfSolution(
+                enr, group, student, 
+                course, idx, task, tType, ver, 
+                slot, solution, score()
+        );
+    }
+
+    public Score score() {
+        return solution.getScore();
+    }
 
     public Score preliminary() {
-        final Class classDue = Nav.classDue(enr, idxEntry, slot);
-        final Class classFrom = Nav.classFrom(enr, idxEntry);
+        final Class classDue = dueClass();
+        final Class classFrom = openClass();
 
         final Map<String, Double> vars = new TreeMap<String, Double>();
 
@@ -76,5 +87,40 @@ public class ScoresOfSolution extends SolutionsOfSlot {
 
     private double flag(final boolean theBool) {
         return theBool ? 1.0 : 0.0;
+    }
+
+    public int daysPending() {
+        final Score score = score();
+        final Long scoreStamp;
+        if (score.state() != State.PENDING) {
+            scoreStamp = score().getStamp();
+        } else {
+            scoreStamp = System.currentTimeMillis();
+        }
+
+        final int daysToApprove = days(TZ, openMillis(), scoreStamp);
+        final int daysToUpload = days(TZ, openMillis(), solution.getStamp());
+
+        return daysToApprove - daysToUpload;
+    }
+
+    public int daysOpen() {
+        return days(TZ, openMillis(), solution.getStamp());
+    }
+
+    public int daysOverdue() {
+        return days(TZ, dueMillis(), solution.getStamp());
+    }
+
+    public State state() {
+        return score().state();
+    }
+
+    public double points() {
+        return idxEntry.computePoints(score(), slot);
+    }
+
+    public ScoreTerm[] terms() {
+        return score().getTerms(tType, false);
     }
 }

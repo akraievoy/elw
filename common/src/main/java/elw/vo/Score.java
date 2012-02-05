@@ -9,6 +9,7 @@ import org.akraievoy.couch.Squab;
 //  TODO mixing Slot and SlotId with Score is not quite ok with me
 public class Score extends Squab.Stamped implements Stamped {
     private Boolean approved;
+
     public Boolean getApproved() { return approved; }
     public void setApproved(Boolean approved) { this.approved = approved; }
 
@@ -144,6 +145,20 @@ public class Score extends Squab.Stamped implements Stamped {
         }
 
         return scoreTerms.toArray(new ScoreTerm[scoreTerms.size()]);
+    }
+
+    public State state() {
+        final Boolean approved = getApproved();
+
+        if (Boolean.TRUE.equals(approved)) {
+            return State.APPROVED;
+        }
+
+        if (Boolean.FALSE.equals(approved)) {
+            return State.DECLINED;
+        }
+
+        return State.PENDING;
     }
 
     protected String[] extraPathElems = null;

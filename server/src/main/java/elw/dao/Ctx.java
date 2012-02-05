@@ -672,7 +672,7 @@ public class Ctx implements elw.vo.Ctx {
 
         boolean approved = false;
         for (Solution s : files) {
-            if (s.getScore() != null && Boolean.TRUE.equals(s.getScore().getApproved())) {
+            if (s.getScore() != null && s.getScore().state() == State.APPROVED) {
                 approved = true;
             }
         }
@@ -690,7 +690,7 @@ public class Ctx implements elw.vo.Ctx {
         }
 
         final Solution s = files.get(files.size() - 1);
-        return s.getScore() != null && !Boolean.TRUE.equals(s.getScore().getApproved());
+        return s.getScore() != null && !(s.getScore().state() == State.APPROVED);
     }
 
     public static boolean isPendingLast(

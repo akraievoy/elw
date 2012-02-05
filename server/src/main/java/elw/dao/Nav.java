@@ -2,6 +2,9 @@ package elw.dao;
 
 import elw.vo.*;
 import elw.vo.Class;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.Days;
 
 import java.util.*;
 
@@ -105,32 +108,5 @@ public class Nav {
         ));
 
         return file;
-    }
-
-    public static Class classFrom(
-            final Enrollment enr,
-            final IndexEntry indexEntry
-    ) {
-        final int classFromIndex =
-                indexEntry.getClassFrom();
-
-        final Class classFrom =
-                enr.getClasses().get(classFromIndex);
-
-        return classFrom;
-    }
-
-    public static Class classDue(
-            final Enrollment enr,
-            final IndexEntry indexEntry,
-            final FileSlot slot
-    ) {
-        final int classDueIndex =
-                indexEntry.getClassDue().get(slot.getId());
-
-        final Class classDue =
-                enr.getClasses().get(classDueIndex);
-
-        return classDue;
     }
 }
