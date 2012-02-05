@@ -7,30 +7,30 @@ import java.util.TreeMap;
 /**
  * All scores for given enrollment.
  */
-public class EnrScores {
-    private final TreeMap<String, StudScores> studentToScore =
-            new TreeMap<String, StudScores>();
+public class RestEnrollmentSummary {
+    private final TreeMap<String, RestStudentSummary> studentToScore =
+            new TreeMap<String, RestStudentSummary>();
 
     public void register(
             final String studentId,
             final String index,
             final String slotId,
-            final SlotScore slotScore
+            final RestSlotSummary slotSummary
     ) {
-        final StudScores updated;
-        final StudScores existing = studentToScore.get(studentId);
+        final RestStudentSummary updated;
+        final RestStudentSummary existing = studentToScore.get(studentId);
         if (existing != null) {
             updated = existing;
         } else {
-            final StudScores created = new StudScores();
+            final RestStudentSummary created = new RestStudentSummary();
             studentToScore.put(studentId, created);
             updated = created;
         }
 
-        updated.register(index, slotId, slotScore);
+        updated.register(index, slotId, slotSummary);
     }
 
-    public SortedMap<String, StudScores> getStudentToScore() {
+    public SortedMap<String, RestStudentSummary> getStudentToScore() {
         return Collections.unmodifiableSortedMap(studentToScore);
     }
 }

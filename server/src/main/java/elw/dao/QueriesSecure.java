@@ -2,9 +2,9 @@ package elw.dao;
 
 import base.pattern.Result;
 import com.google.common.io.InputSupplier;
-import elw.dao.ctx.ScoresOfSolution;
-import elw.dao.ctx.SolutionsOfSlot;
-import elw.dao.rest.EnrScores;
+import elw.dao.ctx.CtxSlot;
+import elw.dao.ctx.CtxSolution;
+import elw.dao.rest.RestEnrollmentSummary;
 import elw.vo.*;
 import org.akraievoy.couch.Squab;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
@@ -19,7 +19,7 @@ public class QueriesSecure implements Queries {
 
     private final Auth auth;
 
-    public EnrScores enrScores(String enrId, Collection<String> studentIds) {
+    public RestEnrollmentSummary enrScores(String enrId, Collection<String> studentIds) {
         if (auth.isAdm()) {
             return queries.enrScores(enrId, studentIds);
         }
@@ -62,15 +62,15 @@ public class QueriesSecure implements Queries {
         return null;  //	TODO review
     }
 
-    public Score score(ScoresOfSolution ctx) {
+    public Score score(CtxSolution ctx) {
         return null;  //	TODO review
     }
 
-    public List<Solution> solutions(SolutionsOfSlot ctx) {
+    public List<Solution> solutions(CtxSlot ctx) {
         return null;  //	TODO review
     }
 
-    public Score score(ScoresOfSolution ctx, Long stamp) {
+    public Score score(CtxSolution ctx, Long stamp) {
         return null;  //	TODO review
     }
 

@@ -6,14 +6,14 @@ import elw.vo.Class;
 /**
  * Parameter Object, storing the full Class/Task/Version context.
  */
-public class SlotsOfTask extends ClassesOfStudent {
+public class CtxTask extends CtxStudent {
     public final int idx;
     public final IndexEntry idxEntry;
     public final TaskType tType;
     public final Task task;
     public final Version ver;
 
-    public SlotsOfTask(
+    public CtxTask(
             Enrollment enr,
             Course course,
             Group group,
@@ -32,14 +32,14 @@ public class SlotsOfTask extends ClassesOfStudent {
         this.ver = ver;
     }
 
-    public SolutionsOfSlot solutions(final FileSlot slot) {
-        final SolutionsOfSlot solutionsOfSlot = new SolutionsOfSlot(
+    public CtxSlot slot(final FileSlot slot) {
+        final CtxSlot ctxSlot = new CtxSlot(
                 enr, group, student, course,
                 idx, task, tType, ver,
                 slot
         );
 
-        return solutionsOfSlot;
+        return ctxSlot;
     }
 
     public Class openClass() {

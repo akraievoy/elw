@@ -9,10 +9,10 @@ import java.util.List;
 /**
  * Parameter Object, storing the full Solution context.
  */
-public class SolutionsOfSlot extends SlotsOfTask {
+public class CtxSlot extends CtxTask {
     public final FileSlot slot;
 
-    public SolutionsOfSlot(
+    public CtxSlot(
             Enrollment enr,
             Group group,
             Student student,
@@ -31,8 +31,8 @@ public class SolutionsOfSlot extends SlotsOfTask {
         this.slot = slot;
     }
 
-    public ScoresOfSolution scores(final Solution solution) {
-        return new ScoresOfSolution(
+    public CtxSolution solution(final Solution solution) {
+        return new CtxSolution(
                 enr, group, student, course,
                 idx, task, tType, ver,
                 slot, solution
@@ -98,12 +98,12 @@ public class SolutionsOfSlot extends SlotsOfTask {
         return true;
     }
 
-    public ScoresOfSolution bestApproved(List<Solution> solutions) {
-        ScoresOfSolution best = null;
+    public CtxSolution bestApproved(List<Solution> solutions) {
+        CtxSolution best = null;
 
         for (Solution solution : solutions) {
             if (solution.getScore().state() == State.APPROVED) {
-                final ScoresOfSolution curr = scores(solution);
+                final CtxSolution curr = solution(solution);
                 if (best == null) {
                     best = curr;
                     continue;
@@ -120,12 +120,12 @@ public class SolutionsOfSlot extends SlotsOfTask {
         return best;
     }
 
-    public ScoresOfSolution lastPending(List<Solution> solutions) {
-        ScoresOfSolution last = null;
+    public CtxSolution lastPending(List<Solution> solutions) {
+        CtxSolution last = null;
 
         for (Solution solution : solutions) {
             if (solution.getScore().state() == State.PENDING) {
-                final ScoresOfSolution curr = scores(solution);
+                final CtxSolution curr = solution(solution);
                 if (last == null) {
                     last = curr;
                     continue;

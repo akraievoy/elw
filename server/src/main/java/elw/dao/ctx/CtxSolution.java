@@ -9,10 +9,10 @@ import java.util.TreeMap;
 /**
  * Parameter Object, storing the full Score context.
  */
-public class ScoresOfSolution extends SolutionsOfSlot {
+public class CtxSolution extends CtxSlot {
     public final Solution solution;
     
-    public ScoresOfSolution(
+    public CtxSolution(
             Enrollment enr,
             Group group,
             Student student,
@@ -27,12 +27,16 @@ public class ScoresOfSolution extends SolutionsOfSlot {
         super(enr, group, student, course, idx, task, tType, ver, slot);
         this.solution = solution;
     }
-    
-    public ScoreOfSolution lastScore() {
-        return new ScoreOfSolution(
+
+    public CtxScore lastScore() {
+        return score(score());
+    }
+
+    public CtxScore score(final Score score) {
+        return new CtxScore(
                 enr, group, student, 
                 course, idx, task, tType, ver, 
-                slot, solution, score()
+                slot, solution, score
         );
     }
 

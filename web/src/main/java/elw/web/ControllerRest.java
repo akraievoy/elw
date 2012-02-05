@@ -1,7 +1,7 @@
 package elw.web;
 
 import elw.dao.*;
-import elw.dao.rest.EnrScores;
+import elw.dao.rest.RestEnrollmentSummary;
 import elw.miniweb.ViewJackson;
 import elw.vo.Course;
 import elw.vo.Enrollment;
@@ -351,14 +351,14 @@ public class ControllerRest extends ControllerElw {
         final Queries queries =
                 (Queries) model.get(MODEL_QUERIES);
 
-        final EnrScores enrScores = queries.enrScores(enrId, null);
+        final RestEnrollmentSummary restEnrollment = queries.enrScores(enrId, null);
 
-        if (enrScores == null) {
+        if (restEnrollment == null) {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             return null;
         }
 
-        return new ModelAndView(ViewJackson.data(enrScores));
+        return new ModelAndView(ViewJackson.data(restEnrollment));
     }
 
     @RequestMapping(

@@ -1,35 +1,35 @@
 package elw.dao.rest;
 
-import elw.dao.ctx.ScoresOfSolution;
+import elw.dao.ctx.CtxSolution;
 import elw.vo.ScoreTerm;
 import elw.vo.State;
 
 /**
  * Score information of a file, with extended information.
  */
-public class SolutionScore {
-    public static SolutionScore create(ScoresOfSolution scores) {
-        final SolutionScore score = new SolutionScore();
+public class RestScore {
+    public static RestScore create(CtxSolution scores) {
+        final RestScore restScore = new RestScore();
 
-        score.solutionId = scores.solution.getId();
-        score.scoreStamp = scores.score().getStamp();
+        restScore.solutionId = scores.solution.getId();
+        restScore.scoreStamp = scores.score().getStamp();
         
-        score.state = scores.state();
-        score.terms = scores.terms();
+        restScore.state = scores.state();
+        restScore.terms = scores.terms();
         //  FIXME onsite/offsite and all other minor props
-        score.sourceAddress = scores.solution.getSourceAddress();
-        score.pointsBudget = scores.pointsBudget();
+        restScore.sourceAddress = scores.solution.getSourceAddress();
+        restScore.pointsBudget = scores.pointsBudget();
         if (scores.state() == State.APPROVED) {
-            score.pointsApproved = scores.points();
+            restScore.pointsApproved = scores.points();
         } else if (scores.state() == State.PENDING) {
-            score.pointsPending = scores.points();
+            restScore.pointsPending = scores.points();
         }
 
-        score.daysOverdue = scores.daysOverdue();
-        score.daysOpen = scores.daysOpen();
-        score.daysPending = scores.daysPending();
+        restScore.daysOverdue = scores.daysOverdue();
+        restScore.daysOpen = scores.daysOpen();
+        restScore.daysPending = scores.daysPending();
 
-        return score;
+        return restScore;
     }
 
     private int daysOverdue;

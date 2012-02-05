@@ -1,7 +1,6 @@
 package elw.dao.rest;
 
-import elw.dao.ctx.ScoresOfSolution;
-import elw.dao.ctx.SolutionsOfSlot;
+import elw.dao.ctx.CtxSlot;
 import elw.vo.Solution;
 import elw.vo.State;
 
@@ -10,55 +9,55 @@ import java.util.List;
 /**
  * Complete ReST-view of score for one particular Task / Version / FileSlot.
  */
-public class SlotScore {
+public class RestSlotSummary {
     /**
-     * @see SlotScore#create(elw.dao.ctx.SolutionsOfSlot, java.util.List)
+     * @see RestSlotSummary#create(elw.dao.ctx.CtxSlot, java.util.List)
      */
-    public SlotScore() {
+    public RestSlotSummary() {
         //  nothing to do here
     }
 
-    public static SlotScore create(
-            SolutionsOfSlot solutionsOfSlot,
+    public static RestSlotSummary create(
+            CtxSlot ctxSlot,
             List<Solution> solutions
     ) {
-        final SlotScore slotScore = new SlotScore();
+        final RestSlotSummary slotSummary = new RestSlotSummary();
 
-        slotScore.taskTypeId = solutionsOfSlot.tType.getId();
+        slotSummary.taskTypeId = ctxSlot.tType.getId();
         //  FIXME move to rest enrollment
-        slotScore.taskTypeName = solutionsOfSlot.tType.getName();
+        slotSummary.taskTypeName = ctxSlot.tType.getName();
 
-        slotScore.taskId = solutionsOfSlot.task.getId();
-        slotScore.taskName = solutionsOfSlot.task.getName();
+        slotSummary.taskId = ctxSlot.task.getId();
+        slotSummary.taskName = ctxSlot.task.getName();
 
-        slotScore.versionId = solutionsOfSlot.ver.getId();
-        slotScore.versionName = solutionsOfSlot.ver.getName();
+        slotSummary.versionId = ctxSlot.ver.getId();
+        slotSummary.versionName = ctxSlot.ver.getName();
 
-        slotScore.openMillis = solutionsOfSlot.openMillis();
-        slotScore.dueMillis = solutionsOfSlot.dueMillis();
+        slotSummary.openMillis = ctxSlot.openMillis();
+        slotSummary.dueMillis = ctxSlot.dueMillis();
 
-        slotScore.state = solutionsOfSlot.state(solutions);
+        slotSummary.state = ctxSlot.state(solutions);
 
-        slotScore.bestApproved = SolutionScore.create(solutionsOfSlot.bestApproved(solutions));
-        slotScore.lastPending =  SolutionScore.create(solutionsOfSlot.lastPending(solutions));
+        slotSummary.bestApproved = RestScore.create(ctxSlot.bestApproved(solutions));
+        slotSummary.lastPending =  RestScore.create(ctxSlot.lastPending(solutions));
         //  FIXME move solution-specific props to score or some wrapper hereof
 
-        return slotScore;
+        return slotSummary;
     }
 
     private State state;
     public State getState() { return state; }
     public void setState(State state) { this.state = state; }
     
-    private SolutionScore bestApproved;
-    public SolutionScore getBestApproved() { return bestApproved; }
-    public void setBestApproved(SolutionScore bestApproved) {
+    private RestScore bestApproved;
+    public RestScore getBestApproved() { return bestApproved; }
+    public void setBestApproved(RestScore bestApproved) {
         this.bestApproved = bestApproved;
     }
 
-    private SolutionScore lastPending;
-    public SolutionScore getLastPending() { return lastPending; }
-    public void setLastPending(SolutionScore lastPending) {
+    private RestScore lastPending;
+    public RestScore getLastPending() { return lastPending; }
+    public void setLastPending(RestScore lastPending) {
         this.lastPending = lastPending;
     }
 

@@ -3,10 +3,10 @@ package elw.dao;
 import base.pattern.Result;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.InputSupplier;
-import elw.dao.ctx.ClassesOfStudent;
-import elw.dao.ctx.ScoresOfSolution;
-import elw.dao.ctx.SlotsOfTask;
-import elw.dao.ctx.SolutionsOfSlot;
+import elw.dao.ctx.CtxStudent;
+import elw.dao.ctx.CtxSlot;
+import elw.dao.ctx.CtxSolution;
+import elw.dao.ctx.CtxTask;
 import elw.dao.rest.*;
 import elw.vo.*;
 import elw.vo.Class;
@@ -33,7 +33,7 @@ public class QueriesImpl implements Queries {
 
     private CouchDao metaDao;
 
-    public EnrScores enrScores(String enrId, Collection<String> studentIds) {
+    public RestEnrollmentSummary enrScores(String enrId, Collection<String> studentIds) {
         final Enrollment enr = enrollment(enrId);
 
         if (enr == null) {
@@ -51,11 +51,11 @@ public class QueriesImpl implements Queries {
 
         final Course course = course(enr.getCourseId());
 
-        final EnrScores enrScores = new EnrScores();
+        final RestEnrollmentSummary restEnrollment = new RestEnrollmentSummary();
         for (String studId : studIds) {
             final Student student = group.getStudents().get(studId);
             
-            final ClassesOfStudent classesOfStudent = new ClassesOfStudent(enr, course, student, group);
+            final CtxStudent ctxStudent = new CtxStudent(enr, course, student, group);
 
             final List<IndexEntry> index = enr.getIndex();
             for (
@@ -63,38 +63,38 @@ public class QueriesImpl implements Queries {
                     idxPos < idxSize;
                     idxPos++
             ) {
-                final SlotsOfTask slotsOfTask = classesOfStudent.slots(idxPos);
+                final CtxTask ctxTask = ctxStudent.task(idxPos);
 
                 for (
                         Map.Entry<String, FileSlot> fsEntry :
-                        slotsOfTask.tType.getFileSlots().entrySet()
+                        ctxTask.tType.getFileSlots().entrySet()
                 ) {
 
                     if (fsEntry.getValue().getScoreWeight() > 0) {
-                        final SolutionsOfSlot solutionsOfSlot =
-                                slotsOfTask.solutions(fsEntry.getValue());
+                        final CtxSlot ctxSlot =
+                                ctxTask.slot(fsEntry.getValue());
 
                         final List<Solution> solutions =
-                                solutions(solutionsOfSlot);
+                                solutions(ctxSlot);
 
-                        final SlotScore slotScore =
-                                SlotScore.create(
-                                        solutionsOfSlot,
+                        final RestSlotSummary slotSummary =
+                                RestSlotSummary.create(
+                                        ctxSlot,
                                         solutions
                                 );
 
-                        enrScores.register(
+                        restEnrollment.register(
                                 studId,
                                 String.valueOf(idxPos),
                                 fsEntry.getKey(),
-                                slotScore
+                                slotSummary
                         );
                     }
                 }
             }
         }
 
-        return enrScores;
+        return restEnrollment;
     }
 
     public void setMetaDao(CouchDao metaDao) {
@@ -172,7 +172,7 @@ public class QueriesImpl implements Queries {
         return slotIdToFiles;
     }
 
-    public List<Solution> solutions(SolutionsOfSlot ctx) {
+    public List<Solution> solutions(CtxSlot ctx) {
         final List<Solution> solutions = solutionDao.findAll(
                 Solution.class,
                 ctx.group.getId(),
@@ -186,7 +186,7 @@ public class QueriesImpl implements Queries {
         );
 
         for (Solution solution : solutions) {
-            final ScoresOfSolution scores = ctx.scores(solution);
+            final CtxSolution scores = ctx.solution(solution);
 
             //  fetch last of previously fixed scores for a given solution
             final Score fixedScore = score(scores);
@@ -205,7 +205,7 @@ public class QueriesImpl implements Queries {
         return Nav.resolveFileType(solutions, ctx.course.getFileTypes());
     }
 
-    public Solution solution(SolutionsOfSlot ctx, String fileId) {
+    public Solution solution(CtxSlot ctx, String fileId) {
         final Solution solution = solutionDao.findLast(
                 Solution.class,
                 ctx.group.getId(),
@@ -220,7 +220,7 @@ public class QueriesImpl implements Queries {
         );
 
         if (solution != null) {
-            solution.setScore(score(ctx.scores(solution)));
+            solution.setScore(score(ctx.solution(solution)));
         }
 
         return Nav.resolveFileType(solution, ctx.course.getFileTypes());
@@ -439,7 +439,7 @@ public class QueriesImpl implements Queries {
         );
     }
 
-    public Score score(ScoresOfSolution ctx) {
+    public Score score(CtxSolution ctx) {
         return solutionDao.findLast(
                 Score.class,
                 ctx.group.getId(),
@@ -454,7 +454,7 @@ public class QueriesImpl implements Queries {
         );
     }
 
-    public Score score(ScoresOfSolution ctx, Long stamp) {
+    public Score score(CtxSolution ctx, Long stamp) {
         return solutionDao.findByStamp(
                 stamp,
                 Score.class,

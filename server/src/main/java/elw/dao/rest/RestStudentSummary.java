@@ -7,31 +7,31 @@ import java.util.TreeMap;
 /**
  * All scores for student's solutions.
  */
-public class StudScores {
-    private final SortedMap<String, SortedMap<String, SlotScore>> indexToSlotToScore =
-            new TreeMap<String, SortedMap<String, SlotScore>>();
+public class RestStudentSummary {
+    private final SortedMap<String, SortedMap<String, RestSlotSummary>> indexToSlotToScore =
+            new TreeMap<String, SortedMap<String, RestSlotSummary>>();
 
     public void register(
             String index,
             String slotId,
-            SlotScore slotScore
+            RestSlotSummary slotSummary
     ) {
-        final SortedMap<String, SlotScore> slotToScoreExisting =
+        final SortedMap<String, RestSlotSummary> slotToScoreExisting =
                 indexToSlotToScore.get(index);
-        final SortedMap<String, SlotScore> slotToScoreUpdated;
+        final SortedMap<String, RestSlotSummary> slotToScoreUpdated;
         if (slotToScoreExisting == null) {
-            final SortedMap<String, SlotScore> slotToScoreCreated =
-                    new TreeMap<String, SlotScore>();
+            final SortedMap<String, RestSlotSummary> slotToScoreCreated =
+                    new TreeMap<String, RestSlotSummary>();
             indexToSlotToScore.put(index, slotToScoreCreated);
             slotToScoreUpdated = slotToScoreCreated;
         } else {
             slotToScoreUpdated = slotToScoreExisting;
         }
 
-        slotToScoreUpdated.put(slotId, slotScore);
+        slotToScoreUpdated.put(slotId, slotSummary);
     }
 
-    public SortedMap<String, SortedMap<String, SlotScore>> getIndexToSlotToScore() {
+    public SortedMap<String, SortedMap<String, RestSlotSummary>> getIndexToSlotToScore() {
         return Collections.unmodifiableSortedMap(indexToSlotToScore);
     }
 

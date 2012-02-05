@@ -5,10 +5,10 @@ import elw.vo.*;
 /**
  * Parameter Object, storing the full Score context.
  */
-public class ScoreOfSolution extends ScoresOfSolution {
+public class CtxScore extends CtxSolution {
     public final Score score;
 
-    public ScoreOfSolution(
+    public CtxScore(
             Enrollment enr,
             Group group,
             Student student,

@@ -1,6 +1,6 @@
 package elw.dao;
 
-import elw.dao.ctx.SolutionsOfSlot;
+import elw.dao.ctx.CtxSlot;
 import elw.vo.Class;
 import elw.vo.*;
 import org.akraievoy.gear.G4Parse;
@@ -707,8 +707,8 @@ public class Ctx implements elw.vo.Ctx {
         return f.getScore() == null;
     }
     
-    public SolutionsOfSlot solutions(final FileSlot slot) {
-        return new SolutionsOfSlot(
+    public CtxSlot solutions(final FileSlot slot) {
+        return new CtxSlot(
                 getEnr(), getGroup(), getStudent(), getCourse(),
                 indexEntry.getKey(),
                 getAss(), getAssType(), getVer(),

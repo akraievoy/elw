@@ -11,15 +11,16 @@ import java.util.TimeZone;
 /**
  *  Parameter Object, storing the full enrollment context.
  */
-public class ClassesOfStudent {
+public class CtxStudent {
     //  LATER replace with some enrollment-scoped property
     public static final TimeZone TZ = TimeZone.getDefault();
+
     public final Enrollment enr;
     public final Group group;
     public final Student student;
     public final Course course;
 
-    public ClassesOfStudent(Enrollment enr, Course course, Student student, Group group) {
+    public CtxStudent(Enrollment enr, Course course, Student student, Group group) {
         this.enr = enr;
         this.course = course;
         this.student = student;
@@ -62,7 +63,7 @@ public class ClassesOfStudent {
         return 1 + Days.daysBetween(anchorEndOfDay, diffDate).getDays();
     }
 
-    public SlotsOfTask slots(final int idxPos) {
+    public CtxTask task(final int idxPos) {
         final IndexEntry idxEntry = enr.getIndex().get(idxPos);
         final String[] path = idxEntry.getPath();
         final String taskTypeId = path[0];
@@ -74,11 +75,11 @@ public class ClassesOfStudent {
                 task, idxEntry, group, student.getId()
         );
 
-        final SlotsOfTask slotsOfTask = new SlotsOfTask(
+        final CtxTask ctxTask = new CtxTask(
                 enr, course, group, student,
                 idxPos, task, taskType, ver
         );
 
-        return slotsOfTask;
+        return ctxTask;
     }
 }
