@@ -1,36 +1,33 @@
 package elw.dao.rest;
 
+import elw.dao.ctx.CtxStudent;
+
 import java.util.Collections;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
 /**
- * All scores for given enrollment.
+ * All scores for given enrollment, group-wise mapping
+ * from student ID to summary per student.
+ *
+ * @see RestStudentSummary
  */
 public class RestEnrollmentSummary {
-    private final TreeMap<String, RestStudentSummary> studentToScore =
+    private final TreeMap<String, RestStudentSummary> students =
             new TreeMap<String, RestStudentSummary>();
 
     public void register(
-            final String studentId,
-            final String index,
-            final String slotId,
-            final RestSlotSummary slotSummary
+            final CtxStudent ctxSlot,
+            final RestStudentSummary studentSummary
     ) {
-        final RestStudentSummary updated;
-        final RestStudentSummary existing = studentToScore.get(studentId);
-        if (existing != null) {
-            updated = existing;
-        } else {
-            final RestStudentSummary created = new RestStudentSummary();
-            studentToScore.put(studentId, created);
-            updated = created;
-        }
+        studentSummary.precachePointTotals();
 
-        updated.register(index, slotId, slotSummary);
+        final String studentId = ctxSlot.student.getId();
+
+        students.put(studentId, studentSummary);
     }
 
-    public SortedMap<String, RestStudentSummary> getStudentToScore() {
-        return Collections.unmodifiableSortedMap(studentToScore);
+    public SortedMap<String, RestStudentSummary> getStudents() {
+        return Collections.unmodifiableSortedMap(students);
     }
 }

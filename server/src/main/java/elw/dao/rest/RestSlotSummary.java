@@ -4,12 +4,22 @@ import elw.dao.ctx.CtxSlot;
 import elw.vo.Solution;
 import elw.vo.State;
 
-import java.util.List;
+import java.util.*;
 
 /**
  * Complete ReST-view of score for one particular Task / Version / FileSlot.
  */
 public class RestSlotSummary {
+    /**
+     * States which are computed simply as enrollment budgets.
+     */
+    public static final List<State> SIMPLE_STATES =
+            Collections.unmodifiableList(
+                    Arrays.asList(
+                            State.CLOSED, State.OPEN, State.DECLINED
+                    )
+            );
+
     /**
      * @see RestSlotSummary#create(elw.dao.ctx.CtxSlot, java.util.List)
      */
@@ -45,10 +55,46 @@ public class RestSlotSummary {
         return slotSummary;
     }
 
+    private final SortedMap<State, Double> points =
+            new TreeMap<State, Double>();
+    public SortedMap<State, Double> getPoints() {
+        return Collections.unmodifiableSortedMap(points);
+    }
+
     private State state;
     public State getState() { return state; }
     public void setState(State state) { this.state = state; }
-    
+
+    public void precachePointTotals(final CtxSlot ctxSlot) {
+        clearPoints(points);
+
+        final double pointsForSlot =
+                ctxSlot.pointsForSlot();
+
+        final RestScore lastPending =
+                getLastPending();
+
+        final State slotState = getState();
+        if (SIMPLE_STATES.contains(slotState)) {
+            increment(points, slotState, pointsForSlot);
+        } else if (slotState == State.PENDING) {
+            increment(points, State.PENDING, lastPending.getPoints());
+        } else if (slotState == State.APPROVED) {
+            //  here we track both approved AND pending solutions
+            //      so we're able to aggregate the data
+            increment(
+                    points,
+                    State.APPROVED,
+                    getBestApproved().getPoints()
+            );
+            if (lastPending != null) {
+                increment(points, State.PENDING, lastPending.getPoints());
+            }
+        } else {
+            throw new IllegalStateException("was unreachable before");
+        }
+    }
+
     private RestScore bestApproved;
     public RestScore getBestApproved() { return bestApproved; }
     public void setBestApproved(RestScore bestApproved) {
@@ -94,4 +140,20 @@ public class RestSlotSummary {
     private String versionName;
     public String getVersionName() { return versionName; }
     public void setVersionName(String versionName) { this.versionName = versionName; }
+
+    public static void increment(
+            final SortedMap<State, Double> points,
+            final State addedState,
+            final double pointsForSlot
+    ) {
+        points.put(addedState, points.get(addedState) + pointsForSlot);
+    }
+
+    public static void clearPoints(
+            final SortedMap<State, Double> points
+    ) {
+        for (State state : State.values()) {
+            points.put(state, (double) 0);
+        }
+    }
 }

@@ -120,7 +120,7 @@ public class CtxSolution extends CtxSlot {
         return score().state();
     }
 
-    public double points() {
+    public double pointsForSolution() {
         return idxEntry.computePoints(score(), slot);
     }
 

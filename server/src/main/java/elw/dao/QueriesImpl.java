@@ -42,28 +42,34 @@ public class QueriesImpl implements Queries {
 
         final Group group = group(enr.getGroupId());
 
-        final Collection<String> studIds;
-        if (studentIds == null) {
-            studIds = group.getStudents().keySet();
-        } else {
-            studIds = studentIds;
+        final Collection<String> studIds = group.getStudents().keySet();
+        if (studentIds != null) {
+            studIds.retainAll(studentIds);
         }
 
         final Course course = course(enr.getCourseId());
+        final List<IndexEntry> index = enr.getIndex();
 
-        final RestEnrollmentSummary restEnrollment = new RestEnrollmentSummary();
+        final RestEnrollmentSummary enrSummary = new RestEnrollmentSummary();
         for (String studId : studIds) {
-            final Student student = group.getStudents().get(studId);
-            
-            final CtxStudent ctxStudent = new CtxStudent(enr, course, student, group);
+            final Student student =
+                    group.getStudents().get(studId);
 
-            final List<IndexEntry> index = enr.getIndex();
+            final CtxStudent ctxStudent =
+                    new CtxStudent(enr, course, student, group);
+
+            final RestStudentSummary studentSummary =
+                    new RestStudentSummary();
+
             for (
                     int idxPos = 0, idxSize = index.size();
                     idxPos < idxSize;
                     idxPos++
             ) {
-                final CtxTask ctxTask = ctxStudent.task(idxPos);
+                final CtxTask ctxTask =
+                        ctxStudent.task(idxPos);
+                final RestTaskSummary taskSummary =
+                        new RestTaskSummary();
 
                 for (
                         Map.Entry<String, FileSlot> fsEntry :
@@ -73,7 +79,6 @@ public class QueriesImpl implements Queries {
                     if (fsEntry.getValue().getScoreWeight() > 0) {
                         final CtxSlot ctxSlot =
                                 ctxTask.slot(fsEntry.getValue());
-
                         final List<Solution> solutions =
                                 solutions(ctxSlot);
 
@@ -83,18 +88,17 @@ public class QueriesImpl implements Queries {
                                         solutions
                                 );
 
-                        restEnrollment.register(
-                                studId,
-                                String.valueOf(idxPos),
-                                fsEntry.getKey(),
-                                slotSummary
-                        );
+                        taskSummary.register(ctxSlot, slotSummary);
                     }
                 }
+
+                studentSummary.register(ctxTask, taskSummary);
             }
+
+            enrSummary.register(ctxStudent, studentSummary);
         }
 
-        return restEnrollment;
+        return enrSummary;
     }
 
     public void setMetaDao(CouchDao metaDao) {

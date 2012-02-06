@@ -40,19 +40,23 @@ public class CtxSlot extends CtxTask {
     }
 
     public State state(List<Solution> solutions) {
-        State state;
         if (!open()) {
-            state = State.CLOSED;
-        } else if (solutions.isEmpty()) {
-            state = State.OPEN;
-        } else if (someApproved(solutions)) {
-            state = State.APPROVED;
-        } else if (allDeclined(solutions)) {
-            state = State.DECLINED;
-        } else {
-            state = State.PENDING;
+            return State.CLOSED;
         }
-        return state;
+
+        if (solutions.isEmpty()) {
+            return State.OPEN;
+        }
+
+        if (someInState(solutions, State.APPROVED)) {
+            return State.APPROVED;
+        }
+
+        if (allInState(solutions, State.DECLINED)) {
+            return State.DECLINED;
+        }
+
+        return State.PENDING;
     }
 
     public Class dueClass() {
@@ -74,9 +78,12 @@ public class CtxSlot extends CtxTask {
         return dueMillis() <= now;
     }
 
-    public boolean someApproved(List<Solution> solutions) {
+    public static boolean someInState(
+            final List<Solution> solutions,
+            final State state
+    ) {
         for (Solution solution : solutions) {
-            if (solution.getScore().state() == State.APPROVED) {
+            if (solution.getScore().state() == state) {
                 return true;
             }
         }
@@ -84,13 +91,16 @@ public class CtxSlot extends CtxTask {
         return false;
     }
 
-    public boolean allDeclined(List<Solution> solutions) {
+    public static boolean allInState(
+            final List<Solution> solutions,
+            final State state
+    ) {
         if (solutions.isEmpty()) {
             return false;
         }
 
         for (Solution solution : solutions) {
-            if (solution.getScore().state() != State.DECLINED) {
+            if (solution.getScore().state() != state) {
                 return false;
             }
         }
@@ -109,8 +119,9 @@ public class CtxSlot extends CtxTask {
                     continue;
                 }
 
-                double bestPoints = best.lastScore().points();
-                double currPoints = curr.lastScore().points();
+                double bestPoints = best.lastScore().pointsForSolution();
+                double currPoints = curr.lastScore().pointsForSolution();
+
                 if (bestPoints < currPoints) {
                     best = curr;
                 }
@@ -133,6 +144,7 @@ public class CtxSlot extends CtxTask {
 
                 final Long lastStamp = last.solution.getStamp();
                 final Long currStamp = curr.solution.getStamp();
+
                 if (lastStamp < currStamp) {
                     last = curr;
                 }
@@ -142,7 +154,7 @@ public class CtxSlot extends CtxTask {
         return last;
     }
     
-    public double pointsBudget() {
+    public double pointsForSlot() {
         return idxEntry.getScoreBudget() * slot.getScoreWeight();
     }
 }

@@ -18,12 +18,7 @@ public class RestScore {
         restScore.terms = scores.terms();
         //  FIXME onsite/offsite and all other minor props
         restScore.sourceAddress = scores.solution.getSourceAddress();
-        restScore.pointsBudget = scores.pointsBudget();
-        if (scores.state() == State.APPROVED) {
-            restScore.pointsApproved = scores.points();
-        } else if (scores.state() == State.PENDING) {
-            restScore.pointsPending = scores.points();
-        }
+        restScore.points = scores.pointsForSolution();
 
         restScore.daysOverdue = scores.daysOverdue();
         restScore.daysOpen = scores.daysOpen();
@@ -44,14 +39,8 @@ public class RestScore {
     private String sourceAddress;
     public String getSourceAddress() { return sourceAddress; }
 
-    private double pointsApproved;
-    public double getPointsApproved() { return pointsApproved; }
-
-    private double pointsPending;
-    public double getPointsPending() { return pointsPending; }
-
-    private double pointsBudget;
-    public double getPointsBudget() { return pointsBudget; }
+    private double points;
+    public double getPoints() { return points; }
 
     private String solutionId;
     public String getSolutionId() { return solutionId; }

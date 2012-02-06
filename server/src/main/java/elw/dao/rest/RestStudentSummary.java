@@ -1,5 +1,9 @@
 package elw.dao.rest;
 
+import elw.dao.ctx.CtxSlot;
+import elw.dao.ctx.CtxTask;
+import elw.vo.State;
+
 import java.util.Collections;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -8,46 +12,57 @@ import java.util.TreeMap;
  * All scores for student's solutions.
  */
 public class RestStudentSummary {
-    private final SortedMap<String, SortedMap<String, RestSlotSummary>> indexToSlotToScore =
-            new TreeMap<String, SortedMap<String, RestSlotSummary>>();
+    private final SortedMap<String, RestTaskSummary> tasks =
+            new TreeMap<String, RestTaskSummary>();
+
+    private final SortedMap<State, Double> points =
+            new TreeMap<State, Double>();
 
     public void register(
-            String index,
-            String slotId,
+            final CtxSlot ctxSlot,
             RestSlotSummary slotSummary
     ) {
-        final SortedMap<String, RestSlotSummary> slotToScoreExisting =
-                indexToSlotToScore.get(index);
-        final SortedMap<String, RestSlotSummary> slotToScoreUpdated;
-        if (slotToScoreExisting == null) {
-            final SortedMap<String, RestSlotSummary> slotToScoreCreated =
-                    new TreeMap<String, RestSlotSummary>();
-            indexToSlotToScore.put(index, slotToScoreCreated);
-            slotToScoreUpdated = slotToScoreCreated;
+        final RestTaskSummary existing =
+                tasks.get(String.valueOf(ctxSlot.idx));
+
+        final RestTaskSummary updated;
+        if (existing == null) {
+            final RestTaskSummary created =
+                    new RestTaskSummary();
+            tasks.put(String.valueOf(ctxSlot.idx), created);
+            updated = created;
         } else {
-            slotToScoreUpdated = slotToScoreExisting;
+            updated = existing;
         }
 
-        slotToScoreUpdated.put(slotId, slotSummary);
+        updated.register(ctxSlot, slotSummary);
     }
 
-    public SortedMap<String, SortedMap<String, RestSlotSummary>> getIndexToSlotToScore() {
-        return Collections.unmodifiableSortedMap(indexToSlotToScore);
+    public void register(
+            final CtxTask ctxTask,
+            final RestTaskSummary taskSummary
+    ) {
+        taskSummary.precachePointTotals(ctxTask);
+
+        tasks.put(String.valueOf(ctxTask.idx), taskSummary);
+    }
+    
+    public void precachePointTotals() {
+        RestSlotSummary.clearPoints(points);
+
+        for (RestTaskSummary taskSummary : tasks.values()) {
+            final SortedMap<State, Double> taskPoints =
+                    taskSummary.getPoints();
+
+            RestTaskSummary.increment(points, taskPoints);
+        }
     }
 
-    public double getPointsOpen() {
-        return 0.0; //  FIXME proceed with computed value
+    public SortedMap<State, Double> getPoints() {
+        return Collections.unmodifiableSortedMap(points);
     }
 
-    public double getPointsApproved() {
-        return 0.0; //  FIXME proceed with computed value
-    }
-
-    public double getPointsPending() {
-        return 0.0; //  FIXME proceed with computed value
-    }
-
-    public double getPointsBudget() {
-        return 0.0; //  FIXME proceed with computed value
+    public SortedMap<String, RestTaskSummary> getTasks() {
+        return Collections.unmodifiableSortedMap(tasks);
     }
 }
