@@ -34,7 +34,6 @@ public class RestSlotSummary {
         final RestSlotSummary slotSummary = new RestSlotSummary();
 
         slotSummary.taskTypeId = ctxSlot.tType.getId();
-        //  FIXME move to rest enrollment
         slotSummary.taskTypeName = ctxSlot.tType.getName();
 
         slotSummary.taskId = ctxSlot.task.getId();
@@ -50,7 +49,6 @@ public class RestSlotSummary {
 
         slotSummary.bestApproved = RestScore.create(ctxSlot.bestApproved(solutions));
         slotSummary.lastPending =  RestScore.create(ctxSlot.lastPending(solutions));
-        //  FIXME move solution-specific props to score or some wrapper hereof
 
         return slotSummary;
     }
@@ -107,12 +105,10 @@ public class RestSlotSummary {
         this.lastPending = lastPending;
     }
 
-    //  FIXME this should be moved to enrollement rest representation
     private long openMillis;
     public long getOpenMillis() { return openMillis; }
     public void setOpenMillis(long openMillis) { this.openMillis = openMillis; }
 
-    //  FIXME this should be moved to enrollement rest representation
     private long dueMillis;
     public long getDueMillis() { return dueMillis; }
     public void setDueMillis(long dueMillis) { this.dueMillis = dueMillis; }

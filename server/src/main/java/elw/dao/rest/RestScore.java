@@ -20,7 +20,6 @@ public class RestScore {
         
         restScore.state = scores.state();
         restScore.terms = scores.terms();
-        //  FIXME onsite/offsite and all other minor props
         restScore.sourceAddress = scores.solution.getSourceAddress();
         restScore.points = scores.pointsForSolution();
 

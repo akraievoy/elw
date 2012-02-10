@@ -27,8 +27,6 @@ public class Nav {
         return null;
     }
     
-    //  LATER filter private versions which are not assigned, per student
-    
     public static List<Version> filterPrivateVersions(Task task) {
         if (task.getVersions().isEmpty()) {
             throw new IllegalStateException(

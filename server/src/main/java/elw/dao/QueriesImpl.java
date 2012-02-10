@@ -258,8 +258,6 @@ public class QueriesImpl implements Queries {
         return Nav.resolveFileType(solution, ctx.course.getFileTypes());
     }
 
-    //  TODO hack jackson to forfeit content-length reporting
-    //      to ensure in-place streaming
     public Result createFile(
             Ctx ctx, FileSlot slot,
             FileBase file, InputSupplier<? extends InputStream> inputSupplier,
@@ -397,7 +395,7 @@ public class QueriesImpl implements Queries {
                         }
                 )));
 
-                //  FIXME for each task iterate over versions and pull the files
+                //  LATER for each task iterate over versions and pull the files
             }
 
             course.setResolved(true);

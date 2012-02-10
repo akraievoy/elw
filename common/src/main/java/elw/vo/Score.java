@@ -6,7 +6,6 @@ import java.util.*;
 
 import org.akraievoy.couch.Squab;
 
-//  TODO mixing Slot and SlotId with Score is not quite ok with me
 public class Score extends Squab.Stamped implements Stamped {
     private Boolean approved;
 

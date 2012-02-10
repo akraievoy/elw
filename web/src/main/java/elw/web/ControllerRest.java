@@ -24,9 +24,7 @@ import java.io.IOException;
 import java.util.*;
 
 /*
-* /myauth
-*
-* /auth    //  LATER specify
+* /auth    //  LATER specify PUT for admin impersonation
 * /auths    //  LATER specify
 *
 * /challenges //   LATER specify
@@ -44,31 +42,10 @@ import java.util.*;
 *      challenge = SHA512(salt, email, millis)
 *      response = SHA512(salt, email, sessionID, request.sourceAddr, expiry, challenge)
 *
-* /enrollment/enrId/classes
-*   GET /
-*      -> {"id": "enrId", "name": "Course Name @ Group Name",
-*          "" : {
-*
-*          }
-*      }
-* /enrollment/enrId/index
-*   GET /
-*      -> {"id": "enrId", "name": "Course Name @ Group Name",
-*          "" : {
-*
-*          }
-*      }
-* /enrollment/enrId/scoring
-*   GET /
-*      -> {"id": "enrId", "name": "Course Name @ Group Name" "points": "5", "pointsOpen": 14, "pointsTotal": 20
-*          "studentId" : {
-*
-*          }
-*      }
 * /enrollment/enrId/files
 *   GET /
 *      -> {}
-* /enrollment/enrId/uploads
+* /enrollment/enrId/solutions
 *   GET /
 *   PUT /
 *

@@ -57,7 +57,7 @@ public class CtxSolution extends CtxSlot {
             overdueDays = (double) classDue.computeDaysOverdue(solution);
         }
         final double onTime = flag(enr.checkOnTime(solution));
-        //  LATER onSite may be different for different classes
+        //  TODO onSite may be different for different classes
         final double onSite = flag(
                 classFrom.checkOnSite(solution.getSourceAddress())
         );
