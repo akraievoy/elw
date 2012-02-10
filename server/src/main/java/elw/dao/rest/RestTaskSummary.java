@@ -47,6 +47,10 @@ public class RestTaskSummary {
             final RestSlotSummary slotSummary =
                     slots.get(slot.getId());
 
+            if (slotSummary == null) {
+                continue;
+            }
+
             increment(
                     points, slotSummary.getPoints()
             );

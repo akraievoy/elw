@@ -2,18 +2,18 @@ package elw.vo;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.joda.time.Days;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-import java.util.TimeZone;
 import java.util.regex.Pattern;
 
 //  LATER think of some other name for this entity, collision with java.lang smells
+//  FIXME date should be id, classes should be stored as map in enrollment
 public class Class implements Cloneable {
     private static final DateTimeFormatter FMT_DATE = DateTimeFormat.forPattern("yyyy-MM-dd");
     private static final DateTimeFormatter FMT_DATE_NICE = DateTimeFormat.forPattern("EEE MMM dd");
+    public static final DateTimeFormatter FMT_DATE_TIME_NICE = DateTimeFormat.forPattern("EEE MMM dd HH:mm");
     private static final DateTimeFormatter FMT_TIME = DateTimeFormat.forPattern("HH:mm");
 
     private String date;
@@ -21,6 +21,10 @@ public class Class implements Cloneable {
     private String toTime;
     private Pattern[] onSitePatterns;
     private String[] onSite;
+
+    public String id() {
+        return getDate() + " " + getFromTime();
+    }
 
     @JsonIgnore
     public boolean isCurrent() {

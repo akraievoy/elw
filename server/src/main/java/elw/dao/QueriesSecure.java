@@ -4,6 +4,7 @@ import base.pattern.Result;
 import com.google.common.io.InputSupplier;
 import elw.dao.ctx.CtxSlot;
 import elw.dao.ctx.CtxSolution;
+import elw.dao.rest.RestEnrollment;
 import elw.dao.rest.RestEnrollmentSummary;
 import elw.vo.*;
 import org.akraievoy.couch.Squab;
@@ -19,15 +20,25 @@ public class QueriesSecure implements Queries {
 
     private final Auth auth;
 
-    public RestEnrollmentSummary enrScores(String enrId, Collection<String> studentIds) {
+    public Auth getAuth() { return auth; }
+
+    public QueriesSecure(QueriesImpl queries, Auth auth) {
+        this.auth = auth;
+        this.queries = queries;
+    }
+
+    public RestEnrollmentSummary restScores(
+            final String enrId,
+            final Collection<String> studentIds
+    ) {
         if (auth.isAdm()) {
-            return queries.enrScores(enrId, studentIds);
+            return queries.restScores(enrId, studentIds);
         }
 
         if (!enrollmentIds().contains(enrId)) {
             return null;
         }
-        
+
         final TreeSet<String> studIds = new TreeSet<String>();
         final Enrollment enr = enrollment(enrId);
         final Group group = group(enr.getGroupId());
@@ -36,14 +47,61 @@ public class QueriesSecure implements Queries {
             studIds.retainAll(studentIds);
         }
 
-        return queries.enrScores(enrId, studIds);
+        return queries.restScores(enrId, studIds);
     }
 
-    public Auth getAuth() { return auth; }
+    public RestEnrollment restEnrollment(
+            final String enrId,
+            final String sourceAddress
+    ) {
+        if (auth.isAdm()) {
+            return queries.restEnrollment(enrId, sourceAddress);
+        }
 
-    public QueriesSecure(QueriesImpl queries, Auth auth) {
-        this.auth = auth;
-        this.queries = queries;
+        if (!enrollmentIds().contains(enrId)) {
+            return null;
+        }
+
+        final RestEnrollment enrollment =
+                queries.restEnrollment(enrId, sourceAddress);
+        final Group group = 
+                group(enrollment.getGroupId());
+
+        for (RestEnrollment.RestIndexEntry entry :
+                enrollment.getIndex().values()) {
+            final TreeMap<String, Version> versions =
+                    new TreeMap<String, Version>();
+
+            //  hide all versions for not yet open tasks
+            if (entry.getClassFrom().isStarted()) {
+                //  hide all versions which are not shared
+                for (Map.Entry<String, Version> verEntry :
+                        entry.getTask().getVersions().entrySet()) {
+                    if (verEntry.getValue().isShared()) {
+                        versions.entrySet().add(verEntry);
+                    }
+                }
+
+                //  hide all versions which are not assigned
+                final Version version = Nav.resolveVersion(
+                        entry.getTask(),
+                        entry.getVerAnchor(),
+                        entry.getVerStep(),
+                        group.getStudents().keySet(),
+                        Nav.findStudent(group, auth.getId()).getId()
+                );
+
+                versions.put(version.getId(), version);
+            }
+
+            entry.getTask().setVersions(versions);
+
+            //  hide version anchors and steps
+            entry.setVerStep(-1);
+            entry.setVerAnchor(-1);
+        }
+
+        return enrollment;
     }
 
     public Admin adminSome(String login) {

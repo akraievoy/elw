@@ -46,8 +46,14 @@ public class CtxTask extends CtxStudent {
         final int classFromIndex =
                 idxEntry.getClassFrom();
 
+        final int classFromIndexSafe = 
+                Math.min(
+                        classFromIndex,
+                        enr.getClasses().size() - 1
+                );
+
         final Class classFrom =
-                enr.getClasses().get(classFromIndex);
+                enr.getClasses().get(classFromIndexSafe);
 
         return classFrom;
     }

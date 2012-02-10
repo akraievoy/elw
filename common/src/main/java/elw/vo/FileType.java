@@ -3,7 +3,7 @@ package elw.vo;
 import java.util.*;
 import java.util.regex.Pattern;
 
-public class FileType implements IdNamed {
+public class FileType implements IdNamed, Cloneable {
     private String id;
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
@@ -36,7 +36,7 @@ public class FileType implements IdNamed {
     public boolean isBinary() { return binary; }
     public void setBinary(boolean binary) { this.binary = binary; }
 
-    private final List<String> contentTypes = new ArrayList<String>();
+    private List<String> contentTypes = new ArrayList<String>();
     public List<String> getContentTypes() {
         return Collections.unmodifiableList(contentTypes);
     }
@@ -47,7 +47,7 @@ public class FileType implements IdNamed {
         }
     }
 
-    private final List<byte[]> headers = new ArrayList<byte[]>();
+    private List<byte[]> headers = new ArrayList<byte[]>();
     public List<byte[]> getHeaders() {
         return Collections.unmodifiableList(headers);
     }
@@ -56,6 +56,16 @@ public class FileType implements IdNamed {
         if (headers != null) {
             this.headers.addAll(headers);
         }
+    }
+
+    @Override
+    public FileType clone() throws CloneNotSupportedException {
+        final FileType clone = (FileType) super.clone();
+        
+        clone.contentTypes = new ArrayList<String>(contentTypes);
+        clone.headers = new ArrayList<byte[]>(headers);
+
+        return clone;
     }
 
     public static class _ {

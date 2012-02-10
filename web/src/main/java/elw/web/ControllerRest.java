@@ -1,12 +1,13 @@
 package elw.web;
 
 import elw.dao.*;
+import elw.dao.rest.RestEnrollment;
 import elw.dao.rest.RestEnrollmentSummary;
 import elw.miniweb.ViewJackson;
 import elw.vo.Course;
-import elw.vo.Enrollment;
 import elw.vo.Group;
 import elw.web.core.Core;
+import elw.web.core.W;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
@@ -78,7 +79,7 @@ import java.util.*;
 @Controller
 @RequestMapping("/rest/**/*")
 public class ControllerRest extends ControllerElw {
-    public static enum ListStyle{ids, map}
+    public static enum ListStyle{IDS, MAP}
 
     public static final String SESSION_AUTH = "elw_auth";
 
@@ -203,7 +204,7 @@ public class ControllerRest extends ControllerElw {
 
         final List<String> courseIds = queries.courseIds();
 
-        if (!ListStyle.map.equals(listStyle)) {
+        if (ListStyle.IDS == listStyle) {
             return new ModelAndView(ViewJackson.data(courseIds));
         }
 
@@ -262,7 +263,7 @@ public class ControllerRest extends ControllerElw {
 
         final List<String> groupIds = queries.groupIds();
 
-        if (!ListStyle.map.equals(listStyle)) {
+        if (ListStyle.IDS == listStyle) {
             return new ModelAndView(ViewJackson.data(groupIds));
         }
 
@@ -321,14 +322,16 @@ public class ControllerRest extends ControllerElw {
 
         final List<String> enrIds = queries.enrollmentIds();
 
-        if (!ListStyle.map.equals(listStyle)) {
+        if (ListStyle.IDS == listStyle) {
             return new ModelAndView(ViewJackson.data(enrIds));
         }
 
-        final Map<String, Enrollment> enrollments =
-                new TreeMap<String, Enrollment>();
+        final Map<String, RestEnrollment> enrollments =
+                new TreeMap<String, RestEnrollment>();
         for (String enrId : enrIds) {
-            enrollments.put(enrId, queries.enrollment(enrId));
+            final RestEnrollment restEnrollment =
+                    queries.restEnrollment(enrId, W.resolveRemoteAddress(req));
+            enrollments.put(enrId, restEnrollment);
         }
 
         return new ModelAndView(ViewJackson.data(enrollments));
@@ -351,7 +354,8 @@ public class ControllerRest extends ControllerElw {
         final Queries queries =
                 (Queries) model.get(MODEL_QUERIES);
 
-        final RestEnrollmentSummary restEnrollment = queries.enrScores(enrId, null);
+        final RestEnrollment restEnrollment = 
+                queries.restEnrollment(enrId, W.resolveRemoteAddress(req));
 
         if (restEnrollment == null) {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -378,18 +382,15 @@ public class ControllerRest extends ControllerElw {
         final Queries queries =
                 (Queries) model.get(MODEL_QUERIES);
 
-        final Enrollment enrollment = queries.enrollment(enrId);
+        final RestEnrollmentSummary enrSummary =
+                queries.restScores(enrId, null);
 
-        if (enrollment == null) {
+        if (enrSummary == null) {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             return null;
         }
 
-
-        
-        //  return a map of maps of maps:
-        //      studId -> indexEntry -> slotId -> score
-        return new ModelAndView(ViewJackson.data(enrollment));
+        return new ModelAndView(ViewJackson.data(enrSummary));
     }
 
     //  http://stackoverflow.com/questions/3686808/spring-3-requestmapping-get-path-value

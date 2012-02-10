@@ -54,6 +54,8 @@ public class Nav {
         return versionsPriv.isEmpty() ? versions : versionsPriv;
     }
 
+    //  FIXME this should be stored in Couch
+    //      along with first access to the task
     public static Version resolveVersion(
             final Task task,
             final int anchor, final int step,

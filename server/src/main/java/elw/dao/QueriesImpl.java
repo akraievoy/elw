@@ -32,9 +32,42 @@ public class QueriesImpl implements Queries {
     private final Object courseResolutionMonitor = new Object();
 
     private CouchDao metaDao;
+    public void setMetaDao(CouchDao metaDao) {
+        this.metaDao = metaDao;
+    }
 
-    public RestEnrollmentSummary enrScores(String enrId, Collection<String> studentIds) {
-        final Enrollment enr = enrollment(enrId);
+    private CouchDao userDao;
+    public void setUserDao(CouchDao userDao) {
+        this.userDao = userDao;
+    }
+
+    private CouchDao attachmentDao;
+    public void setAttachmentDao(CouchDao attachmentDao) {
+        this.attachmentDao = attachmentDao;
+    }
+
+    private CouchDao solutionDao;
+    public void setSolutionDao(CouchDao solutionDao) {
+        this.solutionDao = solutionDao;
+    }
+
+    private CouchDao authDao;
+    public void setAuthDao(CouchDao authDao) {
+        this.authDao = authDao;
+    }
+
+    public QueriesImpl() {
+    }
+    
+    public QueriesSecure secure(final QueriesSecure.Auth auth) {
+        return new QueriesSecure(this, auth);
+    }
+
+    public RestEnrollmentSummary restScores(
+            final String enrId,
+            final Collection<String> studentIds
+    ) {
+        final Enrollment enr = enrollmentSome(enrId);
 
         if (enr == null) {
             return null;
@@ -42,7 +75,8 @@ public class QueriesImpl implements Queries {
 
         final Group group = group(enr.getGroupId());
 
-        final Collection<String> studIds = group.getStudents().keySet();
+        final Collection<String> studIds =
+                new ArrayList<String>(group.getStudents().keySet());
         if (studentIds != null) {
             studIds.retainAll(studentIds);
         }
@@ -101,35 +135,29 @@ public class QueriesImpl implements Queries {
         return enrSummary;
     }
 
-    public void setMetaDao(CouchDao metaDao) {
-        this.metaDao = metaDao;
-    }
+    //  LATER migrate to this method (requires investigation)
+    public RestEnrollment restEnrollment(
+            final String enrId,
+            final String sourceAddress
+    ) {
+        final Enrollment enr =
+                userDao.findSome(Enrollment.class, null, null, enrId);
 
-    private CouchDao userDao;
-    public void setUserDao(CouchDao userDao) {
-        this.userDao = userDao;
-    }
+        if (enr == null) {
+            return null;
+        }
 
-    private CouchDao attachmentDao;
-    public void setAttachmentDao(CouchDao attachmentDao) {
-        this.attachmentDao = attachmentDao;
-    }
+        final Course course =
+                course(enr.getCourseId());
 
-    private CouchDao solutionDao;
-    public void setSolutionDao(CouchDao solutionDao) {
-        this.solutionDao = solutionDao;
-    }
+        final RestEnrollment restEnr =
+                RestEnrollment.create(
+                        enr,
+                        course,
+                        sourceAddress
+                );
 
-    private CouchDao authDao;
-    public void setAuthDao(CouchDao authDao) {
-        this.authDao = authDao;
-    }
-
-    public QueriesImpl() {
-    }
-    
-    public QueriesSecure secure(final QueriesSecure.Auth auth) {
-        return new QueriesSecure(this, auth);
+        return restEnr;
     }
 
     public Group group(final String groupId) {

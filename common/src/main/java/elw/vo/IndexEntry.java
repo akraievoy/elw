@@ -8,6 +8,12 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
+//  FIXME refer to classes via id/date, routed in a robust way like so:
+//      classes.tailMap(idxEntry.classFrom).firstKey()
+//          with a check to remap any overdue references to last class
+//      which would be as simple as classes.lastKey()
+//  FIXME indexEntries should be stored in a treemap also,
+//      where id may be derived from path and classFrom
 public class IndexEntry implements Cloneable {
     //  FIXME add the index property
 

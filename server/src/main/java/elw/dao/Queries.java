@@ -4,6 +4,7 @@ import base.pattern.Result;
 import com.google.common.io.InputSupplier;
 import elw.dao.ctx.CtxSlot;
 import elw.dao.ctx.CtxSolution;
+import elw.dao.rest.RestEnrollment;
 import elw.dao.rest.RestEnrollmentSummary;
 import elw.vo.*;
 import org.akraievoy.couch.Squab;
@@ -89,5 +90,7 @@ public interface Queries {
 
     Enrollment enrollment(String id);
 
-    RestEnrollmentSummary enrScores(String enrId, Collection<String> studentIds);
+    RestEnrollmentSummary restScores(String enrId, Collection<String> studentIds);
+
+    RestEnrollment restEnrollment(String enrId, final String sourceAddress);
 }

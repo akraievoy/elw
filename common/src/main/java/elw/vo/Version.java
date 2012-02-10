@@ -1,8 +1,6 @@
 package elw.vo;
 
-import java.util.*;
-
-public class Version implements IdNamed {
+public class Version implements IdNamed, Cloneable {
     private String id;
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
@@ -17,24 +15,12 @@ public class Version implements IdNamed {
     public boolean isShared() { return shared; }
     public void setShared(boolean shared) { this.shared = shared; }
     
-    private Map<String, List<Solution>> files = new TreeMap<String, List<Solution>>();
-    private List<Solution> getFiles(final String slotId) {
-        final List<Solution> filesForSlot = files.get(slotId);
-        if (filesForSlot == null) {
-            return Collections.emptyList();
-        }
-        return Collections.unmodifiableList(filesForSlot);
-    }
-    public void setFiles(final String slotId, List<Solution> files) {
-        final List<Solution> filesForSlot = this.files.get(slotId);
-        if (filesForSlot == null) {
-            this.files.put(slotId, new ArrayList<Solution>(files));
-            return;
-        }
+    @Override
+    public Version clone() throws CloneNotSupportedException {
+        final Version clone = (Version) super.clone();
 
-        filesForSlot.clear();
-        if (files != null) {
-            filesForSlot.addAll(files);
-        }
+        //  nothing more to do here
+
+        return clone;
     }
 }

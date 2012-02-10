@@ -9,6 +9,10 @@ import elw.vo.State;
  */
 public class RestScore {
     public static RestScore create(CtxSolution scores) {
+        if (scores == null) {
+            return null;
+        }
+
         final RestScore restScore = new RestScore();
 
         restScore.solutionId = scores.solution.getId();

@@ -63,8 +63,13 @@ public class CtxSlot extends CtxTask {
         final int classDueIndex =
                 idxEntry.getClassDue().get(slot.getId());
 
+        final int classDueIndexSafe = Math.min(
+                classDueIndex,
+                enr.getClasses().size() - 1
+        );
+
         final Class classDue =
-                enr.getClasses().get(classDueIndex);
+                enr.getClasses().get(classDueIndexSafe);
 
         return classDue;
     }

@@ -19,6 +19,7 @@
 package elw.vo;
 
 import org.akraievoy.gear.G4mat;
+import org.codehaus.jackson.annotate.JsonIgnore;
 
 public class ScoreTerm {
 	private final String id;
@@ -65,7 +66,8 @@ public class ScoreTerm {
 		return "+" + G4mat.format2(percentage - 100) + "%";
 	}
 
-	public boolean isIdentity() {
+	@JsonIgnore
+    public boolean isIdentity() {
 		return Math.abs(ratio - 1) < 1e-2;
 	}
 
@@ -77,6 +79,7 @@ public class ScoreTerm {
 		return criteria;
 	}
 
+	@JsonIgnore
 	public FileSlot getSlot() {
 		return slot;
 	}

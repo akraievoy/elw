@@ -4,7 +4,7 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 
 import java.util.Map;
 
-public class Criteria implements IdNamed {
+public class Criteria implements IdNamed, Cloneable {
     private String id;
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
@@ -70,5 +70,14 @@ public class Criteria implements IdNamed {
         }
 
         return pows;
+    }
+
+    @Override
+    public Criteria clone() throws CloneNotSupportedException {
+        final Criteria clone = (Criteria) super.clone();
+
+        //  nothing else to do here
+
+        return clone;
     }
 }
