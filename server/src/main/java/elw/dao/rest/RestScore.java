@@ -16,11 +16,13 @@ public class RestScore {
         final RestScore restScore = new RestScore();
 
         restScore.solutionId = scores.solution.getId();
-        restScore.scoreStamp = scores.score().getStamp();
-        
+        restScore.stampMillis = scores.score().getStamp();
+        if (restScore.stampMillis != null) {
+            restScore.stampNice = scores.dateTimeNice(restScore.stampMillis);
+        }
+
         restScore.state = scores.state();
         restScore.terms = scores.terms();
-        restScore.sourceAddress = scores.solution.getSourceAddress();
         restScore.points = scores.pointsForSolution();
 
         restScore.daysOverdue = scores.daysOverdue();
@@ -39,9 +41,6 @@ public class RestScore {
     private int daysPending;
     public int getDaysPending() { return daysPending; }
 
-    private String sourceAddress;
-    public String getSourceAddress() { return sourceAddress; }
-
     private double points;
     public double getPoints() { return points; }
 
@@ -51,8 +50,11 @@ public class RestScore {
     private State state;
     public State getState() { return state; }
 
-    private Long scoreStamp;
-    public Long getScoreStamp() { return scoreStamp; }
+    private Long stampMillis;
+    public Long getStampMillis() { return stampMillis; }
+
+    private String stampNice;
+    public String getStampNice() { return stampNice; }
 
     private ScoreTerm[] terms;
     public ScoreTerm[] getTerms() { return terms; }

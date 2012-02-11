@@ -7,6 +7,7 @@ import elw.dao.ctx.CtxSolution;
 import elw.dao.ctx.CtxStudent;
 import elw.dao.rest.RestEnrollment;
 import elw.dao.rest.RestEnrollmentSummary;
+import elw.dao.rest.RestSolution;
 import elw.vo.*;
 import org.akraievoy.couch.Squab;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
@@ -105,7 +106,7 @@ public class QueriesSecure implements Queries {
         return enrollment;
     }
 
-    public Map<String, Solution> restSolutions(
+    public Map<String,RestSolution> restSolutions(
             final String enrId,
             final SolutionFilter filter
     ) {

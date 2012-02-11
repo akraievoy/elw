@@ -159,7 +159,7 @@ public class QueriesImpl implements Queries {
         return restEnr;
     }
 
-    public Map<String, Solution> restSolutions(
+    public Map<String, RestSolution> restSolutions(
             String enrId,
             SolutionFilter filter
     ) {
@@ -175,8 +175,8 @@ public class QueriesImpl implements Queries {
         final Course course = course(enr.getCourseId());
         final List<IndexEntry> index = enr.getIndex();
 
-        final SortedMap<String, Solution> solutionsRes = 
-                new TreeMap<String, Solution>();
+        final SortedMap<String, RestSolution> solutionsRes =
+                new TreeMap<String, RestSolution>();
 
         for (String studId : studIds) {
             final Student student =
@@ -211,7 +211,7 @@ public class QueriesImpl implements Queries {
                         if (filter.allows(ctxSolution)) {
                             solutionsRes.put(
                                     solution.getCouchId(),
-                                    solution
+                                    RestSolution.create(ctxSolution)
                             );
                         }
                     }

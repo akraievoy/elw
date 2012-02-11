@@ -7,6 +7,8 @@ import elw.vo.Student;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Days;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.util.TimeZone;
 
@@ -14,6 +16,9 @@ import java.util.TimeZone;
  * Parameter Object for general Enrollment Context.
  */
 public class CtxEnrollment {
+    public static final DateTimeFormatter FMT_DATE_TIME_NICE =
+            DateTimeFormat.forPattern("EEE MMM dd HH:mm");
+
     public final Enrollment enr;
     public final Group group;
     public final Course course;
@@ -29,10 +34,12 @@ public class CtxEnrollment {
     public CtxStudent student(
             final Student student
     ) {
-        return new CtxStudent(
+        final CtxStudent ctxStudent = new CtxStudent(
                 enr, course, group,
                 student
         );
+
+        return propagateTZCache(ctxStudent);
     }
 
     public int days(long anchorMillis, long diffMillis) {
@@ -62,6 +69,14 @@ public class CtxEnrollment {
         return new DateTime(diffMillis, dateTimeZone());
     }
 
+    public static String dateTimeNice(final DateTime fromDateTime) {
+        return FMT_DATE_TIME_NICE.print(fromDateTime);
+    }
+    
+    public String dateTimeNice(final long millis) {
+        return dateTimeNice(dateTime(millis));
+    }
+
     public DateTime startOfDay(long anchorMillis) {
         final DateTime date = dateTime(anchorMillis);
         final DateTime anchorStartOfDay = new DateTime(
@@ -81,6 +96,13 @@ public class CtxEnrollment {
         return anchorEndOfDay;
     }
 
+    protected <C extends CtxEnrollment> C propagateTZCache(C ctx) {
+        ctx.timeZoneCache = timeZone();
+        ctx.dateTimeZoneCache = dateTimeZone();
+
+        return ctx;
+    }
+    
     private DateTimeZone dateTimeZoneCache;
     
     public synchronized DateTimeZone dateTimeZone() {

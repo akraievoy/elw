@@ -39,7 +39,7 @@ public class CtxTask extends CtxStudent {
                 slot
         );
 
-        return ctxSlot;
+        return propagateTZCache(ctxSlot);
     }
 
     public Class openClass() {

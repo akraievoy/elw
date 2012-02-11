@@ -35,7 +35,7 @@ public class CtxStudent extends CtxEnrollment {
                 idxPos, task, taskType, ver
         );
 
-        return ctxTask;
+        return propagateTZCache(ctxTask);
     }
 
 }

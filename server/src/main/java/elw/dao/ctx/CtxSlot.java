@@ -32,11 +32,13 @@ public class CtxSlot extends CtxTask {
     }
 
     public CtxSolution solution(final Solution solution) {
-        return new CtxSolution(
+        final CtxSolution ctxSolution = new CtxSolution(
                 enr, group, student, course,
                 idx, task, tType, ver,
                 slot, solution
         );
+
+        return propagateTZCache(ctxSolution);
     }
 
     public State state(List<Solution> solutions) {

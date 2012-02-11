@@ -6,6 +6,7 @@ import elw.dao.ctx.CtxSlot;
 import elw.dao.ctx.CtxSolution;
 import elw.dao.rest.RestEnrollment;
 import elw.dao.rest.RestEnrollmentSummary;
+import elw.dao.rest.RestSolution;
 import elw.vo.*;
 import org.akraievoy.couch.Squab;
 
@@ -95,5 +96,5 @@ public interface Queries {
 
     RestEnrollment restEnrollment(String enrId, final String sourceAddress);
 
-    Map<String,Solution> restSolutions(String enrId, SolutionFilter filter);
+    Map<String,RestSolution> restSolutions(String enrId, SolutionFilter filter);
 }

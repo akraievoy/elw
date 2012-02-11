@@ -43,7 +43,11 @@ public class RestSlotSummary {
         slotSummary.versionName = ctxSlot.ver.getName();
 
         slotSummary.openMillis = ctxSlot.openMillis();
-        slotSummary.dueMillis = ctxSlot.dueMillis();
+        slotSummary.openNice = ctxSlot.dateTimeNice(slotSummary.openMillis);
+        if (ctxSlot.dueClass() != null) {
+            slotSummary.dueMillis = ctxSlot.dueMillis();
+            slotSummary.dueNice = ctxSlot.dateTimeNice(slotSummary.dueMillis);
+        }
 
         slotSummary.state = ctxSlot.state(solutions);
 
@@ -58,10 +62,6 @@ public class RestSlotSummary {
     public SortedMap<State, Double> getPoints() {
         return Collections.unmodifiableSortedMap(points);
     }
-
-    private State state;
-    public State getState() { return state; }
-    public void setState(State state) { this.state = state; }
 
     public void precachePointTotals(final CtxSlot ctxSlot) {
         clearPoints(points);
@@ -93,49 +93,45 @@ public class RestSlotSummary {
         }
     }
 
+    private State state;
+    public State getState() { return state; }
+    public void setState(State state) { this.state = state; }
+
     private RestScore bestApproved;
     public RestScore getBestApproved() { return bestApproved; }
-    public void setBestApproved(RestScore bestApproved) {
-        this.bestApproved = bestApproved;
-    }
 
     private RestScore lastPending;
     public RestScore getLastPending() { return lastPending; }
-    public void setLastPending(RestScore lastPending) {
-        this.lastPending = lastPending;
-    }
 
     private long openMillis;
     public long getOpenMillis() { return openMillis; }
-    public void setOpenMillis(long openMillis) { this.openMillis = openMillis; }
+
+    private String openNice;
+    public String getOpenNice() { return openNice; }
 
     private long dueMillis;
     public long getDueMillis() { return dueMillis; }
-    public void setDueMillis(long dueMillis) { this.dueMillis = dueMillis; }
+
+    private String dueNice;
+    public String getDueNice() { return dueNice; }
 
     private String taskTypeId;
     public String getTaskTypeId() { return taskTypeId; }
-    public void setTaskTypeId(String taskTypeId) { this.taskTypeId = taskTypeId; }
 
     private String taskTypeName;
     public String getTaskTypeName() { return taskTypeName; }
-    public void setTaskTypeName(String taskTypeName) { this.taskTypeName = taskTypeName; }
-    
+
     private String taskId;
     public String getTaskId() { return taskId; }
-    public void setTaskId(String taskId) { this.taskId = taskId; }
 
     private String taskName;
     public String getTaskName() { return taskName; }
-    public void setTaskName(String taskName) { this.taskName = taskName; }
 
     private String versionId;
     public String getVersionId() { return versionId; }
-    public void setVersionId(String versionId) { this.versionId = versionId; }
 
     private String versionName;
     public String getVersionName() { return versionName; }
-    public void setVersionName(String versionName) { this.versionName = versionName; }
 
     public static void increment(
             final SortedMap<State, Double> points,

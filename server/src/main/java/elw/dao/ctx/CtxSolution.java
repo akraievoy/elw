@@ -33,11 +33,13 @@ public class CtxSolution extends CtxSlot {
     }
 
     public CtxScore score(final Score score) {
-        return new CtxScore(
-                enr, group, student, 
-                course, idx, task, tType, ver, 
+        final CtxScore ctxScore = new CtxScore(
+                enr, group, student,
+                course, idx, task, tType, ver,
                 slot, solution, score
         );
+
+        return propagateTZCache(ctxScore);
     }
 
     public Score score() {

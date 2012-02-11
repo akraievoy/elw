@@ -181,12 +181,8 @@ public class RestEnrollment {
             restClass.name = clazz.id();
             restClass.fromMillis = clazz.getFromDateTime().getMillis();
             restClass.toMillis = clazz.getToDateTime().getMillis();
-            restClass.fromNice = Class.FMT_DATE_TIME_NICE.print(
-                    clazz.getFromDateTime()
-            );
-            restClass.toNice = Class.FMT_DATE_TIME_NICE.print(
-                    clazz.getToDateTime()
-            );
+            restClass.fromNice = ctxEnr.dateTimeNice(restClass.fromMillis);
+            restClass.toNice = ctxEnr.dateTimeNice(restClass.toMillis);
             final long now = System.currentTimeMillis();
             restClass.days = ctxEnr.days(
                     now,

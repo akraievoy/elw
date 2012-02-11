@@ -13,7 +13,6 @@ import java.util.regex.Pattern;
 public class Class implements Cloneable {
     private static final DateTimeFormatter FMT_DATE = DateTimeFormat.forPattern("yyyy-MM-dd");
     private static final DateTimeFormatter FMT_DATE_NICE = DateTimeFormat.forPattern("EEE MMM dd");
-    public static final DateTimeFormatter FMT_DATE_TIME_NICE = DateTimeFormat.forPattern("EEE MMM dd HH:mm");
     private static final DateTimeFormatter FMT_TIME = DateTimeFormat.forPattern("HH:mm");
 
     private String date;

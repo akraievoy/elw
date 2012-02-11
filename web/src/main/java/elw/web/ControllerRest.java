@@ -3,6 +3,7 @@ package elw.web;
 import elw.dao.*;
 import elw.dao.rest.RestEnrollment;
 import elw.dao.rest.RestEnrollmentSummary;
+import elw.dao.rest.RestSolution;
 import elw.miniweb.ViewJackson;
 import elw.vo.Course;
 import elw.vo.Group;
@@ -396,7 +397,7 @@ public class ControllerRest extends ControllerElw {
         final Queries queries =
                 (Queries) model.get(MODEL_QUERIES);
 
-        final Map<String, Solution> enrSolutions =
+        final Map<String, RestSolution> enrSolutions =
                 queries.restSolutions(enrId, filter);
 
         if (enrSolutions == null) {
