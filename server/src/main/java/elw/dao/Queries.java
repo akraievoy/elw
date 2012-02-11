@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedMap;
 
 /**
@@ -93,4 +94,6 @@ public interface Queries {
     RestEnrollmentSummary restScores(String enrId, Collection<String> studentIds);
 
     RestEnrollment restEnrollment(String enrId, final String sourceAddress);
+
+    Map<String,Solution> restSolutions(String enrId, SolutionFilter filter);
 }

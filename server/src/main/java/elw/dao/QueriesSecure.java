@@ -4,6 +4,7 @@ import base.pattern.Result;
 import com.google.common.io.InputSupplier;
 import elw.dao.ctx.CtxSlot;
 import elw.dao.ctx.CtxSolution;
+import elw.dao.ctx.CtxStudent;
 import elw.dao.rest.RestEnrollment;
 import elw.dao.rest.RestEnrollmentSummary;
 import elw.vo.*;
@@ -102,6 +103,33 @@ public class QueriesSecure implements Queries {
         }
 
         return enrollment;
+    }
+
+    public Map<String, Solution> restSolutions(
+            final String enrId,
+            final SolutionFilter filter
+    ) {
+        if (auth.isAdm()) {
+            return queries.restSolutions(enrId, filter);
+        }
+
+        if (!enrollmentIds().contains(enrId)) {
+            return null;
+        }
+
+        return queries.restSolutions(enrId, new SolutionFilter() {
+            public boolean preAllows(CtxStudent ctxStudent) {
+                final boolean sameStudent =
+                        ctxStudent.student.getEmail().equals(auth.getId());
+                return sameStudent && filter.preAllows(ctxStudent);
+            }
+
+            public boolean allows(CtxSolution ctxSolution) {
+                //  funnel call to the original filter,
+                //      preAllows() did the job already
+                return filter.allows(ctxSolution);
+            }
+        });
     }
 
     public Admin adminSome(String login) {

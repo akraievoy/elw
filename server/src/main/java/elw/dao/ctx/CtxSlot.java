@@ -60,8 +60,12 @@ public class CtxSlot extends CtxTask {
     }
 
     public Class dueClass() {
-        final int classDueIndex =
+        final Integer classDueIndex =
                 idxEntry.getClassDue().get(slot.getId());
+
+        if (classDueIndex == null) {
+            return null;
+        }
 
         final int classDueIndexSafe = Math.min(
                 classDueIndex,
@@ -75,12 +79,29 @@ public class CtxSlot extends CtxTask {
     }
 
     public long dueMillis() {
-        return dueClass().getToDateTime().getMillis();
+        final Class dueClass = dueClass();
+        
+        if (dueClass == null) {
+            return Long.MAX_VALUE;
+        }
+
+        //  TODO timezone is not accounted for in Class.java
+        return dueClass.getToDateTime().getMillis();
     }
 
-    public boolean due() {
+    public boolean dueOver() {
         long now = System.currentTimeMillis();
-        return dueMillis() <= now;
+        return dueMillis() < now;
+    }
+
+    public boolean dueToday() {
+        long now = System.currentTimeMillis();
+        return dueMillis() < endOfDay(now).getMillis();
+    }
+
+    public boolean dueNextTwoWeeks() {
+        long now = System.currentTimeMillis();
+        return dueMillis() < endOfDay(now).plusDays(14).getMillis();
     }
 
     public static boolean someInState(
@@ -161,5 +182,27 @@ public class CtxSlot extends CtxTask {
     
     public double pointsForSlot() {
         return idxEntry.getScoreBudget() * slot.getScoreWeight();
+    }
+    
+    public boolean dueApplies(DueState state) {
+        if (state == DueState.EVER) {
+            return dueClass() != null;
+        }
+        
+        if (state == DueState.OVERDUE) {
+            return dueOver();
+        }
+        
+        if (state == DueState.TODAY) {
+            return dueToday();
+        }
+
+        //  I would like default branch to be articulated explicitly
+        //noinspection SimplifiableIfStatement
+        if (state == DueState.NEXT_TWO_WEEKS) {
+            return dueNextTwoWeeks();
+        }
+
+        return true;
     }
 }

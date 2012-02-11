@@ -23,7 +23,7 @@ public class CtxTask extends CtxStudent {
             TaskType tType,
             Version ver
     ) {
-        super(enr, course, student, group);
+        super(enr, course, group, student);
         //  LATER simplify idx/indexEntry
         this.idx = idx;
         this.idxEntry = enr.getIndex().get(idx);

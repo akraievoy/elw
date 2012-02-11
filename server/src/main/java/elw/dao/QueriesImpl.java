@@ -3,10 +3,7 @@ package elw.dao;
 import base.pattern.Result;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.InputSupplier;
-import elw.dao.ctx.CtxStudent;
-import elw.dao.ctx.CtxSlot;
-import elw.dao.ctx.CtxSolution;
-import elw.dao.ctx.CtxTask;
+import elw.dao.ctx.*;
 import elw.dao.rest.*;
 import elw.vo.*;
 import elw.vo.Class;
@@ -90,7 +87,7 @@ public class QueriesImpl implements Queries {
                     group.getStudents().get(studId);
 
             final CtxStudent ctxStudent =
-                    new CtxStudent(enr, course, student, group);
+                    new CtxStudent(enr, course, group, student);
 
             final RestStudentSummary studentSummary =
                     new RestStudentSummary();
@@ -147,17 +144,83 @@ public class QueriesImpl implements Queries {
             return null;
         }
 
-        final Course course =
-                course(enr.getCourseId());
+        final CtxEnrollment ctxEnrollment = new CtxEnrollment(
+                enr,
+                course(enr.getCourseId()),
+                group(enr.getGroupId())
+        );
 
         final RestEnrollment restEnr =
                 RestEnrollment.create(
-                        enr,
-                        course,
+                        ctxEnrollment,
                         sourceAddress
                 );
 
         return restEnr;
+    }
+
+    public Map<String, Solution> restSolutions(
+            String enrId,
+            SolutionFilter filter
+    ) {
+        final Enrollment enr = enrollmentSome(enrId);
+        if (enr == null) {
+            return null;
+        }
+
+        final Group group = group(enr.getGroupId());
+        final Collection<String> studIds =
+                new ArrayList<String>(group.getStudents().keySet());
+
+        final Course course = course(enr.getCourseId());
+        final List<IndexEntry> index = enr.getIndex();
+
+        final SortedMap<String, Solution> solutionsRes = 
+                new TreeMap<String, Solution>();
+
+        for (String studId : studIds) {
+            final Student student =
+                    group.getStudents().get(studId);
+            final CtxStudent ctxStudent =
+                    new CtxStudent(enr, course, group, student);
+            if (!filter.preAllows(ctxStudent)) {
+                continue;
+            }
+
+            for (
+                    int idxPos = 0, idxSize = index.size();
+                    idxPos < idxSize;
+                    idxPos++
+            ) {
+                final CtxTask ctxTask =
+                        ctxStudent.task(idxPos);
+
+                for (
+                        Map.Entry<String, FileSlot> fsEntry :
+                        ctxTask.tType.getFileSlots().entrySet()
+                ) {
+                    final CtxSlot ctxSlot =
+                            ctxTask.slot(fsEntry.getValue());
+                    final List<Solution> solutions =
+                            solutions(ctxSlot);
+
+                    for (Solution solution : solutions) {
+                        final CtxSolution ctxSolution = 
+                                ctxSlot.solution(solution);
+                        
+                        if (filter.allows(ctxSolution)) {
+                            solutionsRes.put(
+                                    solution.getCouchId(),
+                                    solution
+                            );
+                        }
+                    }
+
+                }
+            }
+        }
+
+        return solutionsRes;
     }
 
     public Group group(final String groupId) {

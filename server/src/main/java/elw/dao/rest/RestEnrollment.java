@@ -1,6 +1,6 @@
 package elw.dao.rest;
 
-import elw.dao.ctx.CtxStudent;
+import elw.dao.ctx.CtxEnrollment;
 import elw.vo.*;
 import elw.vo.Class;
 
@@ -35,27 +35,30 @@ public class RestEnrollment {
     private String name;
     public String getName() { return name; }
 
+    private String timeZone;
+    public String getTimeZone() { return timeZone; }
+
     public static RestEnrollment create(
-            final Enrollment enr,
-            final Course course,
+            final CtxEnrollment ctxEnr,
             final String sourceAddress
     ) {
         final RestEnrollment restEnr = new RestEnrollment();
 
-        restEnr.groupId = enr.getGroupId();
-        restEnr.courseId = enr.getCourseId();
-        restEnr.id = enr.getId();
-        restEnr.name = enr.getName();
+        restEnr.groupId = ctxEnr.group.getId();
+        restEnr.courseId = ctxEnr.course.getId();
+        restEnr.id = ctxEnr.enr.getId();
+        restEnr.name = ctxEnr.enr.getName();
+        restEnr.timeZone = ctxEnr.timeZone().getDisplayName();
 
         //  temp storage required for the old Couch enrollment model
         final List<String> classIds = new ArrayList<String>();
 
-        for (elw.vo.Class clazz : enr.getClasses()) {
+        for (elw.vo.Class clazz : ctxEnr.enr.getClasses()) {
             final String classId = clazz.id();
             classIds.add(classId);
 
             final RestClass restClass =
-                    RestClass.create(clazz, sourceAddress);
+                    RestClass.create(ctxEnr, clazz, sourceAddress);
             restEnr.classes.put(classId, restClass);
 
             if (restClass.isCurrent()) {
@@ -63,7 +66,7 @@ public class RestEnrollment {
             }
         }
 
-        final List<IndexEntry> enrIndex = enr.getIndex();
+        final List<IndexEntry> enrIndex = ctxEnr.enr.getIndex();
         for (int i = 0, idxSize = enrIndex.size(); i < idxSize; i++) {
             final IndexEntry idxEntry = enrIndex.get(i);
             final String idxEntryId = String.valueOf(i);
@@ -95,7 +98,7 @@ public class RestEnrollment {
             final String taskId = idxEntry.getPath()[1];
             try {
                 restEntry.taskType =
-                        course.getTaskTypes().get(taskTypeId).clone();
+                        ctxEnr.course.getTaskTypes().get(taskTypeId).clone();
                 restEntry.task =
                         restEntry.taskType.getTasks().get(taskId).clone();
 
@@ -168,7 +171,7 @@ public class RestEnrollment {
         public boolean isOnsite() { return onsite; }
 
         public static RestClass create(
-                final Class clazz,
+                CtxEnrollment ctxEnr, final Class clazz,
                 final String sourceAddress
         ) {
             final RestClass restClass = new RestClass();
@@ -185,8 +188,7 @@ public class RestEnrollment {
                     clazz.getToDateTime()
             );
             final long now = System.currentTimeMillis();
-            restClass.days = CtxStudent.days(
-                    CtxStudent.TZ,
+            restClass.days = ctxEnr.days(
                     now,
                     restClass.fromMillis
             );

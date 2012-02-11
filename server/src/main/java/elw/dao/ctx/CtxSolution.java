@@ -102,18 +102,18 @@ public class CtxSolution extends CtxSlot {
             scoreStamp = System.currentTimeMillis();
         }
 
-        final int daysToApprove = days(TZ, openMillis(), scoreStamp);
-        final int daysToUpload = days(TZ, openMillis(), solution.getStamp());
+        final int daysToApprove = days(openMillis(), scoreStamp);
+        final int daysToUpload = days(openMillis(), solution.getStamp());
 
         return daysToApprove - daysToUpload;
     }
 
     public int daysOpen() {
-        return days(TZ, openMillis(), solution.getStamp());
+        return days(openMillis(), solution.getStamp());
     }
 
     public int daysOverdue() {
-        return days(TZ, dueMillis(), solution.getStamp());
+        return days(dueMillis(), solution.getStamp());
     }
 
     public State state() {

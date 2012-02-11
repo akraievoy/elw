@@ -6,6 +6,7 @@ import elw.dao.rest.RestEnrollmentSummary;
 import elw.miniweb.ViewJackson;
 import elw.vo.Course;
 import elw.vo.Group;
+import elw.vo.Solution;
 import elw.web.core.Core;
 import elw.web.core.W;
 import org.springframework.stereotype.Controller;
@@ -19,7 +20,6 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.beans.PropertyEditorSupport;
 import java.io.IOException;
 import java.util.*;
 
@@ -42,12 +42,14 @@ import java.util.*;
 *      challenge = SHA512(salt, email, millis)
 *      response = SHA512(salt, email, sessionID, request.sourceAddr, expiry, challenge)
 *
+* {{{
 * /enrollment/enrId/files
 *   GET /
 *      -> {}
 * /enrollment/enrId/solutions
 *   GET /
 *   PUT /
+* }}}
 *
 * FIXME: SCORES
 *
@@ -77,7 +79,7 @@ public class ControllerRest extends ControllerElw {
     public void initBinder(WebDataBinder binder) {
         binder.registerCustomEditor(
                 ListStyle.class,
-                new ListStylePropertyEditor()
+                new EnumPropertyEditor(ListStyle.values())
         );
     }
 
@@ -346,7 +348,7 @@ public class ControllerRest extends ControllerElw {
             value = "enrollment/{enrId}/scoring",
             method = RequestMethod.GET
     )
-    public ModelAndView do_enrollmentScoresGet(
+    public ModelAndView do_enrollmentScoringGet(
             final HttpServletRequest req,
             final HttpServletResponse resp,
             @PathVariable("enrId") final String enrId
@@ -370,28 +372,45 @@ public class ControllerRest extends ControllerElw {
         return new ModelAndView(ViewJackson.data(enrSummary));
     }
 
+    @RequestMapping(
+            value = "enrollment/{enrId}/solutions/{listStyle}",
+            method = RequestMethod.GET
+    )
+    public ModelAndView do_enrollmentSolutionsGet(
+            final HttpServletRequest req,
+            final HttpServletResponse resp,
+            @PathVariable("enrId") final String enrId,
+            @PathVariable("listStyle") final ListStyle listStyle
+    ) throws IOException {
+        final HashMap<String, Object> model = auth(req, resp, null);
+        if (model == null) {
+            return null;
+        }
+
+        final elw.dao.SolutionFilter filter = RestSolutionFilter.fromRequest(req);
+        if (filter == null) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return null;
+        }
+
+        final Queries queries =
+                (Queries) model.get(MODEL_QUERIES);
+
+        final Map<String, Solution> enrSolutions =
+                queries.restSolutions(enrId, filter);
+
+        if (enrSolutions == null) {
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return null;
+        }
+
+        if (listStyle == ListStyle.IDS) {
+            return new ModelAndView(ViewJackson.data(enrSolutions.keySet()));
+        }
+
+        return new ModelAndView(ViewJackson.data(enrSolutions));
+    }
+
     //  http://stackoverflow.com/questions/3686808/spring-3-requestmapping-get-path-value
 
-    public static class ListStylePropertyEditor
-            extends PropertyEditorSupport {
-        @Override
-        public void setAsText(String text) throws IllegalArgumentException {
-            for (ListStyle style : ListStyle.values()) {
-                if (style.toString().equalsIgnoreCase(text)) {
-                    setValue(style);
-                    return;
-                }
-            }
-
-            throw new IllegalArgumentException("no such ListStyle: " + text);
-        }
-
-        @Override
-        public String getAsText() {
-            final ListStyle listStyle =
-                    (ListStyle) getValue();
-
-            return listStyle.toString();
-        }
-    }
 }

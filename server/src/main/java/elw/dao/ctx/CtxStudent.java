@@ -2,65 +2,20 @@ package elw.dao.ctx;
 
 import elw.dao.Nav;
 import elw.vo.*;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.Days;
-
-import java.util.TimeZone;
 
 /**
  *  Parameter Object, storing the full enrollment context.
  */
-public class CtxStudent {
-    //  LATER replace with some enrollment-scoped property
-    public static final TimeZone TZ = TimeZone.getDefault();
+public class CtxStudent extends CtxEnrollment {
 
-    public final Enrollment enr;
-    public final Group group;
     public final Student student;
-    public final Course course;
 
-    public CtxStudent(Enrollment enr, Course course, Student student, Group group) {
-        this.enr = enr;
-        this.course = course;
-        this.student = student;
-        this.group = group;
-    }
-
-    public static int days(
-            TimeZone tz,
-            long anchorMillis,
-            long diffMillis
+    public CtxStudent(
+            Enrollment enr, Course course,
+            Group group, Student student
     ) {
-        final DateTimeZone dateTimeZone = DateTimeZone.forTimeZone(tz);
-        final DateTime anchorDate = new DateTime(anchorMillis, dateTimeZone);
-        final DateTime anchorStartOfDay = new DateTime(
-                anchorDate.getYear(),
-                anchorDate.getMonthOfYear(),
-                anchorDate.getDayOfMonth(),
-                0, 0, 0, 0,
-                dateTimeZone
-        );
-        final DateTime anchorEndOfDay = anchorStartOfDay.plusDays(1);
-
-        final DateTime diffDate = new DateTime(diffMillis, dateTimeZone);
-
-        //  the diffed instant is earlier that start of anchor day
-        if (anchorStartOfDay.isAfter(diffDate)) {
-            //  -1 is due to returning number of full days within the interval
-            return -1 - Days.daysBetween(
-                    diffDate,
-                    anchorStartOfDay
-            ).getDays();
-        }
-
-        //  within start-end of anchor day return 0 days difference
-        if (anchorEndOfDay.isAfter(diffDate)) {
-            return 0;
-        }
-
-        //  number of full days in the interval, hence +1
-        return 1 + Days.daysBetween(anchorEndOfDay, diffDate).getDays();
+        super(enr, course, group);
+        this.student = student;
     }
 
     public CtxTask task(final int idxPos) {
@@ -82,4 +37,5 @@ public class CtxStudent {
 
         return ctxTask;
     }
+
 }

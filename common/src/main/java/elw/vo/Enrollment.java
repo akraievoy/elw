@@ -20,6 +20,10 @@ public class Enrollment extends Squab implements IdNamed, Cloneable {
     private String courseId;
     public String getCourseId() { return courseId; }
     public void setCourseId(String courseId) { this.courseId = courseId; }
+    
+    private String timeZone;
+    public String getTimeZone() { return timeZone; }
+    public void setTimeZone(String timeZone) { this.timeZone = timeZone; }
 
     private List<Class> classes = new ArrayList<Class>();
     public List<Class> getClasses() {
