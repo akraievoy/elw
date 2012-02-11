@@ -4,7 +4,7 @@ import java.util.*;
 
 import org.akraievoy.couch.Squab;
 
-public class Enrollment extends Squab implements IdNamed {
+public class Enrollment extends Squab implements IdNamed, Cloneable {
     private String id;
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
@@ -64,5 +64,19 @@ public class Enrollment extends Squab implements IdNamed {
             totalBudget += ie.getScoreBudget();
         }
         return totalBudget;
+    }
+
+    @Override
+    public Enrollment clone() throws CloneNotSupportedException {
+        Enrollment clone = (Enrollment) super.clone();
+
+        for (int idxPos = 0; idxPos < index.size(); idxPos++) {
+            clone.index.set(idxPos, clone.index.get(idxPos).clone());
+        }
+        for (int classPos = 0; classPos < classes.size(); classPos++) {
+            clone.classes.set(classPos, this.classes.get(classPos).clone());
+        }
+
+        return clone;
     }
 }

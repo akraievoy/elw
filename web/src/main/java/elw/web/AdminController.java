@@ -20,6 +20,7 @@ package elw.web;
 
 import elw.dao.Ctx;
 import elw.dao.Queries;
+import elw.dao.QueriesImpl;
 import elw.miniweb.Message;
 import elw.miniweb.ViewJackson;
 import elw.vo.*;
@@ -267,7 +268,7 @@ public class AdminController extends ControllerElw {
 
                 final Score lastScoreEntry = allScores.isEmpty() ? null : allScores.get(allScores.lastKey());
                 final Score scoreEntry = stamp == null ? lastScoreEntry : allScores.get(stamp);
-                final Score score = Queries.updateAutos(ctx, slot.getId(), file, scoreEntry);
+                final Score score = QueriesImpl.updateAutos(ctx, slot.getId(), file, scoreEntry);
 
                 model.put("stamp", stamp);
                 model.put("score", score);
@@ -311,7 +312,7 @@ public class AdminController extends ControllerElw {
                 } else {
                     scoreByStamp = core.getQueries().score(ctx, slot, file, stamp);
                 }
-                final Score score = Queries.updateAutos(ctx, slot.getId(), file, scoreByStamp);
+                final Score score = QueriesImpl.updateAutos(ctx, slot.getId(), file, scoreByStamp);
 
                 final String action = req.getParameter("action");
                 if ("next".equalsIgnoreCase(action) || "approve".equalsIgnoreCase(action) || "decline".equalsIgnoreCase(action)) {

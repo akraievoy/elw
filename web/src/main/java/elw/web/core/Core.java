@@ -20,7 +20,7 @@ package elw.web.core;
 
 import com.google.common.base.Strings;
 import elw.dao.Ctx;
-import elw.dao.Queries;
+import elw.dao.QueriesImpl;
 import elw.vo.*;
 import elw.vo.Class;
 import elw.web.ElwUri;
@@ -32,12 +32,12 @@ import java.util.*;
 public class Core {
     private static final String CTX_TO_SCORE_TOTAL = "--total";
 
-    private final Queries queries;
+    private final QueriesImpl queries;
 
     private final VelocityTemplates vt = VelocityTemplates.INSTANCE;
     private final ElwUri uri = new ElwUri();
 
-    public Core(Queries queries) {
+    public Core(QueriesImpl queries) {
         this.queries = queries;
     }
 
@@ -49,7 +49,7 @@ public class Core {
         return uri;
     }
 
-    public Queries getQueries() {
+    public QueriesImpl getQueries() {
         return queries;
     }
 
@@ -607,7 +607,7 @@ public class Core {
             if (e.getScore() != null && e.getScore().getApproved() != null) {
                 continue;    //	don't alter any scores once they're approved
             }
-            final Score autoScore = Queries.updateAutos(
+            final Score autoScore = QueriesImpl.updateAutos(
                     ctxVer, slotId, e, e.getScore()
             );
             e.setScore(autoScore);

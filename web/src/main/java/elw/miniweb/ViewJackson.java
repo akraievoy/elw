@@ -26,32 +26,23 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
+/**
+ * Install JsonView to have the data nicely formatted in firefox.
+ *
+ * http://stackoverflow.com/a/815578/148926
+ * */
 public class ViewJackson implements View {
     public final static ObjectMapper MAPPER = createMapper();
-    private String contentType = "text/json";
 
-    private static ObjectMapper createMapper() {
-        final ObjectMapper mapper = new ObjectMapper();
+    private String contentType = "application/json";
+    private final Object stateOrData;
 
-        mapper.getSerializationConfig().enable(SerializationConfig.Feature.INDENT_OUTPUT);
-
-        return mapper;
+    private ViewJackson(State stateOrData) {
+        this.stateOrData = stateOrData;
     }
 
-    private final State state;
-
-    private ViewJackson(State state) {
-        this.state = state;
-    }
-
-    @Deprecated
     private ViewJackson(Object data) {
-        this(new State(true, null, data));
-    }
-
-    @Deprecated
-    private ViewJackson(String message) {
-        this(new State(false, message, null));
+        this.stateOrData = data;
     }
 
     public String getContentType() {
@@ -71,15 +62,27 @@ public class ViewJackson implements View {
         resp.setHeader("Cache-Control", "no-cache");
         resp.setDateHeader("Expires", System.currentTimeMillis());
 
-        MAPPER.writeValue(resp.getWriter(), state);
+        MAPPER.writeValue(resp.getWriter(), stateOrData);
     }
 
     public static ViewJackson success(Object data) {
-        return new ViewJackson(data);
+        return new ViewJackson(new State(true, null, data));
     }
 
     public static ViewJackson failure(String message) {
-        return new ViewJackson(message);
+        return new ViewJackson(new State(false, message, null));
+    }
+
+    public static ViewJackson data(Object data) {
+        return new ViewJackson(data);
+    }
+
+    private static ObjectMapper createMapper() {
+        final ObjectMapper mapper = new ObjectMapper();
+
+        mapper.getSerializationConfig().enable(SerializationConfig.Feature.INDENT_OUTPUT);
+
+        return mapper;
     }
 
     public static class State {
