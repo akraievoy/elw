@@ -7,7 +7,6 @@ import elw.dao.rest.RestSolution;
 import elw.miniweb.ViewJackson;
 import elw.vo.Course;
 import elw.vo.Group;
-import elw.vo.Solution;
 import elw.web.core.Core;
 import elw.web.core.W;
 import org.springframework.stereotype.Controller;
@@ -48,6 +47,8 @@ import java.util.*;
 *   GET /
 *      -> {}
 * /enrollment/enrId/solutions
+*   GET /
+* /enrollment/enrId/solution
 *   GET /
 *   PUT /
 * }}}
@@ -165,6 +166,8 @@ public class ControllerRest extends ControllerElw {
         return new ModelAndView(ViewJackson.data(model.get(MODEL_AUTH)));
     }
 
+    //  TODO this quite likely is ok to be admin-only
+    //  TODO otherwise it should be proxied via clone and filtered for students
     @RequestMapping(
             value = "courses/{listStyle}",
             method = RequestMethod.GET
@@ -346,7 +349,7 @@ public class ControllerRest extends ControllerElw {
     }
 
     @RequestMapping(
-            value = "enrollment/{enrId}/scoring",
+            value = "enrollment/{enrId}/scores",
             method = RequestMethod.GET
     )
     public ModelAndView do_enrollmentScoringGet(
