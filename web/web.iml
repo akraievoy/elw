@@ -12,7 +12,9 @@
       </configuration>
     </facet>
     <facet type="Spring" name="Spring">
-      <configuration />
+      <configuration>
+        <fileset id="web: elw-mvc servlet context" profiles="" autodetected="true" />
+      </configuration>
     </facet>
   </component>
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_5" inherit-compiler-output="false">
@@ -30,25 +32,29 @@
     <orderEntry type="library" name="Maven: com.google.code.findbugs:jsr305:1.3.9" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.4.3" level="project" />
     <orderEntry type="library" name="Maven: com.google.guava:guava:r09" level="project" />
+    <orderEntry type="library" name="Maven: org.akraievoy:couch:1.3.8" level="project" />
+    <orderEntry type="library" name="Maven: org.codehaus.jackson:jackson-mapper-asl:1.8.8" level="project" />
+    <orderEntry type="library" name="Maven: org.codehaus.jackson:jackson-core-asl:1.8.8" level="project" />
     <orderEntry type="library" name="Maven: org.akraievoy:base:1.3.403j" level="project" />
-    <orderEntry type="library" name="Maven: org.codehaus.jackson:jackson-core-asl:1.4.2" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:jcl104-over-slf4j:1.4.3" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-log4j12:1.4.3" level="project" />
     <orderEntry type="library" name="Maven: log4j:log4j:1.2.16" level="project" />
     <orderEntry type="library" name="Maven: joda-time:joda-time:1.6" level="project" />
     <orderEntry type="module" module-name="datapath" />
-    <orderEntry type="library" name="Maven: org.codehaus.jackson:jackson-mapper-asl:1.4.2" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-context:2.5.6" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-context:3.1.0.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-aop:3.1.0.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: aopalliance:aopalliance:1.0" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-beans:2.5.6" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-core:2.5.6" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-asm:3.1.0.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-beans:3.1.0.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-core:3.1.0.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-expression:3.1.0.RELEASE" level="project" />
     <orderEntry type="module" module-name="datapath-gui" scope="TEST" />
     <orderEntry type="library" scope="TEST" name="Maven: org.slf4j:slf4j-simple:1.4.3" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.slf4j:log4j-over-slf4j:1.4.3" level="project" />
     <orderEntry type="library" name="Maven: commons-fileupload:commons-fileupload:1.2.1" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-webmvc:2.5.6" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-context-support:2.5.6" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-web:2.5.6" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-webmvc:3.1.0.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-context-support:3.1.0.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-web:3.1.0.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.apache.velocity:velocity:1.6.2" level="project" />
     <orderEntry type="library" name="Maven: commons-collections:commons-collections:3.2.1" level="project" />
     <orderEntry type="library" name="Maven: commons-lang:commons-lang:2.4" level="project" />
