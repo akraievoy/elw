@@ -32,27 +32,15 @@ public class RestSlotSummary {
             List<Solution> solutions
     ) {
         final RestSlotSummary slotSummary = new RestSlotSummary();
-
-        slotSummary.taskTypeId = ctxSlot.tType.getId();
-        slotSummary.taskTypeName = ctxSlot.tType.getName();
-
-        slotSummary.taskId = ctxSlot.task.getId();
-        slotSummary.taskName = ctxSlot.task.getName();
-
-        slotSummary.versionId = ctxSlot.ver.getId();
-        slotSummary.versionName = ctxSlot.ver.getName();
-
-        slotSummary.openMillis = ctxSlot.openMillis();
-        slotSummary.openNice = ctxSlot.dateTimeNice(slotSummary.openMillis);
-        if (ctxSlot.dueClass() != null) {
-            slotSummary.dueMillis = ctxSlot.dueMillis();
-            slotSummary.dueNice = ctxSlot.dateTimeNice(slotSummary.dueMillis);
-        }
-
+        
+        slotSummary.slotInfo = RestSlotInfo.create(ctxSlot);
         slotSummary.state = ctxSlot.state(solutions);
-
-        slotSummary.bestApproved = RestScore.create(ctxSlot.bestApproved(solutions));
-        slotSummary.lastPending =  RestScore.create(ctxSlot.lastPending(solutions));
+        slotSummary.bestApproved = RestSolution.create(
+                ctxSlot.bestApproved(solutions), false
+        );
+        slotSummary.lastPending =  RestSolution.create(
+                ctxSlot.lastPending(solutions), false
+        );
 
         return slotSummary;
     }
@@ -69,69 +57,44 @@ public class RestSlotSummary {
         final double pointsForSlot =
                 ctxSlot.pointsForSlot();
 
-        final RestScore lastPending =
-                getLastPending();
+        final RestScore lastPendingScore =
+                getLastPending() != null ? getLastPending().getScore() : null;
+        final RestScore bestApprovedScore =
+                getBestApproved() != null ? getBestApproved().getScore() : null;
 
         final State slotState = getState();
         if (SIMPLE_STATES.contains(slotState)) {
             increment(points, slotState, pointsForSlot);
-        } else if (slotState == State.PENDING) {
-            increment(points, State.PENDING, lastPending.getPoints());
-        } else if (slotState == State.APPROVED) {
+        } else if (slotState == State.PENDING && lastPendingScore != null) {
+            increment(points, State.PENDING, lastPendingScore.getPoints());
+        } else if (slotState == State.APPROVED && bestApprovedScore != null) {
             //  here we track both approved AND pending solutions
             //      so we're able to aggregate the data
             increment(
                     points,
                     State.APPROVED,
-                    getBestApproved().getPoints()
+                    bestApprovedScore.getPoints()
             );
-            if (lastPending != null) {
-                increment(points, State.PENDING, lastPending.getPoints());
+            if (lastPendingScore != null) {
+                increment(points, State.PENDING, lastPendingScore.getPoints());
             }
         } else {
             throw new IllegalStateException("was unreachable before");
         }
     }
 
+    private RestSlotInfo slotInfo = new RestSlotInfo();
+    public RestSlotInfo getSlotInfo() { return slotInfo; }
+
     private State state;
     public State getState() { return state; }
     public void setState(State state) { this.state = state; }
 
-    private RestScore bestApproved;
-    public RestScore getBestApproved() { return bestApproved; }
+    private RestSolution bestApproved;
+    public RestSolution getBestApproved() { return bestApproved; }
 
-    private RestScore lastPending;
-    public RestScore getLastPending() { return lastPending; }
-
-    private long openMillis;
-    public long getOpenMillis() { return openMillis; }
-
-    private String openNice;
-    public String getOpenNice() { return openNice; }
-
-    private long dueMillis;
-    public long getDueMillis() { return dueMillis; }
-
-    private String dueNice;
-    public String getDueNice() { return dueNice; }
-
-    private String taskTypeId;
-    public String getTaskTypeId() { return taskTypeId; }
-
-    private String taskTypeName;
-    public String getTaskTypeName() { return taskTypeName; }
-
-    private String taskId;
-    public String getTaskId() { return taskId; }
-
-    private String taskName;
-    public String getTaskName() { return taskName; }
-
-    private String versionId;
-    public String getVersionId() { return versionId; }
-
-    private String versionName;
-    public String getVersionName() { return versionName; }
+    private RestSolution lastPending;
+    public RestSolution getLastPending() { return lastPending; }
 
     public static void increment(
             final SortedMap<State, Double> points,

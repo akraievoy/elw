@@ -211,7 +211,7 @@ public class QueriesImpl implements Queries {
                         if (filter.allows(ctxSolution)) {
                             solutionsRes.put(
                                     solution.getCouchId(),
-                                    RestSolution.create(ctxSolution)
+                                    RestSolution.create(ctxSolution, true)
                             );
                         }
                     }
