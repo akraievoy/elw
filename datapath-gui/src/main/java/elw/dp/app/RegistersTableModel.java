@@ -41,7 +41,7 @@ public class RegistersTableModel extends AbstractTableModel {
         } else if (COL_NAME.equals(colName)) {
             return "$" + reg.toString();
         } else if (COL_HEX.equals(colName)) {
-            return Data.str(registers.getRegInternal(reg), 16, 8);
+            return Data.str(((long) registers.getRegInternal(reg)) & 0xFFFFFFFF, 16, 8);
         } else if (COL_DEC.equals(colName)) {
             return Data.str(registers.getRegInternal(reg), 10, 1);
         } else if (COL_ACC.equals(colName)) {
