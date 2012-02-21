@@ -322,6 +322,16 @@ public class Alu {
     public void noop(final InstructionContext ctx) {
         ctx.advPc();
     }
+    
+    @InstructionDesc(
+            syntax = "nor $d, $s, $t",
+            template = "000000ssssstttttddddd00000100111",
+            writeRegs = "$d"
+    )
+    public void nor(final InstructionContext ctx) {
+        ctx.setD(~(ctx.getS() | ctx.getT()));
+        ctx.advPc();
+    }
 
     @InstructionDesc(
             syntax = "or $d, $s, $t",
