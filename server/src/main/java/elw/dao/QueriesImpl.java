@@ -23,6 +23,9 @@ import org.akraievoy.couch.Squab;
 import static elw.vo.IdNamed._.*;
 import static elw.vo.IdNamed._.resolve;
 
+/**
+ * Default implementation of data queries.
+ */
 public class QueriesImpl implements Queries {
     private static final Logger log = LoggerFactory.getLogger(QueriesImpl.class);
 
@@ -132,7 +135,7 @@ public class QueriesImpl implements Queries {
         return enrSummary;
     }
 
-    //  LATER migrate to this method (requires investigation)
+    //  LATER migrate all enrollment queries to this method
     public RestEnrollment restEnrollment(
             final String enrId,
             final String sourceAddress
@@ -160,8 +163,8 @@ public class QueriesImpl implements Queries {
     }
 
     public Map<String, RestSolution> restSolutions(
-            String enrId,
-            SolutionFilter filter
+            final String enrId,
+            final SolutionFilter filter
     ) {
         final Enrollment enr = enrollmentSome(enrId);
         if (enr == null) {
@@ -221,6 +224,231 @@ public class QueriesImpl implements Queries {
         }
 
         return solutionsRes;
+    }
+
+    public CtxResolutionState resolveSlot(
+            final String enrollmentId,
+            final String couchId,
+            final StudentFilter studentFilter
+    ) {
+        final Enrollment enr = enrollmentSome(enrollmentId);
+        if (enr == null) {
+            return CtxResolutionState.failed(
+                    couchId, "enrollment "+enrollmentId+" not found"
+            );
+        }
+
+        final Squab.Path path;
+        try {
+            path = Squab.Path.fromId(couchId);
+        } catch (IllegalStateException ise) {
+            return CtxResolutionState.failed(
+                    couchId, "not valid"
+            );
+        }
+
+        final String prefix = Solution.class.getSimpleName();
+        if (path.len() != 11 || !prefix.equals(path.elem(0))) {
+            return CtxResolutionState.failed(
+                    couchId, "has extra/missing entries"
+            );
+        }
+
+        if (!enr.getGroupId().equals(path.elem(1))) {
+            return CtxResolutionState.failed(
+                    couchId, path, "refers to incorrect group"
+            );
+        }
+
+        final Group group = group(enr.getGroupId());
+        if (group == null) {
+            return CtxResolutionState.failed(
+                    couchId, path, "group not found"
+            );
+        }
+
+        if (!enr.getCourseId().equals(path.elem(3))) {
+            return CtxResolutionState.failed(
+                    couchId, path, "refers to incorrect course"
+            );
+        }
+
+        final Course course = course(enr.getCourseId());
+        if (course == null) {
+            return CtxResolutionState.failed(
+                    couchId, path, "course not found"
+            );
+        }
+
+        final CtxEnrollment ctxEnrollment =
+                new CtxEnrollment(enr, course, group);
+
+        final Student student = group.getStudents().get(path.elem(2));
+        if (student == null) {
+            return CtxResolutionState.failed(
+                    couchId, path, "student not found"
+            );
+        }
+
+        if (studentFilter != null && !studentFilter.allows(student)) {
+            return CtxResolutionState.failed(
+                    couchId, path, "student access denied"
+            );
+        }
+
+        final CtxStudent ctxStudent =
+                ctxEnrollment.student(student);
+
+        final int entryIdx = Integer.valueOf(path.elem(4));
+        if (entryIdx < 0 || entryIdx >= enr.getIndex().size()) {
+            return CtxResolutionState.failed(
+                    couchId, path, "index out of range"
+            );
+        }
+
+        //  TODO this is likely to throw some NPEs if fed with incorrect data
+        final CtxTask ctxTask = ctxStudent.task(entryIdx);
+
+        if (ctxTask.tType == null) {
+            return CtxResolutionState.failed(
+                    couchId, path, "taskType not found"
+            );
+        }
+
+        if (!ctxTask.tType.getId().equals(path.elem(5))) {
+            return CtxResolutionState.failed(
+                    couchId, path, "taskType id mismatch"
+            );
+        }
+
+        if (ctxTask.task == null) {
+            return CtxResolutionState.failed(
+                    couchId, path, "task not found"
+            );
+        }
+
+        if (!ctxTask.task.getId().equals(path.elem(6))) {
+            return CtxResolutionState.failed(
+                    couchId, path, "task id mismatch"
+            );
+        }
+
+        if (ctxTask.ver == null) {
+            return CtxResolutionState.failed(
+                    couchId, path, "version not found"
+            );
+        }
+
+        final CtxTask ctxTaskOverride;
+        final String versionElem = path.elem(7);
+        if (!ctxTask.ver.getId().equals(versionElem)) {
+            final Version sharedVersion =
+                    ctxTask.task.getVersions().get(versionElem);
+            if (!sharedVersion.isShared()) {
+                return CtxResolutionState.failed(
+                        couchId, path, "version id mismatch"
+                );
+            }
+
+            ctxTaskOverride = ctxTask.overrideToShared(sharedVersion);
+        } else {
+            ctxTaskOverride = ctxTask;
+        }
+
+        final FileSlot fileSlot = ctxTask.tType.getFileSlots().get(path.elem(8));
+        if (fileSlot == null) {
+            return CtxResolutionState.failed(
+                    couchId, path, "file slot not found"
+            );
+        }
+        final CtxSlot ctxSlot = ctxTaskOverride.slot(fileSlot);
+
+        return new CtxResolutionState(path, ctxSlot);
+    }
+
+    //  FIXME proceed with upload processing
+
+    public CtxSolution resolveSolution(
+            final String enrollmentId,
+            final String solutionCouchId,
+            final StudentFilter studentFilter
+    ) {
+        final CtxResolutionState state =
+                resolveSlot(enrollmentId, solutionCouchId, studentFilter);
+
+        if (!state.complete()) {
+            //  everything is already reported in logs, we just bail
+            return null;
+        }
+
+        final String solutionId = state.path.elem(9);
+        final long solutionStamp = Squab.Stamped.parse(state.path.elem(10));
+
+        final Solution solutionCouch = solutionDao.findByStamp(
+                solutionStamp,
+                Solution.class,
+                state.ctxSlot.group.getId(),
+                state.ctxSlot.student.getId(),
+                state.ctxSlot.course.getId(),
+                String.valueOf(state.ctxSlot.idx),
+                state.ctxSlot.tType.getId(),
+                state.ctxSlot.task.getId(),
+                state.ctxSlot.ver.getId(),
+                state.ctxSlot.slot.getId(),
+                solutionId
+        );
+
+        //  FIXME this somehow got duplicated
+        if (solutionCouch != null) {
+            final Score score = score(state.ctxSlot.solution(solutionCouch));
+            solutionCouch.setScore(score);
+        }
+
+        final Solution solution = Nav.resolveFileType(
+                solutionCouch,
+                state.ctxSlot.course.getFileTypes()
+        );
+
+        return state.ctxSlot.solution(solution);
+    }
+
+    public RestSolution restSolution(
+            final String enrollmentId,
+            final String solId,
+            final StudentFilter studentFilter
+    ) {
+        final CtxSolution ctxSolution = resolveSolution(
+                enrollmentId, solId, studentFilter
+        );
+
+        return RestSolution.create(ctxSolution, true);
+    }
+    
+    public boolean createSolution(
+            final CtxSlot ctxSlot,
+            final Solution solution,
+            final String contentType,
+            final InputSupplier<? extends InputStream> inputSupplier
+    ) {
+        solution.setupPathElems(ctxSlot.solutionPathElems());
+
+        //  there's  no need to store full file type object,
+        //      it's easily resolved on-load
+        final TreeMap<String, FileType> emptyMap =
+                new TreeMap<String, FileType>();
+        emptyMap.put(IdNamed._.one(solution.getFileType()).getId(), null);
+        solution.setFileType(emptyMap);
+
+        final CouchDao.UpdateStatus createStatus =
+                solutionDao.createOrUpdate(solution);
+        solution.setCouchRev(createStatus.rev);
+        solution.setStamp(createStatus.stamp);
+        solutionDao.attachStream(
+                solution, FileBase.CONTENT,
+                contentType, (InputSupplier<InputStream>) inputSupplier
+        );
+
+        return true;
     }
 
     public Group group(final String groupId) {
@@ -322,8 +550,10 @@ public class QueriesImpl implements Queries {
     }
 
     public Result createFile(
-            Ctx ctx, FileSlot slot,
-            FileBase file, InputSupplier<? extends InputStream> inputSupplier,
+            final Ctx ctx,
+            final FileSlot slot,
+            final FileBase file,
+            final InputSupplier<? extends InputStream> inputSupplier,
             final String contentType
     ) {
         try {
@@ -350,7 +580,7 @@ public class QueriesImpl implements Queries {
 
             final CouchDao targetDao =
                     file instanceof Attachment ? attachmentDao : solutionDao;
-            targetDao.update(file);
+            targetDao.createOrUpdate(file);
 
             return new Result("File stored successfully", true);
         } catch (IOException e) {
@@ -639,11 +869,11 @@ public class QueriesImpl implements Queries {
     }
 
     public long createScore(Score score) {
-        return solutionDao.update(score);
+        return solutionDao.createOrUpdate(score).stamp;
     }
 
     public void updateFile(Solution solution) {
-        solutionDao.update(solution, false);
+        solutionDao.createOrUpdate(solution, false);
     }
 
     public String fileText(

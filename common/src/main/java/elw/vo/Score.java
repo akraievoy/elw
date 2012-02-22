@@ -20,7 +20,6 @@ public class Score extends Squab.Stamped implements Stamped {
     public Map<String, Double> getRatios() {
         return Collections.unmodifiableMap(ratios);
     }
-    @SuppressWarnings({"UnusedDeclaration"})
     public void setRatios(Map<String, Double> ratios) {
         this.ratios.clear();
         if (ratios != null) {
@@ -54,19 +53,6 @@ public class Score extends Squab.Stamped implements Stamped {
         return copy;
     }
 
-    public double getRatio(String[] ids) {
-        double res = 1.0;
-
-        for (final String id : ids) {
-            if (!contains(id)) {
-                continue;
-            }
-            res *= Math.pow(ratios.get(id), pows.get(id));
-        }
-
-        return res;
-    }
-
     public double computeRatio(FileSlot slot) {
         double res = 1.0;
 
@@ -75,7 +61,12 @@ public class Score extends Squab.Stamped implements Stamped {
             if (!contains(id)) {
                 continue;
             }
-            res *= Math.pow(ratios.get(id), pows.get(id));
+            final Double ratio = ratios.get(id);
+            final Integer pow = pows.get(id);
+            //  TODO there's some NPE lurking out there
+            if (ratio != null && pow != null) {
+                res *= Math.pow(ratio, pow);
+            }
         }
 
         return res;

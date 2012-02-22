@@ -378,18 +378,6 @@ public abstract class ControllerElw extends MultiActionController implements Web
             }
         }
 
-        protected static String extractNameFromPath(FileItemStream item) {
-            final String name = item.getName();
-            if (name == null) {
-                return null;
-            }
-
-            final int lastSlash = Math.max(name.lastIndexOf("\\"), name.lastIndexOf("/"));
-            final String fName = lastSlash >= 0 ? name.substring(lastSlash + 1) : name;
-
-            return fName;
-        }
-
         protected ModelAndView succeed(boolean put, String refreshUri, Result result) throws IOException {
             if (!put) {
                 Message.addResult(req, result);
@@ -408,12 +396,36 @@ public abstract class ControllerElw extends MultiActionController implements Web
             return null;
         }
 
-        protected static String fieldText(final FileItemStream item) throws IOException {
-            return CharStreams.toString(CharStreams.newReaderSupplier(supplierForFileItem(item), Charsets.UTF_8));
-        }
     }
 
-    protected static InputSupplier<InputStream> supplierForRequest(final HttpServletRequest myReq) {
+    protected static String fieldText(
+            final FileItemStream item
+    ) throws IOException {
+        return CharStreams.toString(
+            CharStreams.newReaderSupplier(
+                supplierForFileItem(item),
+                Charsets.UTF_8
+            )
+        );
+    }
+
+    protected static String extractNameFromPath(FileItemStream item) {
+        final String name = item.getName();
+        if (name == null) {
+            return null;
+        }
+
+        final int lastSlash =
+                Math.max(name.lastIndexOf("\\"), name.lastIndexOf("/"));
+        final String fName =
+                lastSlash >= 0 ? name.substring(lastSlash + 1) : name;
+
+        return fName;
+    }
+
+    protected static InputSupplier<InputStream> supplierForRequest(
+            final HttpServletRequest myReq
+    ) {
         return new InputSupplier<InputStream>() {
             public InputStream getInput() throws IOException {
                 return myReq.getInputStream();
@@ -421,7 +433,9 @@ public abstract class ControllerElw extends MultiActionController implements Web
         };
     }
 
-    protected static InputSupplier<InputStream> supplierForFileItem(final FileItemStream item) {
+    protected static InputSupplier<InputStream> supplierForFileItem(
+            final FileItemStream item
+    ) {
         return new InputSupplier<InputStream>() {
             public InputStream getInput() throws IOException {
                 return item.openStream();

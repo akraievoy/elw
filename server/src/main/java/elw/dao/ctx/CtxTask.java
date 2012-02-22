@@ -68,4 +68,21 @@ public class CtxTask extends CtxStudent {
         long now = System.currentTimeMillis();
         return openMillis() <= now;
     }
+
+    //  some tasks consist completely or partially of shared versions
+    //      solutions to which may queried or uploaded by students
+    public CtxTask overrideToShared(Version sharedVersion) {
+        if (!sharedVersion.isShared()) {
+            throw new IllegalStateException("overriding to non-shared version");
+        }
+
+        final CtxTask ctxTask = new CtxTask(
+                enr, course, group,
+                student,
+                idx, task, tType,
+                sharedVersion
+        );
+
+        return propagateTZCache(ctxTask);
+    }
 }

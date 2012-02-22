@@ -118,6 +118,7 @@ public class QueriesSecure implements Queries {
             return null;
         }
 
+        //  TODO a bit of null-safety here won't hurt anyone
         return queries.restSolutions(enrId, new SolutionFilter() {
             public boolean preAllows(CtxStudent ctxStudent) {
                 final boolean sameStudent =
@@ -131,6 +132,117 @@ public class QueriesSecure implements Queries {
                 return filter.allows(ctxSolution);
             }
         });
+    }
+
+    public RestSolution restSolution(
+            final String enrollmentId,
+            final String solutionId,
+            final StudentFilter outer
+    ) {
+        if (auth.isAdm()) {
+            return queries.restSolution(
+                    enrollmentId, solutionId, outer
+            );
+        }
+
+        if (!enrollmentIds().contains(enrollmentId)) {
+            return null;
+        }
+
+        final StudentFilter inner = secureStudentFilter(outer);
+
+        final RestSolution restSolution = queries.restSolution(
+                enrollmentId, solutionId, inner
+        );
+
+        return restSolution;
+    }
+
+    protected StudentFilter secureStudentFilter(final StudentFilter outer) {
+        return new StudentFilter() {
+            public boolean allows(Student student) {
+                final boolean outerAllowed =
+                        outer == null || outer.allows(student);
+
+                if (auth.isAdm()) {
+                    return outerAllowed;
+                }
+
+                return outerAllowed && authStudent(student);
+            }
+        };
+    }
+
+    protected boolean authStudent(Student student) {
+        return student.getEmail().equalsIgnoreCase(auth.getId());
+    }
+
+    public CtxResolutionState resolveSlot(
+            final String enrollmentId,
+            final String couchId,
+            final StudentFilter outer
+    ) {
+        if (auth.isAdm()) {
+            return queries.resolveSlot(enrollmentId, couchId, outer);
+        }
+
+        if (!enrollmentIds().contains(enrollmentId)) {
+            return CtxResolutionState.failed(
+                    couchId,
+                    "enrollment access denied"
+            );
+        }
+
+        return queries.resolveSlot(
+                enrollmentId, couchId, secureStudentFilter(outer)
+        );
+    }
+
+    public CtxSolution resolveSolution(
+            final String enrollmentId,
+            final String couchId,
+            final StudentFilter outer
+    ) {
+        if (auth.isAdm()) {
+            return queries.resolveSolution(enrollmentId, couchId, outer);
+        }
+
+        if (!enrollmentIds().contains(enrollmentId)) {
+            return null;
+        }
+
+        return queries.resolveSolution(
+                enrollmentId, couchId, secureStudentFilter(outer)
+        );
+    }
+
+    public boolean createSolution(
+            final CtxSlot ctxSlot,
+            final Solution solution,
+            final String contentType,
+            final InputSupplier<? extends InputStream> inputSupplier
+    ) {
+        //  LATER admin should not be able to create solutions
+        //      at least until impersonation is more or less functional
+        if (auth.isAdm()) {
+            return queries.createSolution(
+                    ctxSlot, solution,
+                    contentType, inputSupplier
+            );
+        }
+
+        if (!enrollmentIds().contains(ctxSlot.enr.getId())) {
+            return false;
+        }
+
+        if (!authStudent(ctxSlot.student)) {
+            return false;
+        }
+
+        return queries.createSolution(
+                ctxSlot, solution,
+                contentType, inputSupplier
+        );
     }
 
     public Admin adminSome(String login) {

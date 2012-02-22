@@ -51,5 +51,8 @@ public abstract class FileBase extends Squab.Stamped implements IdNamed, Stamped
         return getCouchFile(CONTENT).getLength();
     }
 
+    @Deprecated
     public abstract void setupPathElems(Ctx ctx, FileSlot slot);
+
+    public abstract void setupPathElems(String[] pathElems);
 }

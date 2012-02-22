@@ -65,6 +65,12 @@ public class Solution extends FileBase {
                 slot.getId()
         };
     }
+    
+    // @see elw.dao.ctx.CtxSlot#solutionPathElems()
+    @Override
+    public void setupPathElems(String[] pathElems) {
+        extraPathElems = pathElems.clone();
+    }
 
     @JsonIgnore
     public boolean isValidated() {

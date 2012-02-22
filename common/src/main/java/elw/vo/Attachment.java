@@ -25,6 +25,11 @@ public class Attachment extends FileBase {
     }
 
     @Override
+    public void setupPathElems(String[] pathElems) {
+        extraPathElems = pathElems;
+    }
+
+    @Override
     public void setupPathElems(Ctx ctx, FileSlot slot) {
         extraPathElems = new String[] {
                 ctx.getCourse().getId(),

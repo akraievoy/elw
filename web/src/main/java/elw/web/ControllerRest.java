@@ -1,14 +1,26 @@
 package elw.web;
 
-import elw.dao.*;
+import com.google.common.base.Strings;
+import com.google.common.io.ByteStreams;
+import com.google.common.io.InputSupplier;
+import elw.dao.Queries;
+import elw.dao.QueriesSecure;
+import elw.dao.ctx.CtxSlot;
 import elw.dao.rest.RestEnrollment;
 import elw.dao.rest.RestEnrollmentSummary;
 import elw.dao.rest.RestSolution;
 import elw.miniweb.ViewJackson;
-import elw.vo.Course;
-import elw.vo.Group;
+import elw.vo.*;
 import elw.web.core.Core;
 import elw.web.core.W;
+import org.akraievoy.gear.G4mat;
+import org.apache.commons.fileupload.FileItemIterator;
+import org.apache.commons.fileupload.FileItemStream;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
@@ -21,6 +33,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 
 /*
@@ -46,11 +59,9 @@ import java.util.*;
 * /enrollment/enrId/files
 *   GET /
 *      -> {}
-* /enrollment/enrId/solutions
-*   GET /
-* /enrollment/enrId/solution
-*   GET /
-*   PUT /
+* /enrollment/enrId/solution/solutionId
+*   GET stream
+*   PUT stream
 * }}}
 *
 * FIXME: SCORES
@@ -67,7 +78,13 @@ public class ControllerRest extends ControllerElw {
     public static final String MODEL_AUTH = SESSION_AUTH;
     public static final String MODEL_QUERIES = "elw_queries";
 
+    private static final Logger log =
+            LoggerFactory.getLogger(ControllerRest.class);
+    private static final DiskFileItemFactory fileItemFactory
+            = createFileItemFactory();
+
     private final boolean devMode;
+
     private long testAuthSwitch = 0;
 
     public ControllerRest(Core core) {
@@ -75,6 +92,19 @@ public class ControllerRest extends ControllerElw {
 
         //  LATER devMode inferencing booster
         devMode = "w".equals(System.getProperty("user.name"));
+    }
+
+    private static DiskFileItemFactory createFileItemFactory() {
+        final DiskFileItemFactory fileItemFactory =
+                new DiskFileItemFactory();
+
+        fileItemFactory.setRepository(
+                new java.io.File(System.getProperty("java.io.tmpdir"))
+        );
+
+        fileItemFactory.setSizeThreshold(1 * 1024 * 1024);
+
+        return fileItemFactory;
     }
 
     @InitBinder
@@ -415,6 +445,218 @@ public class ControllerRest extends ControllerElw {
         return new ModelAndView(ViewJackson.data(enrSolutions));
     }
 
+    //  Regex is required here: solId may contain '.'
+    //  http://stackoverflow.com/questions/3526523/spring-mvc-pathvariable-getting-truncated
+    @RequestMapping(
+            value = "enrollment/{enrId}/solution/{solId:.+}",
+            method = RequestMethod.GET
+    )
+    public ModelAndView do_enrollmentSolutionGet(
+            final HttpServletRequest req,
+            final HttpServletResponse resp,
+            @PathVariable("enrId") final String enrId,
+            @PathVariable("solId") final String solId
+    ) throws IOException {
+        final HashMap<String, Object> model = auth(req, resp, null);
+        if (model == null) {
+            return null;
+        }
+
+        final Queries queries =
+                (Queries) model.get(MODEL_QUERIES);
+
+        final RestSolution solution =
+                queries.restSolution(enrId, solId, null);
+        
+        if (solution == null) {
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return null;
+        }
+
+        return new ModelAndView(ViewJackson.data(solution));
+    }
+
+    //  PUTs are not supported for HTML file uploads
+    //      http://stackoverflow.com/questions/812711/how-do-you-do-an-http-put
+    //      http://stackoverflow.com/questions/2006900/browser-based-webdav-client
+    //  but there's hope they would be someday
+    //      https://www.w3.org/Bugs/Public/show_bug.cgi?id=10671
+    @RequestMapping(
+            value = "enrollment/{enrId}/solution/{solId:.+}",
+            method = RequestMethod.POST
+    )
+    public ModelAndView do_enrollmentSolutionPost(
+            final HttpServletRequest req,
+            final HttpServletResponse resp,
+            @PathVariable("enrId") final String enrId,
+            @PathVariable("solId") final String solId
+    ) throws IOException, FileUploadException {
+        final HashMap<String, Object> model = auth(req, resp, null);
+        if (model == null) {
+            return null;
+        }
+
+        final Queries queries =
+                (Queries) model.get(MODEL_QUERIES);
+        final QueriesSecure.Auth auth =
+                (QueriesSecure.Auth) model.get(MODEL_AUTH);
+
+        final Queries.CtxResolutionState stateSlot =
+                queries.resolveSlot(enrId, solId, null);
+        
+        if (!stateSlot.complete()) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return null;
+        }
+        
+        final CtxSlot ctxSlot = stateSlot.ctxSlot;
+
+        final SortedMap<String, FileType> allTypes =
+                ctxSlot.slot.getFileTypes();
+        final SortedMap<String, FileType> validTypes =
+                new TreeMap<String, FileType>(allTypes);
+
+        //  we may safely assume order over the elements sent
+        //      http://stackoverflow.com/questions/7449861/multipart-upload-form-is-order-guaranteed
+        //  see the w3 spec
+        //      http://www.w3.org/TR/html4/interact/forms.html#h-17.13.4
+
+        //  not used for streaming/api calls but
+        //      still usable for content detection
+        final int length = req.getContentLength();
+
+        final Solution solution = new Solution();
+        solution.setAuthor(auth.getName());
+        solution.setSourceAddress(W.resolveRemoteAddress(req));
+
+        final ServletFileUpload sfu =
+                new ServletFileUpload(fileItemFactory);
+        final FileItemIterator fii = 
+                sfu.getItemIterator(req);
+
+        if (!fii.hasNext()) {
+            //  here we'll have to employ XHR and
+            //      http status message parsing
+            //  http://api.jquery.com/jQuery.ajax/
+            //      esp. see the error(jqXHR, textStatus, errorThrown)
+            resp.sendError(
+                    HttpServletResponse.SC_BAD_REQUEST,
+                    "No upload fields found"
+            );
+            return null;
+        }
+
+        final FileItemStream comm = fii.next();
+        if (!comm.isFormField() || !"comment".equals(comm.getFieldName())) {
+            resp.sendError(
+                    HttpServletResponse.SC_BAD_REQUEST,
+                    "No comment with your upload"
+            );
+            return null;
+        }
+        solution.setComment(fieldText(comm));
+
+        if (!fii.hasNext()) {
+            resp.sendError(
+                    HttpServletResponse.SC_BAD_REQUEST,
+                    "No file stream field found"
+            );
+            return null;
+        }
+        final FileItemStream file = fii.next();
+        if (file.isFormField()) {
+            resp.sendError(
+                    HttpServletResponse.SC_BAD_REQUEST,
+                    "Not a file stream field as expected"
+            );
+            return null;
+        }
+
+        solution.setName(Strings.nullToEmpty(extractNameFromPath(file)));
+        
+        final String contentType = Strings.nullToEmpty(file.getContentType());
+        InputSupplier<? extends InputStream> inputSupplier = 
+                supplierForFileItem(file);
+
+        FileType._.filterByLength(validTypes, length);
+        if (validTypes.isEmpty()) {
+            resp.sendError(
+                    HttpServletResponse.SC_BAD_REQUEST,
+                    "Size " + G4mat.formatMem(length) + " exceeds size limits"
+            );
+            return null;
+        }
+
+        FileType._.filterByName(validTypes, solution.getName().toLowerCase());
+        if (validTypes.isEmpty()) {
+            resp.sendError(
+                    HttpServletResponse.SC_BAD_REQUEST,
+                    "File name failed all regex checks"
+            );
+            return null;
+        }
+
+        if (validTypes.size() > 1) {
+            log.warn(
+                    "More than one valid file type: {} yields {}",
+                    solution.getName(),
+                    validTypes.keySet()
+            );
+        }
+
+        final FileType fileType = validTypes.get(validTypes.firstKey());
+        if (!fileType.getContentTypes().contains(contentType)) {
+            log.warn(
+                    "contentType {} not listed in the file type",
+                    contentType,
+                    fileType.getId()
+            );
+        }
+        solution.setFileType(IdNamed._.singleton(fileType));
+
+        if (!fileType.isBinary()) {
+            if (length > FileBase.DETECT_SIZE_LIMIT) {
+                resp.sendError(
+                        HttpServletResponse.SC_BAD_REQUEST,
+                        "Non-binary file is too big for content check"
+                );
+                return null;
+            }
+
+            final byte[] bytes = ByteStreams.toByteArray(inputSupplier);
+            //	implemented as per this SO answer:
+            //	http://stackoverflow.com/questions/277521/identify-file-binary/277568#277568
+            for (byte b : bytes) {
+                if (b >= 0 && b < 9 || b > 13 && b < 32) {
+                    resp.sendError(
+                            HttpServletResponse.SC_BAD_REQUEST,
+                            "Non-binary file contains binary data"
+                    );
+                    return null;
+                }
+            }
+            inputSupplier = ByteStreams.newInputStreamSupplier(bytes);
+        } else {
+            //  LATER validate binary headers of content here
+        }
+
+        //  TODO there's no simple harness for this method
+        //      maybe there's a way to trigger this one properly with curl?
+        boolean created = queries.createSolution(
+                ctxSlot, solution,
+                contentType, inputSupplier
+        );
+        if (!created) {
+            resp.sendError(
+                    HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                    "Failed to save the file"
+            );
+        }
+
+        return null;
+    }
+
+    //  not currently used, but may be useful for some of streaming requests
     //  http://stackoverflow.com/questions/3686808/spring-3-requestmapping-get-path-value
 
 }

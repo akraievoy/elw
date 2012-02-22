@@ -207,4 +207,18 @@ public class CtxSlot extends CtxTask {
 
         return true;
     }
+    
+    public String[] solutionPathElems() {
+        return new String[] {
+                group.getId(),
+                student.getId(),
+                course.getId(),
+                String.valueOf(idx),
+                tType.getId(),
+                task.getId(),
+                ver.getId(),
+                slot.getId(),
+        };
+
+    }
 }
