@@ -22,65 +22,65 @@ import org.akraievoy.gear.G4mat;
 import org.codehaus.jackson.annotate.JsonIgnore;
 
 public class ScoreTerm {
-	private final String id;
-	private final double ratio;
-	private final int pow;
-	private final FileSlot slot;
-	private final Criteria criteria;
+    private final String id;
+    private final double ratio;
+    private final int pow;
+    private final FileSlot slot;
+    private final Criteria criteria;
 
-	public ScoreTerm(String id, double ratio, int pow, final FileSlot slot, final Criteria criteria) {
-		this.id = id;
-		this.ratio = ratio;
-		this.pow = pow;
-		this.slot = slot;
-		this.criteria = criteria;
-	}
+    public ScoreTerm(String id, double ratio, int pow, final FileSlot slot, final Criteria criteria) {
+        this.id = id;
+        this.ratio = ratio;
+        this.pow = pow;
+        this.slot = slot;
+        this.criteria = criteria;
+    }
 
-	public String getId() {
-		return id;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public double getRatio() {
-		return ratio;
-	}
+    public double getRatio() {
+        return ratio;
+    }
 
-	public int getPow() {
-		return pow;
-	}
+    public int getPow() {
+        return pow;
+    }
 
-	public String getNiceRatio() {
-		return getNiceRatio(ratio);
-	}
+    public String getNiceRatio() {
+        return getNiceRatio(ratio);
+    }
 
-	private static String getNiceRatio(final double ratio) {
-		if (Math.abs(ratio - 1) < 1e-2) {
-			return "";
-		}
+    private static String getNiceRatio(final double ratio) {
+        if (Math.abs(ratio - 1) < 1e-2) {
+            return "";
+        }
 
-		final double percentage = Math.round(ratio * 1000) / 10.0;
+        final double percentage = Math.round(ratio * 1000) / 10.0;
 
-		if (percentage < 100) {
-			return "-" + G4mat.format2(100 - percentage) + "%";
-		}
+        if (percentage < 100) {
+            return "-" + G4mat.format2(100 - percentage) + "%";
+        }
 
-		return "+" + G4mat.format2(percentage - 100) + "%";
-	}
+        return "+" + G4mat.format2(percentage - 100) + "%";
+    }
 
-	@JsonIgnore
+    @JsonIgnore
     public boolean isIdentity() {
-		return Math.abs(ratio - 1) < 1e-2;
-	}
+        return Math.abs(ratio - 1) < 1e-2;
+    }
 
-	public boolean isPositive() {
-		return ratio > 1;
-	}
+    public boolean isPositive() {
+        return ratio > 1;
+    }
 
-	public Criteria getCriteria() {
-		return criteria;
-	}
+    public Criteria getCriteria() {
+        return criteria;
+    }
 
-	@JsonIgnore
-	public FileSlot getSlot() {
-		return slot;
-	}
+    @JsonIgnore
+    public FileSlot getSlot() {
+        return slot;
+    }
 }
