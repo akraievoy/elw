@@ -489,7 +489,7 @@ public class QueriesImpl implements Queries {
                 new TreeMap<String, List<Solution>>();
 
         for (FileSlot slot : ctx.getAssType().getFileSlots().values()) {
-            slotIdToFiles.put(slot.getId(), solutions(ctx.solutions(slot)));
+            slotIdToFiles.put(slot.getId(), solutions(ctx.ctxSlot(slot)));
         }
 
         return slotIdToFiles;
@@ -596,7 +596,7 @@ public class QueriesImpl implements Queries {
             return attachments(ctx, slot.getId());
         }
 
-        return solutions(ctx.solutions(slot));
+        return solutions(ctx.ctxSlot(slot));
     }
 
     public FileBase file(String scope, Ctx ctx, FileSlot slot, String id) {
@@ -604,21 +604,17 @@ public class QueriesImpl implements Queries {
             return attachment(ctx, slot.getId(), id);
         }
 
-        return solution(ctx.solutions(slot), id);
+        return solution(ctx.ctxSlot(slot), id);
     }
 
+    //  LATER we'd have inputSupplier(Attachment, blah, blah) some time ago
     public InputSupplier<InputStream> inputSupplier(
-            final @Nonnull Squab squab, @Nonnull String fileName
+            final @Nonnull CtxSolution ctxSolution,
+            final @Nonnull String fileName
     ) {
-        if (squab instanceof Attachment) {
-            return attachmentDao.couchFileGet(squab.getCouchPath(), fileName);
-        }
-        if (squab instanceof Solution) {
-            return solutionDao.couchFileGet(squab.getCouchPath(), fileName);
-        }
-
-        throw new IllegalArgumentException(
-                "no attachment streaming for: " + squab.getClass()
+        return solutionDao.couchFileGet(
+                ctxSolution.solution.getCouchPath(),
+                fileName
         );
     }
 

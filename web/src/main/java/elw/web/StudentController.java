@@ -354,7 +354,7 @@ public class StudentController extends ControllerElw {
                     return null;
                 }
 
-                retrieveFile(entry, queries);
+                retrieveFile(entry, slot, queries);
 
                 return null;
             }

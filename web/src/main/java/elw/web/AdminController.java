@@ -18,6 +18,7 @@
 
 package elw.web;
 
+import com.google.common.base.Strings;
 import elw.dao.Ctx;
 import elw.dao.Queries;
 import elw.dao.QueriesImpl;
@@ -303,50 +304,60 @@ public class AdminController extends ControllerElw {
     public ModelAndView do_approvePost(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
         return wmScore(req, resp, "", new WebMethodScore() {
             public ModelAndView handleScore(
-                    HttpServletRequest req, HttpServletResponse resp, Ctx ctx, FileSlot slot, Solution file, Long stamp, Map<String, Object> model
+                    HttpServletRequest req, HttpServletResponse resp,
+                    Ctx ctx, FileSlot slot, Solution file, Long stamp,
+                    Map<String, Object> model
             ) throws IOException {
                 final Score scoreByStamp;
                 final String fileId = file.getId();
                 if (stamp == null) {
                     scoreByStamp = null;
                 } else {
-                    scoreByStamp = core.getQueries().score(ctx.solutions(slot).solution(file), stamp);
+                    scoreByStamp = core.getQueries().score(
+                            ctx.ctxSlot(slot).solution(file), stamp
+                    );
                 }
-                final Score score = QueriesImpl.updateAutos(ctx, slot.getId(), file, scoreByStamp);
+                final Score score = QueriesImpl.updateAutos(
+                        ctx, slot.getId(), file, scoreByStamp
+                );
 
-                final String action = req.getParameter("action");
-                if ("next".equalsIgnoreCase(action) || "approve".equalsIgnoreCase(action) || "decline".equalsIgnoreCase(action)) {
-                    if ("approve".equalsIgnoreCase(action) || "decline".equalsIgnoreCase(action)) {
-                        score.setApproved("approve".equalsIgnoreCase(action));
+                final String action =
+                        Strings.nullToEmpty(req.getParameter("action"));
+                final List<String> validActions =
+                        Arrays.asList("next", "approve", "decline");
+                if (!validActions.contains(action.toLowerCase())) {
+                    resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Bad action: " + action);
+                    return null;
+                }
 
-                        final Map<String, Integer> pows =
-                                new TreeMap<String, Integer>(score.getPows());
-                        final Map<String, Double> ratios =
-                                new TreeMap<String, Double>(score.getRatios());
+                if ("approve".equalsIgnoreCase(action) || "decline".equalsIgnoreCase(action)) {
+                    score.setApproved("approve".equalsIgnoreCase(action));
 
-                        for (Criteria cri : slot.getCriterias().values()) {
-                            final int powDef = score.getPow(slot, cri);
-                            final double ratioDef = score.getRatio(slot, cri);
+                    final Map<String, Integer> pows =
+                            new TreeMap<String, Integer>(score.getPows());
+                    final Map<String, Double> ratios =
+                            new TreeMap<String, Double>(score.getRatios());
 
-                            final String idFor = Score.idFor(slot, cri);
-                            final String powReq = req.getParameter(idFor);
-                            final String ratioReq = req.getParameter(idFor + "--ratio");
+                    for (Criteria cri : slot.getCriterias().values()) {
+                        final int powDef = score.getPow(slot, cri);
+                        final double ratioDef = score.getRatio(slot, cri);
 
-                            pows.put(idFor, G4Parse.parse(powReq, powDef));
-                            ratios.put(idFor, G4Parse.parse(ratioReq, ratioDef));
-                        }
+                        final String idFor = Score.idFor(slot, cri);
+                        final String powReq = req.getParameter(idFor);
+                        final String ratioReq = req.getParameter(idFor + "--ratio");
 
-                        score.setPows(pows);
-                        score.setRatios(ratios);
-                        score.setComment(req.getParameter("comment"));
-                        score.setupPathElems(ctx, slot, file);
-                        queries.createScore(score);
+                        pows.put(idFor, G4Parse.parse(powReq, powDef));
+                        ratios.put(idFor, G4Parse.parse(ratioReq, ratioDef));
                     }
 
-                    resp.sendRedirect(core.cmpForwardToEarliestPendingSince(ctx, slot, file.getStamp()));
-                } else {
-                    resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Bad action: " + action);
+                    score.setPows(pows);
+                    score.setRatios(ratios);
+                    score.setComment(req.getParameter("comment"));
+                    score.setupPathElems(ctx, slot, file);
+                    queries.createScore(score);
                 }
+
+                resp.sendRedirect(core.cmpForwardToEarliestPendingSince(ctx, slot, file.getStamp()));
 
                 return null;
             }
@@ -414,7 +425,7 @@ public class AdminController extends ControllerElw {
                     return null;
                 }
 
-                retrieveFile(entry, core.getQueries());
+                retrieveFile(entry, slot, core.getQueries());
 
                 return null;
             }

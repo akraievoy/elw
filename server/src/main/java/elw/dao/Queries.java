@@ -50,7 +50,7 @@ public interface Queries {
     FileBase file(String scope, Ctx ctx, FileSlot slot, String id);
 
     InputSupplier<InputStream> inputSupplier(
-            @Nonnull Squab squab, @Nonnull String fileName
+            @Nonnull CtxSolution ctxSolution, @Nonnull String fileName
     );
 
     List<String> courseIds();

@@ -21,31 +21,18 @@ package elw.vo;
 import org.akraievoy.gear.G4mat;
 import org.codehaus.jackson.annotate.JsonIgnore;
 
-public class ScoreTerm {
-    private final String id;
-    private final double ratio;
-    private final int pow;
+/**
+ * ReST respesentation of single-{@link Criteria}
+ * {@link Score} component.
+ */
+public class ScoreTerm extends ScoreTermInput {
     private final FileSlot slot;
     private final Criteria criteria;
 
     public ScoreTerm(String id, double ratio, int pow, final FileSlot slot, final Criteria criteria) {
-        this.id = id;
-        this.ratio = ratio;
-        this.pow = pow;
+        super(ratio, id, pow);
         this.slot = slot;
         this.criteria = criteria;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public double getRatio() {
-        return ratio;
-    }
-
-    public int getPow() {
-        return pow;
     }
 
     public String getNiceRatio() {

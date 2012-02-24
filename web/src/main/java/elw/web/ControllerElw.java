@@ -130,7 +130,7 @@ public abstract class ControllerElw extends MultiActionController implements Web
             return null;
         }
 
-        final Solution file = core.getQueries().solution(ctx.solutions(slot), fileId);
+        final Solution file = core.getQueries().solution(ctx.ctxSlot(slot), fileId);
         if (file == null) {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND, "file for id " + fileId + " not found");
             return null;
@@ -254,28 +254,21 @@ public abstract class ControllerElw extends MultiActionController implements Web
         protected abstract ModelAndView handleFile(String scope, FileSlot slot) throws IOException;
 
         protected void retrieveFile(
-                FileBase fileBase, final Queries queries
+                FileBase fileBase, FileSlot slot, final Queries queries
         ) throws IOException {
-            final FileType fileType = IdNamed._.one(fileBase.getFileType());
-            final String contentType;
-            if (!fileType.getContentTypes().isEmpty()) {
-                contentType = fileType.getContentTypes().get(0);
-            } else {
-                contentType = fileType.isBinary() ? "binary/octet-stream" : "text/plain";
-            }
+            storeContentHeaders(fileBase, resp);
 
-            if (fileType.isBinary()) {
-                resp.setContentType(contentType);
-            } else {
-                resp.setContentType(contentType + "; charset=UTF-8");
-                resp.setCharacterEncoding("UTF-8");
+            if (!(fileBase instanceof Solution)) {
+                throw new IllegalStateException(
+                        "attachments are now broken"
+                );
             }
-
-            resp.setContentLength(fileBase.getCouchFile(FileBase.CONTENT).getLength().intValue());
-            resp.setHeader("Content-Disposition", "attachment;");
 
             final InputSupplier<InputStream> fileInput =
-                    queries.inputSupplier(fileBase, FileBase.CONTENT);
+                    queries.inputSupplier(
+                            ctx.ctxSlot(slot).solution((Solution) fileBase),
+                            FileBase.CONTENT
+                    );
             ByteStreams.copy(fileInput, resp.getOutputStream());
         }
 
@@ -396,6 +389,34 @@ public abstract class ControllerElw extends MultiActionController implements Web
             return null;
         }
 
+    }
+
+    public static void storeContentHeaders(
+            final FileBase fileBase,
+            final HttpServletResponse resp
+    ) {
+        final FileType fileType =
+                IdNamed._.one(fileBase.getFileType());
+        final String contentType;
+        if (!fileType.getContentTypes().isEmpty()) {
+            contentType =
+                    fileType.getContentTypes().get(0);
+        } else {
+            contentType =
+                    fileType.isBinary() ? "binary/octet-stream" : "text/plain";
+        }
+
+        if (fileType.isBinary()) {
+            resp.setContentType(contentType);
+        } else {
+            resp.setContentType(contentType + "; charset=UTF-8");
+            resp.setCharacterEncoding("UTF-8");
+        }
+
+        resp.setContentLength(
+                fileBase.getCouchFile(FileBase.CONTENT).getLength().intValue()
+        );
+        resp.setHeader("Content-Disposition", "attachment;");
     }
 
     protected static String fieldText(

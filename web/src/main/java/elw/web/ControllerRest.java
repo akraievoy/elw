@@ -6,6 +6,7 @@ import com.google.common.io.InputSupplier;
 import elw.dao.Queries;
 import elw.dao.QueriesSecure;
 import elw.dao.ctx.CtxSlot;
+import elw.dao.ctx.CtxSolution;
 import elw.dao.rest.RestEnrollment;
 import elw.dao.rest.RestEnrollmentSummary;
 import elw.dao.rest.RestSolution;
@@ -59,9 +60,6 @@ import java.util.*;
 * /enrollment/enrId/files
 *   GET /
 *      -> {}
-* /enrollment/enrId/solution/solutionId
-*   GET stream
-*   PUT stream
 * }}}
 *
 * FIXME: SCORES
@@ -656,7 +654,46 @@ public class ControllerRest extends ControllerElw {
         return null;
     }
 
+    @RequestMapping(
+            value = "enrollment/{enrId}/solution/{solId:.+}/{fileName:.+}",
+            method = RequestMethod.GET
+    )
+    public ModelAndView do_enrollmentSolutionGet(
+            final HttpServletRequest req,
+            final HttpServletResponse resp,
+            @PathVariable("enrId") final String enrId,
+            @PathVariable("solId") final String solId,
+            @PathVariable("fileName") final String fileName
+    ) throws IOException {
+        final HashMap<String, Object> model = auth(req, resp, null);
+        if (model == null) {
+            return null;
+        }
+
+        final Queries queries =
+                (Queries) model.get(MODEL_QUERIES);
+
+        final CtxSolution ctxSolution =
+                queries.resolveSolution(enrId, solId, null);
+
+        if (ctxSolution == null) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return null;
+        }
+
+        final InputSupplier<InputStream> contentSupplier =
+                queries.inputSupplier(ctxSolution, FileBase.CONTENT);
+
+        if (contentSupplier != null) {
+            storeContentHeaders(ctxSolution.solution, resp);
+            ByteStreams.copy(contentSupplier, resp.getOutputStream());
+        } else {
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+        }
+
+        return null;
+    }
+
     //  not currently used, but may be useful for some of streaming requests
     //  http://stackoverflow.com/questions/3686808/spring-3-requestmapping-get-path-value
-
 }

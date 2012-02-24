@@ -707,7 +707,7 @@ public class Ctx implements elw.vo.Ctx {
         return f.getScore() == null;
     }
     
-    public CtxSlot solutions(final FileSlot slot) {
+    public CtxSlot ctxSlot(final FileSlot slot) {
         return new CtxSlot(
                 getEnr(), getGroup(), getStudent(), getCourse(),
                 indexEntry.getKey(),

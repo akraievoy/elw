@@ -86,7 +86,7 @@ public class StudentCodeValidator extends G4Run.Task {
                     final FileSlot slot =
                             ctxVer.getAssType().getFileSlots().get(slotId);
                     final List<Solution> files =
-                            queries.solutions(ctxVer.solutions(slot));
+                            queries.solutions(ctxVer.ctxSlot(slot));
                     for (Solution f : files) {
                         if (f.getValidatorStamp() > 0 && f.getScore() != null) {
                             continue;

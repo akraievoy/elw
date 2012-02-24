@@ -5,11 +5,11 @@ import com.google.common.io.InputSupplier;
 import elw.dao.ctx.CtxSlot;
 import elw.dao.ctx.CtxSolution;
 import elw.dao.ctx.CtxStudent;
+import elw.dao.ctx.CtxTask;
 import elw.dao.rest.RestEnrollment;
 import elw.dao.rest.RestEnrollmentSummary;
 import elw.dao.rest.RestSolution;
 import elw.vo.*;
-import org.akraievoy.couch.Squab;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import javax.annotation.Nonnull;
@@ -239,6 +239,22 @@ public class QueriesSecure implements Queries {
             return false;
         }
 
+        if (!ctxSlot.open()) {
+            return false;
+        }
+
+        final CtxTask.StateForSlot stateForSlot = new CtxTask.StateForSlot() {
+            public State getState(FileSlot slot) {
+                final CtxSlot ctxApproveSlot = ctxSlot.slot(slot);
+                return ctxApproveSlot.state(solutions(ctxApproveSlot));
+            }
+        };
+
+        //noinspection SimplifiableIfStatement
+        if (!ctxSlot.writable(ctxSlot.slot, stateForSlot)) {
+            return false;
+        }
+
         return queries.createSolution(
                 ctxSlot, solution,
                 contentType, inputSupplier
@@ -285,8 +301,41 @@ public class QueriesSecure implements Queries {
         return null;  //	TODO review
     }
 
-    public InputSupplier<InputStream> inputSupplier(@Nonnull Squab squab, @Nonnull String fileName) {
-        return null;  //	TODO review
+    public InputSupplier<InputStream> inputSupplier(
+            final @Nonnull CtxSolution ctxSolution,
+            final @Nonnull String fileName
+    ) {
+        if (auth.isAdm()) {
+            return queries.inputSupplier(ctxSolution, fileName);
+        }
+
+        if (!enrollmentIds().contains(ctxSolution.enr.getId())) {
+            return null;
+        }
+
+        if (!authStudent(ctxSolution.student)) {
+            return null;
+        }
+
+        if (!ctxSolution.open()) {
+            return null;
+        }
+
+        final CtxTask.StateForSlot stateForSlot = new CtxTask.StateForSlot() {
+            public State getState(FileSlot slot) {
+                final CtxSlot ctxApproveSlot = ctxSolution.slot(slot);
+                return ctxApproveSlot.state(solutions(ctxApproveSlot));
+            }
+        };
+
+        //noinspection SimplifiableIfStatement
+        if (!ctxSolution.readable(ctxSolution.slot, stateForSlot)) {
+            return null;
+        }
+
+        return queries.inputSupplier(
+                ctxSolution, fileName
+        );
     }
 
     public List<String> courseIds() {

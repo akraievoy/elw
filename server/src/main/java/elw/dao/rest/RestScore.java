@@ -5,9 +5,9 @@ import elw.vo.ScoreTerm;
 import elw.vo.State;
 
 /**
- * Score information of a file, with extended information.
+ * Score information of a {@link elw.vo.Solution}, with extended information.
  */
-public class RestScore {
+public class RestScore extends RestScoreInput {
     public static RestScore create(CtxSolution scores) {
         if (scores == null) {
             return null;
@@ -44,9 +44,6 @@ public class RestScore {
     private double points;
     public double getPoints() { return points; }
 
-    private String solutionId;
-    public String getSolutionId() { return solutionId; }
-
     private State state;
     public State getState() { return state; }
 
@@ -56,6 +53,4 @@ public class RestScore {
     private String stampNice;
     public String getStampNice() { return stampNice; }
 
-    private ScoreTerm[] terms;
-    public ScoreTerm[] getTerms() { return terms; }
 }

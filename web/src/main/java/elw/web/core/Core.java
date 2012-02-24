@@ -160,7 +160,7 @@ public class Core {
                     continue;
                 }
 
-                final List<Solution> uploads = queries.solutions(ctxVer.solutions(slot));
+                final List<Solution> uploads = queries.solutions(ctxVer.ctxSlot(slot));
                 if (!lf.cDue(ctxVer, slot)) {
                     continue;
                 }
@@ -659,7 +659,7 @@ public class Core {
                     if (!s.getId().equals(slot.getId())) {
                         continue;    //	other slots out of scope
                     }
-                    final List<Solution> uploads = queries.solutions(ctxVer.solutions(slot));
+                    final List<Solution> uploads = queries.solutions(ctxVer.ctxSlot(slot));
                     if (uploads != null && uploads.size() > 0) {
                         for (int i = uploads.size() - 1; i >= 0; i--) {
                             final Solution f = uploads.get(i);

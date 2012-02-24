@@ -3,6 +3,8 @@ package elw.dao.ctx;
 import elw.vo.*;
 import elw.vo.Class;
 
+import java.util.List;
+
 /**
  * Parameter Object, storing the full Class/Task/Version context.
  */
@@ -84,5 +86,46 @@ public class CtxTask extends CtxStudent {
         );
 
         return propagateTZCache(ctxTask);
+    }
+
+    public static interface StateForSlot {
+        State getState(FileSlot slot);
+    }
+
+    public boolean writable(
+            final FileSlot slot,
+            final StateForSlot stateForSlot
+    ) {
+        if (!slot.isWritable()) {
+            return false;
+        }
+
+        final List<String> writeApprovals =
+                slot.getWriteApprovals();
+
+        for (String writeApproval : writeApprovals) {
+            final FileSlot approvalSlot =
+                    tType.getFileSlots().get(writeApproval);
+            if (State.APPROVED != stateForSlot.getState(slot)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public boolean readable(FileSlot slot, StateForSlot stateForSlot) {
+        final List<String> readApprovals =
+                slot.getReadApprovals();
+
+        for (String readApproval : readApprovals) {
+            final FileSlot approvalSlot =
+                    tType.getFileSlots().get(readApproval);
+            if (State.APPROVED != stateForSlot.getState(slot)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
