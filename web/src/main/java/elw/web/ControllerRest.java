@@ -684,6 +684,9 @@ public class ControllerRest extends ControllerElw {
         final InputSupplier<InputStream> contentSupplier =
                 queries.inputSupplier(ctxSolution, FileBase.CONTENT);
 
+        //  LATER ideally we should check that fileName is not empty and
+        //      conforms to restrictions of its content type / file type
+
         if (contentSupplier != null) {
             storeContentHeaders(ctxSolution.solution, resp);
             ByteStreams.copy(contentSupplier, resp.getOutputStream());
