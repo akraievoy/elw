@@ -57,7 +57,9 @@ import java.util.*;
 *      response = SHA512(salt, email, sessionID, request.sourceAddr, expiry, challenge)
 *
 * {{{
-* /enrollment/enrId/files
+* /enrollment/enrId/files/
+*   GET fileId --> mapped over to git-ed fs image with cron-ed pull from origin
+* /enrollment/enrId/files/
 *   GET /
 *      -> {}
 * }}}
