@@ -39,12 +39,12 @@ public class MemoryTableModel extends AbstractTableModel {
             return Data.str(address, 16, 8);
         } else if (COL_BIN.equals(colName)) {
             //Look at this hack on the next line! This should be done inside Data.str()
-            return Data.str(((long) memory.getByteInternal(address)) & 0xFF, 2, 8);
+            return Data.str((long) memory.getByteInternal(address) & 0xFF, 2, 8);
         } else if (COL_HEX_WORD.equals(colName)) {
             if (!memory.hasWord(address)) {
                 return "?";
             }
-            return Data.str(((long) memory.getWordInternal(address)) & 0xFFFFFFFF, 16, 8);
+            return Data.str((long) memory.getWordInternal(address) & 0xFFFFFFFF, 16, 8);
         } else if (COL_DEC_WORD.equals(colName)) {
             if (!memory.hasWord(address)) {
                 return "?";
