@@ -5,6 +5,7 @@ import elw.vo.*;
 import elw.vo.Class;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Parameter Object, storing the full Solution context.
@@ -62,22 +63,21 @@ public class CtxSlot extends CtxTask {
     }
 
     public Class dueClass() {
-        final Integer classDueIndex =
-                idxEntry.getClassDue().get(slot.getId());
+        final Map<String,String> classDueMap =
+                idxEntry.getClassDue();
 
-        if (classDueIndex == null) {
+        if (classDueMap == null || classDueMap.isEmpty()) {
             return null;
         }
 
-        final int classDueIndexSafe = Math.min(
-                classDueIndex,
-                enr.getClasses().size() - 1
-        );
+        final String classDue =
+                classDueMap.get(slot.getId());
 
-        final Class classDue =
-                enr.getClasses().get(classDueIndexSafe);
+        if (classDue == null) {
+            return null;
+        }
 
-        return classDue;
+        return classForKey(enr.getClasses(), classDue);
     }
 
     public long dueMillis() {

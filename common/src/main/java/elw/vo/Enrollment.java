@@ -25,14 +25,14 @@ public class Enrollment extends Squab implements IdNamed, Cloneable {
     public String getTimeZone() { return timeZone; }
     public void setTimeZone(String timeZone) { this.timeZone = timeZone; }
 
-    private List<Class> classes = new ArrayList<Class>();
-    public List<Class> getClasses() {
-        return Collections.unmodifiableList(classes);
+    private SortedMap<String, Class> classes = new TreeMap<String, Class>();
+    public SortedMap<String, Class> getClasses() {
+        return Collections.unmodifiableSortedMap(classes);
     }
-    public void setClasses(List<Class> classes) {
+    public void setClasses(SortedMap<String, Class> classes) {
         this.classes.clear();
         if (classes != null) {
-            this.classes.addAll(classes);
+            this.classes.putAll(classes);
         }
     }
 
@@ -53,7 +53,7 @@ public class Enrollment extends Squab implements IdNamed, Cloneable {
     }
 
     public boolean checkOnTime(elw.vo.Stamped stamped) {
-        for (Class aClass : classes) {
+        for (Class aClass : classes.values()) {
             if (aClass.checkOnTime(stamped)) {
                 return true;
             }
@@ -77,8 +77,13 @@ public class Enrollment extends Squab implements IdNamed, Cloneable {
         for (int idxPos = 0; idxPos < index.size(); idxPos++) {
             clone.index.set(idxPos, clone.index.get(idxPos).clone());
         }
-        for (int classPos = 0; classPos < classes.size(); classPos++) {
-            clone.classes.set(classPos, this.classes.get(classPos).clone());
+
+        clone.classes = new TreeMap<String, Class>();
+        for (Map.Entry<String, Class> classEntry : classes.entrySet()) {
+            clone.classes.put(
+                    classEntry.getKey(),
+                    classEntry.getValue().clone()
+            );
         }
 
         return clone;

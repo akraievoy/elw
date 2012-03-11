@@ -4,6 +4,7 @@ import elw.vo.*;
 import elw.vo.Class;
 
 import java.util.List;
+import java.util.SortedMap;
 
 /**
  * Parameter Object, storing the full Class/Task/Version context.
@@ -34,6 +35,27 @@ public class CtxTask extends CtxStudent {
         this.ver = ver;
     }
 
+    public static String safeClassKey(
+            final SortedMap<String, Class> classMap,
+            final String classKey
+    ) {
+        final SortedMap<String, Class> tailMap =
+                classMap.tailMap(classKey);
+
+        if (!tailMap.isEmpty()) {
+            return tailMap.firstKey();
+        }
+
+        return classMap.lastKey();
+    }
+    
+    public static Class classForKey(
+            final SortedMap<String, Class> classMap,
+            final String classKey
+    ) {
+        return classMap.get(safeClassKey(classMap, classKey));
+    }
+
     public CtxSlot slot(final FileSlot slot) {
         final CtxSlot ctxSlot = new CtxSlot(
                 enr, group, student, course,
@@ -45,19 +67,10 @@ public class CtxTask extends CtxStudent {
     }
 
     public Class openClass() {
-        final int classFromIndex =
-                idxEntry.getClassFrom();
-
-        final int classFromIndexSafe = 
-                Math.min(
-                        classFromIndex,
-                        enr.getClasses().size() - 1
-                );
-
-        final Class classFrom =
-                enr.getClasses().get(classFromIndexSafe);
-
-        return classFrom;
+        return classForKey(
+                enr.getClasses(),
+                idxEntry.getClassFrom()
+        );
     }
 
     public long openMillis() {
@@ -106,7 +119,7 @@ public class CtxTask extends CtxStudent {
         for (String writeApproval : writeApprovals) {
             final FileSlot approvalSlot =
                     tType.getFileSlots().get(writeApproval);
-            if (State.APPROVED != stateForSlot.getState(slot)) {
+            if (State.APPROVED != stateForSlot.getState(approvalSlot)) {
                 return false;
             }
         }
@@ -121,7 +134,7 @@ public class CtxTask extends CtxStudent {
         for (String readApproval : readApprovals) {
             final FileSlot approvalSlot =
                     tType.getFileSlots().get(readApproval);
-            if (State.APPROVED != stateForSlot.getState(slot)) {
+            if (State.APPROVED != stateForSlot.getState(approvalSlot)) {
                 return false;
             }
         }

@@ -1,6 +1,7 @@
 package elw.dao;
 
 import elw.dao.ctx.CtxSlot;
+import elw.dao.ctx.CtxTask;
 import elw.vo.Class;
 import elw.vo.*;
 import org.akraievoy.gear.G4Parse;
@@ -546,16 +547,10 @@ public class Ctx implements elw.vo.Ctx {
             throw new IllegalStateException(this.toString());
         }
 
-        final int classFrom = getIndexEntry().getClassFrom();
-        if (classFrom < 0) {
-            log.warn("referencing non-existent opening class: ctx=" + this.toString());
-            return getEnr().getClasses().get(0);
-        } else if (classFrom < getEnr().getClasses().size()) {
-            return getEnr().getClasses().get(classFrom);
-        } else {
-            log.warn("referencing non-existent opening class: ctx=" + this.toString());
-            return getEnr().getClasses().get(getEnr().getClasses().size() - 1);
-        }
+        return CtxTask.classForKey(
+                getEnr().getClasses(),
+                getIndexEntry().getClassFrom()
+        );
     }
 
     public Class cDue(final String slotId) {
@@ -563,25 +558,20 @@ public class Ctx implements elw.vo.Ctx {
             throw new IllegalStateException(this.toString());
         }
 
-        final Map<String, Integer> due = getIndexEntry().getClassDue();
-        final Integer dueIdx = due == null ? null : due.get(slotId);
-        if (dueIdx == null) {
+        final Map<String, String> due = getIndexEntry().getClassDue();
+        final String classDue = due == null ? null : due.get(slotId);
+        if (classDue == null) {
             return null;
         }
-        if (dueIdx < 0) {
-            log.warn("referencing non-existent due class: ctx=" + this.toString() + " slotId=" + slotId);
-            return getEnr().getClasses().get(0);
-        } else if (dueIdx < getEnr().getClasses().size()) {
-            return getEnr().getClasses().get(dueIdx);
-        } else {
-            log.warn("referencing non-existent opening class: ctx=" + this.toString() + " slotId=" + slotId);
-            return getEnr().getClasses().get(getEnr().getClasses().size() - 1);
-        }
+
+        return CtxTask.classForKey(
+                getEnr().getClasses(), classDue
+        );
     }
 
     //	LATER move this to base.G4mat
     private static String renderBytes(byte[] checkSum) {
-        final StringBuffer result = new StringBuffer();
+        final StringBuilder result = new StringBuilder();
 
         for (byte checkByte : checkSum) {
             result.append(Integer.toString((checkByte & 0xff) + 0x100, 16).substring(1));
@@ -821,9 +811,8 @@ public class Ctx implements elw.vo.Ctx {
             KeyVal val = (KeyVal) o;
 
             if (key != null ? !key.equals(val.key) : val.key != null) return false;
-            if (!valueClass.equals(val.valueClass)) return false;
+            return valueClass.equals(val.valueClass);
 
-            return true;
         }
 
         @Override

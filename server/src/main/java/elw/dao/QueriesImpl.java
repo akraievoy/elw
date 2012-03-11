@@ -140,12 +140,14 @@ public class QueriesImpl implements Queries {
             final String enrId,
             final String sourceAddress
     ) {
-        final Enrollment enr =
+        final Enrollment enrRaw =
                 userDao.findSome(Enrollment.class, null, null, enrId);
 
-        if (enr == null) {
+        if (enrRaw == null) {
             return null;
         }
+
+        final Enrollment enr = markEnrollment(enrRaw);
 
         final CtxEnrollment ctxEnrollment = new CtxEnrollment(
                 enr,
@@ -166,10 +168,11 @@ public class QueriesImpl implements Queries {
             final String enrId,
             final SolutionFilter filter
     ) {
-        final Enrollment enr = enrollmentSome(enrId);
-        if (enr == null) {
+        final Enrollment enrRaw = enrollmentSome(enrId);
+        if (enrRaw == null) {
             return null;
         }
+        final Enrollment enr = markEnrollment(enrRaw);
 
         final Group group = group(enr.getGroupId());
         final Collection<String> studIds =
@@ -231,12 +234,13 @@ public class QueriesImpl implements Queries {
             final String couchId,
             final StudentFilter studentFilter
     ) {
-        final Enrollment enr = enrollmentSome(enrollmentId);
-        if (enr == null) {
+        final Enrollment enrRaw = enrollmentSome(enrollmentId);
+        if (enrRaw == null) {
             return CtxResolutionState.failed(
                     couchId, "enrollment "+enrollmentId+" not found"
             );
         }
+        final Enrollment enr = markEnrollment(enrRaw);
 
         final Squab.Path path;
         try {
@@ -728,19 +732,58 @@ public class QueriesImpl implements Queries {
     }
 
     public List<Enrollment> enrollments() {
-        return userDao.findAll(Enrollment.class);
+        final List<Enrollment> allEnrs = userDao.findAll(Enrollment.class);
+
+        final ArrayList<Enrollment> result =
+                new ArrayList<Enrollment>();
+        for (Enrollment enrs : allEnrs) {
+            result.add(markEnrollment(enrs));
+        }
+
+        return result;
     }
 
     public Enrollment enrollmentSome(final String id) {
-        return userDao.findSome(Enrollment.class, null, null, id);
+        final Enrollment enrSome =
+                userDao.findSome(Enrollment.class, null, null, id);
+
+        return markEnrollment(enrSome);
+    }
+
+    protected static Enrollment markEnrollment(Enrollment enrSome) {
+        if (enrSome == null) {
+            return null;
+        }
+
+        final Enrollment enrClone;
+        try {
+            enrClone = enrSome.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new IllegalStateException("clone() was working recently", e);
+        }
+
+        IdNamed._.mark(enrClone.getClasses());
+
+        return enrClone;
     }
 
     public Enrollment enrollment(final String id) {
-        return userDao.findOne(Enrollment.class, null, null, id);
+        return markEnrollment(
+                userDao.findOne(Enrollment.class, null, null, id)
+        );
     }
 
     public List<Enrollment> enrollmentsForGroup(String groupId) {
-        return userDao.findAll(Enrollment.class, groupId);
+        final List<Enrollment> groupEnrs =
+                userDao.findAll(Enrollment.class, groupId);
+
+        final ArrayList<Enrollment> result = new ArrayList<Enrollment>();
+
+        for (Enrollment enr : groupEnrs) {
+            result.add(markEnrollment(enr));
+        }
+
+        return result;
     }
 
     public SortedMap<Long, Score> scores(Ctx ctx, FileSlot slot, Solution file) {

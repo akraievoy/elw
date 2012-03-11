@@ -9,17 +9,29 @@ import org.joda.time.format.DateTimeFormatter;
 import java.util.regex.Pattern;
 
 //  LATER think of some other name for this entity, collision with java.lang smells
-//  FIXME date should be id, classes should be stored as map in enrollment
-public class Class implements Cloneable {
+public class Class implements Cloneable, IdNamed {
     private static final DateTimeFormatter FMT_DATE = DateTimeFormat.forPattern("yyyy-MM-dd");
     private static final DateTimeFormatter FMT_DATE_NICE = DateTimeFormat.forPattern("EEE MMM dd");
     private static final DateTimeFormatter FMT_TIME = DateTimeFormat.forPattern("HH:mm");
 
+    private String id;
+    private String name;
     private String date;
     private String fromTime;
     private String toTime;
     private Pattern[] onSitePatterns;
     private String[] onSite;
+
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
+
+    public String getName() {
+        return name == null ? getDate() + " " + getFromTime() : name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public String id() {
         return getDate() + " " + getFromTime();

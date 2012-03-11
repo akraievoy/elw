@@ -1,6 +1,7 @@
 package elw.dao.rest;
 
 import elw.dao.ctx.CtxEnrollment;
+import elw.dao.ctx.CtxTask;
 import elw.vo.*;
 import elw.vo.Class;
 
@@ -50,16 +51,11 @@ public class RestEnrollment {
         restEnr.name = ctxEnr.enr.getName();
         restEnr.timeZone = ctxEnr.timeZone().getDisplayName();
 
-        //  temp storage required for the old Couch enrollment model
-        final List<String> classIds = new ArrayList<String>();
-
-        for (elw.vo.Class clazz : ctxEnr.enr.getClasses()) {
-            final String classId = clazz.id();
-            classIds.add(classId);
-
+        final SortedMap<String, Class> clazzMap = ctxEnr.enr.getClasses();
+        for (elw.vo.Class clazz : clazzMap.values()) {
             final RestClass restClass =
                     RestClass.create(ctxEnr, clazz, sourceAddress);
-            restEnr.classes.put(classId, restClass);
+            restEnr.classes.put(clazz.id(), restClass);
 
             if (restClass.isCurrent()) {
                 restEnr.currentClass = restClass;
@@ -76,14 +72,20 @@ public class RestEnrollment {
             restEntry.id = idxEntryId;
 
             final String classFromKey =
-                    safeKey(classIds, idxEntry.getClassFrom());
-            restEntry.classFrom = 
+                    CtxTask.classForKey(
+                            ctxEnr.enr.getClasses(),
+                            idxEntry.getClassFrom()
+                    ).getId();
+            restEntry.classFrom =
                     restEnr.classes.get(classFromKey);
 
-            for (final Map.Entry<String, Integer> dueEntry : 
+            for (final Map.Entry<String, String> dueEntry :
                     idxEntry.getClassDue().entrySet()) {
                 final String classDueKey =
-                        safeKey(classIds, dueEntry.getValue());
+                        CtxTask.classForKey(
+                                ctxEnr.enr.getClasses(),
+                                dueEntry.getValue()
+                        ).getId();
                 restEntry.classDue.put(
                         dueEntry.getKey(),
                         restEnr.classes.get(classDueKey)
@@ -104,7 +106,7 @@ public class RestEnrollment {
 
                 //  we should not expose all tasks of the type via ReST
                 //  the same applies to versions,
-                //      but this is done by QueriesSecure
+                //      LATER should be done by QueriesSecure
                 restEntry.taskType.setTasks(
                         new TreeMap<String, Task>()
                 );
@@ -116,21 +118,6 @@ public class RestEnrollment {
         }
 
         return restEnr;
-    }
-
-    private static String safeKey(
-            final List<String> classIds,
-            final int index
-    ) {
-        final int safeIndex;
-
-        if (classIds.size() > index) {
-            safeIndex = index;
-        } else {
-            safeIndex = classIds.size() - 1;
-        }
-
-        return classIds.get(safeIndex);
     }
 
     /**

@@ -8,10 +8,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
-//  FIXME refer to classes via id/date, routed in a robust way like so:
-//      classes.tailMap(idxEntry.classFrom).firstKey()
-//          with a check to remap any overdue references to last class
-//      which would be as simple as classes.lastKey()
 //  FIXME indexEntries should be stored in a treemap also,
 //      where id may be derived from path and classFrom
 public class IndexEntry implements Cloneable {
@@ -25,15 +21,15 @@ public class IndexEntry implements Cloneable {
     public int getScoreBudget() { return scoreBudget; }
     public void setScoreBudget(int scoreBudget) { this.scoreBudget = scoreBudget; }
 
-    private int classFrom;
-    public int getClassFrom() { return classFrom; }
-    public void setClassFrom(int classFrom) { this.classFrom = classFrom; }
+    private String classFrom;
+    public String getClassFrom() { return classFrom; }
+    public void setClassFrom(String classFrom) { this.classFrom = classFrom; }
 
-    private Map<String, Integer> classDue = new TreeMap<String, Integer>();
-    public Map<String, Integer> getClassDue() {
+    private Map<String, String> classDue = new TreeMap<String, String>();
+    public Map<String, String> getClassDue() {
         return Collections.unmodifiableMap(classDue);
     }
-    public void setClassDue(Map<String, Integer> classDue) {
+    public void setClassDue(Map<String, String> classDue) {
         this.classDue.clear();
         if (classDue != null) {
             this.classDue.putAll(classDue);
@@ -108,7 +104,7 @@ public class IndexEntry implements Cloneable {
     public IndexEntry clone() throws CloneNotSupportedException {
         IndexEntry clone = (IndexEntry) super.clone();
         
-        clone.classDue = new TreeMap<String, Integer>(this.classDue);
+        clone.classDue = new TreeMap<String, String>(this.classDue);
         clone.path = this.path.clone();
         
         return clone;
