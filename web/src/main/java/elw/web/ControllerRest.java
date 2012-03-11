@@ -43,6 +43,8 @@ import java.util.*;
 *
 * /challenges //   LATER specify
 *
+*
+* // TODO auth
 * /challenge
 *   GET /iasa@akraievoy.org/13989823443
 *      -> 200 {"status": "response sent", "challenge": "SHA512", "expiry": 13989823443} (response sent to email)
@@ -56,17 +58,14 @@ import java.util.*;
 *      challenge = SHA512(salt, email, millis)
 *      response = SHA512(salt, email, sessionID, request.sourceAddr, expiry, challenge)
 *
-* {{{
-* /enrollment/enrId/files/
-*   GET fileId --> mapped over to git-ed fs image with cron-ed pull from origin
-* /enrollment/enrId/files/
-*   GET /
-*      -> {}
-* }}}
 *
-* FIXME: SCORES
+* TODO: SCORES
+*   get last score for solution
+*   get all scores for solution
+*   list solutions of the same version across the sustem
+*   get reference to next checked solution: switching strategies
 *
-* FIXME: COMMENTS
+* LATER: COMMENTS
 */
 @Controller
 @RequestMapping("/rest/**/*")
