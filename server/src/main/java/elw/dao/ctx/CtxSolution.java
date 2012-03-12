@@ -17,14 +17,14 @@ public class CtxSolution extends CtxSlot {
             Group group,
             Student student,
             Course course,
-            int idx,
+            IndexEntry indexEntry,
             Task task,
             TaskType tType,
             Version ver,
             FileSlot slot,
             Solution solution
     ) {
-        super(enr, group, student, course, idx, task, tType, ver, slot);
+        super(enr, group, student, course, indexEntry, task, tType, ver, slot);
         this.solution = solution;
     }
 
@@ -35,7 +35,7 @@ public class CtxSolution extends CtxSlot {
     public CtxScore score(final Score score) {
         final CtxScore ctxScore = new CtxScore(
                 enr, group, student,
-                course, idx, task, tType, ver,
+                course, indexEntry, task, tType, ver,
                 slot, solution, score
         );
 
@@ -123,7 +123,7 @@ public class CtxSolution extends CtxSlot {
     }
 
     public double pointsForSolution() {
-        return idxEntry.computePoints(score(), slot);
+        return indexEntry.computePoints(score(), slot);
     }
 
     public ScoreTerm[] terms() {

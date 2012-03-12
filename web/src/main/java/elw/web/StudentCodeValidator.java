@@ -76,8 +76,8 @@ public class StudentCodeValidator extends G4Run.Task {
 
             for (Student student : ctxEnr.getGroup().getStudents().values()) {
                 final Ctx ctxStud = ctxEnr.extendStudent(student);
-                for (int index = 0; index < enr.getIndex().size(); index++) {
-                    final Ctx ctxVer = ctxStud.extendIndex(index);
+                for (IndexEntry indexEntry : ctxEnr.getEnr().getIndex().values()) {
+                    final Ctx ctxVer = ctxStud.extendIndex(indexEntry.getId());
                     if (!"lr".equals(ctxVer.getAssType().getId())) {
                         continue;
                     }

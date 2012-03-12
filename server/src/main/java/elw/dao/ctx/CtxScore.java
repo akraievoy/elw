@@ -13,7 +13,7 @@ public class CtxScore extends CtxSolution {
             Group group,
             Student student,
             Course course,
-            int idx,
+            IndexEntry indexEntry,
             Task task,
             TaskType tType,
             Version ver,
@@ -23,7 +23,7 @@ public class CtxScore extends CtxSolution {
     ) {
         super(
                 enr, group, student,
-                course, idx, task, tType, ver,
+                course, indexEntry, task, tType, ver,
                 slot, solution
         );
         this.score = score;

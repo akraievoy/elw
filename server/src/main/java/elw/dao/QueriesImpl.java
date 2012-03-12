@@ -82,7 +82,7 @@ public class QueriesImpl implements Queries {
         }
 
         final Course course = course(enr.getCourseId());
-        final List<IndexEntry> index = enr.getIndex();
+        final Map<String, IndexEntry> index = enr.getIndex();
 
         final RestEnrollmentSummary enrSummary = new RestEnrollmentSummary();
         for (String studId : studIds) {
@@ -95,13 +95,9 @@ public class QueriesImpl implements Queries {
             final RestStudentSummary studentSummary =
                     new RestStudentSummary();
 
-            for (
-                    int idxPos = 0, idxSize = index.size();
-                    idxPos < idxSize;
-                    idxPos++
-            ) {
+            for (Map.Entry<String, IndexEntry> indexEntry : index.entrySet()) {
                 final CtxTask ctxTask =
-                        ctxStudent.task(idxPos);
+                        ctxStudent.task(indexEntry.getKey());
                 final RestTaskSummary taskSummary =
                         new RestTaskSummary();
 
@@ -179,7 +175,7 @@ public class QueriesImpl implements Queries {
                 new ArrayList<String>(group.getStudents().keySet());
 
         final Course course = course(enr.getCourseId());
-        final List<IndexEntry> index = enr.getIndex();
+        final Map<String, IndexEntry> index = enr.getIndex();
 
         final SortedMap<String, RestSolution> solutionsRes =
                 new TreeMap<String, RestSolution>();
@@ -193,13 +189,9 @@ public class QueriesImpl implements Queries {
                 continue;
             }
 
-            for (
-                    int idxPos = 0, idxSize = index.size();
-                    idxPos < idxSize;
-                    idxPos++
-            ) {
+            for (Map.Entry<String, IndexEntry> indexEntry : index.entrySet()) {
                 final CtxTask ctxTask =
-                        ctxStudent.task(idxPos);
+                        ctxStudent.task(indexEntry.getKey());
 
                 for (
                         Map.Entry<String, FileSlot> fsEntry :
@@ -303,15 +295,8 @@ public class QueriesImpl implements Queries {
         final CtxStudent ctxStudent =
                 ctxEnrollment.student(student);
 
-        final int entryIdx = Integer.valueOf(path.elem(4));
-        if (entryIdx < 0 || entryIdx >= enr.getIndex().size()) {
-            return CtxResolutionState.failed(
-                    couchId, path, "index out of range"
-            );
-        }
-
-        //  TODO this is likely to throw some NPEs if fed with incorrect data
-        final CtxTask ctxTask = ctxStudent.task(entryIdx);
+        final String indexKey = path.elem(4);
+        final CtxTask ctxTask = ctxStudent.task(indexKey);
 
         if (ctxTask.tType == null) {
             return CtxResolutionState.failed(
@@ -394,7 +379,7 @@ public class QueriesImpl implements Queries {
                 state.ctxSlot.group.getId(),
                 state.ctxSlot.student.getId(),
                 state.ctxSlot.course.getId(),
-                String.valueOf(state.ctxSlot.idx),
+                state.ctxSlot.indexEntry.getId(),
                 state.ctxSlot.tType.getId(),
                 state.ctxSlot.task.getId(),
                 state.ctxSlot.ver.getId(),
@@ -505,7 +490,7 @@ public class QueriesImpl implements Queries {
                 ctx.group.getId(),
                 ctx.student.getId(),
                 ctx.course.getId(),
-                String.valueOf(ctx.idx),
+                ctx.indexEntry.getId(),
                 ctx.tType.getId(),
                 ctx.task.getId(),
                 ctx.ver.getId(),
@@ -538,7 +523,7 @@ public class QueriesImpl implements Queries {
                 ctx.group.getId(),
                 ctx.student.getId(),
                 ctx.course.getId(),
-                String.valueOf(ctx.idx),
+                ctx.indexEntry.getId(),
                 ctx.tType.getId(),
                 ctx.task.getId(),
                 ctx.ver.getId(),
@@ -763,6 +748,7 @@ public class QueriesImpl implements Queries {
         }
 
         IdNamed._.mark(enrClone.getClasses());
+        IdNamed._.mark(enrClone.getIndex());
 
         return enrClone;
     }
@@ -792,7 +778,7 @@ public class QueriesImpl implements Queries {
                 ctx.getGroup().getId(),
                 ctx.getStudent().getId(),
                 ctx.getCourse().getId(),
-                String.valueOf(ctx.getIndex()),
+                ctx.getIndexEntry().getId(),
                 ctx.getAssType().getId(),
                 ctx.getAss().getId(),
                 ctx.getVer().getId(),
@@ -807,7 +793,7 @@ public class QueriesImpl implements Queries {
                 ctx.group.getId(),
                 ctx.student.getId(),
                 ctx.course.getId(),
-                String.valueOf(ctx.idx),
+                ctx.indexEntry.getId(),
                 ctx.tType.getId(),
                 ctx.task.getId(),
                 ctx.ver.getId(),
@@ -823,7 +809,7 @@ public class QueriesImpl implements Queries {
                 ctx.group.getId(),
                 ctx.student.getId(),
                 ctx.course.getId(),
-                String.valueOf(ctx.idx),
+                ctx.indexEntry.getId(),
                 ctx.tType.getId(),
                 ctx.task.getId(),
                 ctx.ver.getId(),

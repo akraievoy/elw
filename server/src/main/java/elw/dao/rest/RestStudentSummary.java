@@ -23,13 +23,13 @@ public class RestStudentSummary {
             RestSlotSummary slotSummary
     ) {
         final RestTaskSummary existing =
-                tasks.get(String.valueOf(ctxSlot.idx));
+                tasks.get(ctxSlot.indexEntry.getId());
 
         final RestTaskSummary updated;
         if (existing == null) {
             final RestTaskSummary created =
                     new RestTaskSummary();
-            tasks.put(String.valueOf(ctxSlot.idx), created);
+            tasks.put(ctxSlot.indexEntry.getId(), created);
             updated = created;
         } else {
             updated = existing;
@@ -44,7 +44,7 @@ public class RestStudentSummary {
     ) {
         taskSummary.precachePointTotals(ctxTask);
 
-        tasks.put(String.valueOf(ctxTask.idx), taskSummary);
+        tasks.put(ctxTask.indexEntry.getId(), taskSummary);
     }
     
     public void precachePointTotals() {

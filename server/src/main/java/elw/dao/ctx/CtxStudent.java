@@ -18,20 +18,20 @@ public class CtxStudent extends CtxEnrollment {
         this.student = student;
     }
 
-    public CtxTask task(final int idxPos) {
-        final IndexEntry idxEntry = enr.getIndex().get(idxPos);
-        final String taskTypeId = idxEntry.getTaskTypeId();
-        final String taskId = idxEntry.getTaskId();
+    public CtxTask task(final String indexKey) {
+        final IndexEntry indexEntry = enr.getIndex().get(indexKey);
+        final String taskTypeId = indexEntry.getTaskTypeId();
+        final String taskId = indexEntry.getTaskId();
 
         final TaskType taskType = course.getTaskTypes().get(taskTypeId);
         final Task task = taskType.getTasks().get(taskId);
         final Version ver = Nav.resolveVersion(
-                task, idxEntry, group, student.getId()
+                task, indexEntry, group, student.getId()
         );
 
         final CtxTask ctxTask = new CtxTask(
                 enr, course, group, student,
-                idxPos, task, taskType, ver
+                indexEntry, task, taskType, ver
         );
 
         return propagateTZCache(ctxTask);

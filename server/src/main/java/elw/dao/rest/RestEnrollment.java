@@ -62,14 +62,13 @@ public class RestEnrollment {
             }
         }
 
-        final List<IndexEntry> enrIndex = ctxEnr.enr.getIndex();
-        for (int i = 0, idxSize = enrIndex.size(); i < idxSize; i++) {
-            final IndexEntry idxEntry = enrIndex.get(i);
-            final String idxEntryId = String.valueOf(i);
+        final Map<String, IndexEntry> enrIndex = ctxEnr.enr.getIndex();
+        for (Map.Entry<String, IndexEntry> indexEntry : enrIndex.entrySet()) {
+            final IndexEntry idxEntry = indexEntry.getValue();
 
             final RestIndexEntry restEntry = new RestIndexEntry();
 
-            restEntry.id = idxEntryId;
+            restEntry.id = indexEntry.getKey();
 
             final String classFromKey =
                     CtxTask.classForKey(
@@ -114,7 +113,7 @@ public class RestEnrollment {
                 throw new IllegalStateException(e);
             }
 
-            restEnr.index.put(idxEntryId, restEntry);
+            restEnr.index.put(indexEntry.getKey(), restEntry);
         }
 
         return restEnr;

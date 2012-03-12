@@ -71,8 +71,8 @@ public class Core {
             Ctx ctx, Format format, LogFilter lf,
             List<Object[]> logData, final boolean adm
     ) {
-        for (int i = 0; i < ctx.getEnr().getIndex().size(); i++) {
-            final Ctx ctxAss = ctx.extendIndex(i);
+        for (IndexEntry indexEntry : ctx.getEnr().getIndex().values()) {
+            final Ctx ctxAss = ctx.extendIndex(indexEntry.getId());
 
             final TaskType aType = ctxAss.getAssType();
             for (FileSlot slot : aType.getFileSlots().values()) {
@@ -99,7 +99,7 @@ public class Core {
                     final List<Attachment> uploadsVer = queries.attachments(ctxVer, slot.getId());
                     total += uploadsVer.size();
                     if (lf.cScopeOne('v') && lf.cVer(ctxVer)) {
-                        logRows(format, lf, logData, i, ctxVer, slot, uploadsVer, Attachment.SCOPE, adm);
+                        logRows(format, lf, logData, indexEntry.getId(), ctxVer, slot, uploadsVer, Attachment.SCOPE, adm);
                     }
                 }
             }
@@ -145,8 +145,8 @@ public class Core {
             Ctx ctx, Format f,
             LogFilter lf, List<Object[]> logData, Ctx ctxStud,
             boolean adm) {
-        for (int index = 0; index < ctx.getEnr().getIndex().size(); index++) {
-            final Ctx ctxVer = ctxStud.extendIndex(index);
+        for (IndexEntry indexEntry : ctx.getEnr().getIndex().values()) {
+            final Ctx ctxVer = ctxStud.extendIndex(indexEntry.getId());
             if (!adm && !ctxVer.cFrom().isStarted()) {
                 continue;
             }
@@ -165,16 +165,16 @@ public class Core {
                     continue;
                 }
 
-                logRows(f, lf, logData, index, ctxVer, slot, uploads, Solution.SCOPE, adm);
+                logRows(f, lf, logData, indexEntry.getId(), ctxVer, slot, uploads, Solution.SCOPE, adm);
                 if (uploads.size() == 0 && lf.cScopeStud(slot, null)) {
-                    logData.add(logRow(f, lf.getMode(), logData, index, ctxVer, slot, null, Solution.SCOPE, adm));
+                    logData.add(logRow(f, lf.getMode(), logData, indexEntry.getId(), ctxVer, slot, null, Solution.SCOPE, adm));
                 }
             }
         }
     }
 
     private int logRows(
-            Format format, LogFilter logFilter, List<Object[]> logData, int index, Ctx ctxVer, FileSlot slot,
+            Format format, LogFilter logFilter, List<Object[]> logData, String index, Ctx ctxVer, FileSlot slot,
             List<? extends FileBase> uploads, String scope, boolean adm
     ) {
         int shown = 0;
@@ -195,7 +195,7 @@ public class Core {
 
     private Object[] logRow(
             Format f, final String mode, List<Object[]> data,
-            int index, Ctx ctx, FileSlot slot, FileBase fileBase, String scope,
+            String index, Ctx ctx, FileSlot slot, FileBase fileBase, String scope,
             boolean adm) {
         final long time = fileBase == null ? System.currentTimeMillis() : fileBase.getStamp();
 
@@ -387,8 +387,8 @@ public class Core {
         final int studCount = tasksData(ctx, filter, adm, ctxVerToSlotToFiles, ctxEsToScore, ctxEsToSummary);
 
         int totalBudget = 0;
-        for (int i = 0; i < ctx.getEnr().getIndex().size(); i++) {
-            final Ctx ctxAss = ctx.extendIndex(i);
+        for (IndexEntry indexEntry : ctx.getEnr().getIndex().values()) {
+            final Ctx ctxAss = ctx.extendIndex(indexEntry.getId());
             indexData.add(tasksRow(f, indexData, ctxAss, adm, ctxEsToScore, ctxEsToSummary, studCount));
             totalBudget += ctxAss.getIndexEntry().getScoreBudget();
         }
@@ -536,8 +536,8 @@ public class Core {
             Map<String, Double> ctxToScore,
             Map<String, Summary> ctxToSummary
     ) {
-        for (int i = 0; i < ctxStud.getEnr().getIndex().size(); i++) {
-            storeTaskData(ctxStud.extendIndex(i), filter, fileMetas, ctxToScore, ctxToSummary);
+        for (IndexEntry indexEntry : ctxStud.getEnr().getIndex().values()) {
+            storeTaskData(ctxStud.extendIndex(indexEntry.getId()), filter, fileMetas, ctxToScore, ctxToSummary);
         }
     }
 
@@ -650,8 +650,8 @@ public class Core {
         //	LATER oh this pretty obviously looks like we REALLY need some rdbms from now on... :D
         for (Student stud : ctx.getGroup().getStudents().values()) {
             final Ctx ctxStud = ctxEnr.extendStudent(stud);
-            for (int index = 0; index < ctx.getEnr().getIndex().size(); index++) {
-                final Ctx ctxVer = ctxStud.extendIndex(index);
+            for (IndexEntry indexEntry : ctx.getEnr().getIndex().values()) {
+                final Ctx ctxVer = ctxStud.extendIndex(indexEntry.getId());
                 if (!ctxVer.getAssType().getId().equals(ctx.getAssType().getId())) {
                     continue;    //	other ass types out of scope
                 }

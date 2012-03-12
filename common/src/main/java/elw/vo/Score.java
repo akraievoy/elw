@@ -184,7 +184,7 @@ public class Score extends Squab.Stamped implements Stamped {
                 ctx.getGroup().getId(),
                 ctx.getStudent().getId(),
                 ctx.getCourse().getId(),
-                String.valueOf(ctx.getIndex()),
+                ctx.getIndexEntry().getId(),
                 ctx.getAssType().getId(),
                 ctx.getAss().getId(),
                 ctx.getVer().getId(),

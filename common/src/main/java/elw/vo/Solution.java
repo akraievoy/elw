@@ -58,7 +58,7 @@ public class Solution extends FileBase {
                 ctx.getGroup().getId(),
                 ctx.getStudent().getId(),
                 ctx.getCourse().getId(),
-                String.valueOf(ctx.getIndex()),
+                ctx.getIndexEntry().getId(),
                 ctx.getAssType().getId(),
                 ctx.getAss().getId(),
                 ctx.getVer().getId(),

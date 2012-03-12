@@ -38,13 +38,13 @@ public class Ctx implements elw.vo.Ctx {
 
     private final KeyVal<String, Course> course;
     private final KeyVal<String, Group> group;
-    private final KeyVal<Integer, IndexEntry> indexEntry;
+    private final KeyVal<String, IndexEntry> indexEntry;
 
     private final Map<Character, KeyVal> elemToKeyVal = new TreeMap<Character, KeyVal>();
 
     public Ctx(
             String enrId, String groupId, String studId,
-            String courseId, Integer index, String assTypeId, String assId, String verId
+            String courseId, String index, String assTypeId, String assId, String verId
     ) {
         enr = new KeyVal<String, Enrollment>(Enrollment.class, enrId);
         student = new KeyVal<String, Student>(Student.class, studId);
@@ -54,7 +54,7 @@ public class Ctx implements elw.vo.Ctx {
 
         course = new KeyVal<String, Course>(Course.class, courseId);
         group = new KeyVal<String, Group>(Group.class, groupId);
-        indexEntry = new KeyVal<Integer, IndexEntry>(IndexEntry.class, index);
+        indexEntry = new KeyVal<String, IndexEntry>(IndexEntry.class, index);
 
         elemToKeyVal.put(ELEM_ENR, enr);
         elemToKeyVal.put(ELEM_STUD, student);
@@ -106,10 +106,6 @@ public class Ctx implements elw.vo.Ctx {
         return indexEntry.getValue();
     }
 
-    public int getIndex() {
-        return indexEntry.getKey();
-    }
-
     public Ctx removeAll(String elements) {
         final Ctx res = copy();
         for (char element : elements.toCharArray()) {
@@ -157,18 +153,8 @@ public class Ctx implements elw.vo.Ctx {
         for (char elem : order.toCharArray()) {
             if (format.indexOf(elem) >= 0) {
                 final String elemKeyStr = comp[format.indexOf(elem) + 1];
-                if (elem != ELEM_INDEX_ENTRY) {
-                    //noinspection unchecked
-                    ctx.elemToKeyVal.get(elem).setKey(elemKeyStr);
-                    continue;
-                }
-
-                Integer index = G4Parse.parse(elemKeyStr, -1);
-                if (index < 0) {
-                    throw new IllegalArgumentException("invalid indexEntry: '" + path + "'");
-                }
                 //noinspection unchecked
-                ctx.elemToKeyVal.get(elem).setKey(index);
+                ctx.elemToKeyVal.get(elem).setKey(elemKeyStr);
             }
         }
 
@@ -204,7 +190,7 @@ public class Ctx implements elw.vo.Ctx {
     }
 
     public String ei() {
-        return norm("ecgi") + SEP + getEnr().getId() + SEP + getIndex();
+        return norm("ecgi") + SEP + getEnr().getId() + SEP + getIndexEntry().getId();
     }
 
     public String es() {
@@ -231,13 +217,8 @@ public class Ctx implements elw.vo.Ctx {
         }
 
         if (enr.isResolved() && indexEntry.isPending()) {
-            final Integer index = indexEntry.getKey();
-            final IndexEntry ieVal;
-            if (index >= 0 && index < enr.getValue().getIndex().size()) {
-                ieVal = enr.getValue().getIndex().get(index);
-            } else {
-                ieVal = null;
-            }
+            final String indexKey = indexEntry.getKey();
+            final IndexEntry ieVal = enr.getValue().getIndex().get(indexKey);
             if (indexEntry.resolve(ieVal)) {
                 assType.setKey(indexEntry.getValue().getTaskTypeId());
                 ass.setKey(indexEntry.getValue().getTaskId());
@@ -305,14 +286,19 @@ public class Ctx implements elw.vo.Ctx {
         return resolve();
     }
 
-    public Ctx extIndex(final int index) {
+    public Ctx extIndex(final String index) {
         if (!enr.isResolved()) {
             throw new IllegalStateException("enrollment not resolved");
         }
-        if (index < 0 || index >= enr.getValue().getIndex().size()) {
-            throw new IllegalArgumentException("enrollment/index entry mismatch: " + index);
-        }
         indexEntry.setKey(index);
+        return resolve();
+    }
+
+    public Ctx extIndexEntry(IndexEntry indexEntry) {
+        if (!enr.isResolved()) {
+            throw new IllegalStateException("enrollment not resolved");
+        }
+        this.indexEntry.setKey(indexEntry.getId());
         return resolve();
     }
 
@@ -361,7 +347,7 @@ public class Ctx implements elw.vo.Ctx {
         return copy().extStudent(newStud);
     }
 
-    public Ctx extendIndex(final int index) {
+    public Ctx extendIndex(final String index) {
         return copy().extIndex(index);
     }
 
@@ -700,8 +686,7 @@ public class Ctx implements elw.vo.Ctx {
     public CtxSlot ctxSlot(final FileSlot slot) {
         return new CtxSlot(
                 getEnr(), getGroup(), getStudent(), getCourse(),
-                indexEntry.getKey(),
-                getAss(), getAssType(), getVer(),
+                getIndexEntry(), getAss(), getAssType(), getVer(),
                 slot
         );
     }

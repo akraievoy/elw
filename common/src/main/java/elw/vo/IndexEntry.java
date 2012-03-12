@@ -8,8 +8,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
-//  FIXME indexEntries should be stored in a treemap also,
-//      where id may be derived from path and classFrom
 public class IndexEntry implements Cloneable, IdNamed {
     private String id;
     public String getId() { return id; }

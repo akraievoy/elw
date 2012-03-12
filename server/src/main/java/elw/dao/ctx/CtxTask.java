@@ -10,8 +10,7 @@ import java.util.SortedMap;
  * Parameter Object, storing the full Class/Task/Version context.
  */
 public class CtxTask extends CtxStudent {
-    public final int idx;
-    public final IndexEntry idxEntry;
+    public final IndexEntry indexEntry;
     public final TaskType tType;
     public final Task task;
     public final Version ver;
@@ -21,15 +20,13 @@ public class CtxTask extends CtxStudent {
             Course course,
             Group group,
             Student student,
-            int idx,
+            IndexEntry indexEntry,
             Task task,
             TaskType tType,
             Version ver
     ) {
         super(enr, course, group, student);
-        //  LATER simplify idx/indexEntry
-        this.idx = idx;
-        this.idxEntry = enr.getIndex().get(idx);
+        this.indexEntry = indexEntry;
         this.tType = tType;
         this.task = task;
         this.ver = ver;
@@ -59,7 +56,7 @@ public class CtxTask extends CtxStudent {
     public CtxSlot slot(final FileSlot slot) {
         final CtxSlot ctxSlot = new CtxSlot(
                 enr, group, student, course,
-                idx, task, tType, ver,
+                indexEntry, task, tType, ver,
                 slot
         );
 
@@ -69,7 +66,7 @@ public class CtxTask extends CtxStudent {
     public Class openClass() {
         return classForKey(
                 enr.getClasses(),
-                idxEntry.getClassFrom()
+                indexEntry.getClassFrom()
         );
     }
 
@@ -94,7 +91,7 @@ public class CtxTask extends CtxStudent {
         final CtxTask ctxTask = new CtxTask(
                 enr, course, group,
                 student,
-                idx, task, tType,
+                indexEntry, task, tType,
                 sharedVersion
         );
 

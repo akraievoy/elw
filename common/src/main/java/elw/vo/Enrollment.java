@@ -36,14 +36,14 @@ public class Enrollment extends Squab implements IdNamed, Cloneable {
         }
     }
 
-    private List<IndexEntry> index = new ArrayList<IndexEntry>();
-    public List<IndexEntry> getIndex() {
-        return Collections.unmodifiableList(index);
+    private SortedMap<String, IndexEntry> index = new TreeMap<String, IndexEntry>();
+    public SortedMap<String, IndexEntry> getIndex() {
+        return Collections.unmodifiableSortedMap(index);
     }
-    public void setIndex(List<IndexEntry> index) {
+    public void setIndex(SortedMap<String, IndexEntry> index) {
         this.index.clear();
         if (index != null) {
-            this.index.addAll(index);
+            this.index.putAll(index);
         }
     }
 
@@ -64,7 +64,7 @@ public class Enrollment extends Squab implements IdNamed, Cloneable {
 
     public int cmpTotalBudget() {
         int totalBudget = 0;
-        for (IndexEntry ie : getIndex()) {
+        for (IndexEntry ie : getIndex().values()) {
             totalBudget += ie.getScoreBudget();
         }
         return totalBudget;
@@ -74,8 +74,12 @@ public class Enrollment extends Squab implements IdNamed, Cloneable {
     public Enrollment clone() throws CloneNotSupportedException {
         Enrollment clone = (Enrollment) super.clone();
 
-        for (int idxPos = 0; idxPos < index.size(); idxPos++) {
-            clone.index.set(idxPos, clone.index.get(idxPos).clone());
+        clone.index = new TreeMap<String, IndexEntry>();
+        for (Map.Entry<String, IndexEntry> indexEntry : index.entrySet()) {
+            clone.index.put(
+                    indexEntry.getKey(),
+                    indexEntry.getValue().clone()
+            );
         }
 
         clone.classes = new TreeMap<String, Class>();

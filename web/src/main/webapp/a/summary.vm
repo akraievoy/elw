@@ -70,9 +70,8 @@
   var tp_studRows = {};
   var tp_studRow;
   var tp_status;
-  #foreach($entry in $elw_ctx.enr.index)
-   #set($idx = $velocityCount - 1)
-   #set($elw_ctx_ass = $elw_ctx.extendIndex($idx))
+  #foreach($indexKey in $elw_ctx.enr.index.keySet())
+   #set($elw_ctx_ass = $elw_ctx.extendIndex($indexKey))
 
    #set($tp_taskHeader_colspan = 0)
    #foreach($slot in $elw_ctx_ass.assType.fileSlots.values())
@@ -99,7 +98,7 @@
 
          te_studRow.parent().append(tp_studRow);
         #end
-        #set($elw_ctx_ver = $elw_ctx_stud.extendIndex($idx))
+        #set($elw_ctx_ver = $elw_ctx_stud.extendIndex($indexKey))
         #set($filesStud = $fileMetas.get("$elw_ctx_ver.toString()").get($slot.id))
 
         #set($__status = $elw_vt.status($f, $f_mode, "s", $elw_ctx_ver, $slot, $elw_vt.bestOrLastOrNull($filesStud)))

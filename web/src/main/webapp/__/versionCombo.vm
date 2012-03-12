@@ -6,9 +6,8 @@
 #* @vtlvariable name="f_verId" type="java.lang.String" *#
 {
  var f_verId = jQuery("form#${__qId}_filter select[name=f_verId]");
- #foreach($entry in $elw_ctx.enr.index)
-  #set($__idx = $velocityCount - 1)
-  #set($__ctx_ass = $elw_ctx.extendIndex($__idx))
+ #foreach($indexKey in $elw_ctx.enr.index.keySet())
+  #set($__ctx_ass = $elw_ctx.extendIndex($indexKey))
   #if($elw_admin || $__ctx_ass.cFrom().started)
    #if($elw_admin)
     f_verId.append(

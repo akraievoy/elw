@@ -27,7 +27,7 @@ public interface Ctx {
 
     Version getVer();
 
-    int getIndex();
+    IndexEntry getIndexEntry();
 
     boolean resolved(String state);
 }

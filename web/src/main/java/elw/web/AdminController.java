@@ -385,7 +385,12 @@ public class AdminController extends ControllerElw {
             protected ModelAndView handleFile(String scope, FileSlot slot) throws IOException {
                 model.put("slot", slot);
                 final Ctx ctx = (Ctx) model.get("elw_ctx");
-                model.put("elw_ctx_type", Ctx.forEnr(ctx.getEnr()).extCourse(ctx.getCourse()).extIndex(ctx.getIndex()));
+                model.put(
+                        "elw_ctx_type",
+                        Ctx.forEnr(ctx.getEnr())
+                                .extCourse(ctx.getCourse())
+                                .extIndexEntry(ctx.getIndexEntry())
+                );
                 return new ModelAndView("a/ul", model);
             }
         });

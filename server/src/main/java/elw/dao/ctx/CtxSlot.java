@@ -18,7 +18,7 @@ public class CtxSlot extends CtxTask {
             Group group,
             Student student,
             Course course,
-            int idx,
+            IndexEntry indexEntry,
             Task task,
             TaskType tType,
             Version ver,
@@ -26,7 +26,7 @@ public class CtxSlot extends CtxTask {
     ) {
         super(
                 enr, course, group,
-                student, idx, task, tType, ver
+                student, indexEntry, task, tType, ver
         );
 
         this.slot = slot;
@@ -35,7 +35,7 @@ public class CtxSlot extends CtxTask {
     public CtxSolution solution(final Solution solution) {
         final CtxSolution ctxSolution = new CtxSolution(
                 enr, group, student, course,
-                idx, task, tType, ver,
+                indexEntry, task, tType, ver,
                 slot, solution
         );
 
@@ -64,7 +64,7 @@ public class CtxSlot extends CtxTask {
 
     public Class dueClass() {
         final Map<String,String> classDueMap =
-                idxEntry.getClassDue();
+                indexEntry.getClassDue();
 
         if (classDueMap == null || classDueMap.isEmpty()) {
             return null;
@@ -183,7 +183,7 @@ public class CtxSlot extends CtxTask {
     }
     
     public double pointsForSlot() {
-        return idxEntry.getScoreBudget() * slot.getScoreWeight();
+        return indexEntry.getScoreBudget() * slot.getScoreWeight();
     }
     
     public boolean dueApplies(DueState state) {
@@ -213,7 +213,7 @@ public class CtxSlot extends CtxTask {
                 group.getId(),
                 student.getId(),
                 course.getId(),
-                String.valueOf(idx),
+                indexEntry.getId(),
                 tType.getId(),
                 task.getId(),
                 ver.getId(),

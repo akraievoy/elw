@@ -531,7 +531,7 @@ public class QueriesSecure implements Queries {
         try {
             final Enrollment clone = enr.clone();
 
-            for (IndexEntry entry : clone.getIndex()) {
+            for (IndexEntry entry : clone.getIndex().values()) {
                 entry.setVerAnchor(1);
                 entry.setVerStep(-1);
             }
