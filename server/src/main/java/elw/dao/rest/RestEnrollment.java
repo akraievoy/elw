@@ -96,8 +96,8 @@ public class RestEnrollment {
             restEntry.verStep = idxEntry.getVerStep();
             restEntry.verAnchor = idxEntry.getVerAnchor();
 
-            final String taskTypeId = idxEntry.getPath()[0];
-            final String taskId = idxEntry.getPath()[1];
+            final String taskTypeId = idxEntry.getTaskTypeId();
+            final String taskId = idxEntry.getTaskId();
             try {
                 restEntry.taskType =
                         ctxEnr.course.getTaskTypes().get(taskTypeId).clone();

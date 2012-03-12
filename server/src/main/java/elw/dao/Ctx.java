@@ -239,8 +239,8 @@ public class Ctx implements elw.vo.Ctx {
                 ieVal = null;
             }
             if (indexEntry.resolve(ieVal)) {
-                assType.setKey(indexEntry.getValue().getPath()[0]);
-                ass.setKey(indexEntry.getValue().getPath()[1]);
+                assType.setKey(indexEntry.getValue().getTaskTypeId());
+                ass.setKey(indexEntry.getValue().getTaskId());
             }
         }
 
@@ -749,7 +749,7 @@ public class Ctx implements elw.vo.Ctx {
                 return false;
             }
 
-            if (value instanceof IdNamed) {
+            if (value instanceof IdNamed && !(value instanceof IndexEntry)) {
                 final String valueKey = ((IdNamed) value).getId();
                 if (key != null) {
                     if (!key.equals(valueKey)) {

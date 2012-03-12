@@ -10,12 +10,22 @@ import java.util.TreeMap;
 
 //  FIXME indexEntries should be stored in a treemap also,
 //      where id may be derived from path and classFrom
-public class IndexEntry implements Cloneable {
-    //  FIXME add the index property
+public class IndexEntry implements Cloneable, IdNamed {
+    private String id;
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
 
-    private String[] path;
-    public String[] getPath() { return path; }
-    public void setPath(String[] path) { this.path = path; }
+    private String name;
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    private String taskTypeId;
+    public String getTaskTypeId() { return taskTypeId; }
+    public void setTaskTypeId(String taskTypeId) { this.taskTypeId = taskTypeId; }
+
+    private String taskId;
+    public String getTaskId() { return taskId; }
+    public void setTaskId(String taskId) { this.taskId = taskId; }
 
     private int scoreBudget;
     public int getScoreBudget() { return scoreBudget; }
@@ -102,11 +112,10 @@ public class IndexEntry implements Cloneable {
 
     @Override
     public IndexEntry clone() throws CloneNotSupportedException {
-        IndexEntry clone = (IndexEntry) super.clone();
+        final IndexEntry clone = (IndexEntry) super.clone();
         
         clone.classDue = new TreeMap<String, String>(this.classDue);
-        clone.path = this.path.clone();
-        
+
         return clone;
     }
 }

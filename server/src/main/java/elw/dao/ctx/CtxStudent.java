@@ -20,9 +20,8 @@ public class CtxStudent extends CtxEnrollment {
 
     public CtxTask task(final int idxPos) {
         final IndexEntry idxEntry = enr.getIndex().get(idxPos);
-        final String[] path = idxEntry.getPath();
-        final String taskTypeId = path[0];
-        final String taskId = path[1];
+        final String taskTypeId = idxEntry.getTaskTypeId();
+        final String taskId = idxEntry.getTaskId();
 
         final TaskType taskType = course.getTaskTypes().get(taskTypeId);
         final Task task = taskType.getTasks().get(taskId);
