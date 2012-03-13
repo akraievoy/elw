@@ -51,6 +51,8 @@ public class QueriesImpl implements Queries {
         this.solutionDao = solutionDao;
     }
 
+    //  LATER proceed with auth
+    @SuppressWarnings("FieldCanBeLocal")
     private CouchDao authDao;
     public void setAuthDao(CouchDao authDao) {
         this.authDao = authDao;
@@ -82,8 +84,6 @@ public class QueriesImpl implements Queries {
         }
 
         final Course course = course(enr.getCourseId());
-        final Map<String, IndexEntry> index = enr.getIndex();
-
         final RestEnrollmentSummary enrSummary = new RestEnrollmentSummary();
         final CtxEnrollment ctxEnr = new CtxEnrollment(enr, course, group);
         for (CtxStudent ctxStudent : ctxEnr.students) {
@@ -156,12 +156,7 @@ public class QueriesImpl implements Queries {
         final Enrollment enr = markEnrollment(enrRaw);
 
         final Group group = group(enr.getGroupId());
-        final Collection<String> studIds =
-                new ArrayList<String>(group.getStudents().keySet());
-
         final Course course = course(enr.getCourseId());
-        final Map<String, IndexEntry> index = enr.getIndex();
-
         final SortedMap<String, RestSolution> solutionsRes =
                 new TreeMap<String, RestSolution>();
 
