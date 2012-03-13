@@ -10,6 +10,8 @@ import org.joda.time.Days;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+import java.util.Iterator;
+import java.util.Map;
 import java.util.TimeZone;
 
 /**
@@ -22,6 +24,7 @@ public class CtxEnrollment {
     public final Enrollment enr;
     public final Group group;
     public final Course course;
+    public final Iterable<CtxStudent> students;
 
     public CtxEnrollment(
             final Enrollment enr, final Course course, final Group group
@@ -29,6 +32,26 @@ public class CtxEnrollment {
         this.group = group;
         this.course = course;
         this.enr = enr;
+        this.students = new Iterable<CtxStudent>() {
+            public Iterator<CtxStudent> iterator() {
+                final Iterator<Map.Entry<String, Student>> studentIterator =
+                        group.getStudents().entrySet().iterator();
+
+                return new Iterator<CtxStudent>() {
+                    public boolean hasNext() {
+                        return studentIterator.hasNext();
+                    }
+
+                    public CtxStudent next() {
+                        return student(studentIterator.next().getValue());
+                    }
+
+                    public void remove() {
+                        studentIterator.remove();
+                    }
+                };
+            }
+        };
     }
     
     public CtxStudent student(

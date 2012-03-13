@@ -3,7 +3,9 @@ package elw.dao.ctx;
 import elw.vo.*;
 import elw.vo.Class;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedMap;
 
 /**
@@ -14,6 +16,7 @@ public class CtxTask extends CtxStudent {
     public final TaskType tType;
     public final Task task;
     public final Version ver;
+    public final Iterable<CtxSlot> slots;
 
     public CtxTask(
             Enrollment enr,
@@ -30,9 +33,29 @@ public class CtxTask extends CtxStudent {
         this.tType = tType;
         this.task = task;
         this.ver = ver;
+        this.slots = new Iterable<CtxSlot>() {
+            public Iterator<CtxSlot> iterator() {
+                final Iterator<Map.Entry<String, FileSlot>> slotIterator = 
+                        CtxTask.this.tType.getFileSlots().entrySet().iterator();
+
+                return new Iterator<CtxSlot>() {
+                    public boolean hasNext() {
+                        return slotIterator.hasNext();
+                    }
+
+                    public CtxSlot next() {
+                        return slot(slotIterator.next().getValue());
+                    }
+
+                    public void remove() {
+                        slotIterator.remove();
+                    }
+                };
+            }
+        };
     }
 
-    public static String safeClassKey(
+    protected static String safeClassKey(
             final SortedMap<String, Class> classMap,
             final String classKey
     ) {

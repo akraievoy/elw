@@ -85,41 +85,26 @@ public class QueriesImpl implements Queries {
         final Map<String, IndexEntry> index = enr.getIndex();
 
         final RestEnrollmentSummary enrSummary = new RestEnrollmentSummary();
-        for (String studId : studIds) {
-            final Student student =
-                    group.getStudents().get(studId);
-
-            final CtxStudent ctxStudent =
-                    new CtxStudent(enr, course, group, student);
-
+        final CtxEnrollment ctxEnr = new CtxEnrollment(enr, course, group);
+        for (CtxStudent ctxStudent : ctxEnr.students) {
             final RestStudentSummary studentSummary =
                     new RestStudentSummary();
 
-            for (Map.Entry<String, IndexEntry> indexEntry : index.entrySet()) {
-                final CtxTask ctxTask =
-                        ctxStudent.task(indexEntry.getKey());
+            for (CtxTask ctxTask : ctxStudent.tasks) {
                 final RestTaskSummary taskSummary =
                         new RestTaskSummary();
 
-                for (
-                        Map.Entry<String, FileSlot> fsEntry :
-                        ctxTask.tType.getFileSlots().entrySet()
-                ) {
-
-                    if (fsEntry.getValue().getScoreWeight() > 0) {
-                        final CtxSlot ctxSlot =
-                                ctxTask.slot(fsEntry.getValue());
-                        final List<Solution> solutions =
-                                solutions(ctxSlot);
-
-                        final RestSlotSummary slotSummary =
-                                RestSlotSummary.create(
-                                        ctxSlot,
-                                        solutions
-                                );
-
-                        taskSummary.register(ctxSlot, slotSummary);
+                for (CtxSlot ctxSlot : ctxTask.slots) {
+                    if (ctxSlot.slot.getScoreWeight() <= 0) {
+                        continue;
                     }
+
+                    final List<Solution> solutions =
+                            solutions(ctxSlot);
+                    final RestSlotSummary slotSummary =
+                            RestSlotSummary.create(ctxSlot, solutions);
+
+                    taskSummary.register(ctxSlot, slotSummary);
                 }
 
                 studentSummary.register(ctxTask, taskSummary);
@@ -180,25 +165,14 @@ public class QueriesImpl implements Queries {
         final SortedMap<String, RestSolution> solutionsRes =
                 new TreeMap<String, RestSolution>();
 
-        for (String studId : studIds) {
-            final Student student =
-                    group.getStudents().get(studId);
-            final CtxStudent ctxStudent =
-                    new CtxStudent(enr, course, group, student);
+        final CtxEnrollment ctxEnr = new CtxEnrollment(enr, course, group);
+        for (CtxStudent ctxStudent : ctxEnr.students) {
             if (!filter.preAllows(ctxStudent)) {
                 continue;
             }
 
-            for (Map.Entry<String, IndexEntry> indexEntry : index.entrySet()) {
-                final CtxTask ctxTask =
-                        ctxStudent.task(indexEntry.getKey());
-
-                for (
-                        Map.Entry<String, FileSlot> fsEntry :
-                        ctxTask.tType.getFileSlots().entrySet()
-                ) {
-                    final CtxSlot ctxSlot =
-                            ctxTask.slot(fsEntry.getValue());
+            for (CtxTask ctxTask : ctxStudent.tasks) {
+                for (CtxSlot ctxSlot : ctxTask.slots) {
                     final List<Solution> solutions =
                             solutions(ctxSlot);
 

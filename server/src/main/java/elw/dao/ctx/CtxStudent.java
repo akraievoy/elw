@@ -3,12 +3,16 @@ package elw.dao.ctx;
 import elw.dao.Nav;
 import elw.vo.*;
 
+import java.util.Iterator;
+import java.util.Map;
+
 /**
  *  Parameter Object, storing the full enrollment context.
  */
 public class CtxStudent extends CtxEnrollment {
 
     public final Student student;
+    public final Iterable<CtxTask> tasks;
 
     public CtxStudent(
             Enrollment enr, Course course,
@@ -16,8 +20,29 @@ public class CtxStudent extends CtxEnrollment {
     ) {
         super(enr, course, group);
         this.student = student;
+        this.tasks = new Iterable<CtxTask>() {
+            public Iterator<CtxTask> iterator() {
+                final Iterator<Map.Entry<String, IndexEntry>> indexIterator =
+                        CtxStudent.this.enr.getIndex().entrySet().iterator();
+
+                return new Iterator<CtxTask>() {
+                    public boolean hasNext() {
+                        return indexIterator.hasNext();
+                    }
+
+                    public CtxTask next() {
+                        return task(indexIterator.next().getKey());
+                    }
+
+                    public void remove() {
+                        indexIterator.remove();
+                    }
+                };
+            }
+        };
     }
 
+    //  LATER use IndexEntry reference instead of indexKey
     public CtxTask task(final String indexKey) {
         final IndexEntry indexEntry = enr.getIndex().get(indexKey);
         final String taskTypeId = indexEntry.getTaskTypeId();
