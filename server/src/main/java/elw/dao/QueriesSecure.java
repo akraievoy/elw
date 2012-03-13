@@ -2,10 +2,7 @@ package elw.dao;
 
 import base.pattern.Result;
 import com.google.common.io.InputSupplier;
-import elw.dao.ctx.CtxSlot;
-import elw.dao.ctx.CtxSolution;
-import elw.dao.ctx.CtxStudent;
-import elw.dao.ctx.CtxTask;
+import elw.dao.ctx.*;
 import elw.dao.rest.RestEnrollment;
 import elw.dao.rest.RestEnrollmentSummary;
 import elw.dao.rest.RestSolution;
@@ -220,7 +217,7 @@ public class QueriesSecure implements Queries {
             final CtxSlot ctxSlot,
             final Solution solution,
             final String contentType,
-            final InputSupplier<? extends InputStream> inputSupplier
+            final InputSupplier<InputStream> inputSupplier
     ) {
         //  LATER admin should not be able to create solutions
         //      at least until impersonation is more or less functional
@@ -301,12 +298,45 @@ public class QueriesSecure implements Queries {
         return null;  //	TODO review
     }
 
-    public InputSupplier<InputStream> inputSupplier(
+    public InputSupplier<InputStream> attachmentInput(
+            final @Nonnull CtxAttachment ctxAttachment,
+            final @Nonnull String fileName
+    ) {
+        if (auth.isAdm()) {
+            return queries.attachmentInput(ctxAttachment, fileName);
+        }
+
+        if (!enrollmentIds().contains(ctxAttachment.enr.getId())) {
+            return null;
+        }
+
+        if (!ctxAttachment.open()) {
+            return null;
+        }
+
+        final CtxTask.StateForSlot stateForSlot = new CtxTask.StateForSlot() {
+            public State getState(FileSlot slot) {
+                final CtxSlot ctxApproveSlot = ctxAttachment.slot(slot);
+                return ctxApproveSlot.state(solutions(ctxApproveSlot));
+            }
+        };
+
+        //noinspection SimplifiableIfStatement
+        if (!ctxAttachment.readable(ctxAttachment.slot, stateForSlot)) {
+            return null;
+        }
+
+        return queries.attachmentInput(
+                ctxAttachment, fileName
+        );
+    }
+
+    public InputSupplier<InputStream> solutionInput(
             final @Nonnull CtxSolution ctxSolution,
             final @Nonnull String fileName
     ) {
         if (auth.isAdm()) {
-            return queries.inputSupplier(ctxSolution, fileName);
+            return queries.solutionInput(ctxSolution, fileName);
         }
 
         if (!enrollmentIds().contains(ctxSolution.enr.getId())) {
@@ -333,7 +363,7 @@ public class QueriesSecure implements Queries {
             return null;
         }
 
-        return queries.inputSupplier(
+        return queries.solutionInput(
                 ctxSolution, fileName
         );
     }

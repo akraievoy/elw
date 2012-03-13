@@ -33,6 +33,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -574,7 +575,7 @@ public class ControllerRest extends ControllerElw {
         solution.setName(Strings.nullToEmpty(extractNameFromPath(file)));
         
         final String contentType = Strings.nullToEmpty(file.getContentType());
-        InputSupplier<? extends InputStream> inputSupplier = 
+        InputSupplier<InputStream> inputSupplier =
                 supplierForFileItem(file);
 
         FileType._.filterByLength(validTypes, length);
@@ -634,7 +635,10 @@ public class ControllerRest extends ControllerElw {
                     return null;
                 }
             }
-            inputSupplier = ByteStreams.newInputStreamSupplier(bytes);
+            final InputSupplier<? extends InputStream> baisSupplier =
+                    ByteStreams.newInputStreamSupplier(bytes);
+            //noinspection unchecked
+            inputSupplier = (InputSupplier<InputStream>) baisSupplier;
         } else {
             //  LATER validate binary headers of content here
         }
@@ -683,7 +687,7 @@ public class ControllerRest extends ControllerElw {
         }
 
         final InputSupplier<InputStream> contentSupplier =
-                queries.inputSupplier(ctxSolution, FileBase.CONTENT);
+                queries.solutionInput(ctxSolution, FileBase.CONTENT);
 
         //  LATER ideally we should check that fileName is not empty and
         //      conforms to restrictions of its content type / file type

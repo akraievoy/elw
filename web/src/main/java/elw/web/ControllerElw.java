@@ -256,19 +256,24 @@ public abstract class ControllerElw extends MultiActionController implements Web
         protected void retrieveFile(
                 FileBase fileBase, FileSlot slot, final Queries queries
         ) throws IOException {
-            storeContentHeaders(fileBase, resp);
-
-            if (!(fileBase instanceof Solution)) {
+            final InputSupplier<InputStream> fileInput;
+            if (fileBase instanceof Solution) {
+                fileInput = queries.solutionInput(
+                        ctx.ctxSlot(slot).solution((Solution) fileBase),
+                        FileBase.CONTENT
+                );
+            } else if (fileBase instanceof Attachment) {
+                fileInput = queries.attachmentInput(
+                        ctx.ctxSlot(slot).attachment((Attachment) fileBase),
+                        FileBase.CONTENT
+                );
+            } else {
                 throw new IllegalStateException(
-                        "attachments are now broken"
+                        "not supported fileBase instance: " + fileBase
                 );
             }
 
-            final InputSupplier<InputStream> fileInput =
-                    queries.inputSupplier(
-                            ctx.ctxSlot(slot).solution((Solution) fileBase),
-                            FileBase.CONTENT
-                    );
+            storeContentHeaders(fileBase, resp);
             ByteStreams.copy(fileInput, resp.getOutputStream());
         }
 

@@ -2,6 +2,7 @@ package elw.dao;
 
 import base.pattern.Result;
 import com.google.common.io.InputSupplier;
+import elw.dao.ctx.CtxAttachment;
 import elw.dao.ctx.CtxSlot;
 import elw.dao.ctx.CtxSolution;
 import elw.dao.rest.RestEnrollment;
@@ -49,7 +50,7 @@ public interface Queries {
 
     FileBase file(String scope, Ctx ctx, FileSlot slot, String id);
 
-    InputSupplier<InputStream> inputSupplier(
+    InputSupplier<InputStream> solutionInput(
             @Nonnull CtxSolution ctxSolution, @Nonnull String fileName
     );
 
@@ -104,7 +105,7 @@ public interface Queries {
             final CtxSlot ctxSlot,
             final Solution solution,
             final String contentType,
-            final InputSupplier<? extends InputStream> inputSupplier
+            final InputSupplier<InputStream> inputSupplier
     );
 
     /**
@@ -138,6 +139,11 @@ public interface Queries {
             String enrollmentId,
             String couchId,
             StudentFilter studentFilter
+    );
+
+    InputSupplier<InputStream> attachmentInput(
+            @Nonnull CtxAttachment ctxAttachment,
+            @Nonnull String fileName
     );
 
     interface StudentFilter {

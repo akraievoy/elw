@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * Parameter Object, storing the full Score context.
+ * Parameter Object, storing the full Solution context.
  */
 public class CtxSolution extends CtxSlot {
     public final Solution solution;

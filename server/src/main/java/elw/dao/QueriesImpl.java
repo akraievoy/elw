@@ -417,7 +417,7 @@ public class QueriesImpl implements Queries {
             final CtxSlot ctxSlot,
             final Solution solution,
             final String contentType,
-            final InputSupplier<? extends InputStream> inputSupplier
+            final InputSupplier<InputStream> inputSupplier
     ) {
         solution.setupPathElems(ctxSlot.solutionPathElems());
 
@@ -434,7 +434,7 @@ public class QueriesImpl implements Queries {
         solution.setStamp(createStatus.stamp);
         solutionDao.attachStream(
                 solution, FileBase.CONTENT,
-                contentType, (InputSupplier<InputStream>) inputSupplier
+                contentType, inputSupplier
         );
 
         return true;
@@ -596,13 +596,22 @@ public class QueriesImpl implements Queries {
         return solution(ctx.ctxSlot(slot), id);
     }
 
-    //  LATER we'd have inputSupplier(Attachment, blah, blah) some time ago
-    public InputSupplier<InputStream> inputSupplier(
+    public InputSupplier<InputStream> solutionInput(
             final @Nonnull CtxSolution ctxSolution,
             final @Nonnull String fileName
     ) {
         return solutionDao.couchFileGet(
                 ctxSolution.solution.getCouchPath(),
+                fileName
+        );
+    }
+
+    public InputSupplier<InputStream> attachmentInput(
+            final @Nonnull CtxAttachment ctxAttachment,
+            final @Nonnull String fileName
+    ) {
+        return attachmentDao.couchFileGet(
+                ctxAttachment.attachment.getCouchPath(),
                 fileName
         );
     }

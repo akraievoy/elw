@@ -41,6 +41,16 @@ public class CtxSlot extends CtxTask {
 
         return propagateTZCache(ctxSolution);
     }
+    
+    public CtxAttachment attachment(final Attachment attachment) {
+        final CtxAttachment ctxAttachment = new CtxAttachment(
+                enr, group, student, course,
+                indexEntry, task, tType, ver,
+                slot, attachment
+        );
+
+        return propagateTZCache(ctxAttachment);
+    }
 
     public State state(List<Solution> solutions) {
         if (!open()) {
