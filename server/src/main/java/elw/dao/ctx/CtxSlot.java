@@ -218,7 +218,7 @@ public class CtxSlot extends CtxTask {
         return true;
     }
     
-    public String[] solutionPathElems() {
+    public String[] pathForSolution() {
         return new String[] {
                 group.getId(),
                 student.getId(),

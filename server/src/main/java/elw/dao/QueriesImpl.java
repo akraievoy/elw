@@ -388,7 +388,7 @@ public class QueriesImpl implements Queries {
             final String contentType,
             final InputSupplier<InputStream> inputSupplier
     ) {
-        solution.setupPathElems(ctxSlot.solutionPathElems());
+        solution.setupPathElems(ctxSlot.pathForSolution());
 
         //  there's  no need to store full file type object,
         //      it's easily resolved on-load
@@ -415,17 +415,17 @@ public class QueriesImpl implements Queries {
         return group;
     }
 
-    public List<Attachment> attachments(Ctx ctxVer, final String slotId) {
+    public List<Attachment> attachments(CtxSlot ctxSlot) {
         final List<Attachment> attachments = attachmentDao.findAll(
                 Attachment.class,
-                ctxVer.getCourse().getId(),
-                ctxVer.getAssType().getId(),
-                ctxVer.getAss().getId(),
-                ctxVer.getVer().getId(),
-                slotId
+                ctxSlot.course.getId(),
+                ctxSlot.tType.getId(),
+                ctxSlot.task.getId(),
+                ctxSlot.ver.getId(),
+                ctxSlot.slot.getId()
         );
 
-        return Nav.resolveFileType(attachments, ctxVer.getCourse().getFileTypes());
+        return Nav.resolveFileType(attachments, ctxSlot.course.getFileTypes());
     }
 
     public Attachment attachment(Ctx ctxVer, final String slotId, final String id) {
@@ -547,11 +547,12 @@ public class QueriesImpl implements Queries {
         }
     }
 
+    // LATER inline this
     public List<? extends FileBase> files(
             String scope, Ctx ctx, FileSlot slot
     ) {
         if (scope.equals(Attachment.SCOPE)) {
-            return attachments(ctx, slot.getId());
+            return attachments(ctx.ctxSlot(slot));
         }
 
         return solutions(ctx.ctxSlot(slot));
@@ -808,6 +809,7 @@ public class QueriesImpl implements Queries {
         return allScores;
     }
 
+    // TODO remove this, use CtxSolution.preliminary() instead
     public static Score updateAutos(
             Ctx ctx, final String slotId, Solution file, final Score score
     ) {
@@ -831,8 +833,6 @@ public class QueriesImpl implements Queries {
         vars.put("$offsite", 1 - onSite);
         vars.put("$rapid", ctx.cFrom().checkOnTime(file) ? 1.0 : 0.0);
 
-        //	LATER the validator has to be wired via classname,
-        //      not directly in spring context
         if (file.getTotalTests() > 0 || file.isValidated()) {
             vars.put("$passratio", file.getPassRatio());
         }
@@ -847,7 +847,7 @@ public class QueriesImpl implements Queries {
             }
 
             if (!c.auto()) {
-                ratio = G4Parse.parse(c.getRatio(), (Double) null);
+                ratio = G4Parse.parse(c.getRatio(), 1.0);
                 powDef = G4Parse.parse(c.getPowDef(), 0);
             } else {
                 ratio = c.resolveRatio(vars);
@@ -871,7 +871,9 @@ public class QueriesImpl implements Queries {
         return res;
     }
 
-    public long createScore(Score score) {
+    public long createScore(CtxSolution ctxSolution, Score score) {
+        score.setupPathElems(ctxSolution.pathForScore());
+
         return solutionDao.createOrUpdate(score).stamp;
     }
 

@@ -19,9 +19,8 @@
 package elw.web;
 
 import base.pattern.Result;
-import elw.dao.Ctx;
 import elw.dao.Queries;
-import elw.dao.QueriesImpl;
+import elw.dao.ctx.*;
 import elw.dp.mips.MipsValidator;
 import elw.dp.mips.TaskBean;
 import elw.vo.*;
@@ -31,10 +30,18 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.SortedMap;
 import java.util.concurrent.ScheduledExecutorService;
 
 public class StudentCodeValidator extends G4Run.Task {
     private static final Logger log = LoggerFactory.getLogger(StudentCodeValidator.class);
+
+    //  LATER this should be configurable/injectable on per-course/taskType basis
+    public static final String COURSE_ID_AOS = "aos";
+    public static final String TASKTYPE_ID_LR = "lr";
+    public static final String SLOT_ID_SOLUTIONS = "code";
+    public static final String SLOT_ID_STATEMENT = "statement";
+    public static final String SLOT_ID_TEST = "test";
 
     private int periodMillis = 300000;
     private final Queries queries;
@@ -63,51 +70,57 @@ public class StudentCodeValidator extends G4Run.Task {
     protected void runInternal() throws Throwable {
         final List<Enrollment> enrs = queries.enrollments();
         for (Enrollment enr : enrs) {
-            final Ctx ctxEnr;
+            final CtxEnrollment ctxEnr;
             {
                 final Course course = queries.course(enr.getCourseId());
                 final Group group = queries.group(enr.getGroupId());
-                ctxEnr = Ctx.forEnr(enr).extendCourse(course).extendGroup(group);
+                ctxEnr = new CtxEnrollment(enr, course, group);
             }
 
-            if (!ctxEnr.getCourse().getId().contains("aos")) {
+            if (!ctxEnr.course.getId().contains(COURSE_ID_AOS)) {
                 continue;
             }
 
-            for (Student student : ctxEnr.getGroup().getStudents().values()) {
-                final Ctx ctxStud = ctxEnr.extendStudent(student);
-                for (IndexEntry indexEntry : ctxEnr.getEnr().getIndex().values()) {
-                    final Ctx ctxVer = ctxStud.extendIndex(indexEntry.getId());
-                    if (!"lr".equals(ctxVer.getAssType().getId())) {
+            for (CtxStudent ctxStud : ctxEnr.students) {
+                for (CtxTask ctxVer : ctxStud.tasks) {
+                    if (!TASKTYPE_ID_LR.equals(ctxVer.tType.getId())) {
                         continue;
                     }
 
-                    final String slotId = "code";
-                    final FileSlot slot =
-                            ctxVer.getAssType().getFileSlots().get(slotId);
+                        final CtxSlot ctxSlotCode =
+                            ctxVer.slot(SLOT_ID_SOLUTIONS);
+                    final CtxSlot ctxSlotStatement =
+                            ctxVer.slot(SLOT_ID_STATEMENT);
+                    final CtxSlot ctxSlotTest =
+                            ctxVer.slot(SLOT_ID_TEST);
+
                     final List<Solution> files =
-                            queries.solutions(ctxVer.ctxSlot(slot));
+                            queries.solutions(ctxSlotCode);
+
                     for (Solution f : files) {
                         if (f.getValidatorStamp() > 0 && f.getScore() != null) {
                             continue;
                         }
+
+                        final CtxSolution ctxSolution =
+                                ctxSlotCode.solution(f);
 
                         Score score = null;
                         try {
                             final Result[] resRef = {new Result("unknown", false)};
                             final int[] passFailCounts = new int[2];
                             final List<Attachment> allStatements =
-                                    queries.attachments(ctxVer, "statement");
+                                    queries.attachments(ctxSlotStatement);
                             final List<Attachment> allTests =
-                                    queries.attachments(ctxVer, "test");
+                                    queries.attachments(ctxSlotTest);
                             final List<String> allTestsStr =
                                     new ArrayList<String>();
-                            for (int i = 0; i < allTests.size(); i++) {
+                            for (Attachment allTest : allTests) {
                                 allTestsStr.add(
-                                    queries.fileText(
-                                        allTests.get(i),
-                                        FileBase.CONTENT
-                                    )
+                                        queries.fileText(
+                                                allTest,
+                                                FileBase.CONTENT
+                                        )
                                 );
                             }
                             final TaskBean taskBean = new TaskBean(
@@ -130,9 +143,7 @@ public class StudentCodeValidator extends G4Run.Task {
                             f.setTestsFailed(passFailCounts[1]);
                             f.setTestsPassed(passFailCounts[0]);
 
-                            score = QueriesImpl.updateAutos(
-                                    ctxVer, slotId, f, null
-                            );
+                            score = ctxSolution.preliminary();
                             final boolean passed =
                                     passFailCounts[1] == 0 &&
                                             passFailCounts[0] > 0;
@@ -152,9 +163,8 @@ public class StudentCodeValidator extends G4Run.Task {
 
                         if (score != null) {
                             try {
-                                score.setupPathElems(ctxVer, slot, f);
                                 final long scoreStamp =
-                                        queries.createScore(score);
+                                        queries.createScore(ctxSolution, score);
 
                                 f.setValidatorStamp(scoreStamp);
                                 queries.updateFile(f);

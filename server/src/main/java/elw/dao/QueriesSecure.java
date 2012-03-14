@@ -240,15 +240,8 @@ public class QueriesSecure implements Queries {
             return false;
         }
 
-        final CtxTask.StateForSlot stateForSlot = new CtxTask.StateForSlot() {
-            public State getState(FileSlot slot) {
-                final CtxSlot ctxApproveSlot = ctxSlot.slot(slot);
-                return ctxApproveSlot.state(solutions(ctxApproveSlot));
-            }
-        };
-
         //noinspection SimplifiableIfStatement
-        if (!ctxSlot.writable(ctxSlot.slot, stateForSlot)) {
+        if (!ctxSlot.writable(ctxSlot.slot, stateForSlot(ctxSlot))) {
             return false;
         }
 
@@ -262,8 +255,36 @@ public class QueriesSecure implements Queries {
         return null;  //	TODO review
     }
 
-    public List<Attachment> attachments(Ctx ctxVer, String slotId) {
-        return null;  //	TODO review
+    public List<Attachment> attachments(final CtxSlot ctxSlot) {
+        if (auth.isAdm()) {
+            return queries.attachments(ctxSlot);
+        }
+
+        if (!enrollmentIds().contains(ctxSlot.enr.getId())) {
+            return null;
+        }
+
+        if (!ctxSlot.open()) {
+            return null;
+        }
+
+        //noinspection SimplifiableIfStatement
+        if (!ctxSlot.readable(ctxSlot.slot, stateForSlot(ctxSlot))) {
+            return null;
+        }
+
+        return queries.attachments(
+                ctxSlot
+        );
+    }
+
+    protected CtxTask.StateForSlot stateForSlot(final CtxSlot ctxSlot) {
+        return new CtxTask.StateForSlot() {
+            public State getState(FileSlot slot) {
+                final CtxSlot ctxApproveSlot = ctxSlot.slot(slot);
+                return ctxApproveSlot.state(solutions(ctxApproveSlot));
+            }
+        };
     }
 
     public Attachment attachment(Ctx ctxVer, String slotId, String id) {
@@ -314,15 +335,8 @@ public class QueriesSecure implements Queries {
             return null;
         }
 
-        final CtxTask.StateForSlot stateForSlot = new CtxTask.StateForSlot() {
-            public State getState(FileSlot slot) {
-                final CtxSlot ctxApproveSlot = ctxAttachment.slot(slot);
-                return ctxApproveSlot.state(solutions(ctxApproveSlot));
-            }
-        };
-
         //noinspection SimplifiableIfStatement
-        if (!ctxAttachment.readable(ctxAttachment.slot, stateForSlot)) {
+        if (!ctxAttachment.readable(ctxAttachment.slot, stateForSlot(ctxAttachment))) {
             return null;
         }
 
@@ -351,15 +365,8 @@ public class QueriesSecure implements Queries {
             return null;
         }
 
-        final CtxTask.StateForSlot stateForSlot = new CtxTask.StateForSlot() {
-            public State getState(FileSlot slot) {
-                final CtxSlot ctxApproveSlot = ctxSolution.slot(slot);
-                return ctxApproveSlot.state(solutions(ctxApproveSlot));
-            }
-        };
-
         //noinspection SimplifiableIfStatement
-        if (!ctxSolution.readable(ctxSolution.slot, stateForSlot)) {
+        if (!ctxSolution.readable(ctxSolution.slot, stateForSlot(ctxSolution))) {
             return null;
         }
 
@@ -624,7 +631,7 @@ public class QueriesSecure implements Queries {
         return null;  //	TODO review
     }
 
-    public long createScore(Score score) {
+    public long createScore(CtxSolution ctxSolution, Score score) {
         return 0;  //	TODO review
     }
 

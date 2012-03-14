@@ -77,7 +77,7 @@ public class Score extends Squab.Stamped implements Stamped {
     }
 
     private boolean contains(String id) {
-        return pows.containsKey(id) && ratios.containsKey(id);
+        return pows.get(id) != null && ratios.get(id) != null;
     }
 
     public boolean containsAll(String[] ids) {
@@ -192,4 +192,10 @@ public class Score extends Squab.Stamped implements Stamped {
                 solution.getId()
         };
     }
+
+    // @see elw.dao.ctx.CtxSolution#pathForScore()
+    public void setupPathElems(String[] pathElems) {
+        extraPathElems = pathElems.clone();
+    }
+
 }

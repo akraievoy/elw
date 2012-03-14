@@ -4,7 +4,6 @@ import elw.dao.ctx.CtxSlot;
 import elw.dao.ctx.CtxTask;
 import elw.vo.Class;
 import elw.vo.*;
-import org.akraievoy.gear.G4Parse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -682,7 +681,12 @@ public class Ctx implements elw.vo.Ctx {
         final Solution f = files.get(files.size() - 1);
         return f.getScore() == null;
     }
-    
+
+
+    public CtxSlot ctxSlot(String slotId) {
+        return ctxSlot(getAssType().getFileSlots().get(slotId));
+    }
+
     public CtxSlot ctxSlot(final FileSlot slot) {
         return new CtxSlot(
                 getEnr(), getGroup(), getStudent(), getCourse(),

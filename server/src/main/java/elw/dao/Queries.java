@@ -29,7 +29,7 @@ public interface Queries {
 
     Group group(String groupId);
 
-    List<Attachment> attachments(Ctx ctxVer, String slotId);
+    List<Attachment> attachments(final CtxSlot ctxSlot);
 
     Attachment attachment(Ctx ctxVer, String slotId, String id);
 
@@ -77,7 +77,7 @@ public interface Queries {
 
     SortedMap<Long, Score> scoresAuto(Ctx ctx, FileSlot slot, Solution file);
 
-    long createScore(Score score);
+    long createScore(CtxSolution ctxSolution, Score score);
 
     void updateFile(Solution solution);
 

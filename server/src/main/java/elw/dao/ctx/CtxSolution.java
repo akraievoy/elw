@@ -129,4 +129,18 @@ public class CtxSolution extends CtxSlot {
     public ScoreTerm[] terms() {
         return score().getTerms(tType, false);
     }
+    
+    public String[] pathForScore() {
+        return new String[] {
+                group.getId(),
+                student.getId(),
+                course.getId(),
+                indexEntry.getId(),
+                tType.getId(),
+                task.getId(),
+                ver.getId(),
+                slot.getId(),
+                solution.getId()
+        };
+    }
 }

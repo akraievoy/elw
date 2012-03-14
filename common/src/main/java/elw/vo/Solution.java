@@ -66,7 +66,7 @@ public class Solution extends FileBase {
         };
     }
     
-    // @see elw.dao.ctx.CtxSlot#solutionPathElems()
+    // @see elw.dao.ctx.CtxSlot#pathForSolution()
     @Override
     public void setupPathElems(String[] pathElems) {
         extraPathElems = pathElems.clone();

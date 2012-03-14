@@ -75,6 +75,19 @@ public class CtxTask extends CtxStudent {
     ) {
         return classMap.get(safeClassKey(classMap, classKey));
     }
+    
+    public CtxSlot slot(final String slotId) {
+        final FileSlot slot = tType.getFileSlots().get(slotId);
+        //  LATER these checks somehow duplicate Ctx resolution code
+        //      maybe a custom exception here would fit better
+        if (slot == null) {
+            throw new IllegalStateException(
+                    "slot '" + slotId + "' not found: " + String.valueOf(this)
+            );
+        }
+
+        return slot(slot);
+    }
 
     public CtxSlot slot(final FileSlot slot) {
         final CtxSlot ctxSlot = new CtxSlot(

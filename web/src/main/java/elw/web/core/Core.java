@@ -96,7 +96,7 @@ public class Core {
                 int total = 0;
                 for (Version ver : versions) {
                     final Ctx ctxVer = ctxAss.extendVer(ver);
-                    final List<Attachment> uploadsVer = queries.attachments(ctxVer, slot.getId());
+                    final List<Attachment> uploadsVer = queries.attachments(ctxVer.ctxSlot(slot.getId()));
                     total += uploadsVer.size();
                     if (lf.cScopeOne('v') && lf.cVer(ctxVer)) {
                         logRows(format, lf, logData, indexEntry.getId(), ctxVer, slot, uploadsVer, Attachment.SCOPE, adm);

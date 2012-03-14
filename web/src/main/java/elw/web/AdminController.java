@@ -22,6 +22,7 @@ import com.google.common.base.Strings;
 import elw.dao.Ctx;
 import elw.dao.Queries;
 import elw.dao.QueriesImpl;
+import elw.dao.ctx.CtxSolution;
 import elw.miniweb.Message;
 import elw.miniweb.ViewJackson;
 import elw.vo.*;
@@ -309,12 +310,12 @@ public class AdminController extends ControllerElw {
                     Map<String, Object> model
             ) throws IOException {
                 final Score scoreByStamp;
-                final String fileId = file.getId();
+                final CtxSolution ctxSolution = ctx.ctxSlot(slot).solution(file);
                 if (stamp == null) {
                     scoreByStamp = null;
                 } else {
                     scoreByStamp = core.getQueries().score(
-                            ctx.ctxSlot(slot).solution(file), stamp
+                            ctxSolution, stamp
                     );
                 }
                 final Score score = QueriesImpl.updateAutos(
@@ -353,8 +354,7 @@ public class AdminController extends ControllerElw {
                     score.setPows(pows);
                     score.setRatios(ratios);
                     score.setComment(req.getParameter("comment"));
-                    score.setupPathElems(ctx, slot, file);
-                    queries.createScore(score);
+                    queries.createScore(ctxSolution, score);
                 }
 
                 resp.sendRedirect(core.cmpForwardToEarliestPendingSince(ctx, slot, file.getStamp()));
