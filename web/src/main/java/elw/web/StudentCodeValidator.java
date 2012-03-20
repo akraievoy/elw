@@ -142,11 +142,8 @@ public class StudentCodeValidator extends G4Run.Task {
                             f.setTestsPassed(passFailCounts[0]);
 
                             score = ctxSolution.preliminary();
-                            final boolean passed =
-                                    passFailCounts[1] == 0 &&
-                                            passFailCounts[0] > 0;
-                            if (passed) {
-                                score.setApproved(passed);
+                            if (passFailCounts[0] > 0) {
+                                score.setApproved(passFailCounts[1] == 0);
                             }
                         } catch (Throwable t) {
                             log.warn(

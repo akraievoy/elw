@@ -19,7 +19,8 @@ import java.util.regex.Pattern;
 public class MipsAssembler {
     private static final Logger log = LoggerFactory.getLogger(MipsAssembler.class);
 
-    private static final Pattern PATTERN_LABEL = Pattern.compile("^[a-zA-Z_][a-zA-Z_0-9]*$");
+    private static final Pattern PATTERN_LABEL =
+            Pattern.compile("^[a-zA-Z_][a-zA-Z_0-9]*$");
 
     private final static Map<Pattern, String> codeNormMap = createCodeNormMap();
 
@@ -33,7 +34,8 @@ public class MipsAssembler {
         map.put(Pattern.compile(" ?: ?"), ":");
         map.put(Pattern.compile(" ?\\( ?"), "(");
         map.put(Pattern.compile(" ?\\) ?"), ")");
-        map.put(Pattern.compile(" ?#.*"), ""); //added to throw away comments at the end of code lines
+        //added to throw away comments at the end of code lines
+        map.put(Pattern.compile("\\s*#.*"), "");
 
         return map;
     }
@@ -123,7 +125,7 @@ public class MipsAssembler {
                 removeOpName(syntax);    //	it must be the same as code stated above
 
                 Instruction inst = new Instruction(
-                        desc, codeLine, instructionIndex, lineIndex + 1,
+                        desc, code.toString(), instructionIndex, lineIndex + 1,
                         labels.toArray(new String[labels.size()])
                 );
 
