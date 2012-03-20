@@ -110,6 +110,7 @@ public class MipsAssembler {
             }
 
             if (code.length() > 0) {
+                final String codeLineStr = code.toString();
                 final String opName = removeOpName(code);
 
                 final Method aluMethod;
@@ -125,7 +126,7 @@ public class MipsAssembler {
                 removeOpName(syntax);    //	it must be the same as code stated above
 
                 Instruction inst = new Instruction(
-                        desc, code.toString(), instructionIndex, lineIndex + 1,
+                        desc, codeLineStr, instructionIndex, lineIndex + 1,
                         labels.toArray(new String[labels.size()])
                 );
 
