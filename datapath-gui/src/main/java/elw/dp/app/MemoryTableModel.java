@@ -44,7 +44,7 @@ public class MemoryTableModel extends AbstractTableModel {
             if (!memory.hasWord(address)) {
                 return "?";
             }
-            return Data.str((long) memory.getWordInternal(address) & 0xFFFFFFFF, 16, 8);
+            return Data.str((long) memory.getWordInternal(address) & 0xFFFFFFFFL, 16, 8);
         } else if (COL_DEC_WORD.equals(colName)) {
             if (!memory.hasWord(address)) {
                 return "?";
