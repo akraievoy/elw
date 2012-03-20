@@ -75,11 +75,9 @@ public interface Queries {
 
     Score score(CtxSolution ctx, Long stamp);
 
-    SortedMap<Long, Score> scoresAuto(Ctx ctx, FileSlot slot, Solution file);
-
     long createScore(CtxSolution ctxSolution, Score score);
 
-    void updateFile(Solution solution);
+    void updateSolution(Solution solution);
 
     String fileText(
             FileBase file, String attachment

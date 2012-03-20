@@ -603,16 +603,6 @@ public class Core {
             return null;
         }
 
-        for (Solution e : filesForSlot) {
-            if (e.getScore() != null && e.getScore().getApproved() != null) {
-                continue;    //	don't alter any scores once they're approved
-            }
-            final Score autoScore = QueriesImpl.updateAutos(
-                    ctxVer, slotId, e, e.getScore()
-            );
-            e.setScore(autoScore);
-        }
-
         Solution usedEntry = null;
         double maxScore = 0;
         for (Solution e : filesForSlot) {

@@ -467,23 +467,27 @@ public class QueriesImpl implements Queries {
         );
 
         for (Solution solution : solutions) {
-            final CtxSolution scores = ctx.solution(solution);
-
-            //  fetch last of previously fixed scores for a given solution
-            final Score fixedScore = score(scores);
-
-            final Score currentScore;
-            if (fixedScore == null) {
-                //  okay, nothing yet set, compute preliminary one
-                currentScore = scores.preliminary();
-            } else {
-                currentScore = fixedScore;
-            }
-
-            solution.setScore(currentScore);
+            setupScore(ctx, solution);
         }
 
         return Nav.resolveFileType(solutions, ctx.course.getFileTypes());
+    }
+
+    protected void setupScore(CtxSlot ctx, Solution solution) {
+        final CtxSolution ctxSolution = ctx.solution(solution);
+
+        //  fetch last of previously fixed scores for a given solution
+        final Score fixedScore = score(ctxSolution);
+
+        final Score currentScore;
+        if (fixedScore == null) {
+            //  okay, nothing yet set, compute preliminary one
+            currentScore = ctxSolution.preliminary();
+        } else {
+            currentScore = fixedScore;
+        }
+
+        solution.setScore(currentScore);
     }
 
     public Solution solution(CtxSlot ctx, String fileId) {
@@ -501,7 +505,7 @@ public class QueriesImpl implements Queries {
         );
 
         if (solution != null) {
-            solution.setScore(score(ctx.solution(solution)));
+            setupScore(ctx, solution);
         }
 
         return Nav.resolveFileType(solution, ctx.course.getFileTypes());
@@ -752,7 +756,7 @@ public class QueriesImpl implements Queries {
     }
 
     public SortedMap<Long, Score> scores(Ctx ctx, FileSlot slot, Solution file) {
-        return solutionDao.findAllStamped(
+        final SortedMap<Long, Score> stampToScore = solutionDao.findAllStamped(
                 Score.class,
                 ctx.getGroup().getId(),
                 ctx.getStudent().getId(),
@@ -764,10 +768,24 @@ public class QueriesImpl implements Queries {
                 slot.getId(),
                 file.getId()
         );
+
+        if (stampToScore.isEmpty()) {
+            final TreeMap<Long, Score> preliminary =
+                    new TreeMap<Long, Score>();
+
+            preliminary.put(
+                    Long.MAX_VALUE,
+                    ctx.ctxSlot(slot).solution(file).preliminary()
+            );
+
+            return preliminary;
+        }
+
+        return stampToScore;
     }
 
     public Score score(CtxSolution ctx) {
-        return solutionDao.findLast(
+        final Score lastScore = solutionDao.findLast(
                 Score.class,
                 ctx.group.getId(),
                 ctx.student.getId(),
@@ -779,9 +797,20 @@ public class QueriesImpl implements Queries {
                 ctx.slot.getId(),
                 ctx.solution.getId()
         );
+
+        if (lastScore == null) {
+            return ctx.preliminary();
+        }
+
+
+        return lastScore;
     }
 
     public Score score(CtxSolution ctx, Long stamp) {
+        if (Long.MAX_VALUE == stamp) {
+            return ctx.preliminary();
+        }
+
         return solutionDao.findByStamp(
                 stamp,
                 Score.class,
@@ -797,87 +826,13 @@ public class QueriesImpl implements Queries {
         );
     }
 
-    public SortedMap<Long, Score> scoresAuto(Ctx ctx, FileSlot slot, Solution file) {
-        final SortedMap<Long, Score> allScores =
-                new TreeMap<Long, Score>(scores(ctx, slot, file));
-
-        final Score newScore = updateAutos(ctx, slot.getId(), file, null);
-        newScore.updateStamp();
-
-        allScores.put(newScore.getStamp(), newScore);
-
-        return allScores;
-    }
-
-    // TODO remove this, use CtxSolution.preliminary() instead
-    public static Score updateAutos(
-            Ctx ctx, final String slotId, Solution file, final Score score
-    ) {
-        final Class classDue = ctx.cDue(slotId);
-        final FileSlot slot = ctx.getAssType().getFileSlots().get(slotId);
-
-        final Map<String, Double> vars = new TreeMap<String, Double>();
-        final double overDue =
-                classDue == null ?
-                    0.0 :
-                    (double) classDue.computeDaysOverdue(file);
-        final double onTime = ctx.getEnr().checkOnTime(file) ? 1.0 : 0.0;
-        final double onSite =
-                ctx.cFrom().checkOnSite(file.getSourceAddress()) ?
-                        1.0 :
-                        0.0;
-        vars.put("$overdue", overDue);
-        vars.put("$ontime", onTime);
-        vars.put("$onsite", onSite);
-        vars.put("$offtime", 1 - onTime);
-        vars.put("$offsite", 1 - onSite);
-        vars.put("$rapid", ctx.cFrom().checkOnTime(file) ? 1.0 : 0.0);
-
-        if (file.getTotalTests() > 0 || file.isValidated()) {
-            vars.put("$passratio", file.getPassRatio());
-        }
-
-        final Score res = score == null ? new Score() : score.copy();
-        for (Criteria c : slot.getCriterias().values()) {
-            final Double ratio;
-            final Integer powDef;
-
-            if (res.contains(slot, c)) {
-                continue;
-            }
-
-            if (!c.auto()) {
-                ratio = G4Parse.parse(c.getRatio(), 1.0);
-                powDef = G4Parse.parse(c.getPowDef(), 0);
-            } else {
-                ratio = c.resolveRatio(vars);
-                powDef = c.resolvePowDef(vars);
-            }
-            if (ratio != null && powDef != null) {
-                final String id = Score.idFor(slot, c);
-                final Map<String, Integer> pows =
-                        new TreeMap<String, Integer>(res.getPows());
-                final Map<String, Double> ratios =
-                        new TreeMap<String, Double>(res.getRatios());
-
-                pows.put(id, powDef);
-                ratios.put(id, ratio);
-
-                res.setPows(pows);
-                res.setRatios(ratios);
-            }
-        }
-
-        return res;
-    }
-
     public long createScore(CtxSolution ctxSolution, Score score) {
         score.setupPathElems(ctxSolution.pathForScore());
 
         return solutionDao.createOrUpdate(score).stamp;
     }
 
-    public void updateFile(Solution solution) {
+    public void updateSolution(Solution solution) {
         solutionDao.createOrUpdate(solution, false);
     }
 

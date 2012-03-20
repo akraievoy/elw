@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.SortedMap;
 import java.util.concurrent.ScheduledExecutorService;
 
 public class StudentCodeValidator extends G4Run.Task {
@@ -126,7 +125,6 @@ public class StudentCodeValidator extends G4Run.Task {
                             final TaskBean taskBean = new TaskBean(
                                     queries.fileText(
                                         allStatements.get(
-                                                //  FIXME why so?
                                                 allStatements.size() - 1
                                         ),
                                         FileBase.CONTENT
@@ -167,7 +165,7 @@ public class StudentCodeValidator extends G4Run.Task {
                                         queries.createScore(ctxSolution, score);
 
                                 f.setValidatorStamp(scoreStamp);
-                                queries.updateFile(f);
+                                queries.updateSolution(f);
                             } catch (Throwable t) {
                                 log.warn(
                                     "failed to store update {} / {} / {}: {}",

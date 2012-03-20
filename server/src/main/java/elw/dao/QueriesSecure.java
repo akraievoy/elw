@@ -627,16 +627,12 @@ public class QueriesSecure implements Queries {
         return null;  //	TODO review
     }
 
-    public SortedMap<Long, Score> scoresAuto(Ctx ctx, FileSlot slot, Solution file) {
-        return null;  //	TODO review
-    }
-
     public long createScore(CtxSolution ctxSolution, Score score) {
         return 0;  //	TODO review
     }
 
-    public void updateFile(Solution solution) {
-        //	TODO review
+    public void updateSolution(Solution solution) {
+        //  log something sensible
     }
 
     public String fileText(FileBase file, String attachment) throws IOException {

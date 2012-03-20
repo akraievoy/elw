@@ -264,13 +264,20 @@ public class AdminController extends ControllerElw {
     public ModelAndView do_approve(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
         return wmScore(req, resp, "", new WebMethodScore() {
             public ModelAndView handleScore(
-                    HttpServletRequest req, HttpServletResponse resp, Ctx ctx, FileSlot slot, Solution file, Long stamp, Map<String, Object> model
+                    HttpServletRequest req,
+                    HttpServletResponse resp,
+                    Ctx ctx,
+                    FileSlot slot,
+                    Solution file,
+                    Long stamp,
+                    Map<String, Object> model
             ) {
-                final SortedMap<Long, Score> allScores = core.getQueries().scores(ctx, slot, file);
+                final SortedMap<Long, Score> allScores =
+                        core.getQueries().scores(ctx, slot, file);
 
-                final Score lastScoreEntry = allScores.isEmpty() ? null : allScores.get(allScores.lastKey());
-                final Score scoreEntry = stamp == null ? lastScoreEntry : allScores.get(stamp);
-                final Score score = QueriesImpl.updateAutos(ctx, slot.getId(), file, scoreEntry);
+                final long stampEff =
+                        stamp == null ? allScores.lastKey() : stamp;
+                final Score score =                          allScores.get(stampEff);
 
                 model.put("stamp", stamp);
                 model.put("score", score);
@@ -283,18 +290,29 @@ public class AdminController extends ControllerElw {
     }
 
     @RequestMapping(value = "rest/scoreLog", method = RequestMethod.GET)
-    public ModelAndView do_restScoreLog(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+    public ModelAndView do_restScoreLog(
+            final HttpServletRequest req,
+            final HttpServletResponse resp
+    ) throws IOException {
         return wmScore(req, resp, null, new WebMethodScore() {
             public ModelAndView handleScore(
-                    HttpServletRequest req, HttpServletResponse resp, Ctx ctx, FileSlot slot, Solution file, Long stamp, Map<String, Object> model
+                    HttpServletRequest req,
+                    HttpServletResponse resp,
+                    Ctx ctx,
+                    FileSlot slot,
+                    Solution file,
+                    Long stamp,
+                    Map<String, Object> model
             ) {
                 final Format f = (Format) model.get(FormatTool.MODEL_KEY);
 
-                final SortedMap<Long, Score> allScores = core.getQueries().scoresAuto(ctx, slot, file);
+                final SortedMap<Long, Score> allScores =
+                        core.getQueries().scores(ctx, slot, file);
 
                 final String mode = req.getParameter("f_mode");
 
-                final List<Object[]> logData = core.logScore(allScores, ctx, slot, file, f, mode, stamp);
+                final List<Object[]> logData =
+                        core.logScore(allScores, ctx, slot, file, f, mode, stamp);
 
                 return new ModelAndView(ViewJackson.success(logData));
             }
@@ -302,24 +320,26 @@ public class AdminController extends ControllerElw {
     }
 
     @RequestMapping(value = "approve", method = RequestMethod.POST)
-    public ModelAndView do_approvePost(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+    public ModelAndView do_approvePost(
+            final HttpServletRequest req,
+            final HttpServletResponse resp
+    ) throws IOException {
         return wmScore(req, resp, "", new WebMethodScore() {
             public ModelAndView handleScore(
-                    HttpServletRequest req, HttpServletResponse resp,
-                    Ctx ctx, FileSlot slot, Solution file, Long stamp,
+                    HttpServletRequest req,
+                    HttpServletResponse resp,
+                    Ctx ctx, FileSlot slot,
+                    Solution file, Long stamp,
                     Map<String, Object> model
             ) throws IOException {
-                final Score scoreByStamp;
-                final CtxSolution ctxSolution = ctx.ctxSlot(slot).solution(file);
-                if (stamp == null) {
-                    scoreByStamp = null;
-                } else {
-                    scoreByStamp = core.getQueries().score(
-                            ctxSolution, stamp
-                    );
-                }
-                final Score score = QueriesImpl.updateAutos(
-                        ctx, slot.getId(), file, scoreByStamp
+                final CtxSolution ctxSolution =
+                        ctx.ctxSlot(slot).solution(file);
+
+                final long stampEff =
+                        stamp == null ? Long.MAX_VALUE : stamp;
+
+                final Score score = core.getQueries().score(
+                        ctxSolution, stampEff
                 );
 
                 final String action =
@@ -327,11 +347,15 @@ public class AdminController extends ControllerElw {
                 final List<String> validActions =
                         Arrays.asList("next", "approve", "decline");
                 if (!validActions.contains(action.toLowerCase())) {
-                    resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Bad action: " + action);
+                    resp.sendError(
+                            HttpServletResponse.SC_BAD_REQUEST,
+                            "Bad action: " + action
+                    );
                     return null;
                 }
 
-                if ("approve".equalsIgnoreCase(action) || "decline".equalsIgnoreCase(action)) {
+                if ("approve".equalsIgnoreCase(action)
+                        || "decline".equalsIgnoreCase(action)) {
                     score.setApproved("approve".equalsIgnoreCase(action));
 
                     final Map<String, Integer> pows =
@@ -357,7 +381,11 @@ public class AdminController extends ControllerElw {
                     queries.createScore(ctxSolution, score);
                 }
 
-                resp.sendRedirect(core.cmpForwardToEarliestPendingSince(ctx, slot, file.getStamp()));
+                resp.sendRedirect(
+                        core.cmpForwardToEarliestPendingSince(
+                                ctx, slot, file.getStamp()
+                        )
+                );
 
                 return null;
             }
