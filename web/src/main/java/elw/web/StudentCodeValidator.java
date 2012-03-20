@@ -80,102 +80,122 @@ public class StudentCodeValidator extends G4Run.Task {
                 continue;
             }
 
-            for (CtxStudent ctxStud : ctxEnr.students) {
-                for (CtxTask ctxVer : ctxStud.tasks) {
-                    if (!TASKTYPE_ID_LR.equals(ctxVer.tType.getId())) {
+            processEnrollment(ctxEnr);
+        }
+    }
+
+    protected void processEnrollment(CtxEnrollment ctxEnr) {
+        for (CtxStudent ctxStud : ctxEnr.students) {
+            for (CtxTask ctxVer : ctxStud.tasks) {
+                if (!TASKTYPE_ID_LR.equals(ctxVer.tType.getId())) {
+                    continue;
+                }
+
+                final CtxSlot ctxSlotCode =
+                        ctxVer.slot(SLOT_ID_SOLUTIONS);
+                final CtxSlot ctxSlotStatement =
+                        ctxVer.slot(SLOT_ID_STATEMENT);
+                final CtxSlot ctxSlotTest =
+                        ctxVer.slot(SLOT_ID_TEST);
+
+                final List<Solution> files =
+                        queries.solutions(ctxSlotCode);
+
+                for (Solution f : files) {
+                    if (f.getValidatorStamp() > 0 && f.getScore() != null) {
                         continue;
                     }
 
-                        final CtxSlot ctxSlotCode =
-                            ctxVer.slot(SLOT_ID_SOLUTIONS);
-                    final CtxSlot ctxSlotStatement =
-                            ctxVer.slot(SLOT_ID_STATEMENT);
-                    final CtxSlot ctxSlotTest =
-                            ctxVer.slot(SLOT_ID_TEST);
+                    final CtxSolution ctxSolution =
+                            ctxSlotCode.solution(f);
 
-                    final List<Solution> files =
-                            queries.solutions(ctxSlotCode);
-
-                    for (Solution f : files) {
-                        if (f.getValidatorStamp() > 0 && f.getScore() != null) {
-                            continue;
-                        }
-
-                        final CtxSolution ctxSolution =
-                                ctxSlotCode.solution(f);
-
-                        Score score = null;
-                        try {
-                            final Result[] resRef = {new Result("unknown", false)};
-                            final int[] passFailCounts = new int[2];
-                            final List<Attachment> allStatements =
-                                    queries.attachments(ctxSlotStatement);
-                            final List<Attachment> allTests =
-                                    queries.attachments(ctxSlotTest);
-                            final List<String> allTestsStr =
-                                    new ArrayList<String>();
-                            for (Attachment allTest : allTests) {
-                                allTestsStr.add(
-                                        queries.fileText(
-                                                allTest,
-                                                FileBase.CONTENT
-                                        )
-                                );
-                            }
-                            final TaskBean taskBean = new TaskBean(
-                                    queries.fileText(
-                                        allStatements.get(
-                                                allStatements.size() - 1
-                                        ),
-                                        FileBase.CONTENT
-                                    ),
-                                    allTestsStr,
-                                    ""
-                            );
-                            validator.batch(
-                                resRef,
-                                taskBean,
-                                queries.fileLines(f, FileBase.CONTENT),
-                                passFailCounts
-                            );
-                            f.setTestsFailed(passFailCounts[1]);
-                            f.setTestsPassed(passFailCounts[0]);
-
-                            score = ctxSolution.preliminary();
-                            if (passFailCounts[0] > 0) {
-                                score.setApproved(passFailCounts[1] == 0);
-                            }
-                        } catch (Throwable t) {
-                            log.warn(
-                                "failed to validate {} / {} / {}: {}",
-                                new Object[]{
-                                        ctxVer, f.getId(), f.getStamp(),
-                                        String.valueOf(t)
-                                }
-                            );
-                            log.debug("exception trace", t);
-                        }
-
-                        if (score != null) {
-                            try {
-                                final long scoreStamp =
-                                        queries.createScore(ctxSolution, score);
-
-                                f.setValidatorStamp(scoreStamp);
-                                queries.updateSolution(f);
-                            } catch (Throwable t) {
-                                log.warn(
-                                    "failed to store update {} / {} / {}: {}",
-                                    new Object[]{
-                                            ctxVer, f.getId(), f.getStamp(),
-                                            String.valueOf(t)
-                                    }
-                                );
-                                log.debug("exception trace", t);
-                            }
-                        }
-                    }
+                    processSolution(
+                            ctxSlotStatement,
+                            ctxSlotTest,
+                            ctxSolution
+                    );
                 }
+            }
+        }
+    }
+
+    protected void processSolution(
+            CtxSlot ctxSlotStatement,
+            CtxSlot ctxSlotTest,
+            CtxSolution ctxSolution
+    ) {
+        Score score = null;
+        try {
+            final Result[] resRef = {new Result("unknown", false)};
+            final int[] passFailCounts = new int[2];
+            final List<Attachment> allStatements =
+                    queries.attachments(ctxSlotStatement);
+            final List<Attachment> allTests =
+                    queries.attachments(ctxSlotTest);
+            final List<String> allTestsStr =
+                    new ArrayList<String>();
+            for (Attachment allTest : allTests) {
+                allTestsStr.add(
+                        queries.fileText(
+                                allTest,
+                                FileBase.CONTENT
+                        )
+                );
+            }
+            final TaskBean taskBean = new TaskBean(
+                    queries.fileText(
+                        allStatements.get(
+                                allStatements.size() - 1
+                        ),
+                        FileBase.CONTENT
+                    ),
+                    allTestsStr,
+                    ""
+            );
+            validator.batch(
+                resRef,
+                taskBean,
+                queries.fileLines(ctxSolution.solution, FileBase.CONTENT),
+                passFailCounts
+            );
+            ctxSolution.solution.setTestsFailed(passFailCounts[1]);
+            ctxSolution.solution.setTestsPassed(passFailCounts[0]);
+
+            score = ctxSolution.preliminary();
+            if (passFailCounts[0] > 0) {
+                score.setApproved(passFailCounts[1] == 0);
+            }
+        } catch (Throwable t) {
+            log.warn(
+                "failed to validate {} / {} / {}: {}",
+                new Object[]{
+                        ctxSolution,
+                        ctxSolution.solution.getId(),
+                        ctxSolution.solution.getStamp(),
+                        String.valueOf(t)
+                }
+            );
+            log.debug("exception trace", t);
+        }
+
+        if (score != null) {
+            try {
+                final long scoreStamp =
+                        queries.createScore(ctxSolution, score);
+
+                ctxSolution.solution.setValidatorStamp(scoreStamp);
+                queries.updateSolution(ctxSolution.solution);
+            } catch (Throwable t) {
+                log.warn(
+                    "failed to store update {} / {} / {}: {}",
+                    new Object[]{
+                            ctxSolution,
+                            ctxSolution.solution.getId(),
+                            ctxSolution.solution.getStamp(),
+                            String.valueOf(t)
+                    }
+                );
+                log.debug("exception trace", t);
             }
         }
     }
