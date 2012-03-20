@@ -561,7 +561,7 @@ public class Core {
             }
 
             final Class classDue = ctxVer.cDue(slot.getId());
-            final Long classDueStamp = classDue != null ? classDue.getFromDateTime().getMillis() : null;
+            final Long classDueStamp = classDue != null ? classDue.getToDateTime().getMillis() : null;
             final List<Solution> filesForSlot = slotIdToFiles.get(slot.getId());
             final Solution bestFile = selectBestFile(ctxVer, slot.getId(), filesForSlot, slot);
 
