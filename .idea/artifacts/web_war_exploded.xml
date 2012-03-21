@@ -14,20 +14,19 @@
           <element id="archive" name="common-1.3.jar">
             <element id="module-output" name="common" />
           </element>
+          <element id="library" level="project" name="Maven: org.slf4j:slf4j-api:1.5.6" />
+          <element id="library" level="project" name="Maven: org.akraievoy:couch:1.3.10" />
           <element id="library" level="project" name="Maven: com.google.code.findbugs:jsr305:1.3.9" />
-          <element id="library" level="project" name="Maven: org.slf4j:slf4j-api:1.4.3" />
-          <element id="library" level="project" name="Maven: com.google.guava:guava:r09" />
-          <element id="library" level="project" name="Maven: org.akraievoy:couch:1.3.9" />
           <element id="library" level="project" name="Maven: org.codehaus.jackson:jackson-mapper-asl:1.8.8" />
           <element id="library" level="project" name="Maven: org.codehaus.jackson:jackson-core-asl:1.8.8" />
-          <element id="library" level="project" name="Maven: org.akraievoy:base:1.3.403j" />
-          <element id="library" level="project" name="Maven: org.slf4j:jcl104-over-slf4j:1.4.3" />
-          <element id="library" level="project" name="Maven: org.slf4j:slf4j-log4j12:1.4.3" />
-          <element id="library" level="project" name="Maven: log4j:log4j:1.2.16" />
+          <element id="library" level="project" name="Maven: org.akraievoy:base:1.3.3" />
+          <element id="library" level="project" name="Maven: com.google.guava:guava:11.0.2" />
           <element id="library" level="project" name="Maven: joda-time:joda-time:1.6" />
           <element id="archive" name="datapath-1.3.jar">
             <element id="module-output" name="datapath" />
           </element>
+          <element id="library" level="project" name="Maven: commons-configuration:commons-configuration:1.8" />
+          <element id="library" level="project" name="Maven: commons-lang:commons-lang:2.4" />
           <element id="library" level="project" name="Maven: org.springframework:spring-context:3.1.0.RELEASE" />
           <element id="library" level="project" name="Maven: org.springframework:spring-aop:3.1.0.RELEASE" />
           <element id="library" level="project" name="Maven: aopalliance:aopalliance:1.0" />
@@ -41,10 +40,12 @@
           <element id="library" level="project" name="Maven: org.springframework:spring-web:3.1.0.RELEASE" />
           <element id="library" level="project" name="Maven: org.apache.velocity:velocity:1.6.2" />
           <element id="library" level="project" name="Maven: commons-collections:commons-collections:3.2.1" />
-          <element id="library" level="project" name="Maven: commons-lang:commons-lang:2.4" />
           <element id="library" level="project" name="Maven: oro:oro:2.0.8" />
           <element id="library" level="project" name="Maven: javax.activation:activation:1.1" />
           <element id="library" level="project" name="Maven: javax.mail:mail:1.4" />
+          <element id="library" level="project" name="Maven: org.slf4j:slf4j-log4j12:1.5.6" />
+          <element id="library" level="project" name="Maven: log4j:log4j:1.2.16" />
+          <element id="library" level="project" name="Maven: org.slf4j:jcl-over-slf4j:1.5.6" />
         </element>
       </element>
     </root>
