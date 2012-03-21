@@ -1,7 +1,8 @@
 package elw.dp.app;
 
+import com.google.common.io.ByteStreams;
+import com.google.common.io.CharStreams;
 import elw.dp.mips.TaskBean;
-import org.akraievoy.gear.G4Io;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.JsonToken;
@@ -10,6 +11,7 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.swing.*;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -54,7 +56,9 @@ class RunnableLoadTask implements Runnable {
             URLConnection ucDl = setupGet(urlDl);
             is = ucDl.getInputStream();
 
-            return G4Io.dumpToString(is, "UTF-8");
+            return CharStreams.toString(
+                    new InputStreamReader(is, "UTF-8")
+            );
         } catch (IOException e) {
             callback.updateStatus("download failed: '" + strDl + "'", e);
             return null;

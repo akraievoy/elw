@@ -3,7 +3,6 @@ package elw.dp.app;
 import elw.dp.mips.Instruction;
 import elw.dp.mips.Instructions;
 import elw.dp.mips.asm.Data;
-import org.akraievoy.gear.G4Str;
 
 import javax.swing.table.AbstractTableModel;
 
@@ -55,7 +54,14 @@ public class InstructionsTableModel extends AbstractTableModel {
         } else if (COL_LABELS.equals(colName)) {
             final Instruction internal = instructions.getInternal(address);
             if (internal != null) {
-                return G4Str.join(internal.getLabels(), ", ");
+                StringBuilder labelsStr = new StringBuilder();
+                for (String label : internal.getLabels()) {
+                    if (labelsStr.length() > 0) {
+                        labelsStr.append(", ");
+                    }
+                    labelsStr.append(label);
+                }
+                return labelsStr.toString();
             }
         }
 

@@ -14,7 +14,6 @@ import elw.miniweb.ViewJackson;
 import elw.vo.*;
 import elw.web.core.Core;
 import elw.web.core.W;
-import org.akraievoy.gear.G4mat;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
@@ -582,7 +581,7 @@ public class ControllerRest extends ControllerElw {
         if (validTypes.isEmpty()) {
             resp.sendError(
                     HttpServletResponse.SC_BAD_REQUEST,
-                    "Size " + G4mat.formatMem(length) + " exceeds size limits"
+                    "Size " + org.akraievoy.base.Format.formatMem(length) + " exceeds size limits"
             );
             return null;
         }

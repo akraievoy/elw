@@ -30,9 +30,8 @@ import elw.miniweb.Message;
 import elw.vo.*;
 import elw.web.core.Core;
 import elw.web.core.W;
+import org.akraievoy.base.*;
 import org.akraievoy.couch.Squab;
-import org.akraievoy.gear.G4Parse;
-import org.akraievoy.gear.G4mat;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
@@ -136,7 +135,7 @@ public abstract class ControllerElw extends MultiActionController implements Web
             return null;
         }
 
-        final Long stamp = G4Parse.parse(req.getParameter("stamp"), (Long) null);
+        final Long stamp = Parse.oneLong(req.getParameter("stamp"), (Long) null);
 
         return wm.handleScore(req, resp, ctx, slot, file, stamp, model);
     }
@@ -337,7 +336,7 @@ public abstract class ControllerElw extends MultiActionController implements Web
             }
             FileType._.filterByLength(validTypes, length);
             if (validTypes.isEmpty()) {
-                return fail(put, failureUri, "Size " + G4mat.formatMem(length) + " exceeds size limits");
+                return fail(put, failureUri, "Size " + org.akraievoy.base.Format.formatMem(length) + " exceeds size limits");
             }
             FileType._.filterByName(validTypes, file.getName().toLowerCase());
             if (validTypes.isEmpty()) {

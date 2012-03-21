@@ -6,7 +6,6 @@ import elw.dp.mips.MipsValidator;
 import elw.dp.mips.TaskBean;
 import elw.dp.ui.DataPathForm;
 import elw.dp.ui.RendererFactory;
-import org.akraievoy.gear.G;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
@@ -459,7 +458,7 @@ public class Controller implements ControllerSetup, RunnableLoadTask.Callback {
 
                         validator.step(resRef, steps);
                     } catch (Throwable t) {
-                        Result.failure(log, resRef, "Failed: " + G.report(t));
+                        Result.failure(log, resRef, "Failed: " + t.getMessage());
                         log.trace("trace", t);
                     } finally {
                         SwingUtilities.invokeLater(new Runnable() {
@@ -534,7 +533,7 @@ public class Controller implements ControllerSetup, RunnableLoadTask.Callback {
                             Result.failure(log, resRef, "Failed to parse test index: " + testItem);
                         }
                     } catch (Throwable t) {
-                        Result.failure(log, resRef, "Failed: " + G.report(t));
+                        Result.failure(log, resRef, "Failed: " + t.getClass() + ": " + t.getMessage());
                         log.trace("trace", t);
                     } finally {
                         SwingUtilities.invokeLater(new Runnable() {

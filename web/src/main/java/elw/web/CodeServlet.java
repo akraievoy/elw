@@ -18,7 +18,7 @@
 
 package elw.web;
 
-import org.akraievoy.gear.G4Io;
+import com.google.common.io.ByteStreams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,7 +70,7 @@ public class CodeServlet extends HttpServlet {
             try {
                 fis = new FileInputStream(codeFile);
 
-                G4Io.pumpData(fis, resp.getOutputStream());
+                ByteStreams.copy(fis, resp.getOutputStream());
             } finally {
                 if (fis != null) {
                     try {

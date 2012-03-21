@@ -18,7 +18,6 @@
 
 package elw.vo;
 
-import org.akraievoy.gear.G4mat;
 import org.codehaus.jackson.annotate.JsonIgnore;
 
 /**
@@ -47,10 +46,10 @@ public class ScoreTerm extends ScoreTermInput {
         final double percentage = Math.round(ratio * 1000) / 10.0;
 
         if (percentage < 100) {
-            return "-" + G4mat.format2(100 - percentage) + "%";
+            return "-" + org.akraievoy.base.Format.format2(100 - percentage) + "%";
         }
 
-        return "+" + G4mat.format2(percentage - 100) + "%";
+        return "+" + org.akraievoy.base.Format.format2(percentage - 100) + "%";
     }
 
     @JsonIgnore

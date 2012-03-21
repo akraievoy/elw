@@ -24,7 +24,7 @@ import elw.dao.ctx.*;
 import elw.dp.mips.MipsValidator;
 import elw.dp.mips.TaskBean;
 import elw.vo.*;
-import org.akraievoy.gear.G4Run;
+import org.akraievoy.base.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 
-public class StudentCodeValidator extends G4Run.Task {
+public class StudentCodeValidator extends Executors.Task {
     private static final Logger log = LoggerFactory.getLogger(StudentCodeValidator.class);
 
     //  LATER this should be configurable/injectable on per-course/taskType basis

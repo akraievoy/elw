@@ -29,7 +29,7 @@ import elw.vo.*;
 import elw.web.core.Core;
 import elw.web.core.LogFilter;
 import elw.web.core.W;
-import org.akraievoy.gear.G4Parse;
+import org.akraievoy.base.Parse;
 import org.apache.commons.fileupload.FileUploadException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -371,8 +371,8 @@ public class AdminController extends ControllerElw {
                         final String powReq = req.getParameter(idFor);
                         final String ratioReq = req.getParameter(idFor + "--ratio");
 
-                        pows.put(idFor, G4Parse.parse(powReq, powDef));
-                        ratios.put(idFor, G4Parse.parse(ratioReq, ratioDef));
+                        pows.put(idFor, Parse.oneInt(powReq, powDef));
+                        ratios.put(idFor, Parse.oneDouble(ratioReq, ratioDef));
                     }
 
                     score.setPows(pows);

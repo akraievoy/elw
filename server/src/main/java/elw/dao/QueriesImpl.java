@@ -8,7 +8,6 @@ import elw.dao.rest.*;
 import elw.vo.*;
 import elw.vo.Class;
 import elw.vo.Score;
-import org.akraievoy.gear.G4Parse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
