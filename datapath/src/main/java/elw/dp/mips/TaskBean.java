@@ -2,7 +2,6 @@ package elw.dp.mips;
 
 import elw.dp.mips.asm.Data;
 import elw.dp.mips.asm.MipsAssembler;
-import org.akraievoy.gear.G;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -110,23 +109,23 @@ public class TaskBean {
                 if (regsText.containsKey(reg)) {
                     line.addError("multiple occurence, ignored");
                 }
-                if (!G.contains(Reg.publicRegs, reg)) {
+                if (!Reg.publicRegs.contains(reg)) {
                     line.addError(
                             "register $" + reg.toString() + " is reserved"
                     );
                 }
-                if (G.contains(Reg.roRegs, reg)) {
+                if (Reg.roRegs.contains(reg)) {
                     line.addError(
                             "register $" + reg.toString() + " is read-only"
                     );
                 }
-                if (G.contains(Reg.autoRegs, reg)) {
+                if (Reg.autoRegs.contains(reg)) {
                     line.addError(
                             "register $" + reg.toString() +
                                     " is set/verified automatically"
                     );
                 }
-                if (G.contains(Reg.tempRegs, reg)) {
+                if (Reg.tempRegs.contains(reg)) {
                     line.addError(
                             "register $" + reg.toString() + " is temporary"
                     );

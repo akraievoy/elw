@@ -1,6 +1,7 @@
 package elw.dp.mips;
 
 import gnu.trove.TIntArrayList;
+import org.akraievoy.base.Die;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -38,15 +39,15 @@ public class DataPath {
             try {
                 method = alu.getClass().getMethod(instruction.getOpName(), InstructionContext.class);
             } catch (NoSuchMethodException e) {
-                throw base.Die.ifReached(e);
+                throw Die.ifReached(e);
             }
 
             try {
                 method.invoke(alu, ctx);
             } catch (IllegalAccessException e) {
-                throw base.Die.ifReached(e);
+                throw Die.ifReached(e);
             } catch (InvocationTargetException e) {
-                throw base.Die.ifReached(e);
+                throw Die.ifReached(e);
             }
         }
 

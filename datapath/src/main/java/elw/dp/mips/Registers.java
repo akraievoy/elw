@@ -2,7 +2,6 @@ package elw.dp.mips;
 
 import gnu.trove.TIntArrayList;
 import gnu.trove.TIntIntHashMap;
-import org.akraievoy.gear.G;
 
 import java.util.Arrays;
 
@@ -32,7 +31,7 @@ public class Registers {
     }
 
     private int setRegInternal(Reg reg, int value) {
-        if (G.contains(Reg.roRegs, reg)) {
+        if (Reg.roRegs.contains(reg)) {
             //	LATER log
             return 0;
         }

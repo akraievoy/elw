@@ -1,10 +1,9 @@
 package elw.dp.mips;
 
-import base.Die;
 import base.pattern.Result;
 import elw.dp.mips.asm.MipsAssembler;
 import gnu.trove.TIntIntHashMap;
-import org.akraievoy.gear.G;
+import org.akraievoy.base.ObjArrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +41,9 @@ public class MipsValidator {
         final Instruction[] newInstructions = assembler.loadInstructions(sourceLines, resRef, labelIndex);
 
         if (resRef[0].isSuccess()) {
-            Die.ifNull("newInstructions", newInstructions);
+            if (newInstructions == null) {
+                throw new IllegalStateException("newInstructions == null");
+            };
             instructions = newInstructions;
             return newInstructions;
         } else {
@@ -155,7 +156,7 @@ public class MipsValidator {
         final TIntIntHashMap expectedRegMap = regs[1];
         final Reg[] expectedRegs = Reg.values(expectedRegMap.keys());
         for (Reg expectedReg : expectedRegs) {
-            if (!G.contains(setupRegs, expectedReg)) {
+            if (!ObjArrays.contains(setupRegs, expectedReg)) {
                 Result.failure(log, resRef, "Test Failed: expecting $" + expectedReg.toString() + ", but register never set");
                 return;
             }
@@ -169,10 +170,10 @@ public class MipsValidator {
         }
 
         for (Reg setupReg : setupRegs) {
-            if (G.contains(Reg.tempRegs, setupReg)) {
+            if (Reg.tempRegs.contains(setupReg)) {
                 continue;
             }
-            if (G.contains(expectedRegs, setupReg)) {
+            if (ObjArrays.contains(expectedRegs, setupReg)) {
                 continue;
             }
 
@@ -218,7 +219,7 @@ public class MipsValidator {
                 }
             } catch (Throwable t) {
                 failCount++;
-                Result.failure(log, resRef, "Failed: " + G.report(t));
+                Result.failure(log, resRef, "Failed: " + t.getClass() + t.getMessage());
                 log.trace("trace", t);
             }
         }

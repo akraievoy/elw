@@ -7,7 +7,7 @@ package elw.dp.mips.asm;
 import base.pattern.Result;
 import elw.dp.mips.*;
 import gnu.trove.TIntIntHashMap;
-import org.akraievoy.gear.G;
+import org.akraievoy.base.ObjArrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,7 +91,7 @@ public class MipsAssembler {
                 labelList = code.substring(0, labelsEnd).split(",");
                 code.delete(0, labelsEnd + 1);
             } else {
-                labelList = G.STRINGS_EMPTY;
+                labelList = new String[0];
             }
 
             if (labelList.length > 0) {
@@ -240,11 +240,11 @@ public class MipsAssembler {
             if (reg == null) {
                 return true;
             }
-            if (!G.contains(Reg.publicRegs, reg)) {
+            if (!Reg.publicRegs.contains(reg)) {
                 Result.failure(log, resRef, prefixOn + "direct ref to $" + reg.toString());
                 return true;
             }
-            if (desc.writeRegs().contains(regId) && G.contains(Reg.roRegs, reg)) {
+            if (desc.writeRegs().contains(regId) && Reg.roRegs.contains(reg)) {
                 Result.failure(log, resRef, prefixOn + "write to $" + reg.toString());
                 return true;
             }

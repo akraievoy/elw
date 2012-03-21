@@ -17,11 +17,6 @@
 
     <repositories>
         <repository>
-            <id>local</id>
-            <name>local</name>
-            <url>file://${project.basedir}/../ext/repo</url>
-        </repository>
-        <repository>
             <id>github-akraievoy-mvn_repo</id>
             <name>github-akraievoy-mvn_repo</name>
             <url>https://github.com/akraievoy/mvn_repo/raw/master/releases/</url>
