@@ -29,6 +29,8 @@
 
 	<context:annotation-config/>
 
+    <bean name="configurer" class="elw.dao.PropertyPlaceholderConfCommons"/>
+
 	<bean id="handlerMapping" class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
 		<property name="alwaysUseFullPath" value="true"/>
 	</bean>
@@ -44,50 +46,50 @@
     -->
     <bean id="metaDao" class="org.akraievoy.couch.CouchDao">
         <constructor-arg type="boolean" value="false"/>
-        <property name="couchUrl" value="http://127.0.0.1:5984/"/>
+        <property name="couchUrl" value="${couchdb.url}"/>
         <property name="dbName" value="elw-data"/>
-        <property name="username" value="supercow"/>
-        <property name="password" value="typical"/>
+        <property name="username" value="${couchdb.user}"/>
+        <property name="password" value="${couchdb.password}"/>
         <property name="cacheValidityMinutes" value="32"/>
         <property name="concurrencyLevel" value="8"/>
     </bean>
 
     <bean id="attachmentDao" class="org.akraievoy.couch.CouchDao">
         <constructor-arg type="boolean" value="false"/>
-        <property name="couchUrl" value="http://127.0.0.1:5984/"/>
+        <property name="couchUrl" value="${couchdb.url}"/>
         <property name="dbName" value="elw-attachment"/>
-        <property name="username" value="supercow"/>
-        <property name="password" value="typical"/>
+        <property name="username" value="${couchdb.user}"/>
+        <property name="password" value="${couchdb.password}"/>
         <property name="cacheValidityMinutes" value="32"/>
         <property name="concurrencyLevel" value="8"/>
     </bean>
 
     <bean id="solutionDao" class="org.akraievoy.couch.CouchDao">
         <constructor-arg type="boolean" value="false"/>
-        <property name="couchUrl" value="http://127.0.0.1:5984/"/>
+        <property name="couchUrl" value="${couchdb.url}"/>
         <property name="dbName" value="elw-solution"/>
-        <property name="username" value="supercow"/>
-        <property name="password" value="typical"/>
+        <property name="username" value="${couchdb.user}"/>
+        <property name="password" value="${couchdb.password}"/>
         <property name="cacheValidityMinutes" value="8"/>
         <property name="concurrencyLevel" value="8"/>
     </bean>
 
     <bean id="userDao" class="org.akraievoy.couch.CouchDao">
         <constructor-arg type="boolean" value="false"/>
-        <property name="couchUrl" value="http://127.0.0.1:5984/"/>
+        <property name="couchUrl" value="${couchdb.url}"/>
         <property name="dbName" value="elw-user"/>
-        <property name="username" value="supercow"/>
-        <property name="password" value="typical"/>
+        <property name="username" value="${couchdb.user}"/>
+        <property name="password" value="${couchdb.password}"/>
         <property name="cacheValidityMinutes" value="4"/>
         <property name="concurrencyLevel" value="4"/>
     </bean>
 
     <bean id="authDao" class="org.akraievoy.couch.CouchDao">
         <constructor-arg type="boolean" value="false"/>
-        <property name="couchUrl" value="http://127.0.0.1:5984/"/>
+        <property name="couchUrl" value="${couchdb.url}"/>
         <property name="dbName" value="elw-auth"/>
-        <property name="username" value="supercow"/>
-        <property name="password" value="typical"/>
+        <property name="username" value="${couchdb.user}"/>
+        <property name="password" value="${couchdb.password}"/>
         <property name="cacheValidityMinutes" value="1"/>
         <property name="concurrencyLevel" value="4"/>
     </bean>
@@ -104,14 +106,14 @@
 		<constructor-arg type="elw.dao.QueriesImpl" ref="queries"/>
 	</bean>
 
-	<bean id="daemonThreadFactory" class="org.akraievoy.gear.G4Run$ThreadFactory">
+	<bean id="daemonThreadFactory" class="org.akraievoy.base.Executors$ThreadFactory">
 		<constructor-arg type="boolean" value="true"/>
 		<constructor-arg type="java.lang.String" value="ELW Daemon"/>
 	</bean>
 
-	<bean id="daemonExecutor" class="org.akraievoy.gear.G4Run" factory-method="scheduledExecutor">
+	<bean id="daemonExecutor" class="org.akraievoy.base.Executors" factory-method="scheduledExecutor">
 		<constructor-arg type="int" value="3"/>
-		<constructor-arg type="org.akraievoy.gear.G4Run$ThreadFactory" ref="daemonThreadFactory"/>
+		<constructor-arg type="org.akraievoy.base.Executors$ThreadFactory" ref="daemonThreadFactory"/>
 	</bean>
 
 	<bean id="studentCodeValidator" class="elw.web.StudentCodeValidator">
