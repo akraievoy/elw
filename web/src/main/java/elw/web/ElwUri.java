@@ -22,6 +22,9 @@ import com.google.common.base.Strings;
 import elw.dao.Ctx;
 import elw.vo.FileBase;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 public class ElwUri {
     public static final String MODEL_KEY = "elw_uri";
 
@@ -77,18 +80,42 @@ public class ElwUri {
         return "summary?elw_ctx=e--" + enrId;
     }
 
-    private String fileQuery(final Ctx ctx, final String scope, final String slotId, FileBase file) {
-        final String xferQuery = "?elw_ctx=" + ctx.toString() + "&s=" + scope + "&sId=" + slotId;
+    private String fileQueryForObj(
+            final Ctx ctx,
+            final String scope,
+            final String slotId,
+            final FileBase file
+    ) {
+        return fileQueryForId(
+                ctx,
+                scope,
+                slotId,
+                file == null ? null : file.getId()
+        );
+    }
 
-        if (file != null && !Strings.isNullOrEmpty(file.getId())) {
-            return xferQuery + "&fId=" + file.getId();
+    private String fileQueryForId(
+            final Ctx ctx,
+            final String scope,
+            final String slotId,
+            final String fileId
+    ) {
+        final String xferQuery =
+                "?elw_ctx=" + ctx.toString() + "&s=" + scope + "&sId=" + slotId;
+
+        if (Strings.isNullOrEmpty(fileId)) {
+            return xferQuery;
         }
 
-        return xferQuery;
+        try {
+            return xferQuery + "&fId=" + URLEncoder.encode(fileId, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalStateException("UTF-8 not supported", e);
+        }
     }
 
     public String upload(final Ctx ctx, final String scope, final String slotId) {
-        return "ul" + fileQuery(ctx, scope, slotId, null);
+        return "ul" + fileQueryForObj(ctx, scope, slotId, (FileBase) null);
     }
 
     public String download(final Ctx ctx, final String scope, final String slotId, FileBase e, String nameNorm) {
@@ -97,17 +124,17 @@ public class ElwUri {
         }
 
         final String name = nameNorm == null ? e.getName() : nameNorm;
-        return "dl/" + name + fileQuery(ctx, scope, slotId, e);
+        return "dl/" + name + fileQueryForObj(ctx, scope, slotId, e);
     }
 
     public String approve(final Ctx ctx, final String scope, final String slotId, FileBase e) {
         if (e == null) {
             return null;
         }
-        return "approve" + fileQuery(ctx, scope, slotId, e);
+        return "approve" + fileQueryForObj(ctx, scope, slotId, e);
     }
 
     public String edit(final Ctx ctxVer, final String scope, final String slotId, final String fileId) {
-        return "edit?elw_ctx=" + ctxVer.toString() + "&s=" + scope + "&sId=" + slotId + "&fId=" + fileId;
+        return "edit" + fileQueryForId(ctxVer, scope, slotId, fileId);
     }
 }
