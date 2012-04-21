@@ -32,7 +32,6 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -85,9 +84,12 @@ public class ControllerRest extends ControllerElw {
     private final boolean devMode;
 
     private long testAuthSwitch = 0;
+    private AuthTool authTool;
 
-    public ControllerRest(Core core) {
+    public ControllerRest(Core core, AuthTool authTool) {
         super(core);
+
+        this.authTool = authTool;
 
         //  LATER devMode inferencing booster
         devMode = "w".equals(System.getProperty("user.name"));

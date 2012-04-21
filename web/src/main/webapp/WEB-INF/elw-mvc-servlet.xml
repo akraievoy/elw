@@ -39,6 +39,12 @@
 	</bean>
 	<context:component-scan base-package="elw.web"/>
 
+    <bean id="serverConfig" class="elw.web.ElwServerConfig">
+        <property name="baseUrl" value="${baseUrl}"/>
+    </bean>
+
+    <bean id="auth" class="elw.web.AuthTool"/>
+
     <!--
         LATER: but we have separate caches for each dao,
             so invalidations are not that obvious now
