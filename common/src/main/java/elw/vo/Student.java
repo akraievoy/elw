@@ -1,5 +1,9 @@
 package elw.vo;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 public class Student implements IdNamed {
     private String id;
     public String getId() { return id; }
@@ -12,6 +16,17 @@ public class Student implements IdNamed {
     private String email;
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
+
+    private List<String> openIds = new ArrayList<String>();
+    public List<String> getOpenIds() {
+        return Collections.unmodifiableList(openIds);
+    }
+    public void setOpenIds(ArrayList<String> openIds) {
+        this.openIds.clear();
+        if (openIds != null) {
+            this.openIds.addAll(openIds);
+        }
+    }
 
     private boolean lead;
     public boolean isLead() { return lead; }

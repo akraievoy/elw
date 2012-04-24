@@ -20,6 +20,10 @@ package elw.vo;
 
 import org.akraievoy.couch.Squab;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 //  FIXME this plain-text password stored in the couch is... well.. LAME
 public class Admin extends Squab implements IdNamed {
     private String id;
@@ -34,8 +38,19 @@ public class Admin extends Squab implements IdNamed {
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
 
+    private List<String> openIds = new ArrayList<String>();
+    public List<String> getOpenIds() {
+        return Collections.unmodifiableList(openIds);
+    }
+    public void setOpenIds(ArrayList<String> openIds) {
+        this.openIds.clear();
+        if (openIds != null) {
+            this.openIds.addAll(openIds);
+        }
+    }
+
     @Override
     protected String[] pathElems() {
         return new String[] {id};
     }
-}
+ }
