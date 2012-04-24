@@ -668,6 +668,32 @@ public class QueriesImpl implements Queries {
         return userDao.findSome(Admin.class, login);
     }
 
+    public EmailAuth lastAuth(String email) {
+        return authDao.findLast(EmailAuth.class, email);
+    }
+
+    public EmailAuth createAuth(String email) {
+        final EmailAuth emailAuth = new EmailAuth();
+
+        emailAuth.setActivated(false);
+        emailAuth.setEmail(email);
+
+        @SuppressWarnings("UnusedDeclaration")
+        final CouchDao.UpdateStatus updateStatus =
+                authDao.createOrUpdate(emailAuth);
+
+        return emailAuth;
+    }
+
+    public void activateAuth(final EmailAuth emailAuth) {
+        emailAuth.setActivated(true);
+        authDao.update(emailAuth, false);
+    }
+
+    public List<Admin> admins() {
+        return userDao.findAll(Admin.class);
+    }
+
     public List<String> groupIds() {
         final List<List<String>> axes = 
                 userDao.axes(Group.class, (String) null);

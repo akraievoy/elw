@@ -60,6 +60,8 @@ public interface Queries {
 
     Admin adminSome(String login);
 
+    List<Admin> admins();
+
     List<Group> groups();
 
     List<Enrollment> enrollments();

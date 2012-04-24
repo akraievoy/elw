@@ -61,6 +61,10 @@
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>elw-mvc</servlet-name>
+		<url-pattern>/auth/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>elw-mvc</servlet-name>
 		<url-pattern>/s/*</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>

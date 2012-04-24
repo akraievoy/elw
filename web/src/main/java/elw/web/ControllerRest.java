@@ -12,6 +12,7 @@ import elw.dao.rest.RestEnrollmentSummary;
 import elw.dao.rest.RestSolution;
 import elw.miniweb.ViewJackson;
 import elw.vo.*;
+import elw.webauth.ControllerAuth;
 import elw.web.core.Core;
 import elw.web.core.W;
 import org.apache.commons.fileupload.FileItemIterator;
@@ -71,9 +72,6 @@ import java.util.*;
 public class ControllerRest extends ControllerElw {
     public static enum ListStyle{IDS, MAP}
 
-    public static final String SESSION_AUTH = "elw_auth";
-
-    public static final String MODEL_AUTH = SESSION_AUTH;
     public static final String MODEL_QUERIES = "elw_queries";
 
     private static final Logger log =
@@ -84,12 +82,17 @@ public class ControllerRest extends ControllerElw {
     private final boolean devMode;
 
     private long testAuthSwitch = 0;
-    private AuthTool authTool;
 
-    public ControllerRest(Core core, AuthTool authTool) {
+    private final ElwServerConfig elwServerConfig;
+
+
+    public ControllerRest(
+            final Core core,
+            final ElwServerConfig config
+    ) {
         super(core);
 
-        this.authTool = authTool;
+        this.elwServerConfig = config;
 
         //  LATER devMode inferencing booster
         devMode = "w".equals(System.getProperty("user.name"));
@@ -124,7 +127,7 @@ public class ControllerRest extends ControllerElw {
     ) throws IOException {
         final HttpSession session = req.getSession(true);
 
-        QueriesSecure.Auth auth = (QueriesSecure.Auth) session.getAttribute(SESSION_AUTH);
+        QueriesSecure.Auth auth = (QueriesSecure.Auth) session.getAttribute(ControllerAuthElw.SESSION_AUTH);
         QueriesSecure queriesSecure = null;
 
         //  FIXME this shall be true for nginx-proxied remote requests
@@ -138,17 +141,14 @@ public class ControllerRest extends ControllerElw {
                 auth.setId("iasa@akraievoy.org");
                 auth.setName("AK");
                 auth.setRoles(Collections.singletonList(QueriesSecure.Auth.ROLE_ADM));
-                auth.setOnSite(false);
             } else if (testAuth % 3 == 1) {
                 auth.setId("vasya@poopkeen.org");
                 auth.setName("Vuneedlo");
                 auth.setRoles(Collections.singletonList(QueriesSecure.Auth.ROLE_STUD));
-                auth.setOnSite(true);
             } else if (testAuth % 3 == 2) {
                 auth.setId("elw@akraievoy.org");
                 auth.setName("anon");
                 auth.setRoles(Collections.singletonList(QueriesSecure.Auth.ROLE_GUEST));
-                auth.setOnSite(null);
             }
 
             auth.setExpiry(System.currentTimeMillis() + 30 * 60 * 1000);
@@ -158,7 +158,7 @@ public class ControllerRest extends ControllerElw {
             auth.setEnrIds(queriesSecure.enrollmentIds());
             auth.setCourseIds(queriesSecure.courseIds());
 
-            session.setAttribute(SESSION_AUTH, auth);
+            session.setAttribute(ControllerAuthElw.SESSION_AUTH, auth);
         }
 
         if (auth == null) {
@@ -175,7 +175,7 @@ public class ControllerRest extends ControllerElw {
 
         final HashMap<String, Object> model = prepareDefaultModel(req);
 
-        model.put(MODEL_AUTH, auth);
+        model.put(ControllerAuthElw.MODEL_AUTH, auth);
         model.put(MODEL_QUERIES, queriesSecure);
 
         return model;
@@ -194,7 +194,7 @@ public class ControllerRest extends ControllerElw {
             return null;
         }
 
-        return new ModelAndView(ViewJackson.data(model.get(MODEL_AUTH)));
+        return new ModelAndView(ViewJackson.data(model.get(ControllerAuthElw.MODEL_AUTH)));
     }
 
     //  TODO this quite likely is ok to be admin-only
@@ -500,7 +500,7 @@ public class ControllerRest extends ControllerElw {
         final Queries queries =
                 (Queries) model.get(MODEL_QUERIES);
         final QueriesSecure.Auth auth =
-                (QueriesSecure.Auth) model.get(MODEL_AUTH);
+                (QueriesSecure.Auth) model.get(ControllerAuthElw.MODEL_AUTH);
 
         final Queries.CtxResolutionState stateSlot =
                 queries.resolveSlot(enrId, solId, null);

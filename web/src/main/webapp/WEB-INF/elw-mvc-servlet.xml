@@ -19,31 +19,34 @@
 
 <beans xmlns="http://www.springframework.org/schema/beans"
 	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	   xmlns:sec="http://www.springframework.org/schema/security"
 	   xmlns:context="http://www.springframework.org/schema/context"
-	   xsi:schemaLocation=
-			   "http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-2.0.4.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd"
 	   default-init-method="start"
 	   default-destroy-method="stop"
 	   default-autowire="constructor">
 
 	<context:annotation-config/>
 
-    <bean name="configurer" class="elw.dao.PropertyPlaceholderConfCommons"/>
+    <bean name="configurer" class="elw.dao.PropertyOverrideConfCommons">
+        <property name="baseName" value="elw"/>
+        <property name="prefix" value="elw-mvc-servlet"/>
+    </bean>
 
-	<bean id="handlerMapping" class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
-		<property name="alwaysUseFullPath" value="true"/>
-	</bean>
-	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+    <bean id="handlerMapping"
+          class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
+        <property name="alwaysUseFullPath" value="true"/>
+    </bean>
+    <bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
 		<property name="alwaysUseFullPath" value="true"/>
 	</bean>
 	<context:component-scan base-package="elw.web"/>
 
     <bean id="serverConfig" class="elw.web.ElwServerConfig">
-        <property name="baseUrl" value="${baseUrl}"/>
+        <!--
+            nothing injected here (explicitly):
+                this is wired with Commons Config directly
+        -->
     </bean>
-
-    <bean id="auth" class="elw.web.AuthTool"/>
 
     <!--
         LATER: but we have separate caches for each dao,
@@ -51,51 +54,36 @@
             not sure this breaks anything though
     -->
     <bean id="metaDao" class="org.akraievoy.couch.CouchDao">
-        <constructor-arg type="boolean" value="false"/>
-        <property name="couchUrl" value="${couchdb.url}"/>
+        <constructor-arg ref="serverConfig"/>
         <property name="dbName" value="elw-data"/>
-        <property name="username" value="${couchdb.user}"/>
-        <property name="password" value="${couchdb.password}"/>
         <property name="cacheValidityMinutes" value="32"/>
         <property name="concurrencyLevel" value="8"/>
     </bean>
 
     <bean id="attachmentDao" class="org.akraievoy.couch.CouchDao">
-        <constructor-arg type="boolean" value="false"/>
-        <property name="couchUrl" value="${couchdb.url}"/>
+        <constructor-arg ref="serverConfig"/>
         <property name="dbName" value="elw-attachment"/>
-        <property name="username" value="${couchdb.user}"/>
-        <property name="password" value="${couchdb.password}"/>
         <property name="cacheValidityMinutes" value="32"/>
         <property name="concurrencyLevel" value="8"/>
     </bean>
 
     <bean id="solutionDao" class="org.akraievoy.couch.CouchDao">
-        <constructor-arg type="boolean" value="false"/>
-        <property name="couchUrl" value="${couchdb.url}"/>
+        <constructor-arg ref="serverConfig"/>
         <property name="dbName" value="elw-solution"/>
-        <property name="username" value="${couchdb.user}"/>
-        <property name="password" value="${couchdb.password}"/>
         <property name="cacheValidityMinutes" value="8"/>
         <property name="concurrencyLevel" value="8"/>
     </bean>
 
     <bean id="userDao" class="org.akraievoy.couch.CouchDao">
-        <constructor-arg type="boolean" value="false"/>
-        <property name="couchUrl" value="${couchdb.url}"/>
+        <constructor-arg ref="serverConfig"/>
         <property name="dbName" value="elw-user"/>
-        <property name="username" value="${couchdb.user}"/>
-        <property name="password" value="${couchdb.password}"/>
         <property name="cacheValidityMinutes" value="4"/>
         <property name="concurrencyLevel" value="4"/>
     </bean>
 
     <bean id="authDao" class="org.akraievoy.couch.CouchDao">
-        <constructor-arg type="boolean" value="false"/>
-        <property name="couchUrl" value="${couchdb.url}"/>
+        <constructor-arg ref="serverConfig"/>
         <property name="dbName" value="elw-auth"/>
-        <property name="username" value="${couchdb.user}"/>
-        <property name="password" value="${couchdb.password}"/>
         <property name="cacheValidityMinutes" value="1"/>
         <property name="concurrencyLevel" value="4"/>
     </bean>

@@ -252,8 +252,22 @@ public class QueriesSecure implements Queries {
     }
 
     public Admin adminSome(String login) {
-        return null;  //	TODO review
+        if (auth.isAdm()) {
+            return queries.adminSome(login);
+        }
+
+        return null;
     }
+
+
+    public List<Admin> admins() {
+        if (auth.isAdm()) {
+            return queries.admins();
+        }
+
+        return Collections.emptyList();
+    }
+
 
     public List<Attachment> attachments(final CtxSlot ctxSlot) {
         if (auth.isAdm()) {
@@ -667,9 +681,9 @@ public class QueriesSecure implements Queries {
             this.sourceAddr = sourceAddr; 
         }
 
-        private Boolean onSite;
-        public Boolean getOnSite() { return onSite; }
-        public void setOnSite(Boolean onSite) { this.onSite = onSite; }
+        private boolean confirmed;
+        public boolean isConfirmed() { return confirmed; }
+        public void setConfirmed(boolean confirmed) { this.confirmed = confirmed; }
 
         private final List<String> roles = new ArrayList<String>(1);
         public List<String> getRoles() {

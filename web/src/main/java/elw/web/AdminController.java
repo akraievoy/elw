@@ -60,7 +60,11 @@ public class AdminController extends ControllerElw {
         this.queries = queries;
     }
 
-    protected HashMap<String, Object> auth(final HttpServletRequest req, final HttpServletResponse resp, final String pathToRoot) throws IOException {
+    protected HashMap<String, Object> auth(
+            final HttpServletRequest req,
+            final HttpServletResponse resp,
+            final String pathToRoot
+    ) throws IOException {
         final HttpSession session = req.getSession(true);
         final Admin admin = (Admin) session.getAttribute(S_ADMIN);
 

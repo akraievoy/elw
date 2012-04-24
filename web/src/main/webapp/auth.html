@@ -1,0 +1,75 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta content="text/html; charset=UTF-8">
+  <title>Login</title>
+  <link type="text/css" rel="stylesheet" href="css/openid.css"/>
+
+  <script type="text/javascript" src="js/jquery-1.4.2.js"></script>
+  <script type="text/javascript" src="js/jquery.cookie.js"></script>
+  <script type="text/javascript" src="js/jquery.codecs.js"></script>
+  <script type="text/javascript"
+          src="js/jquery-ui-1.8.5.custom.min.js"></script>
+  <script type="text/javascript" src="js/jquery.jgrowl.js"></script>
+  <script type="text/javascript" src="js/jquery.dataTables.js"></script>
+  <script type="text/javascript" src="js/openid-jquery.js"></script>
+  <script type="text/javascript" src="js/openid-ru.js"></script>
+</head>
+<body>
+<div style="margin: 3em auto; padding: 1em; width: 600px;">
+  <div>
+    <form action="auth/namechallenge" method="get" id="name_form">
+      <fieldset>
+        <legend>Simple Authentication</legend>
+          <label for="name_last" style="display: inline-block; width: 10em;">Last Name:</label>
+          <input id="name_last" name="firstName" type="text"
+                 value="Dobbs"/><br/>
+          <label for="name_first" style="display: inline-block; width: 10em;">First Name:</label>
+          <input id="name_first" name="lastName" type="text"
+                 value="Bob"/>
+          <input id="name_submit" type="submit" value="Verify"/>
+      </fieldset>
+    </form>
+  </div>
+  <div>
+    <form action="auth/smtpchallenge" method="get" id="smtp_form">
+      <fieldset>
+        <legend>Email Token Authentication</legend>
+          <label for="smtp_email">Specify your email:</label>
+          <input id="smtp_email" name="email" type="text"
+                 value="bob@dobbs.com"/>
+          <input id="smtp_submit" type="submit" value="Verify"/>
+      </fieldset>
+    </form>
+  </div>
+  <div>
+    <form action="auth/oidchallenge" method="get" id="openid_form">
+      <input type="hidden" name="action" value="verify"/>
+      <fieldset>
+        <legend>OpenID Authentication</legend>
+        <div id="openid_choice">
+          <p>Please choose your OpenID provider:</p>
+
+          <div id="openid_btns"></div>
+        </div>
+        <div id="openid_input_area">
+          <label for="openid_identifier"></label>
+          <input id="openid_identifier" name="openid_identifier" type="text"
+                 value="http://"/>
+          <input id="openid_submit" type="submit" value="Verify"/>
+        </div>
+      </fieldset>
+    </form>
+  </div>
+</div>
+</body>
+<script type="text/javascript">
+  jQuery(document).ready(function () {
+    openid.img_path = "css/images/";
+    openid.init('openid_identifier');
+
+    jQuery('input[type=text]').bind('focus', function() {
+      this.select();
+    } );
+  });
+</script>
+</html>
