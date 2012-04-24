@@ -541,7 +541,7 @@ public class QueriesImpl implements Queries {
 
             final CouchDao targetDao =
                     file instanceof Attachment ? attachmentDao : solutionDao;
-            targetDao.createOrUpdate(file);
+            targetDao.createOrUpdate(file, file.getStamp() == null);
 
             return new Result("File stored successfully", true);
         } catch (IOException e) {

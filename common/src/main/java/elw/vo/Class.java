@@ -62,7 +62,7 @@ public class Class implements Cloneable, IdNamed {
         return parseDateTime(getDate(), getToTime());
     }
 
-    private static DateTime parseDateTime(String dateStr, String timeStr) {
+    public static DateTime parseDateTime(String dateStr, String timeStr) {
         final DateTime date = FMT_DATE.parseDateTime(dateStr);
         final DateTime time = FMT_TIME.parseDateTime(timeStr);
         final DateTime dateExact = new DateTime(

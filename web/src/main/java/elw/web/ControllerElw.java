@@ -28,6 +28,7 @@ import elw.dao.Ctx;
 import elw.dao.Queries;
 import elw.miniweb.Message;
 import elw.vo.*;
+import elw.vo.Class;
 import elw.web.core.Core;
 import elw.web.core.W;
 import org.akraievoy.base.*;
@@ -37,6 +38,7 @@ import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.ModelAndView;
@@ -287,7 +289,6 @@ public abstract class ControllerElw extends MultiActionController implements Web
             final int length = req.getContentLength();
 
             file.setAuthor(authorName);
-            file.setSourceAddress(W.resolveRemoteAddress(req));
 
             InputSupplier<? extends InputStream> inputSupplier = null;
             String contentType = null;
@@ -307,8 +308,32 @@ public abstract class ControllerElw extends MultiActionController implements Web
                     while (fii.hasNext()) {
                         final FileItemStream item = fii.next();
                         if (item.isFormField()) {
-                            if ("comment".equals(item.getFieldName())) {
+                            final String fieldName = item.getFieldName();
+                            if ("comment".equals(fieldName)) {
                                 file.setComment(fieldText(item));
+                            }
+                            if (req.getSession().getAttribute(S_ADMIN) != null) {
+                                if ("sourceAddr".equals(fieldName)) {
+                                    final String sourceAddr = fieldText(item);
+                                    if (!Strings.isNullOrEmpty(sourceAddr)) {
+                                        file.setSourceAddress(sourceAddr);
+                                    }
+                                } else if ("dateTime".equals(fieldName)) {
+                                    final String dateTime = fieldText(item);
+                                    if (!Strings.isNullOrEmpty(dateTime)) {
+                                        final String[] parts =
+                                            dateTime.trim().split("\\s+");
+
+                                        final String date = parts[0];
+                                        final String time = 
+                                            parts.length > 1 ? parts[1] : "11:00";
+
+                                        final DateTime instant =
+                                            Class.parseDateTime(date, time);
+
+                                        file.setStamp(instant.getMillis());
+                                    }
+                                }
                             }
                             continue;
                         }
@@ -330,6 +355,9 @@ public abstract class ControllerElw extends MultiActionController implements Web
                 }
             }
 
+            if (Strings.isNullOrEmpty(file.getSourceAddress())) {
+                file.setSourceAddress(W.resolveRemoteAddress(req));
+            }
             if (length == -1) {
                 final String message = "Upload size not reported";
                 return fail(put, failureUri, message);

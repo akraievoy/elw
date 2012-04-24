@@ -115,7 +115,7 @@ public class ElwUri {
     }
 
     public String upload(final Ctx ctx, final String scope, final String slotId) {
-        return "ul" + fileQueryForObj(ctx, scope, slotId, (FileBase) null);
+        return "ul" + fileQueryForObj(ctx, scope, slotId, null);
     }
 
     public String download(final Ctx ctx, final String scope, final String slotId, FileBase e, String nameNorm) {

@@ -64,6 +64,15 @@ public class StudentController extends ControllerElw {
         //	admin impersonation
         final Admin admin = (Admin) session.getAttribute(S_ADMIN);
         if (admin != null) {
+            final Group group = (Group) session.getAttribute(S_GROUP);
+            final Student student = (Student) session.getAttribute(S_STUD);
+            if (ctx.getGroup() == null) {
+                ctx = ctx.extendGroup(group);
+            }
+            if (ctx.getStudent() == null) {
+                ctx = ctx.extendStudent(student);
+            }
+
             if (!ctx.resolve(queries).resolved(Ctx.STATE_GS)) {
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "context path problem, please check the logs");
                 return null;
@@ -72,6 +81,7 @@ public class StudentController extends ControllerElw {
             final HashMap<String, Object> model = prepareDefaultModel(req);
 
             model.put(R_CTX, ctx);
+            model.put("elw_admin", admin);
 
             return model;
         }
