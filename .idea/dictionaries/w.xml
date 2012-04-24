@@ -2,8 +2,10 @@
   <dictionary name="w">
     <words>
       <w>addr</w>
+      <w>couchdb</w>
       <w>loopback</w>
       <w>simplifiable</w>
+      <w>smtp</w>
     </words>
   </dictionary>
 </component>
