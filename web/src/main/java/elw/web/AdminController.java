@@ -21,9 +21,7 @@ package elw.web;
 import com.google.common.base.Strings;
 import elw.dao.Ctx;
 import elw.dao.Queries;
-import elw.dao.QueriesImpl;
 import elw.dao.ctx.CtxSolution;
-import elw.miniweb.Message;
 import elw.miniweb.ViewJackson;
 import elw.vo.*;
 import elw.web.core.Core;
@@ -40,7 +38,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.*;
 
@@ -49,45 +46,30 @@ import java.util.*;
 public class AdminController extends ControllerElw {
     private static final Logger log = LoggerFactory.getLogger(AdminController.class);
 
-    private final SortedSet<String> validNonces = new TreeSet<String>();
     private final Queries queries;
 
     public AdminController(
             Queries queries,
-            Core core
+            Core core,
+            ElwServerConfig elwServerConfig
     ) {
-        super(core);
+        super(core, elwServerConfig);
         this.queries = queries;
     }
 
     protected HashMap<String, Object> auth(
             final HttpServletRequest req,
             final HttpServletResponse resp,
-            final String pathToRoot
+            final boolean page,
+            final boolean verified
     ) throws IOException {
-        final HttpSession session = req.getSession(true);
-        final Admin admin = (Admin) session.getAttribute(S_ADMIN);
+        final HashMap<String, Object> model =
+                super.auth(req, resp, page, verified);
 
-        if (admin == null) {
-            if (pathToRoot != null) {
-                Message.addWarn(req, "Admin authentication required");
-                if (req.getQueryString() != null) {
-                    session.setAttribute("loginTo", req.getRequestURI() + "?" + req.getQueryString());
-                } else {
-                    session.setAttribute("loginTo", req.getRequestURI());
-                }
-                resp.sendRedirect(pathToRoot + "login");
-            } else {
-                resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Admin authentication required");
-            }
-
+        if (model == null) {
             return null;
         }
 
-        session.removeAttribute("loginTo");    //	LATER extract constant
-
-        final HashMap<String, Object> model = prepareDefaultModel(req);
-        model.put(S_ADMIN, admin);
         model.put(
                 R_CTX,
                 Ctx.fromString(req.getParameter(R_CTX)).resolve(queries)
@@ -96,74 +78,11 @@ public class AdminController extends ControllerElw {
         return model;
     }
 
-    @RequestMapping(value = "login", method = RequestMethod.GET)
-    public ModelAndView do_login(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-        final HashMap<String, Object> model = prepareDefaultModel(req);
-
-        final String nonce = Long.toString(System.currentTimeMillis(), 36);
-        synchronized (validNonces) {
-            validNonces.add(nonce);
-        }
-        model.put("nonce", nonce);
-
-        return new ModelAndView("a/login", model);
-    }
-
-    @RequestMapping(value = "loginPost", method = RequestMethod.POST)
-    public ModelAndView do_loginPost(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-        final String login = req.getParameter("login");
-        final String nonce = req.getParameter("nonce");
-        final String hash = req.getParameter("hash");
-
-        final HttpSession session = req.getSession(true);
-        if (
-                nonce == null || nonce.trim().length() == 0 ||
-                        hash == null || hash.trim().length() == 0 ||
-                        login == null || login.trim().length() == 0
-                ) {
-            Message.addWarn(req, "nonce/hash parameters NOT set");
-        } else {
-            boolean nonceValid;
-            synchronized (validNonces) {
-                nonceValid = validNonces.remove(nonce);
-                validNonces.headSet(nonce).clear();
-            }
-
-            if (nonceValid) {
-                final Admin admin = core.getQueries().adminSome(login);
-                final String hashExpected;
-                if (admin != null) {
-                    hashExpected = Ctx.digest(nonce + "-->" + login + "-->" + admin.getPassword());
-                } else {
-                    hashExpected = null;
-                }
-
-                if (hashExpected != null && hashExpected.equalsIgnoreCase(hash)) {
-                    session.setAttribute(S_ADMIN, admin);
-                    session.setMaxInactiveInterval(300);
-                    Message.addInfo(req, "Admin area : logged on");
-                    final Object loginToAttr = session.getAttribute("loginTo");
-                    if (loginToAttr instanceof String) {
-                        session.removeAttribute("loginTo");
-                        resp.sendRedirect((String) loginToAttr);
-                    } else {
-                        resp.sendRedirect("index");
-                    }
-                    return null;
-                } else {
-                    Message.addWarn(req, "terribly wrong login/password, please retry");
-                }
-            } else {
-                Message.addWarn(req, "nonce expired, please retry authentication");
-            }
-        }
-
-        resp.sendRedirect("login");
-        return null;
-    }
-
     @RequestMapping(value = "logout", method = RequestMethod.GET)
-    public ModelAndView do_logout(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+    public ModelAndView do_logout(
+            final HttpServletRequest req,
+            final HttpServletResponse resp
+    ) throws IOException {
         req.getSession(true).invalidate();
         resp.sendRedirect("index");
         return null;
@@ -171,7 +90,7 @@ public class AdminController extends ControllerElw {
 
     @RequestMapping(value = "index", method = RequestMethod.GET)
     public ModelAndView do_index(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-        final HashMap<String, Object> model = auth(req, resp, "");
+        final HashMap<String, Object> model = auth(req, resp, true, false);
         if (model == null) {
             return null;
         }
@@ -181,7 +100,7 @@ public class AdminController extends ControllerElw {
 
     @RequestMapping(value = "rest/index", method = RequestMethod.GET)
     public ModelAndView do_restIndex(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-        final HashMap<String, Object> model = auth(req, resp, null);
+        final HashMap<String, Object> model = auth(req, resp, false, false);
         if (model == null) {
             return null;
         }
@@ -193,7 +112,7 @@ public class AdminController extends ControllerElw {
 
     @RequestMapping(value = "summary", method = RequestMethod.GET)
     public ModelAndView do_summary(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-        return wmECG(req, resp, "", new WebMethodCtx() {
+        return wmECG(req, resp, true, false, new WebMethodCtx() {
             @Override
             public ModelAndView handleCtx() throws IOException {
                 W.storeFilter(req, model);
@@ -217,7 +136,7 @@ public class AdminController extends ControllerElw {
 
     @RequestMapping(value = "log", method = RequestMethod.GET)
     public ModelAndView do_log(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-        return wmECG(req, resp, "", new WebMethodCtx() {
+        return wmECG(req, resp, true, false, new WebMethodCtx() {
             public ModelAndView handleCtx() throws IOException {
                 W.storeFilter(req, model);
                 return new ModelAndView("a/log", model);
@@ -227,7 +146,7 @@ public class AdminController extends ControllerElw {
 
     @RequestMapping(value = "rest/log", method = RequestMethod.GET)
     public ModelAndView do_restLog(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-        return wmECG(req, resp, null, new WebMethodCtx() {
+        return wmECG(req, resp, false, false, new WebMethodCtx() {
             public ModelAndView handleCtx() throws IOException {
                 final Format format = (Format) model.get(FormatTool.MODEL_KEY);
                 final List<Object[]> logData = core.log(
@@ -241,7 +160,7 @@ public class AdminController extends ControllerElw {
 
     @RequestMapping(value = "tasks", method = RequestMethod.GET)
     public ModelAndView do_tasks(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-        return wmECG(req, resp, "", new WebMethodCtx() {
+        return wmECG(req, resp, true, false, new WebMethodCtx() {
             public ModelAndView handleCtx() throws IOException {
                 W.storeFilter(req, model);
                 return new ModelAndView("a/tasks", model);
@@ -251,7 +170,7 @@ public class AdminController extends ControllerElw {
 
     @RequestMapping(value = "rest/tasks", method = RequestMethod.GET)
     public ModelAndView do_restTasks(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-        return wmECG(req, resp, null, new WebMethodCtx() {
+        return wmECG(req, resp, false, false, new WebMethodCtx() {
             public ModelAndView handleCtx() throws IOException {
                 final Format format = (Format) model.get(FormatTool.MODEL_KEY);
 
@@ -266,7 +185,7 @@ public class AdminController extends ControllerElw {
 
     @RequestMapping(value = "approve", method = RequestMethod.GET)
     public ModelAndView do_approve(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-        return wmScore(req, resp, "", new WebMethodScore() {
+        return wmScore(req, resp, true, false, new WebMethodScore() {
             public ModelAndView handleScore(
                     HttpServletRequest req,
                     HttpServletResponse resp,
@@ -298,7 +217,7 @@ public class AdminController extends ControllerElw {
             final HttpServletRequest req,
             final HttpServletResponse resp
     ) throws IOException {
-        return wmScore(req, resp, null, new WebMethodScore() {
+        return wmScore(req, resp, false, false, new WebMethodScore() {
             public ModelAndView handleScore(
                     HttpServletRequest req,
                     HttpServletResponse resp,
@@ -328,7 +247,7 @@ public class AdminController extends ControllerElw {
             final HttpServletRequest req,
             final HttpServletResponse resp
     ) throws IOException {
-        return wmScore(req, resp, "", new WebMethodScore() {
+        return wmScore(req, resp, false, true, new WebMethodScore() {
             public ModelAndView handleScore(
                     HttpServletRequest req,
                     HttpServletResponse resp,
@@ -398,7 +317,7 @@ public class AdminController extends ControllerElw {
 
     @RequestMapping(value = "groups", method = RequestMethod.GET)
     public ModelAndView do_groups(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-        final HashMap<String, Object> model = auth(req, resp, "");
+        final HashMap<String, Object> model = auth(req, resp, true, false);
         if (model == null) {
             return null;
         }
@@ -412,7 +331,7 @@ public class AdminController extends ControllerElw {
 
     @RequestMapping(value = "ul", method = {RequestMethod.GET})
     public ModelAndView do_ul(final HttpServletRequest req, final HttpServletResponse resp) throws IOException, FileUploadException {
-        return wmFile(req, resp, "", null, new WebMethodFile() {
+        return wmFile(req, resp, null, true, false, new WebMethodFile() {
             @Override
             protected ModelAndView handleFile(String scope, FileSlot slot) throws IOException {
                 model.put("slot", slot);
@@ -430,12 +349,12 @@ public class AdminController extends ControllerElw {
 
     @RequestMapping(value = "ul", method = RequestMethod.POST)
     public ModelAndView do_ulPost(final HttpServletRequest req, final HttpServletResponse resp) throws IOException, FileUploadException {
-        return wmFile(req, resp, "", null, new WebMethodFile() {
+        return wmFile(req, resp, null, false, true, new WebMethodFile() {
             @Override
             protected ModelAndView handleFile(String scope, FileSlot slot) throws IOException {
                 final String failureUri = core.getUri().upload(ctx, scope, slot.getId());
                 final String refreshUri = core.getUri().logCourseE(ctx.getEnr().getId());
-                final String authorName = ((Admin) model.get(S_ADMIN)).getName();
+                final String authorName = auth(model).getAdmin().getName();
 
                 return storeFile(
                         slot, refreshUri, failureUri, authorName,
@@ -447,7 +366,7 @@ public class AdminController extends ControllerElw {
 
     @RequestMapping(value = "dl/*.*", method = RequestMethod.GET)
     public ModelAndView do_dl(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-        return wmFile(req, resp, "../", null, new WebMethodFile() {
+        return wmFile(req, resp, null, false, true, new WebMethodFile() {
             @Override
             protected ModelAndView handleFile(String scope, FileSlot slot) throws IOException {
                 final String fileId = req.getParameter("fId");

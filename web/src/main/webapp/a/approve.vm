@@ -1,4 +1,5 @@
 #* @vtlvariable name="f" type="elw.web.FormatTool" *#
+#* @vtlvariable name="elw_auth" type="elw.dao.Auth" *#
 #* @vtlvariable name="score" type="elw.vo.Score" *#
 #* @vtlvariable name="slot" type="elw.vo.FileSlot" *#
 #* @vtlvariable name="file" type="elw.vo.Solution" *#
@@ -18,7 +19,7 @@
 <head>
 	<meta content="text/html; charset=UTF-8">
  <META HTTP-EQUIV=Refresh CONTENT="1; URL=${downloadUri}"/>
-	<title>$elw_ctx.group.name $elw_ctx.student.name $elw_ctx.ass.name $elw_ctx.ver.name $slot.name : Approval - $elw_admin.name</title>
+	<title>$elw_ctx.group.name $elw_ctx.student.name $elw_ctx.ass.name $elw_ctx.ver.name $slot.name : Approval - $elw_auth.admin.name</title>
  #parse("/__/imports.vm")
 </head>
 <body>

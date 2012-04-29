@@ -24,14 +24,15 @@ import com.google.common.base.Strings;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.CharStreams;
 import com.google.common.io.InputSupplier;
+import elw.dao.*;
 import elw.dao.Ctx;
-import elw.dao.Queries;
 import elw.miniweb.Message;
 import elw.vo.*;
 import elw.vo.Class;
 import elw.web.core.Core;
 import elw.web.core.W;
-import org.akraievoy.base.*;
+import elw.webauth.ControllerAuth;
+import org.akraievoy.base.Parse;
 import org.akraievoy.couch.Squab;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
@@ -47,6 +48,7 @@ import org.springframework.web.servlet.support.RequestContextUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -54,14 +56,22 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import static elw.dao.Auth.SESSION_KEY;
+
 public abstract class ControllerElw extends MultiActionController implements WebSymbols {
     private static final Logger log = LoggerFactory.getLogger(ControllerElw.class);
 
     private static final DiskFileItemFactory fileItemFactory = createFileItemFactory();
-    protected final Core core;
 
-    protected ControllerElw(Core core) {
+    protected final Core core;
+    protected final ElwServerConfig elwServerConfig;
+
+    protected ControllerElw(
+            final Core core,
+            final ElwServerConfig elwServerConfig
+    ) {
         this.core = core;
+        this.elwServerConfig = elwServerConfig;
     }
 
     private static DiskFileItemFactory createFileItemFactory() {
@@ -72,22 +82,92 @@ public abstract class ControllerElw extends MultiActionController implements Web
         return fileItemFactory;
     }
 
-    protected HashMap<String, Object> prepareDefaultModel(HttpServletRequest req) {
+    //  LATER move to ControllerAuth (required direct instance-level call dispatch)
+    public HashMap<String, Object> noAuth(
+            HttpServletRequest req,
+            HttpServletResponse resp,
+            boolean page,
+            final String message
+    ) throws IOException {
+        if (page) {
+            Message.addWarn(req, message);
+            ControllerAuth.storeSuccessRedirect(req);
+            resp.sendRedirect(elwServerConfig.getBaseUrl() + "auth.html");
+        } else {
+            resp.sendError(
+                    HttpServletResponse.SC_FORBIDDEN,
+                    message
+            );
+        }
+
+        return null;
+    }
+
+    //  TODO abstract away from returning concrete hashmap class
+    protected HashMap<String, Object> prepareDefaultModel(
+            final HttpServletRequest req,
+            final Auth auth,
+            final Ctx ctx
+    ) {
         final HashMap<String, Object> model = new HashMap<String, Object>();
 
         model.put(S_MESSAGES, Message.drainMessages(req));
-        model.put(FormatTool.MODEL_KEY, FormatTool.forLocale(RequestContextUtils.getLocale(req)));
+        model.put(
+                FormatTool.MODEL_KEY,
+                FormatTool.forLocale(RequestContextUtils.getLocale(req))
+        );
         model.put(VelocityTemplates.MODEL_KEY, core.getTemplates());
         model.put(ElwUri.MODEL_KEY, core.getUri());
+        model.put(Auth.MODEL_KEY, auth);
+        model.put(QueriesSecure.MODEL_KEY, core.getQueries().secure(auth));
 
         return model;
     }
 
-    protected abstract HashMap<String, Object> auth(
+    protected static Auth auth(HttpServletRequest req) {
+        return (Auth) req.getSession(true).getAttribute(SESSION_KEY);
+    }
+
+    protected static Auth auth(Map<String, Object> model) {
+        return (Auth) model.get(Auth.MODEL_KEY);
+    }
+
+    protected static QueriesSecure queries(Map<String, Object> model) {
+        return (QueriesSecure) model.get(QueriesSecure.MODEL_KEY);
+    }
+
+    //  TODO better to avoid returning nulls and throw a specific exception
+    protected HashMap<String, Object> auth(
             final HttpServletRequest req,
             final HttpServletResponse resp,
-            final String pathToRoot
-    ) throws IOException;
+            final boolean page,
+            final boolean verified
+    ) throws IOException {
+        final HttpSession session = req.getSession(true);
+        final Auth auth = (Auth) session.getAttribute(SESSION_KEY);
+
+        if (auth == null) {
+            return noAuth(req, resp, page, "Auth required");
+        }
+        
+        if (!W.resolveRemoteAddress(req).equals(auth.getSourceAddr())) {
+            return noAuth(req, resp, page, "Source address changed");
+        }
+
+        auth.renew(core.getQueries());
+
+        if (auth.isEmpty()) {
+            return noAuth(req, resp, page, "Non-empty Auth required");
+        }
+
+        if (verified && !auth.isVerified()) {
+            return noAuth(req, resp, page, "Verified Auth required");
+        }
+
+        session.removeAttribute(ControllerAuth.SESSION_SUCCESS_REDIRECT);
+
+        return prepareDefaultModel(req, auth, null);
+    }
 
     protected static interface WebMethodScore {
         ModelAndView handleScore(
@@ -99,10 +179,14 @@ public abstract class ControllerElw extends MultiActionController implements Web
 
     //  FIXME some of file VT parameters are broken
     protected ModelAndView wmScore(
-            HttpServletRequest req, HttpServletResponse resp,
-            final String pathToRoot, final WebMethodScore wm
+            final HttpServletRequest req,
+            final HttpServletResponse resp,
+            final boolean page,
+            final boolean verified,
+            final WebMethodScore wm
     ) throws IOException {
-        final HashMap<String, Object> model = auth(req, resp, pathToRoot);
+        final HashMap<String, Object> model =
+                auth(req, resp, page, verified);
         if (model == null) {
             return null;
         }
@@ -137,7 +221,7 @@ public abstract class ControllerElw extends MultiActionController implements Web
             return null;
         }
 
-        final Long stamp = Parse.oneLong(req.getParameter("stamp"), (Long) null);
+        final Long stamp = Parse.oneLong(req.getParameter("stamp"), null);
 
         return wm.handleScore(req, resp, ctx, slot, file, stamp, model);
     }
@@ -148,7 +232,12 @@ public abstract class ControllerElw extends MultiActionController implements Web
         protected Ctx ctx;
         protected Map<String, Object> model;
 
-        protected void init(HttpServletRequest req, HttpServletResponse resp, Ctx ctx, Map<String, Object> model) {
+        protected void init(
+                HttpServletRequest req,
+                HttpServletResponse resp,
+                Ctx ctx,
+                Map<String, Object> model
+        ) {
             this.ctx = ctx;
             this.model = model;
             this.req = req;
@@ -158,25 +247,24 @@ public abstract class ControllerElw extends MultiActionController implements Web
         public abstract ModelAndView handleCtx() throws IOException;
     }
 
-    protected ModelAndView wmECGS(
-            HttpServletRequest req, HttpServletResponse resp,
-            final String pathToRoot, final WebMethodCtx wm
-    ) throws IOException {
-        return wm(req, resp, pathToRoot, Ctx.STATE_ECGS, wm);
-    }
-
     protected ModelAndView wmECG(
             HttpServletRequest req, HttpServletResponse resp,
-            final String pathToRoot, final WebMethodCtx wm
+            final boolean page,
+            final boolean verified,
+            final WebMethodCtx wm
     ) throws IOException {
-        return wm(req, resp, pathToRoot, Ctx.STATE_ECG, wm);
+        return wm(req, resp, Ctx.STATE_ECG, wm, page, verified);
     }
 
     private ModelAndView wm(
-            HttpServletRequest req, HttpServletResponse resp,
-            final String pathToRoot, final String ctxResolveState, final WebMethodCtx wm
+            final HttpServletRequest req,
+            final HttpServletResponse resp,
+            final String ctxResolveState,
+            final WebMethodCtx wm,
+            final boolean page,
+            final boolean verified
     ) throws IOException {
-        final HashMap<String, Object> model = auth(req, resp, pathToRoot);
+        final HashMap<String, Object> model = auth(req, resp, page, verified);
         if (model == null) {
             return null;
         }
@@ -192,10 +280,14 @@ public abstract class ControllerElw extends MultiActionController implements Web
     }
 
     protected ModelAndView wmFile(
-            HttpServletRequest req, HttpServletResponse resp, final String pathToRoot,
-            final String scopeForced, final WebMethodFile wm
+            final HttpServletRequest req,
+            final HttpServletResponse resp,
+            final String scopeForced,
+            final boolean page,
+            final boolean verified,
+            final WebMethodFile wm
     ) throws IOException {
-        final HashMap<String, Object> model = auth(req, resp, pathToRoot);
+        final HashMap<String, Object> model = auth(req, resp, page, verified);
         if (model == null) {
             return null;
         }
@@ -312,7 +404,7 @@ public abstract class ControllerElw extends MultiActionController implements Web
                             if ("comment".equals(fieldName)) {
                                 file.setComment(fieldText(item));
                             }
-                            if (req.getSession().getAttribute(S_ADMIN) != null) {
+                            if (auth(req).getAdmin() != null) {
                                 if ("sourceAddr".equals(fieldName)) {
                                     final String sourceAddr = fieldText(item);
                                     if (!Strings.isNullOrEmpty(sourceAddr)) {

@@ -1,5 +1,6 @@
 package elw.webauth;
 
+import com.google.common.base.Strings;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.io.CharStreams;
@@ -34,6 +35,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.mail.*;
+import javax.mail.Message;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
@@ -50,7 +52,7 @@ import java.util.concurrent.TimeUnit;
 public abstract class ControllerAuth {
     private static final Logger log = LoggerFactory.getLogger(ControllerAuth.class);
 
-    public static final String SESSION_AUTH_SUCCESS = "AUTH_SUCCESS";
+    public static final String SESSION_SUCCESS_REDIRECT = "SUCCESS_REDIRECT";
 
     protected static final String SESSION_OID_DISCOVERY = "OID_DISCOVERY";
     protected static final String SESSION_OID_CONSUMER = "OID_CONSUMER";
@@ -67,7 +69,7 @@ public abstract class ControllerAuth {
             "http://openid.mail.ru/mail/";
 
     protected static final String OID_REDIR_BODY_TARGETURL = "${targetUrl}";
-    protected static final String OID_REDIR_BODY_PARAMS = "${paramsGoHere}\n";
+    protected static final String OID_REDIR_BODY_PARAMS = "${paramsGoHere}";
     protected static final String OID_REDIR_PARAMKEY = "${parameter.key}";
     protected static final String OID_REDIR_PARAMVAL = "${parameter.value}";
 
@@ -114,6 +116,25 @@ public abstract class ControllerAuth {
                 );
 
         this.srcAddrToStamp = caches.build();
+    }
+
+    public static void storeSuccessRedirect(
+            HttpServletRequest req
+    ) {
+
+        final String reqUri = req.getRequestURI();
+
+        if (!Strings.isNullOrEmpty(req.getQueryString())) {
+            req.getSession(true).setAttribute(
+                    SESSION_SUCCESS_REDIRECT,
+                    reqUri + "?" + req.getQueryString()
+            );
+        } else {
+            req.getSession(true).setAttribute(
+                    SESSION_SUCCESS_REDIRECT,
+                    reqUri
+            );
+        }
     }
 
     @RequestMapping(
@@ -612,17 +633,25 @@ public abstract class ControllerAuth {
     ) throws IOException {
         processAuthInfo(req, session, emails, openIds);
 
+        return processAuthSuccess(req, resp);
+    }
+
+    protected ModelAndView processAuthSuccess(
+            HttpServletRequest req,
+            HttpServletResponse resp
+    ) throws IOException {
+        final HttpSession session = req.getSession(true);
         final Object successRedirSession =
-                session.getAttribute(SESSION_AUTH_SUCCESS);
+                session.getAttribute(SESSION_SUCCESS_REDIRECT);
         final String successRedir;
         if (successRedirSession == null) {
             successRedir = serverConfig.getBaseUrl();
         } else {
-            successRedir = serverConfig.getBaseUrl() + successRedirSession;
+            successRedir = String.valueOf(successRedirSession);
         }
 
         resp.sendRedirect(successRedir);
-        session.removeAttribute(SESSION_AUTH_SUCCESS);
+        session.removeAttribute(SESSION_SUCCESS_REDIRECT);
         return null;
     }
 

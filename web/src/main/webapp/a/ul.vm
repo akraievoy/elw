@@ -1,3 +1,4 @@
+#* @vtlvariable name="elw_auth" type="elw.dao.Auth" *#
 #* @vtlvariable name="f" type="elw.web.FormatTool" *#
 #* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
 #* @vtlvariable name="elw_ctx_type" type="elw.dao.Ctx" *#
@@ -5,7 +6,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
  <meta content="text/html; charset=UTF-8">
- <title>$elw_ctx.course.name $elw_ctx.ass.name $slot.name : Upload - $elw_admin.name</title>
+ <title>$elw_ctx.course.name $elw_ctx.ass.name $slot.name : Upload - $elw_auth.admin.name</title>
  #parse("/__/imports.vm")
 </head>
 <body>

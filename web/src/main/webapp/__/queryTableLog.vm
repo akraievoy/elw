@@ -1,10 +1,10 @@
 #* @vtlvariable name="__qId" type="java.lang.String" *#
 
-#* @vtlvariable name="elw_admin" type="elw.vo.Admin" *#
+#* @vtlvariable name="elw_auth" type="elw.dao.Auth" *#
 #* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
 <form id="${__qId}_filter" style="text-align: center;">
  <input type="hidden" name="elw_ctx" value="$elw_ctx.toString()"/>
- #if($elw_admin)
+ #if($elw_auth.admin)
   <select id="${__qId}_filter_stud" name="f_studId" style="width: 7em;"><option value="">Student...</option></select><label for="${__qId}_filter_stud"></label>
  #end
  <select id="${__qId}_filter_slot" name="f_slotId" style="width: 11em;"><option value="">Task Type / Slot...</option></select><label for="${__qId}_filter_slot"></label>

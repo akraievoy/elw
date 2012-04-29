@@ -1,3 +1,4 @@
+#* @vtlvariable name="elw_auth" type="elw.dao.Auth" *#
 #* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
 #* @vtlvariable name="fileMetas" type="java.util.Map<java.lang.String,java.util.Map<java.lang.String,java.util.List<elw.vo.Solution>>>" *#
 #* @vtlvariable name="ctxToScore" type="java.util.Map<java.lang.String,java.lang.Double>" *#
@@ -13,7 +14,7 @@
 <html>
 <head>
  <meta content="text/html; charset=UTF-8">
- <title>$elw_ctx.group.name : Summary - $elw_admin.name</title>
+ <title>$elw_ctx.group.name : Summary - $elw_auth.admin.name</title>
  #parse("/__/imports.vm")
 </head>
 <body style="text-align: left;">

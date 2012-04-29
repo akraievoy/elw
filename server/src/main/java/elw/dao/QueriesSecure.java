@@ -7,7 +7,6 @@ import elw.dao.rest.RestEnrollment;
 import elw.dao.rest.RestEnrollmentSummary;
 import elw.dao.rest.RestSolution;
 import elw.vo.*;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
@@ -15,15 +14,36 @@ import java.io.InputStream;
 import java.util.*;
 
 public class QueriesSecure implements Queries {
+    public static final String MODEL_KEY = "elw_queries";
     private final QueriesImpl queries;
 
     private final Auth auth;
-
     public Auth getAuth() { return auth; }
+
+    private final List<String> visibleGroupIds = new ArrayList<String>(1);
+    public List<String> getVisibleGroupIds() {
+        return Collections.unmodifiableList(visibleGroupIds);
+    }
+
+    private final List<String> visibleEnrIds = new ArrayList<String>(2);
+    public List<String> getVisibleEnrIds() {
+        return Collections.unmodifiableList(visibleEnrIds);
+    }
+
+    private final List<String> visibleCourseIds = new ArrayList<String>(2);
+    public List<String> getVisibleCourseIds() {
+        return Collections.unmodifiableList(visibleCourseIds);
+    }
 
     public QueriesSecure(QueriesImpl queries, Auth auth) {
         this.auth = auth;
         this.queries = queries;
+    }
+
+    public void precacheVisible() {
+        visibleGroupIds.addAll(groupIds());
+        visibleEnrIds.addAll(enrollmentIds());
+        visibleCourseIds.addAll(courseIds());
     }
 
     public RestEnrollmentSummary restScores(
@@ -39,9 +59,9 @@ public class QueriesSecure implements Queries {
         }
 
         final TreeSet<String> studIds = new TreeSet<String>();
-        final Enrollment enr = enrollment(enrId);
-        final Group group = group(enr.getGroupId());
-        studIds.add(Nav.findStudent(group, auth.getId()).getId());
+        if (auth.isStud()) {
+            studIds.add(auth.getStudent().getId());
+        }
         if (studentIds != null) {
             studIds.retainAll(studentIds);
         }
@@ -87,7 +107,7 @@ public class QueriesSecure implements Queries {
                         entry.getVerAnchor(),
                         entry.getVerStep(),
                         group.getStudents().keySet(),
-                        Nav.findStudent(group, auth.getId()).getId()
+                        auth.getStudent().getId()
                 );
 
                 versions.put(version.getId(), version);
@@ -119,7 +139,7 @@ public class QueriesSecure implements Queries {
         return queries.restSolutions(enrId, new SolutionFilter() {
             public boolean preAllows(CtxStudent ctxStudent) {
                 final boolean sameStudent =
-                        ctxStudent.student.getEmail().equals(auth.getId());
+                        ctxStudent.student.equals(auth.getStudent());
                 return sameStudent && filter.preAllows(ctxStudent);
             }
 
@@ -171,7 +191,7 @@ public class QueriesSecure implements Queries {
     }
 
     protected boolean authStudent(Student student) {
-        return student.getEmail().equalsIgnoreCase(auth.getId());
+        return student.equals(auth.getStudent());
     }
 
     public CtxResolutionState resolveSlot(
@@ -391,8 +411,7 @@ public class QueriesSecure implements Queries {
 
     public List<String> courseIds() {
         //  check auth-scope cache
-        final List<String> preCached =
-                auth.getCourseIds();
+        final List<String> preCached = visibleCourseIds;
 
         if (!preCached.isEmpty()) {
             return preCached;
@@ -433,8 +452,7 @@ public class QueriesSecure implements Queries {
 
     public List<String> groupIds() {
         //  check auth-scope cache
-        final List<String> preCached =
-                auth.getGroupIds();
+        final List<String> preCached = visibleGroupIds;
 
         if (!preCached.isEmpty()) {
             return preCached;
@@ -446,22 +464,9 @@ public class QueriesSecure implements Queries {
         }
 
         // any other user sees only groups he/she is a student of
-        final List<Group> groups =
-                new ArrayList<Group>(queries.groups());
-
-        for (
-                Iterator<Group> groupIt = groups.iterator();
-                groupIt.hasNext();
-        ) {
-            final Group group = groupIt.next();
-            if (Nav.findStudent(group, auth.getId()) == null) {
-                groupIt.remove();
-            }
-        }
-
         final List<String> groupIds = new ArrayList<String>();
-        for (Group group : groups) {
-            groupIds.add(group.getId());
+        if (auth.isStud()) {
+            groupIds.add(auth.getGroup().getId());
         }
 
         return Collections.unmodifiableList(groupIds);
@@ -482,7 +487,7 @@ public class QueriesSecure implements Queries {
         }
 
         //  check auth-scope explicit group listing
-        final List<String> authExplicit = auth.getGroupIds();
+        final List<String> authExplicit = visibleGroupIds;
         if (!authExplicit.isEmpty()) {
             final List<Group> groups =
                     new ArrayList<Group>();
@@ -496,25 +501,16 @@ public class QueriesSecure implements Queries {
 
         // any other user sees only groups he/she is a student of
         final List<Group> groups =
-                new ArrayList<Group>(queries.groups());
+                new ArrayList<Group>();
 
-        for (
-                Iterator<Group> groupIt = groups.iterator();
-                groupIt.hasNext();
-        ) {
-            final Group group = groupIt.next();
-            if (!group.getStudents().containsKey(auth.getId())) {
-                groupIt.remove();
-            }
-        }
+        groups.add(auth.getGroup());
 
         return Collections.unmodifiableList(groups);
     }
 
     public List<String> enrollmentIds() {
         //  check auth-scope cache
-        final List<String> preCached = 
-                auth.getEnrIds();
+        final List<String> preCached = visibleEnrIds;
 
         if (!preCached.isEmpty()) {
             return preCached;
@@ -549,7 +545,7 @@ public class QueriesSecure implements Queries {
         }
 
         //  check auth-scope cache
-        final List<String> preCached = auth.getEnrIds();
+        final List<String> preCached = visibleEnrIds;
         if (!preCached.isEmpty()) {
             final List<Enrollment> enrollments =
                     new ArrayList<Enrollment>();
@@ -657,72 +653,4 @@ public class QueriesSecure implements Queries {
         return null;  //	TODO review
     }
 
-    @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
-    public static class Auth {
-        public static final String ROLE_ADM = "adm";
-        public static final String ROLE_STUD = "stud";
-        public static final String ROLE_GUEST = "guest";
-
-        private String id;
-        public String getId() { return id; }
-        public void setId(String id) { this.id = id; }
-
-        private String name;
-        public void setName(String name) { this.name = name; }
-        public String getName() { return name; }
-
-        private long expiry;
-        public long getExpiry() { return expiry; }
-        public void setExpiry(long expiry) { this.expiry = expiry; }
-
-        private String sourceAddr;
-        public String getSourceAddr() { return sourceAddr; }
-        public void setSourceAddr(String sourceAddr) { 
-            this.sourceAddr = sourceAddr; 
-        }
-
-        private boolean confirmed;
-        public boolean isConfirmed() { return confirmed; }
-        public void setConfirmed(boolean confirmed) { this.confirmed = confirmed; }
-
-        private final List<String> roles = new ArrayList<String>(1);
-        public List<String> getRoles() {
-            return Collections.unmodifiableList(roles);
-        }
-        public void setRoles(List<String> roles) {
-            this.roles.clear();
-            this.roles.addAll(roles);
-        }
-
-        private final List<String> groupIds = new ArrayList<String>(1);
-        public List<String> getGroupIds() {
-            return Collections.unmodifiableList(groupIds);
-        }
-        public void setGroupIds(List<String> groupIds) {
-            this.groupIds.clear(); 
-            this.groupIds.addAll(groupIds); 
-        }
-
-        private final List<String> enrIds = new ArrayList<String>(2);
-        public List<String> getEnrIds() {
-            return Collections.unmodifiableList(enrIds);
-        }
-        public void setEnrIds(List<String> enrIds) { 
-            this.enrIds.clear();
-            this.enrIds.addAll(enrIds); 
-        }
-
-        private final List<String> courseIds = new ArrayList<String>(2);
-        public List<String> getCourseIds() {
-            return Collections.unmodifiableList(courseIds);
-        }
-        public void setCourseIds(List<String> courseIds) { 
-            this.courseIds.clear();
-            this.courseIds.addAll(courseIds);
-        }
-
-        public boolean isAdm() {
-            return getRoles().contains(ROLE_ADM);
-        }
-    }
 }

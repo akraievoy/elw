@@ -1,4 +1,4 @@
-#* @vtlvariable name="elw_admin" type="elw.vo.Admin" *#
+#* @vtlvariable name="elw_auth" type="elw.dao.Auth" *#
 #* @vtlvariable name="__qId" type="java.lang.String" *#
 <script type="text/javascript">
  jQuery(document).ready(function() {
@@ -12,7 +12,7 @@
     #* 3 group.name 0*# {'sTitle': 'Group', "sWidth": "7em", "sClass": "text_align_center"},
     #* 4 course.id - *# {"bVisible": false, "bSortable": false},
     #* 5 course.name 1 *# {'sTitle': 'Course', "sWidth": "23em", "sClass": "text_align_center"},
-     #if($elw_admin)
+     #if($elw_auth.admin)
     #* 6 summary ref 2 *# {'sTitle': 'Summary', "bSortable": false, "fnRender": elw_dt_url(6, 'Summary'), "sClass": "text_align_center"},
     #* 7 students ref 3 *# {'sTitle': 'Students', "bSortable": false, "fnRender": elw_dt_url(7, 'Students'), "sClass": "text_align_center"},
      #else

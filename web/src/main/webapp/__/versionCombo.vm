@@ -1,6 +1,6 @@
 #* @vtlvariable name="__qId" type="java.lang.String" *#
 
-#* @vtlvariable name="elw_admin" type="elw.vo.Admin" *#
+#* @vtlvariable name="elw_auth" type="elw.dao.Auth" *#
 #* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
 #* @vtlvariable name="f" type="elw.web.FormatTool" *#
 #* @vtlvariable name="f_verId" type="java.lang.String" *#
@@ -8,8 +8,8 @@
  var f_verId = jQuery("form#${__qId}_filter select[name=f_verId]");
  #foreach($indexKey in $elw_ctx.enr.index.keySet())
   #set($__ctx_ass = $elw_ctx.extendIndex($indexKey))
-  #if($elw_admin || $__ctx_ass.cFrom().started)
-   #if($elw_admin)
+  #if($elw_auth.admin || $__ctx_ass.cFrom().started)
+   #if($elw_auth.admin)
     f_verId.append(
      jQuery("<option></option>")
        .attr("value", $f.json($__ctx_ass.ass.id) + "--")
@@ -17,7 +17,7 @@
     );
    #end
    #foreach($ver in $__ctx_ass.ass.versions.values())
-    #if($elw_admin || $__ctx_ass.ver.id == $ver.id)
+    #if($elw_auth.admin || $__ctx_ass.ver.id == $ver.id)
      f_verId.append(
        jQuery("<option></option>")
          .attr("value", $f.json($__ctx_ass.ass.id) + "--" + $f.json($ver.id) + "--")

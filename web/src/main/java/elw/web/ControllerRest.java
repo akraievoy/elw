@@ -3,6 +3,7 @@ package elw.web;
 import com.google.common.base.Strings;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.InputSupplier;
+import elw.dao.Auth;
 import elw.dao.Queries;
 import elw.dao.QueriesSecure;
 import elw.dao.ctx.CtxSlot;
@@ -12,7 +13,6 @@ import elw.dao.rest.RestEnrollmentSummary;
 import elw.dao.rest.RestSolution;
 import elw.miniweb.ViewJackson;
 import elw.vo.*;
-import elw.webauth.ControllerAuth;
 import elw.web.core.Core;
 import elw.web.core.W;
 import org.apache.commons.fileupload.FileItemIterator;
@@ -72,8 +72,6 @@ import java.util.*;
 public class ControllerRest extends ControllerElw {
     public static enum ListStyle{IDS, MAP}
 
-    public static final String MODEL_QUERIES = "elw_queries";
-
     private static final Logger log =
             LoggerFactory.getLogger(ControllerRest.class);
     private static final DiskFileItemFactory fileItemFactory
@@ -83,16 +81,11 @@ public class ControllerRest extends ControllerElw {
 
     private long testAuthSwitch = 0;
 
-    private final ElwServerConfig elwServerConfig;
-
-
     public ControllerRest(
             final Core core,
-            final ElwServerConfig config
+            final ElwServerConfig elwServerConfig
     ) {
-        super(core);
-
-        this.elwServerConfig = config;
+        super(core, elwServerConfig);
 
         //  LATER devMode inferencing booster
         devMode = "w".equals(System.getProperty("user.name"));
@@ -119,68 +112,6 @@ public class ControllerRest extends ControllerElw {
         );
     }
 
-    @Override
-    protected HashMap<String, Object> auth(
-            HttpServletRequest req,
-            HttpServletResponse resp,
-            String pathToRoot
-    ) throws IOException {
-        final HttpSession session = req.getSession(true);
-
-        QueriesSecure.Auth auth = (QueriesSecure.Auth) session.getAttribute(ControllerAuthElw.SESSION_AUTH);
-        QueriesSecure queriesSecure = null;
-
-        //  FIXME this shall be true for nginx-proxied remote requests
-        boolean loopback = "127.0.0.1".equals(req.getRemoteAddr());
-        if (devMode && loopback) {
-            auth = new QueriesSecure.Auth();
-            queriesSecure = core.getQueries().secure(auth);
-
-            long testAuth = testAuthSwitch++;
-            if (testAuth % 3 == 0) {
-                auth.setId("iasa@akraievoy.org");
-                auth.setName("AK");
-                auth.setRoles(Collections.singletonList(QueriesSecure.Auth.ROLE_ADM));
-            } else if (testAuth % 3 == 1) {
-                auth.setId("vasya@poopkeen.org");
-                auth.setName("Vuneedlo");
-                auth.setRoles(Collections.singletonList(QueriesSecure.Auth.ROLE_STUD));
-            } else if (testAuth % 3 == 2) {
-                auth.setId("elw@akraievoy.org");
-                auth.setName("anon");
-                auth.setRoles(Collections.singletonList(QueriesSecure.Auth.ROLE_GUEST));
-            }
-
-            auth.setExpiry(System.currentTimeMillis() + 30 * 60 * 1000);
-            auth.setSourceAddr(req.getRemoteAddr());
-
-            auth.setGroupIds(queriesSecure.groupIds());
-            auth.setEnrIds(queriesSecure.enrollmentIds());
-            auth.setCourseIds(queriesSecure.courseIds());
-
-            session.setAttribute(ControllerAuthElw.SESSION_AUTH, auth);
-        }
-
-        if (auth == null) {
-            resp.sendError(
-                    HttpServletResponse.SC_NOT_IMPLEMENTED,
-                    "Nope: auth not yet implemented. Better luck next time."
-            );
-            return null;
-        }
-
-        if (queriesSecure == null) {
-            queriesSecure = core.getQueries().secure(auth);
-        }
-
-        final HashMap<String, Object> model = prepareDefaultModel(req);
-
-        model.put(ControllerAuthElw.MODEL_AUTH, auth);
-        model.put(MODEL_QUERIES, queriesSecure);
-
-        return model;
-    }
-
     @RequestMapping(
             value = "auth",
             method = RequestMethod.GET
@@ -189,12 +120,12 @@ public class ControllerRest extends ControllerElw {
             final HttpServletRequest req,
             final HttpServletResponse resp
     ) throws IOException {
-        final HashMap<String, Object> model = auth(req, resp, null);
+        final HashMap<String, Object> model = auth(req, resp, false, false);
         if (model == null) {
             return null;
         }
 
-        return new ModelAndView(ViewJackson.data(model.get(ControllerAuthElw.MODEL_AUTH)));
+        return new ModelAndView(ViewJackson.data(model.get(Auth.MODEL_KEY)));
     }
 
     //  TODO this quite likely is ok to be admin-only
@@ -208,13 +139,13 @@ public class ControllerRest extends ControllerElw {
             final HttpServletResponse resp,
             @PathVariable("listStyle") final ListStyle listStyle
     ) throws IOException {
-        final HashMap<String, Object> model = auth(req, resp, null);
+        final HashMap<String, Object> model = auth(req, resp, false, false);
         if (model == null) {
             return null;
         }
 
         final Queries queries =
-                (Queries) model.get(MODEL_QUERIES);
+                (Queries) model.get(QueriesSecure.MODEL_KEY);
 
         final List<String> courseIds = queries.courseIds();
 
@@ -240,13 +171,13 @@ public class ControllerRest extends ControllerElw {
             final HttpServletResponse resp,
             @PathVariable("courseId") final String courseId
     ) throws IOException {
-        final HashMap<String, Object> model = auth(req, resp, null);
+        final HashMap<String, Object> model = auth(req, resp, false, false);
         if (model == null) {
             return null;
         }
 
         final Queries queries =
-                (Queries) model.get(MODEL_QUERIES);
+                (Queries) model.get(QueriesSecure.MODEL_KEY);
 
         final Course course = queries.course(courseId);
 
@@ -267,13 +198,13 @@ public class ControllerRest extends ControllerElw {
             final HttpServletResponse resp,
             @PathVariable("listStyle") final ListStyle listStyle
     ) throws IOException {
-        final HashMap<String, Object> model = auth(req, resp, null);
+        final HashMap<String, Object> model = auth(req, resp, false, false);
         if (model == null) {
             return null;
         }
 
         final Queries queries =
-                (Queries) model.get(MODEL_QUERIES);
+                (Queries) model.get(QueriesSecure.MODEL_KEY);
 
         final List<String> groupIds = queries.groupIds();
 
@@ -299,13 +230,13 @@ public class ControllerRest extends ControllerElw {
             final HttpServletResponse resp,
             @PathVariable("groupId") final String groupId
     ) throws IOException {
-        final HashMap<String, Object> model = auth(req, resp, null);
+        final HashMap<String, Object> model = auth(req, resp, false, false);
         if (model == null) {
             return null;
         }
 
         final Queries queries =
-                (Queries) model.get(MODEL_QUERIES);
+                (Queries) model.get(QueriesSecure.MODEL_KEY);
 
         final Group group = queries.group(groupId);
 
@@ -326,13 +257,13 @@ public class ControllerRest extends ControllerElw {
             final HttpServletResponse resp,
             @PathVariable("listStyle") final ListStyle listStyle
     ) throws IOException {
-        final HashMap<String, Object> model = auth(req, resp, null);
+        final HashMap<String, Object> model = auth(req, resp, false, false);
         if (model == null) {
             return null;
         }
 
         final Queries queries =
-                (Queries) model.get(MODEL_QUERIES);
+                (Queries) model.get(QueriesSecure.MODEL_KEY);
 
         final List<String> enrIds = queries.enrollmentIds();
 
@@ -360,13 +291,14 @@ public class ControllerRest extends ControllerElw {
             final HttpServletResponse resp,
             @PathVariable("enrId") final String enrId
     ) throws IOException {
-        final HashMap<String, Object> model = auth(req, resp, null);
+        final HashMap<String, Object> model =
+                auth(req, resp, false, false);
         if (model == null) {
             return null;
         }
 
         final Queries queries =
-                (Queries) model.get(MODEL_QUERIES);
+                (Queries) model.get(QueriesSecure.MODEL_KEY);
 
         final RestEnrollment restEnrollment = 
                 queries.restEnrollment(enrId, W.resolveRemoteAddress(req));
@@ -388,13 +320,14 @@ public class ControllerRest extends ControllerElw {
             final HttpServletResponse resp,
             @PathVariable("enrId") final String enrId
     ) throws IOException {
-        final HashMap<String, Object> model = auth(req, resp, null);
+        final HashMap<String, Object> model =
+                auth(req, resp, false, false);
         if (model == null) {
             return null;
         }
 
         final Queries queries =
-                (Queries) model.get(MODEL_QUERIES);
+                (Queries) model.get(QueriesSecure.MODEL_KEY);
 
         final RestEnrollmentSummary enrSummary =
                 queries.restScores(enrId, null);
@@ -417,7 +350,8 @@ public class ControllerRest extends ControllerElw {
             @PathVariable("enrId") final String enrId,
             @PathVariable("listStyle") final ListStyle listStyle
     ) throws IOException {
-        final HashMap<String, Object> model = auth(req, resp, null);
+        final HashMap<String, Object> model =
+                auth(req, resp, false, false);
         if (model == null) {
             return null;
         }
@@ -429,7 +363,7 @@ public class ControllerRest extends ControllerElw {
         }
 
         final Queries queries =
-                (Queries) model.get(MODEL_QUERIES);
+                (Queries) model.get(QueriesSecure.MODEL_KEY);
 
         final Map<String, RestSolution> enrSolutions =
                 queries.restSolutions(enrId, filter);
@@ -458,13 +392,13 @@ public class ControllerRest extends ControllerElw {
             @PathVariable("enrId") final String enrId,
             @PathVariable("solId") final String solId
     ) throws IOException {
-        final HashMap<String, Object> model = auth(req, resp, null);
+        final HashMap<String, Object> model = auth(req, resp, false, false);
         if (model == null) {
             return null;
         }
 
         final Queries queries =
-                (Queries) model.get(MODEL_QUERIES);
+                (Queries) model.get(QueriesSecure.MODEL_KEY);
 
         final RestSolution solution =
                 queries.restSolution(enrId, solId, null);
@@ -492,15 +426,16 @@ public class ControllerRest extends ControllerElw {
             @PathVariable("enrId") final String enrId,
             @PathVariable("solId") final String solId
     ) throws IOException, FileUploadException {
-        final HashMap<String, Object> model = auth(req, resp, null);
+        final HashMap<String, Object> model =
+                auth(req, resp, false, false);
         if (model == null) {
             return null;
         }
 
         final Queries queries =
-                (Queries) model.get(MODEL_QUERIES);
-        final QueriesSecure.Auth auth =
-                (QueriesSecure.Auth) model.get(ControllerAuthElw.MODEL_AUTH);
+                (Queries) model.get(QueriesSecure.MODEL_KEY);
+        final Auth auth =
+                (Auth) model.get(Auth.MODEL_KEY);
 
         final Queries.CtxResolutionState stateSlot =
                 queries.resolveSlot(enrId, solId, null);
@@ -671,13 +606,14 @@ public class ControllerRest extends ControllerElw {
             @PathVariable("solId") final String solId,
             @PathVariable("fileName") final String fileName
     ) throws IOException {
-        final HashMap<String, Object> model = auth(req, resp, null);
+        final HashMap<String, Object> model =
+                auth(req, resp, false, false);
         if (model == null) {
             return null;
         }
 
         final Queries queries =
-                (Queries) model.get(MODEL_QUERIES);
+                (Queries) model.get(QueriesSecure.MODEL_KEY);
 
         final CtxSolution ctxSolution =
                 queries.resolveSolution(enrId, solId, null);

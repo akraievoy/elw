@@ -1,7 +1,7 @@
-#* @vtlvariable name="elw_admin" type="elw.vo.Admin" *#
+#* @vtlvariable name="elw_auth" type="elw.dao.Auth" *#
 <div id="cred">
- #if($elw_admin)
-  [&nbsp;$elw_admin.name&nbsp;]&nbsp;
+ #if($elw_auth.admin)
+  [&nbsp;$elw_auth.admin.name&nbsp;]&nbsp;
   <form method="GET" style="display:inline; margin: 0 0.25em; padding: 0;" action="logout">
    <input type="Submit" value="Log Out" class="elw_button_logout"/>
   </form>

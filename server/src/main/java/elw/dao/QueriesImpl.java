@@ -6,7 +6,6 @@ import com.google.common.io.InputSupplier;
 import elw.dao.ctx.*;
 import elw.dao.rest.*;
 import elw.vo.*;
-import elw.vo.Class;
 import elw.vo.Score;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,8 +49,6 @@ public class QueriesImpl implements Queries {
         this.solutionDao = solutionDao;
     }
 
-    //  LATER proceed with auth
-    @SuppressWarnings("FieldCanBeLocal")
     private CouchDao authDao;
     public void setAuthDao(CouchDao authDao) {
         this.authDao = authDao;
@@ -60,8 +57,12 @@ public class QueriesImpl implements Queries {
     public QueriesImpl() {
     }
     
-    public QueriesSecure secure(final QueriesSecure.Auth auth) {
-        return new QueriesSecure(this, auth);
+    public QueriesSecure secure(final Auth auth) {
+        final QueriesSecure queriesSecure = new QueriesSecure(this, auth);
+
+        queriesSecure.precacheVisible();
+
+        return queriesSecure;
     }
 
     public RestEnrollmentSummary restScores(

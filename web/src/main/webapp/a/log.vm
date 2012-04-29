@@ -1,3 +1,4 @@
+#* @vtlvariable name="elw_auth" type="elw.dao.Auth" *#
 #* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
 #* @vtlvariable name="f" type="elw.web.FormatTool" *#
 #* @vtlvariable name="f_due" type="java.lang.Boolean" *#
@@ -10,7 +11,7 @@
 <html>
 <head>
  <meta content="text/html; charset=UTF-8">
- <title>$elw_ctx.group.name Uploads - $elw_admin.name</title>
+ <title>$elw_ctx.group.name Uploads - $elw_auth.admin.name</title>
  #parse("/__/imports.vm")
 </head>
 <body style="text-align: left;">

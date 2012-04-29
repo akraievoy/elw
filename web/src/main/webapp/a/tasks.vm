@@ -1,10 +1,11 @@
+#* @vtlvariable name="elw_auth" type="elw.dao.Auth" *#
 #* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
 #* @vtlvariable name="f" type="elw.web.FormatTool" *#
 #* @vtlvariable name="f_studId" type="java.lang.String" *#
 <html>
 <head>
  <meta content="text/html; charset=UTF-8">
- <title>$elw_ctx.group.name Tasks - $elw_admin.name</title>
+ <title>$elw_ctx.group.name Tasks - $elw_auth.admin.name</title>
  #parse("/__/imports.vm")
 </head>
 <body style="text-align: left;">

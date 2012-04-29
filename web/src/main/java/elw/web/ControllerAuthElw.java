@@ -1,8 +1,7 @@
 package elw.web;
 
-import elw.dao.Queries;
+import elw.dao.Auth;
 import elw.dao.QueriesImpl;
-import elw.dao.QueriesSecure;
 import elw.miniweb.Message;
 import elw.vo.Admin;
 import elw.vo.EmailAuth;
@@ -13,9 +12,13 @@ import elw.webauth.AuthException;
 import elw.webauth.ControllerAuth;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -27,10 +30,6 @@ import java.util.Random;
 @Controller
 @RequestMapping("/auth/**/*")
 public class ControllerAuthElw extends ControllerAuth {
-    public static final String SESSION_AUTH = "elw_auth";
-    public static final String SESSION_QUERIES = "elw_queries";
-    public static final String MODEL_AUTH = SESSION_AUTH;
-    public static final String MODEL_QUERIES = SESSION_QUERIES;
 
     private final QueriesImpl queries;
     private final ElwServerConfig elwServerConfig;
@@ -45,6 +44,74 @@ public class ControllerAuthElw extends ControllerAuth {
         this.elwServerConfig = serverConfig;
         this.queries = queries;
         this.random = new Random();
+    }
+
+    @RequestMapping(
+            value = "nameresponse",
+            method = RequestMethod.POST
+    )
+    public ModelAndView do_nameresponseGet(
+            final HttpServletRequest req,
+            final HttpServletResponse resp
+    ) throws IOException {
+        final String nameFirstParam = req.getParameter("name_first");
+        if (nameFirstParam == null || nameFirstParam.trim().length() == 0) {
+            resp.sendError(
+                    HttpServletResponse.SC_BAD_REQUEST,
+                    "first name not set"
+            );
+            return null;
+        }
+        final String nameFirst = nameFirstParam.trim();
+
+        final String nameLastParam = req.getParameter("name_last");
+        if (nameLastParam == null || nameLastParam.trim().length() == 0) {
+            resp.sendError(
+                    HttpServletResponse.SC_BAD_REQUEST,
+                    "last name not set"
+            );
+            return null;
+        }
+        final String nameLast = nameLastParam.trim();
+
+        final String nameFull = nameLast + ' ' + nameFirst;
+
+        for (Admin admin : queries.admins()) {
+            if (admin.getName().equalsIgnoreCase(nameFull)) {
+                authAdm(
+                        req,
+                        admin,
+                        Collections.<String>emptyList(),
+                        Collections.<String>emptyList()
+                );
+                return processAuthSuccess(req, resp);
+            }
+        }
+
+        final List<Group> groups = queries.groups();
+        for (Group group : groups) {
+            for (Student student : group.getStudents().values()) {
+                if (student.getName().equalsIgnoreCase(nameFull)) {
+                    final Auth auth = ControllerElw.auth(req);
+                    if (auth != null && auth.isAdm()) {
+                        //  impersonate, leaving admin credentials intact
+                        auth.setGroup(group);
+                        auth.setStudent(student);
+                        return processAuthSuccess(req, resp);
+                    }
+
+                    authStudent(
+                            req, student, group,
+                            Collections.<String>emptyList(),
+                            Collections.<String>emptyList()
+                    );
+                    return processAuthSuccess(req, resp);
+                }
+            }
+        }
+
+        resp.sendRedirect(elwServerConfig.getBaseUrl() + "auth.html");
+        return null;
     }
 
     @Override
@@ -178,18 +245,27 @@ public class ControllerAuthElw extends ControllerAuth {
         for (String email : emails) {
             final Admin admin = queries.adminSome(email);
             if (admin != null) {
-                authAdm(req, admin);
+                authAdm(
+                    req,
+                    admin,
+                    Collections.singletonList(email),
+                    intersect(openIds, admin.getOpenIds())
+                );
                 return;
             }
         }
 
         for (Admin admin : queries.admins()) {
             final List<String> commonOpenIds =
-                    new ArrayList<String>(admin.getOpenIds());
-            commonOpenIds.retainAll(openIds);
+                    intersect(openIds, admin.getOpenIds());
 
             if (!commonOpenIds.isEmpty()) {
-                authAdm(req, admin);
+                authAdm(
+                    req,
+                    admin,
+                    openIds.size() == 1 ? emails : Collections.<String>emptyList(),
+                    commonOpenIds
+                );
                 return;
             }
         }
@@ -198,61 +274,80 @@ public class ControllerAuthElw extends ControllerAuth {
         for (Group group : groups) {
             for (Student student : group.getStudents().values()) {
                 final List<String> commonOpenIds =
-                    new ArrayList<String>(student.getOpenIds());
-                commonOpenIds.retainAll(openIds);
+                        intersect(openIds, student.getOpenIds());
 
-                if (!commonOpenIds.isEmpty() ||
-                    emails.contains(student.getEmail())) {
+                if (!commonOpenIds.isEmpty()) {
+                    authStudent(
+                        req,
+                        student,
+                        group,
+                        openIds.size() == 1 ? emails : Collections.<String>emptyList(),
+                        commonOpenIds
+                    );
+                    return;
+                }
 
-                    authStudent(req, student);
+                if (emails.contains(student.getEmail())) {
+                    authStudent(
+                        req,
+                        student,
+                        group,
+                        Collections.singletonList(student.getEmail()),
+                        commonOpenIds
+                    );
                     return;
                 }
             }
         }
     }
 
+    protected List<String> intersect(
+            final List<String> verified,
+            final List<String> current) {
+        final List<String> common =
+                new ArrayList<String>(current);
+        common.retainAll(verified);
+        return common;
+    }
+
     protected void authAdm(
             final HttpServletRequest req,
-            final Admin admin
+            final Admin admin,
+            final List<String> verifiedEmails,
+            final List<String> verifiedOpenIds
     ) {
-        final QueriesSecure.Auth auth = new QueriesSecure.Auth();
-        auth.setId(admin.getId());
-        auth.setName(admin.getName());
-        auth.setRoles(Collections.singletonList(QueriesSecure.Auth.ROLE_ADM));
-        auth.setConfirmed(true);
+        final Auth auth = new Auth();
+        auth.setAdmin(admin);
 
-        setupAuthCommon(req, auth);
+        setupAuthCommon(req, auth, verifiedEmails, verifiedOpenIds);
     }
 
     protected void authStudent(
             final HttpServletRequest req,
-            final Student student
+            final Student student,
+            Group group, final List<String> verifiedEmails,
+            final List<String> verifiedOpenIds
     ) {
-        final QueriesSecure.Auth auth = new QueriesSecure.Auth();
-        auth.setId(student.getEmail());
-        auth.setName(student.getName());
-        auth.setRoles(Collections.singletonList(QueriesSecure.Auth.ROLE_STUD));
-        auth.setConfirmed(true);
+        final Auth auth = new Auth();
+        auth.setStudent(student);
+        auth.setGroup(group);
 
-        setupAuthCommon(req, auth);
+        setupAuthCommon(req, auth, verifiedEmails, verifiedOpenIds);
     }
 
     protected void setupAuthCommon(
             final HttpServletRequest req,
-            final QueriesSecure.Auth auth
+            final Auth auth,
+            final List<String> verifiedEmails,
+            final List<String> verifiedOpenIds
     ) {
-        auth.setExpiry(
-                System.currentTimeMillis() +
-                        elwServerConfig.getSessionExpiryMillis()
-        );
         auth.setSourceAddr(W.resolveRemoteAddress(req));
+        auth.setVerifiedOpenIds(verifiedOpenIds);
+        auth.setVerifiedEmails(verifiedEmails);
 
-        final Queries queriesSecure = queries.secure(auth);
-        auth.setGroupIds(queriesSecure.groupIds());
-        auth.setEnrIds(queriesSecure.enrollmentIds());
-        auth.setCourseIds(queriesSecure.courseIds());
-
-        req.getSession().setAttribute(SESSION_AUTH, auth);
-        req.getSession().setAttribute(SESSION_QUERIES, queriesSecure);
+        req.getSession(true).setAttribute(Auth.SESSION_KEY, auth);
+        req.getSession(true).setMaxInactiveInterval(
+                (int) (elwServerConfig.getSessionExpiryMillis() / 1000)
+        );
     }
 }

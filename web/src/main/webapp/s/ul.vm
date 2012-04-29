@@ -1,3 +1,4 @@
+#* @vtlvariable name="elw_auth" type="elw.dao.Auth" *#
 #* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
 #* @vtlvariable name="slot" type="elw.vo.FileSlot" *#
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -24,7 +25,7 @@
    <form method="POST" enctype="multipart/form-data" action="ul?elw_ctx=$elw_ctx&sId=$slot.id">
     <div class="formLabel" style="height: 7em;"><label for="ul_comment">Comment:</label></div>
     <div class="formField" style="height: 7em;"><textarea id="ul_comment" name="comment" title="Add a note" rows="5" cols="35"></textarea></div>
-  #if($elw_admin)
+  #if($elw_auth.admin)
    <div class="formLabel"><label for="sourceAddr">Source IP:</label></div>
    <div class="formField"><input id="sourceAddr" type="text" name="sourceAddr" value="192.168.13.23"/></div>
    <div class="formLabel"><label for="dateTime">File:</label></div>
