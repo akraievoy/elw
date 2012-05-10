@@ -138,12 +138,23 @@ public abstract class ControllerAuth {
     }
 
     @RequestMapping(
-            value = "smtpchallenge",
-            method = RequestMethod.GET
+        value = "smtpchallenge",
+        method = RequestMethod.GET
     )
     public ModelAndView do_smtpchallengeGet(
-            final HttpServletRequest req,
-            final HttpServletResponse resp
+        final HttpServletRequest req,
+        final HttpServletResponse resp
+    ) throws IOException {
+        return do_smtpchallengePost(req, resp);
+    }
+
+    @RequestMapping(
+            value = "smtpchallenge",
+            method = RequestMethod.POST
+    )
+    public ModelAndView do_smtpchallengePost(
+        final HttpServletRequest req,
+        final HttpServletResponse resp
     ) throws IOException {
         final String emailParam = req.getParameter("email");
         if (emailParam == null || emailParam.trim().length() == 0) {
