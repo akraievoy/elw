@@ -82,19 +82,6 @@ public class Message {
         }
     }
 
-    public static Message[] drainMessages(HttpServletRequest req) {
-        synchronized (Message.class) {
-            final List<Message> messages = getOrCreateMessages(req);
-
-            final Message[] result = messages.toArray(new Message[messages.size()]);
-
-            messages.clear();
-
-            return result;
-        }
-    }
-
-
     public static void delete(
             final HttpServletRequest req, final String stamp
     ) {

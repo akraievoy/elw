@@ -240,7 +240,7 @@ public class ControllerAuthElw extends ControllerAuth {
         final List<String> emails,
         final List<String> openIds
     ) {
-        Message.addWarn(req, "openIds: " + openIds + " emails: " + emails);
+        Message.addInfo(req, "openIds: " + openIds + " emails: " + emails);
 
         for (String email : emails) {
             final Admin admin = queries.adminSome(email);

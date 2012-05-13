@@ -111,7 +111,6 @@ public abstract class ControllerElw extends MultiActionController implements Web
     ) {
         final HashMap<String, Object> model = new HashMap<String, Object>();
 
-        model.put(S_MESSAGES, Message.drainMessages(req));
         model.put(
                 FormatTool.MODEL_KEY,
                 FormatTool.forLocale(RequestContextUtils.getLocale(req))

@@ -66,6 +66,10 @@ public class StudentController extends ControllerElw {
         final HashMap<String, Object> model =
                 super.auth(req, resp, page, verified);
 
+        if (model == null) {
+            return null;
+        }
+
         final Auth auth = auth(model);
         final Group group = auth.getGroup();
         final Student student = auth.getStudent();

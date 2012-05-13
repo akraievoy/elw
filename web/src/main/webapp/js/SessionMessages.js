@@ -70,9 +70,15 @@ jQuery(document).ready(function () {
             sessionMessageList.each(this.addOne);
         },
         clearAll: function() {
-            sessionMessageList.each(function(view) {
-                view.destroy();
-            });
+            //  I have to copy views to a temp array as
+            //    Collection.each sees only even indexes if
+            //    I delete them in iterator callback
+            _.each(
+                sessionMessageList.map(function(orig) {return orig}),
+                function(view) {
+                  view.destroy();
+                }
+            );
         }
     });
 

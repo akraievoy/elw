@@ -2,7 +2,6 @@
 #* @vtlvariable name="__highlight" type="java.lang.String" *#
 
 #* @vtlvariable name="elw_auth" type="elw.dao.Auth" *#
-*#
 #* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
 #* @vtlvariable name="f" type="elw.web.FormatTool" *#
 #* @vtlvariable name="f_due" type="java.lang.Boolean" *#

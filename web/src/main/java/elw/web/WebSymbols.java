@@ -20,6 +20,4 @@ package elw.web;
 
 public interface WebSymbols {
     String R_CTX = "elw_ctx";
-
-    String S_MESSAGES = "elw_messages";
 }
