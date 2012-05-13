@@ -1,5 +1,6 @@
 package elw.dao;
 
+import com.google.common.base.Strings;
 import elw.vo.Admin;
 import elw.vo.Group;
 import elw.vo.Student;
@@ -66,6 +67,21 @@ public class Auth {
     }
 
     public boolean isVerified() {
+        final boolean studentOnlyAuth = admin == null && student != null;
+        if (studentOnlyAuth) {
+            //  couple of silly placeholders made it into the couch, so...
+            final boolean emailEmpty =
+                    Strings.isNullOrEmpty(student.getEmail())
+                    || "1".equalsIgnoreCase(student.getEmail())
+                    || "undef@in.ed".equalsIgnoreCase(student.getEmail());
+            final boolean verificationSetupEmpty =
+                    student.getOpenIds().isEmpty()
+                            && emailEmpty;
+            if (verificationSetupEmpty) {
+                return true;
+            }
+        }
+
         return !getVerifiedOpenIds().isEmpty() || !getVerifiedEmails().isEmpty();
     }
 
