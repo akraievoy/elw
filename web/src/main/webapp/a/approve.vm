@@ -33,7 +33,7 @@
  #parse("/__/credAdm.vm")
 	<div id="header_hr"> </div>
 </div>
- #parse("/__/messages.vm")
+ #parse("/__/SessionMessages.vm")
 <div id=main>
 	<h3 id="title"></h3>
  <div>

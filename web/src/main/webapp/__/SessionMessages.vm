@@ -1,0 +1,4 @@
+<div id="SessionMessageList_target" title="Session Messages">
+    <ul id="SessionMessageList_messageArea"></ul>
+    <div><a style="display: none;" id="SessionMessageList_clearAll" href="#">Clear all messages</a></div>
+</div>

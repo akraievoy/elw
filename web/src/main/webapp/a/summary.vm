@@ -26,7 +26,7 @@
  #parse("/__/credAdm.vm")
  <div id="header_hr"></div>
 </div>
- #parse("/__/messages.vm")
+ #parse("/__/SessionMessages.vm")
 <form style="text-align: center;" action="summary" id="summary_filter">
  <input type="hidden" name="elw_ctx" value="$elw_ctx.toString()"/>
  <select name="f_studId"><option value="">Choose...</option></select>

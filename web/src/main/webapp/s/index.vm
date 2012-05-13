@@ -11,7 +11,7 @@
  #parse("/__/credStud.vm")
 	<div id="header_hr"> </div>
 </div>
- #parse("/__/messages.vm")
+ #parse("/__/SessionMessages.vm")
 <div id=main>
  #set($__qId="idx") #parse("/__/queryTableIndex.vm")
 </div>
