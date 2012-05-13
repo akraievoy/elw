@@ -4,14 +4,14 @@
  jQuery(document).ready(function() {
   jQuery.jGrowl.defaults.position = "center";
   #foreach($m in $elw_messages)
-   #if($m.type == "err")
-    jQuery.jGrowl("$m.message", {"header":"Error", "theme": "ui-state-error", "sticky": true});
+   #if($m.severity == "err")
+    jQuery.jGrowl("$m.text", {"header":"Error", "theme": "ui-state-error", "sticky": true});
    #end
-   #if($m.type == "warn")
-    jQuery.jGrowl("$m.message", {"header":"Warning", "theme": "ui-state-error", "sticky": true});
+   #if($m.severity == "warn")
+    jQuery.jGrowl("$m.text", {"header":"Warning", "theme": "ui-state-error", "sticky": true});
    #end
-   #if($m.type == "info")
-    jQuery.jGrowl("$m.message", {"header":"Info", "life": 7000,  "theme": "ui-state-highlight"});
+   #if($m.severity == "info")
+    jQuery.jGrowl("$m.text", {"header":"Info", "life": 7000,  "theme": "ui-state-highlight"});
    #end
   #end
  });

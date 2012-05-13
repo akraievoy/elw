@@ -29,6 +29,38 @@ th {
   font-size: 0.95em;
 }
 
+#SessionMessageList_target {
+  margin: 0.25em auto;
+  width: 36em;
+  padding: 0.25em;
+  border: #CCCCCC thin dotted;
+  background-color: #EEEEFF;
+}
+
+div#SessionMessageList_target #SessionMessageList_messageArea {
+  margin: 0 0;
+  padding: 0 0;
+  list-style-type: none;
+}
+
+div#SessionMessageList_target > div {
+  text-align: center;
+}
+
+#SessionMessageList_messageArea li.info {
+  color: #336633;
+  font-style: italic;
+}
+
+#SessionMessageList_messageArea li.warn {
+  color: #993333;
+}
+
+#SessionMessageList_messageArea li.error {
+  color: #993333;
+  font-weight: bold;
+}
+
 .te {
   visibility: hidden;
   display: none;
@@ -84,10 +116,6 @@ h3 {
 #main {
   clear: both;
   text-align: left;
-}
-
-#messages div {
-  text-align: center;
 }
 
 div.formArea {

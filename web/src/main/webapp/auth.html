@@ -3,6 +3,7 @@
   <meta content="text/html; charset=UTF-8">
   <title>Login</title>
   <link type="text/css" rel="stylesheet" href="css/openid.css"/>
+  <link type="text/css" rel="stylesheet" href="css/elw.css"/>
 
   <script type="text/javascript" src="js/jquery-1.4.2.js"></script>
   <script type="text/javascript" src="js/jquery.cookie.js"></script>
@@ -14,14 +15,11 @@
   <script type="text/javascript" src="js/jquery.dataTables.js"></script>
   <script type="text/javascript" src="js/openid-jquery.js"></script>
   <script type="text/javascript" src="js/openid-ru.js"></script>
-  <script type="text/html" id="SessionMessage_template">
-    <div class="<%-message.severity%>"><% message.text %></div>
-  </script>
 </head>
 <body>
 <div id="SessionMessageList_target">
-  <div id="SessionMessageList_messageArea"></div>
-  <div><a id="SessionMessageList_clearAll" href="#">Clear all messages</a></div>
+  <ul id="SessionMessageList_messageArea"></ul>
+  <div><a style="display: none;" id="SessionMessageList_clearAll" href="#">Clear all messages</a></div>
 </div>
 <div style="margin: 3em auto; padding: 1em; width: 600px;">
   <div>
@@ -80,7 +78,8 @@
     });
 
     var SessionMessage = Backbone.Model.extend({
-      "defaults": function() {
+      idAttribute: "stamp",
+      defaults: function() {
         return {
           stamp: 0,
           severity: "message_minor",
@@ -90,26 +89,26 @@
     });
 
     var SessionMessageList = Backbone.Collection.extend({
-      model: SessionMessage,
-      localStorage: new Store()
+      url: "rest/SessionMessage",
+      model: SessionMessage
     });
 
     var sessionMessageList = new SessionMessageList();
 
     var SessionMessageView = Backbone.View.extend({
-      tagName: 'div',
-      template: _.template(jQuery('#SessionMessage_template').html()),
+      tagName: "li",
       events: {
         "click a.destroy" : "destroy"
       },
 
       initialize: function() {
         this.model.bind('change', this.render, this);
-        this.model.bind('destroy', this.destroy, this);
+        this.model.bind('destroy', this.remove, this);
       },
 
       render: function() {
-        this.$el.html(this.template(this.model.toJSON()));
+        this.$el.html(this.model.get('text'));
+        jQuery(this.$el).toggleClass(this.model.get('severity'));
         return this;
       },
 
@@ -124,7 +123,7 @@
         "click #SessionMessageList_clearAll": "clearAll"
       },
       initialize: function() {
-        this.clearAll = this.$('#SessionMessageList_clearAll');
+        this.clearAllElem = this.$('#SessionMessageList_clearAll');
 
         sessionMessageList.bind('add', this.addOne, this);
         sessionMessageList.bind('reset', this.addAll, this);
@@ -133,12 +132,12 @@
         sessionMessageList.fetch();
       },
       render: function() {
-        var messageCount = SessionMessageList.length;
+        var messageCount = sessionMessageList.length;
 
-        if (messageCount) {
-          this.clearAll.show();
+        if (messageCount > 0) {
+          this.clearAllElem.show();
         } else {
-          this.clearAll.hide();
+          this.clearAllElem.hide();
         }
       },
       addOne: function(sessionMessage) {
@@ -147,6 +146,11 @@
       },
       addAll: function() {
         sessionMessageList.each(this.addOne);
+      },
+      clearAll: function() {
+        sessionMessageList.each(function(view) {
+          view.destroy();
+        });
       }
     });
     var sessionMessageListView = new SessionMessageListView();

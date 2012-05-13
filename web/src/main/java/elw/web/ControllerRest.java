@@ -11,6 +11,7 @@ import elw.dao.ctx.CtxSolution;
 import elw.dao.rest.RestEnrollment;
 import elw.dao.rest.RestEnrollmentSummary;
 import elw.dao.rest.RestSolution;
+import elw.miniweb.Message;
 import elw.miniweb.ViewJackson;
 import elw.vo.*;
 import elw.web.core.Core;
@@ -111,6 +112,31 @@ public class ControllerRest extends ControllerElw {
                 new EnumPropertyEditor(ListStyle.values())
         );
     }
+
+    @RequestMapping(
+            value = "SessionMessage",
+            method = RequestMethod.GET
+    )
+    public ModelAndView do_SessionMessageGet(
+            final HttpServletRequest req,
+            final HttpServletResponse resp
+    ) throws IOException {
+        return new ModelAndView(ViewJackson.data(Message.getMessages(req)));
+    }
+
+    @RequestMapping(
+            value = "SessionMessage/{stamp}",
+            method = RequestMethod.DELETE
+    )
+    public ModelAndView do_SessionMessageDelete(
+            final HttpServletRequest req,
+            final HttpServletResponse resp,
+            @PathVariable("stamp") final String stamp
+    ) throws IOException {
+        Message.delete(req, stamp);
+        return null;
+    }
+
 
     @RequestMapping(
             value = "auth",

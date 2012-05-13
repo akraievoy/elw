@@ -23,7 +23,7 @@ import base.pattern.Result;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 public class Message {
@@ -31,50 +31,90 @@ public class Message {
     private static final String TYPE_WARN = "warn";
     private static final String TYPE_ERR = "err";
 
-    private String message;
-    private String type;
+    private static long lastUsedStamp = 0;
 
-    private Message(String message, String type) {
-        this.message = message;
-        this.type = type;
+    private final long stamp;
+    private final String text;
+    private final String severity;
+
+    private Message(String text, String severity) {
+        this.text = text;
+        this.severity = severity;
+        synchronized (Message.class) {
+            final long currentMillis = System.currentTimeMillis();
+            lastUsedStamp =
+                    stamp =
+                            Math.max(currentMillis, lastUsedStamp + 1);
+        }
     }
 
-    public String getMessage() {
-        return message;
+    public String getText() {
+        return text;
     }
 
-    public String getType() {
-        return type;
+    public String getSeverity() {
+        return severity;
     }
 
-    private static List<Message> getMessages(HttpServletRequest req) {
+    public long getStamp() {
+        return stamp;
+    }
+
+    private static List<Message> getOrCreateMessages(HttpServletRequest req) {
         final HttpSession session = req.getSession(true);
 
-        List<Message> messages;
-        synchronized (Message.class) {
-            messages = (List<Message>) session.getAttribute("elw_messages");
+        @SuppressWarnings("unchecked")
+        List<Message> messages =
+                (List<Message>) session.getAttribute("elw_messages");
 
-            if (messages == null) {
-                messages = Collections.synchronizedList(new ArrayList<Message>());
-                session.setAttribute("elw_messages", messages);
-            }
+        if (messages == null) {
+            messages = new ArrayList<Message>();
+            session.setAttribute("elw_messages", messages);
         }
 
         return messages;
     }
 
-    public static Message[] drainMessages(HttpServletRequest req) {
-        final List<Message> messages = getMessages(req);
-
-        final Message[] result = messages.toArray(new Message[messages.size()]);
-
-        messages.clear();
-
-        return result;
+    public static List<Message> getMessages(HttpServletRequest req) {
+        synchronized (Message.class) {
+            final List<Message> messages = getOrCreateMessages(req);
+            return new ArrayList<Message>(messages);
+        }
     }
 
+    public static Message[] drainMessages(HttpServletRequest req) {
+        synchronized (Message.class) {
+            final List<Message> messages = getOrCreateMessages(req);
+
+            final Message[] result = messages.toArray(new Message[messages.size()]);
+
+            messages.clear();
+
+            return result;
+        }
+    }
+
+
+    public static void delete(
+            final HttpServletRequest req, final String stamp
+    ) {
+        synchronized (Message.class) {
+            final List<Message> messageList = getOrCreateMessages(req);
+
+            for (Iterator<Message> iterator = messageList.iterator(); iterator.hasNext(); ) {
+                Message message = iterator.next();
+                if (String.valueOf(message.getStamp()).equals(stamp)) {
+                    iterator.remove();
+                }
+            }
+        }
+    }
+
+
     private static void addMessage(final HttpServletRequest req, final String type, final String message) {
-        getMessages(req).add(new Message(message, type));
+        synchronized (Message.class) {
+            getOrCreateMessages(req).add(new Message(message, type));
+        }
     }
 
     public static void addInfo(final HttpServletRequest req, final String message) {
