@@ -17,205 +17,218 @@
  */
 
 body {
-	font-family: arial, sans-serif;
- font-size: 0.9em;
+  font-family: arial, sans-serif;
+  font-size: 0.9em;
 }
 
 td {
- font-size: 0.9em;
+  font-size: 0.9em;
 }
 
 th {
- font-size: 0.95em;
+  font-size: 0.95em;
 }
 
 .te {
-	visibility:hidden;
-	display:none;
+  visibility: hidden;
+  display: none;
 }
 
 .elw_dialogContent {
-	display:none;
+  display: none;
 }
 
 h1 {
-	margin-top: 1em;
-	margin-bottom: 0.5em;
-	font-size: 1.5em;
-	font-weight: normal;
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+  font-size: 1.5em;
+  font-weight: normal;
 }
+
 h2 {
-	margin-top: 0.75em;
-	margin-bottom: 0.25em;
-	font-size: 1.25em;
-	font-weight: normal;
+  margin-top: 0.75em;
+  margin-bottom: 0.25em;
+  font-size: 1.25em;
+  font-weight: normal;
 }
+
 h3 {
-	margin-top: 0.5em;
-	margin-bottom: 0.25em;
-	font-size: 1.1em;
-	font-weight: normal;
+  margin-top: 0.5em;
+  margin-bottom: 0.25em;
+  font-size: 1.1em;
+  font-weight: normal;
 }
 
 #elw_header {
-	text-align: center;
-	margin-top: 4px;
-	margin-bottom: 2px;
+  text-align: center;
+  margin-top: 4px;
+  margin-bottom: 2px;
 }
 
 #header_hr {
-	clear: both;
+  clear: both;
 }
 
 #nav {
-	margin-top: 6px;
-	margin-left: 4px;
-	float: left;
+  margin-top: 6px;
+  margin-left: 4px;
+  float: left;
 }
 
 #cred {
-	margin-top: 2px;
-	margin-right: 4px;
-	float: right;
+  margin-top: 2px;
+  margin-right: 4px;
+  float: right;
 }
 
 #main {
-	clear: both;
-	text-align: left;
+  clear: both;
+  text-align: left;
 }
 
 #messages div {
-	text-align: center;
+  text-align: center;
 }
 
 div.formArea {
-	margin: 3em auto;
-	width: 36em;
-	padding: 1em;
+  margin: 3em auto;
+  width: 36em;
+  padding: 1em;
 }
 
 div.formLabel {
-	clear: both;
-	margin-right: 0.25em;
-	float: left;
-	padding-top: 0.4em;
-	width: 12em;
-	height: 1.5em;
-	text-align: right;
+  clear: both;
+  margin-right: 0.25em;
+  float: left;
+  padding-top: 0.4em;
+  width: 12em;
+  height: 1.5em;
+  text-align: right;
 }
 
 div.formField {
-	float: left;
-	width: 18em;
-	padding-top: 0.2em;
-	height: 1.5em;
-	text-align: left;
+  float: left;
+  width: 18em;
+  padding-top: 0.2em;
+  height: 1.5em;
+  text-align: left;
 }
 
 div.formfield input {
- width: 17em;
+  width: 17em;
 }
 
 div.formButtons {
-	clear: both;
-	padding: 1.5em 2em 0 0;
-	text-align: right;
+  clear: both;
+  padding: 1.5em 2em 0 0;
+  text-align: right;
 }
 
 .extra {
-	font-size: smaller;
-	color: #333333;
+  font-size: smaller;
+  color: #333333;
 }
 
 .expandTrigger {
-	background-color: #99FF99;
-	border: 1px #66CC66 solid;
+  background-color: #99FF99;
+  border: 1px #66CC66 solid;
 }
 
 .expandTrigger.expanded {
-	background-color: #CCFFCC;
-	border: 1px #99CC99 dotted;
+  background-color: #CCFFCC;
+  border: 1px #99CC99 dotted;
 }
 
 a.expandTrigger:hover {
-	background-color: #66CC66;
-	border: 1px #339933 solid;
+  background-color: #66CC66;
+  border: 1px #339933 solid;
 }
 
 .popupTrigger {
-	background-color: #CCCCFF;
-	border: 1px #9999CC dotted;
-	padding: 0 2px;
-	margin: 0 1px;
+  background-color: #CCCCFF;
+  border: 1px #9999CC dotted;
+  padding: 0 2px;
+  margin: 0 1px;
 }
 
 a.popupTrigger:hover {
-	background-color: #9999FF;
-	border: 1px #6666CC solid;
+  background-color: #9999FF;
+  border: 1px #6666CC solid;
 }
 
 .popup {
-	padding: 1em 1em;
-	position: absolute;
-	z-index: 1;
-	background: #EEEEEE;
-	border: #CCCCCC thin dashed; 
+  padding: 1em 1em;
+  position: absolute;
+  z-index: 1;
+  background: #EEEEEE;
+  border: #CCCCCC thin dashed;
 }
 
 .text_align_center {
- text-align: center;
+  text-align: center;
 }
 
 .text_align_right {
- text-align: right;
+  text-align: right;
 }
 
 th.text_align_right {
- text-align: center;
- padding-right: 1em;
+  text-align: center;
+  padding-right: 1em;
 }
 
 .elw_closed {
- color: #CCCCCC;
- font-style: italic;
+  color: #CCCCCC;
+  font-style: italic;
 }
+
 .elw_open {
 }
+
 .elw_pending {
- color: #336633;
+  color: #336633;
 }
 
 .elw_negTerm {
- color: #993333;
- font-size: 0.6em;
+  color: #993333;
+  font-size: 0.6em;
 }
+
 .elw_posTerm {
- color: #339933;
- font-size: 0.6em;
+  color: #339933;
+  font-size: 0.6em;
 }
+
 .elw_approved {
- font-weight: bold;
- color: #009900;
+  font-weight: bold;
+  color: #009900;
 }
+
 .elw_declined {
- font-weight: bold;
- color: #990000;
+  font-weight: bold;
+  color: #990000;
 }
+
 .elw_due_passed {
- font-weight: bold;
+  font-weight: bold;
 }
+
 .elw_overdue {
- border: 1px dotted #FFCCCC;
+  border: 1px dotted #FFCCCC;
 }
+
 .elw_open.elw_overdue {
- border: 1px dashed #FF6666;
+  border: 1px dashed #FF6666;
 }
+
 .elw_offsite {
- text-decoration: underline;
+  text-decoration: underline;
 }
+
 .elw_offtime {
- font-style: italic !important;
+  font-style: italic !important;
 }
+
 .elw_nodue {
- opacity: .25;
+  opacity: .25;
 }
