@@ -107,8 +107,12 @@ public class ElwUri {
             return xferQuery;
         }
 
+        return xferQuery + "&fId=" + urlEncode(fileId);
+    }
+
+    public static String urlEncode(String fileId) {
         try {
-            return xferQuery + "&fId=" + URLEncoder.encode(fileId, "UTF-8");
+            return URLEncoder.encode(fileId, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             throw new IllegalStateException("UTF-8 not supported", e);
         }

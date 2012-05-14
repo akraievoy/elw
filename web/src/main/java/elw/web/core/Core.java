@@ -674,7 +674,10 @@ public class Core {
 
         final String forward;
         if (epCtx != null) {
-            forward = "approve?elw_ctx=" + epCtx.toString() + "&sId=" + slot.getId() + "&fId=" + epF.getId();
+            forward = "approve?"
+                    + "elw_ctx=" + epCtx.toString()
+                    + "&sId=" + slot.getId()
+                    + "&fId=" + ElwUri.urlEncode(epF.getId());
         } else {
             forward = "log?elw_ctx=" + ctxEnr.toString() + "&f_slot=" + slot.getId() + "&f_scope=s--p--";
         }

@@ -39,7 +39,7 @@
  <div>
   <div style="float: left; width: 35%; overflow-x: auto;">
    <div class="formArea ui-widget-header ui-corner-all" style="width: auto;">
-    <form method="POST" action="approve">
+    <form method="POST" action="approve" accept-charset="utf-8">
      <input type="hidden" name="elw_ctx" value="$f.esc($elw_ctx.toString())"/>
      <input type="hidden" name="sId" value="$f.esc($slot.id)"/>
      <input type="hidden" name="fId" value="$f.esc($file.id)"/>
