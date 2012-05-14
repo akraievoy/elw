@@ -19,6 +19,7 @@
 package elw.web;
 
 import com.google.common.base.Strings;
+import elw.dao.Auth;
 import elw.dao.Ctx;
 import elw.dao.Queries;
 import elw.dao.ctx.CtxSolution;
@@ -76,6 +77,15 @@ public class AdminController extends ControllerElw {
         );
 
         return model;
+    }
+
+    @Override
+    protected String extraAuthValidations(Auth auth) {
+        if (!auth.isAdm()) {
+            return "Admin Auth Required";
+        }
+
+        return null;
     }
 
     @RequestMapping(value = "logout", method = RequestMethod.GET)

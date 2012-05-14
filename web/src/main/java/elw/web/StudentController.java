@@ -110,7 +110,7 @@ public class StudentController extends ControllerElw {
 
 
         model.put(R_CTX, ctx);
-        //  LATER noone knows what's this and whether it's needed at all
+        //  LATER nobody knows what's this and whether it's needed at all
         model.put(
                 "expandTriggers",
                 req.getSession().getAttribute("viewToExpandTriggers")

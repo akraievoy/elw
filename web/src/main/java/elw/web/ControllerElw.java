@@ -159,6 +159,13 @@ public abstract class ControllerElw extends MultiActionController implements Web
             return noAuth(req, resp, page, "Non-empty Auth required");
         }
 
+        final String extraValidationMessage =
+                extraAuthValidations(auth);
+
+        if (!Strings.isNullOrEmpty(extraValidationMessage)) {
+            return noAuth(req, resp, page, extraValidationMessage);
+        }
+
         if (verified && !auth.isVerified()) {
             return noAuth(req, resp, page, "Verified Auth required");
         }
@@ -166,6 +173,10 @@ public abstract class ControllerElw extends MultiActionController implements Web
         session.removeAttribute(ControllerAuth.SESSION_SUCCESS_REDIRECT);
 
         return prepareDefaultModel(req, auth, null);
+    }
+
+    protected String extraAuthValidations(Auth auth) {
+        return null;
     }
 
     protected static interface WebMethodScore {
