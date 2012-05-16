@@ -68,21 +68,23 @@ public class Auth {
 
     public boolean isVerified() {
         final boolean studentOnlyAuth = admin == null && student != null;
-        if (studentOnlyAuth) {
-            //  couple of silly placeholders made it into the couch, so...
-            final boolean emailEmpty =
-                    Strings.isNullOrEmpty(student.getEmail())
-                    || "1".equalsIgnoreCase(student.getEmail())
-                    || "undef@in.ed".equalsIgnoreCase(student.getEmail());
-            final boolean verificationSetupEmpty =
-                    student.getOpenIds().isEmpty()
-                            && emailEmpty;
-            if (verificationSetupEmpty) {
-                return true;
-            }
+        //noinspection SimplifiableIfStatement
+        if (studentOnlyAuth && isVerificationSetupEmpty(student)) {
+            return true;
         }
 
         return !getVerifiedOpenIds().isEmpty() || !getVerifiedEmails().isEmpty();
+    }
+
+    public static boolean isVerificationSetupEmpty(Student student) {
+        return student.getOpenIds().isEmpty() && isEmailEmpty(student);
+    }
+
+    public static boolean isEmailEmpty(Student student) {
+        //  couple of silly placeholders made it into the couch, so...
+        return Strings.isNullOrEmpty(student.getEmail())
+                || "1".equalsIgnoreCase(student.getEmail())
+                || "undef@in.ed".equalsIgnoreCase(student.getEmail());
     }
 
     public boolean isEmpty() {

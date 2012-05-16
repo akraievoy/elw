@@ -48,6 +48,7 @@ import java.net.URLEncoder;
 import java.security.*;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 public abstract class ControllerAuth {
     private static final Logger log = LoggerFactory.getLogger(ControllerAuth.class);
@@ -57,16 +58,16 @@ public abstract class ControllerAuth {
     protected static final String SESSION_OID_DISCOVERY = "OID_DISCOVERY";
     protected static final String SESSION_OID_CONSUMER = "OID_CONSUMER";
 
-    protected static final String OID_ENDPOINT_YAHOO =
-            "https://me.yahoo.com";
-    protected static final String OID_ENDPOINT_GOOGLE =
-            "https://www.google.com/accounts/o8/id";
-    protected static final String OID_ENDPOINT_GOOGLE_PROFILES =
-            "http://www.google.com/profiles/";
-    protected static final String OID_ENDPOINT_YANDEX =
-            "http://openid.yandex.ru";
-    protected static final String OID_ENDPOINT_MAILRU =
-            "http://openid.mail.ru/mail/";
+    protected static final Pattern OID_YAHOO =
+            Pattern.compile("^https?://me\\.yahoo\\.com(/.*)?$");
+    protected static final Pattern OID_GOOGLE =
+            Pattern.compile("^https?://www\\.google\\.com/accounts/o8/id(/.*)?(\\?.+)?$");
+    protected static final Pattern OID_GOOGLE_PROFILES =
+            Pattern.compile("^https?://www\\.google\\.com/profiles/.+$");
+    protected static final Pattern OID_YANDEX =
+            Pattern.compile("^https?://openid\\.yandex\\.ru(/.*)?$");
+    protected static final Pattern OID_MAILRU =
+            Pattern.compile("^https?://openid\\.mail\\.ru/mail(/.*)?$");
 
     protected static final String OID_REDIR_BODY_TARGETURL = "${targetUrl}";
     protected static final String OID_REDIR_BODY_PARAMS = "${paramsGoHere}";
@@ -74,19 +75,26 @@ public abstract class ControllerAuth {
     protected static final String OID_REDIR_PARAMVAL = "${parameter.value}";
 
     /**
-     * Not all endpoints are reporting confirmed emails,
-     * so we have to white-list them.
+     * Not all endpoints are reporting confirmed emails (i.e. myopenid reports an unconfirmed email thus forging it),
+     * so we have to white-list (or, rather white-map) both openids and corresponding emails.
      */
-    protected static final List<String> OID_ENDPOINT_TRUSTED =
-            Collections.unmodifiableList(
-                    Arrays.asList(
-                            OID_ENDPOINT_YAHOO,
-                            OID_ENDPOINT_GOOGLE,
-                            OID_ENDPOINT_GOOGLE_PROFILES,
-                            OID_ENDPOINT_YANDEX,
-                            OID_ENDPOINT_MAILRU
-                    )
+    protected static final Map<Pattern, Pattern> OID_EMAIL_WHITEMAP =
+            Collections.unmodifiableMap(
+                    createTrustedProviderMap()
             );
+
+    protected static Map<Pattern, Pattern> createTrustedProviderMap() {
+        final Map<Pattern, Pattern> trustedProviders =
+                new HashMap<Pattern, Pattern>();
+
+        trustedProviders.put(OID_YAHOO, Pattern.compile("^.+@yahoo\\.com$"));
+        trustedProviders.put(OID_GOOGLE, Pattern.compile("^.+@gmail\\.com$"));
+        trustedProviders.put(OID_GOOGLE_PROFILES, Pattern.compile("^.+@gmail\\.com$"));
+        trustedProviders.put(OID_YANDEX, Pattern.compile("^.+@yandex\\.ru$"));
+        trustedProviders.put(OID_MAILRU, Pattern.compile("^.+@mail\\.ru$"));
+
+        return trustedProviders;
+    }
 
     protected static RealmVerifierFactory realmVerifierFactory =
             //  what the heck, I did not see anything like that in the docs?..
@@ -723,20 +731,20 @@ public abstract class ControllerAuth {
                 );
 
         FetchRequest fetch = FetchRequest.createFetchRequest();
-        if (OID_ENDPOINT_GOOGLE.equals(oidIdent)) {
+        if (OID_GOOGLE.matcher(oidIdent).matches()) {
             fetch.addAttribute(
                     "email",
                     "http://axschema.org/contact/email",
                     true
             );
-        } else if (OID_ENDPOINT_YAHOO.equals(oidIdent)) {
+        } else if (OID_YAHOO.matcher(oidIdent).matches()) {
             fetch.addAttribute(
                     "email",
                     "http://axschema.org/contact/email",
                     true
             );
         } else {
-            //works for myOpenID
+            // TODO works for myOpenID, but should this be the default case?
             fetch.addAttribute(
                     "email",
                     "http://schema.openid.net/contact/email",
@@ -847,17 +855,23 @@ public abstract class ControllerAuth {
             }
         }
         
-        boolean trustedEmails = false;
-        for (String trustedEndpoint : OID_ENDPOINT_TRUSTED) {
-            if (authSuccess.getOpEndpoint().startsWith(trustedEndpoint)) {
-                trustedEmails = true;
+        Pattern trustedEmails = null;
+        for (Map.Entry<Pattern, Pattern> trustedEndpoint : OID_EMAIL_WHITEMAP.entrySet()) {
+            if (trustedEndpoint.getKey().matcher(authSuccess.getClaimed()).matches()) {
+                trustedEmails = trustedEndpoint.getValue();
             }
         }
 
         // success
-        final List<String> emptyEmails = Collections.emptyList();
         final List<String> emailsEffective =
-                trustedEmails ? emails : emptyEmails;
+                new ArrayList<String>();
+        if (trustedEmails != null) {
+            for (String email : emails) {
+                if (trustedEmails.matcher(email).matches()) {
+                    emailsEffective.add(email);
+                }
+            }
+        }
 
         return new OpenIdResponseResult(
                 emailsEffective,

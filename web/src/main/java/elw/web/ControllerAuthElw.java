@@ -78,6 +78,7 @@ public class ControllerAuthElw extends ControllerAuth {
 
         for (Admin admin : queries.admins()) {
             if (admin.getName().equalsIgnoreCase(nameFull)) {
+                Message.addWarn(req, "Logged in as " + admin.getName() + ": READ-ONLY");
                 authAdm(
                         req,
                         admin,
@@ -93,13 +94,25 @@ public class ControllerAuthElw extends ControllerAuth {
             for (Student student : group.getStudents().values()) {
                 if (student.getName().equalsIgnoreCase(nameFull)) {
                     final Auth auth = ControllerElw.auth(req);
-                    if (auth != null && auth.isAdm()) {
+                    if (auth != null && auth.isAdm() && auth.isVerified()) {
                         //  impersonate, leaving admin credentials intact
+                        Message.addInfo(req, "impersonated as " + student.getName());
                         auth.setGroup(group);
                         auth.setStudent(student);
                         return processAuthSuccess(req, resp);
                     }
 
+                    if (Auth.isVerificationSetupEmpty(student)) {
+                        Message.addInfo(req, "Logged in as " + student.getName() + ", no extra verifications required");
+                    } else {
+                        Message.addWarn(req, "Logged in as " + student.getName() + ": READ-ONLY");
+                        if (!Auth.isEmailEmpty(student)) {
+                            Message.addWarn(req, "Log-in via email " + student.getEmail() + " to gain full access");
+                        }
+                        if (!student.getOpenIds().isEmpty()) {
+                            Message.addWarn(req, "Log-in via OpenID " + student.getOpenIds() + " to gain full access");
+                        }
+                    }
                     authStudent(
                             req, student, group,
                             Collections.<String>emptyList(),
@@ -110,6 +123,7 @@ public class ControllerAuthElw extends ControllerAuth {
             }
         }
 
+        Message.addWarn(req, "No users found, please check your spelling?");
         resp.sendRedirect(elwServerConfig.getBaseUrl() + "auth.html");
         return null;
     }
