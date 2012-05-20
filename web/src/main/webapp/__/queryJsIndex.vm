@@ -6,30 +6,26 @@
    "sDom": 'lprf<"clear">ti',
    'aaData': [ ],
    'aoColumns': [
-    #* 0 index - *# {"bVisible": false, "bSortable": false},
-    #* 1 enr.id - *# {"bVisible": false, "bSortable": false},
-    #* 2 group.id - *# {"bVisible": false, "bSortable": false},
-    #* 3 group.name 0*# {'sTitle': 'Group', "sWidth": "7em", "sClass": "text_align_center"},
-    #* 4 course.id - *# {"bVisible": false, "bSortable": false},
-    #* 5 course.name 1 *# {'sTitle': 'Course', "sWidth": "23em", "sClass": "text_align_center"},
+    {"mDataProp": "index", "bVisible": false, "bSortable": false},
+    {"mDataProp": "enrId", "bVisible": false, "bSortable": false},
+    {"mDataProp": "groupId", "bVisible": false, "bSortable": false},
+    {"mDataProp": "groupName", 'sTitle': 'Group', "sWidth": "7em", "sClass": "text_align_center"},
+    {"mDataProp": "courseId", "bVisible": false, "bSortable": false},
+    {"mDataProp": "courseName", 'sTitle': 'Course', "sWidth": "23em", "sClass": "text_align_center"},
      #if($elw_auth.admin)
-    #* 6 summary ref 2 *# {'sTitle': 'Summary', "bSortable": false, "fnRender": elw_dt_url(6, 'Summary'), "sClass": "text_align_center"},
-    #* 7 students ref 3 *# {'sTitle': 'Students', "bSortable": false, "fnRender": elw_dt_url(7, 'Students'), "sClass": "text_align_center"},
+     {"mDataProp": "summaryRef", 'sTitle': 'Summary', "bSortable": false, "fnRender": elw_dt_url('summaryRef', 'Summary'), "sClass": "text_align_center"},
      #else
-      #* 6 summary ref 2 *# {"bVisible": false, "bSortable": false},
-      #* 7 students ref 3 *# {"bVisible": false, "bSortable": false},
+     {"mDataProp": "summaryRef", "bVisible": false, "bSortable": false},
      #end
-    #* 8 tasks ref 4 *# {'sTitle': 'Tasks', "bSortable": false, "fnRender": elw_dt_url(8, 'Tasks'), "sClass": "text_align_center"},
-    #* 9 classes ref 5 *# {'sTitle': 'Classes', "bSortable": false, "fnRender": elw_dt_url(9, 'Classes'), "sClass": "text_align_center"},
-    #* 10 uploads ref 6 *# {'sTitle': 'Pending', "bSortable": false, "fnRender": elw_dt_url(10, 'Pending'), "sClass": "text_align_center"},
-    #* 11 uploads-open ref 7 *# {'sTitle': 'Open', "bSortable": false, "fnRender": elw_dt_url(11, 'Open'), "sClass": "text_align_center"},
-    #* 12 uploads-course ref 8 *# {'sTitle': 'Course', "bSortable": false, "fnRender": elw_dt_url(12, 'Course'), "sClass": "text_align_center"}
+    {"mDataProp": "tasksRef", 'sTitle': 'Tasks', "bSortable": false, "fnRender": elw_dt_url("tasksRef", 'Tasks'), "sClass": "text_align_center"},
+    {"mDataProp": "solutionsRef", 'sTitle': 'Solutions', "bSortable": false, "fnRender": elw_dt_url("solutionsRef", 'Solutions'), "sClass": "text_align_center"},
+    {"mDataProp": "attachmentsRef",'sTitle': 'Attachments', "bSortable": false, "fnRender": elw_dt_url("attachmentsRef", 'Attachments'), "sClass": "text_align_center"}
    ],
    "aaSorting": [ [5,'asc'], [3,'asc'] ],
    "aaSortingFixed": [ ],
    "fnRowCallback": function(node, data/*, dispIndex, dataIndex*/) {
-    jQuery("td:eq(0)", node).attr("title", data[2]);
-    jQuery("td:eq(1)", node).attr("title", data[4]);
+    jQuery("td:eq(0)", node).attr("title", data["groupId"]);
+    jQuery("td:eq(1)", node).attr("title", data["courseName"]);
     return node;
    }
   });

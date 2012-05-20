@@ -28,12 +28,8 @@ import java.net.URLEncoder;
 public class ElwUri {
     public static final String MODEL_KEY = "elw_uri";
 
-    public String logPendingE(final String enrId) {
-        return "log?elw_ctx=e--" + enrId + "&f_scope=s--p--&f_due=twoweeks&f_mode=dd";
-    }
-
-    public String logOpenE(final String enrId) {
-        return "log?elw_ctx=e--" + enrId + "&f_scope=s--o--&f_due=twoweeks&f_mode=dd";
+    public String logAnyE(final String enrId) {
+        return "log?elw_ctx=e--" + enrId + "&f_scope=s--&f_due=twoweeks&f_mode=s";
     }
 
     public String logCourseE(final String enrId) {

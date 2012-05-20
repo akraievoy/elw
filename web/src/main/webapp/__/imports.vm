@@ -16,5 +16,5 @@
 <script type="text/javascript" src="${__relPath}js/backbone-0.9.2.js"></script>
 <!-- https://github.com/douglascrockford/JSON-js/blob/master/json2.js -->
 <script type="text/javascript" src="${__relPath}js/json2-fc535e9cc8.js"></script>
-<script type="text/javascript" src="${__relPath}js/jquery.dataTables.js"></script>
+<script type="text/javascript" src="${__relPath}js/jquery.dataTables-1.9.1.js"></script>
 <script type="text/javascript" src="${__relPath}js/SessionMessages.js"></script>

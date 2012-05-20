@@ -287,34 +287,31 @@ public class Core {
         return dataRow;
     }
 
-    public List<Object[]> index(List<Enrollment> enrolls) {
-        final List<Object[]> indexData = new ArrayList<Object[]>();
+    public List<IndexRow> index(List<Enrollment> enrolls) {
+        final List<IndexRow> indexData = new ArrayList<IndexRow>();
         for (Enrollment enr : enrolls) {
             indexData.add(indexRow(indexData, enr));
         }
         return indexData;
     }
 
-    private Object[] indexRow(List<Object[]> indexData, Enrollment enr) {
+    private IndexRow indexRow(List<IndexRow> indexData, Enrollment enr) {
         final Group group = queries.group(enr.getGroupId());
         final Course course = queries.course(enr.getCourseId());
 
-        final Object[] arr = {
-                /* 0 index - */ indexData.size(),
-                /* 1 enr.id - */ enr.getId(),
-                /* 2 group.id - */ group.getId(),
-                /* 3 group.name 0*/ group.getName(),
-                /* 4 course.id - */ course.getId(),
-                /* 5 course.name 1 */ course.getName(),
-                /* 6 summary ref 2 */ uri.summary(enr.getId()),
-                /* 7 students ref 3 */ "#",
-                /* 8 tasks ref 4 */ uri.tasks(enr.getId()),
-                /* 9 classes ref 5 */ "#",
-                /* 10 uploads ref 6 */ uri.logPendingE(enr.getId()),
-                /* 11 uploads-open ref 7 */ uri.logOpenE(enr.getId()),
-                /* 12 uploads-course ref 8 */ uri.logCourseE(enr.getId()),
-        };
-        return arr;
+        final IndexRow indexRow = new IndexRow(
+                indexData.size(),
+                enr.getId(),
+                group.getId(),
+                group.getName(),
+                course.getId(),
+                course.getName(),
+                uri.summary(enr.getId()),
+                uri.tasks(enr.getId()),
+                uri.logAnyE(enr.getId()),
+                uri.logCourseE(enr.getId())
+        );
+        return indexRow;
     }
 
     public List<Object[]> logScore(

@@ -26,6 +26,7 @@ import elw.dao.ctx.CtxSolution;
 import elw.miniweb.ViewJackson;
 import elw.vo.*;
 import elw.web.core.Core;
+import elw.web.core.IndexRow;
 import elw.web.core.LogFilter;
 import elw.web.core.W;
 import org.akraievoy.base.Parse;
@@ -116,7 +117,7 @@ public class AdminController extends ControllerElw {
         }
 
         final List<Enrollment> enrolls = core.getQueries().enrollments();
-        final List<Object[]> indexData = core.index(enrolls);
+        final List<IndexRow> indexData = core.index(enrolls);
         return new ModelAndView(ViewJackson.success(indexData));
     }
 
