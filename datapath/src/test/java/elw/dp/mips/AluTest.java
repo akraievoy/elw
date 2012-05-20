@@ -4,6 +4,7 @@ import base.pattern.Result;
 import junit.framework.TestCase;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.List;
 
@@ -15,6 +16,9 @@ public class AluTest extends TestCase {
         final Method[] aluMethods = Alu.class.getDeclaredMethods();
 
         for (Method m : aluMethods) {
+            if (Modifier.isStatic(m.getModifiers())) {
+                continue;
+            }
             final InstructionDesc descAnnot = m.getAnnotation(InstructionDesc.class);
             assertNotNull(m.getName(), descAnnot);
 
@@ -50,6 +54,90 @@ public class AluTest extends TestCase {
     protected void assembleInstructions(final List<String> intstructions) {
         final Instruction instruction = validator.assemble(new Result[1], intstructions)[0];
         iCtx.setInstruction(instruction);
+    }
+
+    public void testSltu_negpos_false() {
+        registers.setReg(Reg.t1, -1);
+        registers.setReg(Reg.t2, 0);
+        registers.setReg(Reg.t3, 2);
+
+        assembleInstruction("sltu $t3, $t1, $t2");
+
+        alu.sltu(iCtx);
+
+        assertEquals(-1, registers.getReg(Reg.t1));
+        assertEquals(0, registers.getReg(Reg.t2));
+        assertEquals(0, registers.getReg(Reg.t3));
+    }
+
+    public void testSltu_posneg_true() {
+        registers.setReg(Reg.t1, 0);
+        registers.setReg(Reg.t2, -1);
+        registers.setReg(Reg.t3, 2);
+
+        assembleInstruction("sltu $t3, $t1, $t2");
+
+        alu.sltu(iCtx);
+
+        assertEquals(0, registers.getReg(Reg.t1));
+        assertEquals(-1, registers.getReg(Reg.t2));
+        assertEquals(1, registers.getReg(Reg.t3));
+    }
+
+    public void testSltu_pospos_true() {
+        registers.setReg(Reg.t1, 0);
+        registers.setReg(Reg.t2, 1);
+        registers.setReg(Reg.t3, 2);
+
+        assembleInstruction("sltu $t3, $t1, $t2");
+
+        alu.sltu(iCtx);
+
+        assertEquals(0, registers.getReg(Reg.t1));
+        assertEquals(1, registers.getReg(Reg.t2));
+        assertEquals(1, registers.getReg(Reg.t3));
+    }
+
+    public void testSltu_pospos_false() {
+        registers.setReg(Reg.t1, 1);
+        registers.setReg(Reg.t2, 0);
+        registers.setReg(Reg.t3, 2);
+
+        assembleInstruction("sltu $t3, $t1, $t2");
+
+        alu.sltu(iCtx);
+
+        assertEquals(1, registers.getReg(Reg.t1));
+        assertEquals(0, registers.getReg(Reg.t2));
+        assertEquals(0, registers.getReg(Reg.t3));
+    }
+
+    public void testSltu_negneg_false() {
+        registers.setReg(Reg.t1, -2);
+        registers.setReg(Reg.t2, -1);
+        registers.setReg(Reg.t3, 2);
+
+        assembleInstruction("sltu $t3, $t1, $t2");
+
+        alu.sltu(iCtx);
+
+        assertEquals(-2, registers.getReg(Reg.t1));
+        assertEquals(-1, registers.getReg(Reg.t2));
+        assertEquals(1, registers.getReg(Reg.t3));
+    }
+
+    public void testSltu_negneg_true() {
+        registers.setReg(Reg.t1, -1);
+        registers.setReg(Reg.t2, -2);
+        registers.setReg(Reg.t3, 2);
+
+        assembleInstruction("sltu $t3, $t1, $t2");
+
+        alu.sltu(iCtx);
+
+        assertEquals(-1, registers.getReg(Reg.t1));
+        assertEquals(-2, registers.getReg(Reg.t2));
+        assertEquals(0, registers.getReg(Reg.t3));
     }
 
     public void testAdd() {

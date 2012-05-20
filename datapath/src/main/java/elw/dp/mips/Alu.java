@@ -1,6 +1,26 @@
 package elw.dp.mips;
 
 public class Alu {
+    protected static Integer s32(long unsigned) {
+        return (int) unsigned;
+    }
+
+    /*
+     * switches from 32bit signed to 64bit signed holding same bit sequence
+     * treated as 32bit unsigned
+     */
+    protected static long u32(final int signed) {
+        return (long) signed & 0xFFFFFFFFL;
+    }
+
+    /*
+     * switches from 32bit signed to 32bit signed holding value of 16 
+     * least significant bits treated as unsigned
+     */
+    protected static int u16(final int signed) {
+        return (int) signed & 0x0000FFFF;
+    }
+
     @InstructionDesc(
             syntax = "addu $d, $s, $t",
             template = "000000ssssstttttddddd00000100001",
@@ -8,7 +28,7 @@ public class Alu {
             unsigned = true
     )
     public void addu(final InstructionContext ctx) {
-        ctx.setD(ctx.getS() + ctx.getT());
+        ctx.setD(s32(u32(ctx.getS()) + u32(ctx.getT())));
         ctx.advPc();
     }
 
@@ -39,7 +59,7 @@ public class Alu {
             unsigned = true
     )
     public void addiu(final InstructionContext ctx) {
-        ctx.setT(ctx.getS() + ctx.getI16());
+        ctx.setT(ctx.getS() + u16(ctx.getI16()));
         ctx.advPc();
     }
 
@@ -176,11 +196,11 @@ public class Alu {
             unsigned = true
     )
     public void divu(final InstructionContext ctx) {
-        final int s = ctx.getS();
-        final int t = ctx.getT();
+        final long s = u32(ctx.getS());
+        final long t = u32(ctx.getT());
 
-        ctx.getRegisters().setReg(Reg.lo, s / t);
-        ctx.getRegisters().setReg(Reg.hi, s % t);
+        ctx.getRegisters().setReg(Reg.lo, s32(s / t));
+        ctx.getRegisters().setReg(Reg.hi, s32(s % t));
         ctx.advPc();
     }
 
@@ -291,7 +311,7 @@ public class Alu {
         final int s = ctx.getS();
         final int t = ctx.getT();
 
-        final long value = ((long) s & 0xFFFFFFFFL) * ((long) t & 0xFFFFFFFFL);
+        final long value = u32(s) * u32(t);
 
         ctx.getRegisters().setReg(Reg.lo, (int) value);
         ctx.getRegisters().setReg(Reg.hi, (int) (value >> 32));
@@ -390,7 +410,7 @@ public class Alu {
             unsigned = true
     )
     public void sltu(final InstructionContext ctx) {
-        if (ctx.getS() < ctx.getT()) {
+        if (u32(ctx.getS()) < u32(ctx.getT())) {
             ctx.setD(1);
         } else {
             ctx.setD(0);
@@ -419,7 +439,7 @@ public class Alu {
             unsigned = true
     )
     public void sltiu(final InstructionContext ctx) {
-        if (ctx.getS() < ctx.getI16()) {
+        if (ctx.getS() < u16(ctx.getI16())) {
             ctx.setT(1);
         } else {
             ctx.setT(0);
@@ -488,7 +508,7 @@ public class Alu {
             unsigned = true
     )
     public void subu(final InstructionContext ctx) {
-        ctx.setD(ctx.getS() - ctx.getT());
+        ctx.setD(s32(u32(ctx.getS()) - u32(ctx.getT())));
         ctx.advPc();
     }
 
