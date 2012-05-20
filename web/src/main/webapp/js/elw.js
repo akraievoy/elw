@@ -90,13 +90,13 @@ function elw_ajaxStart(myAjaxStamp) {
     "data": jQuery.toJSON(elw_expandedTriggers()),
     "success": function(resp) {
       if (resp == null || !resp.success) {
-        jQuery.jGrowl("Failed to save view state", {"header":"Warning", "life": 10000});
+        document.sessionMessageList.warn("Failed to save view state");
       } else {
-        jQuery.jGrowl("View state saved", {"header":"Info", "life": 3000});
+        document.sessionMessageList.info("View state saved");
       }
     },
     "error": function() {
-      jQuery.jGrowl("Failed to save view state", {"header":"Warning", "life": 10000});
+        document.sessionMessageList.warn("Failed to save view state");
     },
     "dataType": 'json'
   });

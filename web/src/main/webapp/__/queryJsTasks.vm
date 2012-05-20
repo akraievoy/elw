@@ -62,7 +62,7 @@
     "success": function(resp) {
      f_selects.attr("disabled", "");
      if (resp == null || !resp.success) {
-      jQuery.jGrowl("Response error", {"header":"AJAX error", "theme": "ui-state-error"});
+      document.sessionMessageList.error("Malformed server AJAX Response");
       return;
      }
 
@@ -71,7 +71,7 @@
     },
     "error": function() {
      f_selects.attr("disabled", "");
-     jQuery.jGrowl("General error", {"header":"AJAX error", "theme": "ui-state-error"});
+     document.sessionMessageList.error("AJAX streaming error");
     },
     "dataType": 'json'
    });

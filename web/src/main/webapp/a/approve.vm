@@ -165,7 +165,7 @@
     "data": f_data,
     "success": function(resp) {
      if (resp == null || !resp.success) {
-      jQuery.jGrowl("Response error", {"header":"AJAX error", "theme": "ui-state-error"});
+      document.sessionMessageList.error("Malformed server AJAX Response");
       return;
      }
 
@@ -173,7 +173,7 @@
      dataTable.fnAddData(resp.data);
     },
     "error": function() {
-     jQuery.jGrowl("General error", {"header":"AJAX error", "theme": "ui-state-error"});
+     document.sessionMessageList.error("AJAX streaming error");
     },
     "dataType": 'json'
    });

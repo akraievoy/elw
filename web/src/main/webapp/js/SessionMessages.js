@@ -12,10 +12,20 @@ jQuery(document).ready(function () {
 
     var SessionMessageList = Backbone.Collection.extend({
         url: "/rest/SessionMessage",  //  TODO base drifts along the page URLs, backbone Router helps here
-        model: SessionMessage
+        model: SessionMessage,
+        info: function(text) {
+          this.add({severity:"info", text: text});
+        },
+        warn: function(text) {
+          this.add({severity:"warn", text: text});
+        },
+        error: function(text) {
+          this.add({severity:"error", text: text});
+        }
     });
 
     var sessionMessageList = new SessionMessageList();
+    document.sessionMessageList = sessionMessageList;
 
     var SessionMessageView = Backbone.View.extend({
         tagName: "li",
