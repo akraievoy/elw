@@ -61,6 +61,13 @@ div#SessionMessageList_target > div {
   font-weight: bold;
 }
 
+ul.radio  {
+  margin: 0;
+  padding: 0;
+  margin-left: 20px;
+  list-style: none;
+}
+
 .te {
   visibility: hidden;
   display: none;

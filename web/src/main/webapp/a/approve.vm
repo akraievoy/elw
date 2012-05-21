@@ -39,7 +39,7 @@
  <div>
   <div style="float: left; width: 35%; overflow-x: auto;">
    <div class="formArea ui-widget-header ui-corner-all" style="width: auto;">
-    <form method="POST" action="approve" accept-charset="utf-8">
+    <form method="POST" action="approve" accept-charset="utf-8" id="approval_form">
      <input type="hidden" name="elw_ctx" value="$f.esc($elw_ctx.toString())"/>
      <input type="hidden" name="sId" value="$f.esc($slot.id)"/>
      <input type="hidden" name="fId" value="$f.esc($file.id)"/>
@@ -50,15 +50,27 @@
      <div id="sliders_auto"></div>
      <div class="formLabel" style="width:12em;"><label for="approve_comment">Comment</label></div>
      <div class="formField" style="width:16em; height: 7em;"><textarea id="approve_comment" name="comment" cols="25" rows="5"></textarea></div>
-     <div class="formLabel" style="width:12em; margin-top: 1em;"><label for="approve_action">Action</label></div>
-     <div class="formField" style="width:16em; margin-top: 1em;"><select id="approve_action" name="action">
-      <option value="approve">Approve</option>
-      <option value="decline">Decline</option>
-      <option value="next">Defer, I am not sure yet</option>
-     </select></div>
-     <div class="formButtons">
-      <input type="submit" name="action" value="Submit"/>
-     </div>
+     <fieldset class="radiogroup" style="clear:both;">
+         <legend>Approval</legend>
+         <ul class="radio">
+             <li>
+                 <input type="radio" name="action" id="action_approve" value="approve"/>
+                 <label for="action_approve">Approve</label>
+             </li>
+             <li>
+                 <input type="radio" name="action" id="action_approve_clean" value="approve_clean"/>
+                 <label for="action_approve_clean">Approve this / Decline dupes</label>
+             </li>
+             <li>
+                 <input type="radio" name="action" id="action_decline" value="decline"/>
+                 <label for="action_decline">Decline</label>
+             </li>
+             <li>
+                 <input type="radio" name="action" id="action_defer" value="next"/>
+                 <label for="action_defer">Defer, view next</label>
+             </li>
+         </ul>
+     </fieldset>
     </form>
    </div>
   </div>
@@ -182,8 +194,11 @@
   }
 
   jQuery("#dataLoader").click(loadData);
+     jQuery("input[type='radio']").click(function () {
+         jQuery('#approval_form').submit();
+     });
 
-  loadData();
+     loadData();
  });
 </script>
  #if(!$f_verId) #set($f_verId = "${elw_ctx.ass.id}--${elw_ctx.ver.id}--") #end 
