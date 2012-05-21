@@ -279,7 +279,7 @@ public class AdminController extends ControllerElw {
                 final String action =
                         Strings.nullToEmpty(req.getParameter("action"));
                 final List<String> validActions =
-                        Arrays.asList("next", "approve", "decline");
+                        Arrays.asList("next", "approve", "approve_clean", "decline");
                 if (!validActions.contains(action.toLowerCase())) {
                     resp.sendError(
                             HttpServletResponse.SC_BAD_REQUEST,
@@ -289,8 +289,12 @@ public class AdminController extends ControllerElw {
                 }
 
                 if ("approve".equalsIgnoreCase(action)
+                        || "approve_clean".equalsIgnoreCase(action)
                         || "decline".equalsIgnoreCase(action)) {
-                    score.setApproved("approve".equalsIgnoreCase(action));
+                    score.setApproved(
+                            "approve".equalsIgnoreCase(action)
+                                    || "approve_clean".equalsIgnoreCase(action)
+                    );
 
                     final Map<String, Integer> pows =
                             new TreeMap<String, Integer>(score.getPows());
@@ -313,6 +317,26 @@ public class AdminController extends ControllerElw {
                     score.setRatios(ratios);
                     score.setComment(req.getParameter("comment"));
                     queries.createScore(ctxSolution, score);
+                }
+
+                if ("approve_clean".equalsIgnoreCase(action)) {
+                    final List<Solution> dupes = queries.solutions(ctxSolution);
+                    for (Solution dupe : dupes) {
+                        if (dupe.getStamp().equals(ctxSolution.solution.getStamp())) {
+                            continue;
+                        }
+
+                        final CtxSolution ctxDupe = ctxSolution.solution(dupe);
+                        final Score scoreDupe = core.getQueries().score(
+                                ctxDupe, Long.MAX_VALUE
+                        );
+                        
+                        scoreDupe.setApproved(Boolean.FALSE);
+                        score.setComment("Duplicate");
+                        
+                        queries.createScore(ctxDupe, scoreDupe);
+                    }
+
                 }
 
                 resp.sendRedirect(
