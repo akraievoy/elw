@@ -76,7 +76,7 @@
 
    #set($tp_taskHeader_colspan = 0)
    #foreach($slot in $elw_ctx_ass.assType.fileSlots.values())
-    #if($elw_ctx_ass.cDue($slot.id))
+    #if($elw_ctx_ass.cDue($slot.id) && $elw_ctx_ass.indexEntry.scoreBudget > 0)
      #set($z = "--") #* idea yells at me if I do this directly*#
      #set($z = "${elw_ctx_ass.assType.id}${z}${slot.id}${z}")
      #if(!$f_slotId || $z.startsWith($f_slotId))
