@@ -166,7 +166,9 @@ public class Core {
                 }
 
                 logRows(f, lf, logData, indexEntry.getId(), ctxVer, slot, uploads, Solution.SCOPE, adm);
-                if (uploads.size() == 0 && lf.cScopeStud(slot, null)) {
+                if (uploads.size() == 0
+                        && lf.cScopeStud(slot, null)
+                        && ctxVer.getIndexEntry().getScoreBudget() > 0) {
                     logData.add(logRow(f, lf.getMode(), logData, indexEntry.getId(), ctxVer, slot, null, Solution.SCOPE, adm));
                 }
             }
