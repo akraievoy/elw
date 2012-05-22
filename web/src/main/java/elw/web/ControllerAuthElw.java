@@ -301,7 +301,15 @@ public class ControllerAuthElw extends ControllerAuth {
                     return;
                 }
 
-                if (emails.contains(student.getEmail())) {
+                boolean emailPresent = false;
+                for (String email : emails) {
+                    if (email.equalsIgnoreCase(student.getEmail())) {
+                        emailPresent = true;
+                        break;
+                    }
+                }
+
+                if (emailPresent) {
                     authStudent(
                         req,
                         student,

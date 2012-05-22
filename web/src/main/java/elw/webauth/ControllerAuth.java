@@ -188,7 +188,7 @@ public abstract class ControllerAuth {
         }
         srcAddrToStamp.put(remoteAddress, currentMillis);
 
-        final String email = emailParam.trim();
+        final String email = emailParam.trim().toLowerCase();
         final String smtpChallengeToken;
         try {
             smtpChallengeToken = registerChallengeToken(req, email);
@@ -442,7 +442,7 @@ public abstract class ControllerAuth {
             return null;
         }
 
-        final String email = emailParam.trim();
+        final String email = emailParam.trim().toLowerCase();
 
         final String tokenParam = req.getParameter("token");
         if (tokenParam == null || tokenParam.trim().length() == 0) {
@@ -851,7 +851,7 @@ public abstract class ControllerAuth {
 
             List emailsRaw = fetchResp.getAttributeValues("email");
             for (Object emailRaw : emailsRaw) {
-                emails.add(String.valueOf(emailRaw));
+                emails.add(String.valueOf(emailRaw).trim().toLowerCase());
             }
         }
         
