@@ -325,6 +325,12 @@ public class AdminController extends ControllerElw {
                         if (dupe.getStamp().equals(ctxSolution.solution.getStamp())) {
                             continue;
                         }
+                        if (dupe.getId().equals(ctxSolution.solution.getId())) {
+                            //  separate fix for name-id collision:
+                            //      uploads with the same name are treated as same entity
+                            //      when navigating from solution to score
+                            continue;
+                        }
 
                         final CtxSolution ctxDupe = ctxSolution.solution(dupe);
                         final Score scoreDupe = core.getQueries().score(

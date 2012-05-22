@@ -389,7 +389,10 @@ public abstract class ControllerElw extends MultiActionController implements Web
             final SortedMap<String, FileType> validTypes = new TreeMap<String, FileType>(allTypes);
             final boolean put = "PUT".equalsIgnoreCase(req.getMethod());
             final int length = req.getContentLength();
-
+            final String stamp = Long.toString(
+                    Squab.Stamped.genStamp(), 36
+            );
+            file.setId(stamp);
             file.setAuthor(authorName);
 
             InputSupplier<? extends InputStream> inputSupplier = null;
@@ -398,10 +401,7 @@ public abstract class ControllerElw extends MultiActionController implements Web
                 //  FIXME remove this extra variant with non-encoded put uploads
                 inputSupplier = supplierForRequest(req);
                 contentType = "text/plain";
-                //  urgent fix: code uploads collide on the name
-                final String stamp = Long.toString(
-                        Squab.Stamped.genStamp(), 36
-                );
+
                 file.setName("upload_" + stamp + ".txt");
             } else {
                 try {

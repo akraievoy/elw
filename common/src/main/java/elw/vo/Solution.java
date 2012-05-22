@@ -41,7 +41,7 @@ public class Solution extends FileBase {
                             "taskId" + PATH_SEP + // 5
                             "verId" + PATH_SEP + // 6
                             "slotId" + PATH_SEP + // 7
-                            "nameId"
+                            "id"
             );
         } else {
             return new String[] {

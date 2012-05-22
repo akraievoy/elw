@@ -16,6 +16,7 @@ import elw.miniweb.ViewJackson;
 import elw.vo.*;
 import elw.web.core.Core;
 import elw.web.core.W;
+import org.akraievoy.couch.Squab;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
@@ -437,7 +438,7 @@ public class ControllerRest extends ControllerElw {
         return new ModelAndView(ViewJackson.data(solution));
     }
 
-    //  PUTs are not supported for HTML file uploads
+    //  PUTs are not supported for file uploads hosted by HTML forms
     //      http://stackoverflow.com/questions/812711/how-do-you-do-an-http-put
     //      http://stackoverflow.com/questions/2006900/browser-based-webdav-client
     //  but there's hope they would be someday
@@ -486,8 +487,12 @@ public class ControllerRest extends ControllerElw {
         //  not used for streaming/api calls but
         //      still usable for content detection
         final int length = req.getContentLength();
+        final String stamp = Long.toString(
+                Squab.Stamped.genStamp(), 36
+        );
 
         final Solution solution = new Solution();
+        solution.setId(stamp);
         solution.setAuthor(auth.getName());
         solution.setSourceAddress(W.resolveRemoteAddress(req));
 

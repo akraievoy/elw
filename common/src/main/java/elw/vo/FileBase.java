@@ -21,7 +21,6 @@ public abstract class FileBase extends Squab.Stamped implements IdNamed, Stamped
     public String getName() { return name; }
     public void setName(String name) {
         this.name = name;
-        this.id = this.name.replaceAll("\\s+", "_").replaceAll(PATH_SEP, "");
     }
 
     private String comment;
