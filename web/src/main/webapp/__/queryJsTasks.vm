@@ -31,7 +31,7 @@
     #* 14 score sort *# {"bVisible": false, "bSortable": false},
     #* 15 score nice 5 *# {'sTitle': 'Score', "sClass": "text_align_center", "iDataSort": 14, "sWidth": "10%" },
     #* 16 uploads ref 6 *# {'sTitle': '<span title="Pending">Pending</span>', "sWidth": "10%", "bSortable": false, "sClass": "text_align_center", "fnRender": elw_dt_url(16, 'Pending') },
-    #* 17 uploads-open ref 7 *# {'sTitle': '<span title="Open">Open</span>', "sWidth": "10%", "bSortable": false, "sClass": "text_align_center", "fnRender": elw_dt_url(17, 'Open') },
+    #* 17 uploads-open ref 7 *# {'sTitle': '<span title="Approved">Approved</span>', "sWidth": "10%", "bSortable": false, "sClass": "text_align_center", "fnRender": elw_dt_url(17, 'Approved') },
     #* 18 uploads-course ref 8 *# {'sTitle': '<span title="Course">Course</span>', "sWidth": "10%", "bSortable": false, "sClass": "text_align_center", "fnRender": elw_dt_url(18, 'Course') },
     #* 19 task-total sort - *# {"bVisible": false}
    ],

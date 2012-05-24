@@ -40,28 +40,12 @@ public class ElwUri {
         return "tasks?elw_ctx=e--" + enrId;
     }
 
-    public String logPendingEA(final Ctx ctx) {
-        return "log?elw_ctx=e--" + ctx.getEnr().getId() + "&f_verId=" + ctx.getAss().getId() + "--&f_scope=s--p--&f_due=twoweeks&f_mode=dd";
+    public String logOpenPendingEAV(final Ctx ctx) {
+        return logEAV(ctx, "s--op--", "any") + "&f_mode=dd";
     }
 
-    public String logOpenEA(final Ctx ctx) {
-        return "log?elw_ctx=e--" + ctx.getEnr().getId() + "&f_verId=" + ctx.getAss().getId() + "--&f_scope=s--o--&f_due=twoweeks&f_mode=dd";
-    }
-
-    public String logCourseEA(final Ctx ctx) {
-        return "log?elw_ctx=e--" + ctx.getEnr().getId() + "&f_verId=" + ctx.getAss().getId() + "--&f_scope=c--av--&f_due=any";
-    }
-
-    public String logPendingEAV(final Ctx ctx) {
-        return logEAV(ctx, "s--p--", "set") + "&f_mode=dd";
-    }
-
-    public String logAnyEAV(final Ctx ctx) {
-        return logEAV(ctx, "s--", "set") + "&f_mode=dd";
-    }
-
-    public String logOpenEAV(final Ctx ctx) {
-        return logEAV(ctx, "s--o--", "set") + "&f_mode=dd";
+    public String logApprovedDeclinedEAV(final Ctx ctx) {
+        return logEAV(ctx, "s--ad--", "any") + "&f_mode=s";
     }
 
     public String logCourseEAV(final Ctx ctx) {
@@ -69,7 +53,17 @@ public class ElwUri {
     }
 
     public String logEAV(Ctx ctx, String scope, String due) {
-        return "log?elw_ctx=e--" + ctx.getEnr().getId() + "&f_verId=" + ctx.getAss().getId() + "--" + ctx.getVer().getId() + "--&f_scope=" + scope + "&f_due=" + due;
+        final StringBuilder builder = new StringBuilder("log?");
+
+        builder.append("elw_ctx=e--").append(ctx.getEnr().getId());
+        builder.append("&").append("f_verId").append("=").append(ctx.getAss().getId()).append("--");
+        if (ctx.resolved(Ctx.STATE_CIV)) {
+            builder.append(ctx.getVer().getId()).append("--");
+        }
+        builder.append("&").append("f_scope").append("=").append(scope);
+        builder.append("&").append("f_due").append("=").append(due);
+
+        return builder.toString();
     }
 
     public String summary(final String enrId) {

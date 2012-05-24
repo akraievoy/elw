@@ -1,12 +1,7 @@
 <select name="f_scope" style="width: 11em;">
  <option value="s--">Any @ Student</option>
- <option value="s--o--">Open @ Student</option>
- <option value="s--p--">Pending @ Student</option>
- <option value="s--od--" selected="true">Open/Declined @ Student</option>
- <option value="s--opd--">Open/Pending/Declined @ Student</option>
- <option value="s--pad--">Pending/Approved/Declined @ Student</option>
- <option value="s--a--">Approved @ Student</option>
- <option value="s--d--">Declined @ Student</option>
+ <option value="s--op--" selected="true">Open/Pending @ Student</option>
+ <option value="s--ad--">Approved/Declined @ Student</option>
  <option value="c--">Any @ Course</option>
  <option value="c--v--">Version @ Course</option>
  <option value="c--t--">Type @ Course</option>

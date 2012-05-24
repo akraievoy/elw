@@ -1,7 +1,7 @@
 <select name="f_due">
- <option value="any">Due Date...</option>
+ <option value="any" selected>Due Date...</option>
  <option value="none">No Due</option>
- <option value="set" selected>Due Set</option>
+ <option value="set">Due Set</option>
  <option value="over">Due Passed</option>
  <option value="today">Due Today</option>
  <option value="twoweeks">Due within Two Weeks</option>

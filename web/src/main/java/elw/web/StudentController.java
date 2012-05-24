@@ -364,7 +364,7 @@ public class StudentController extends ControllerElw {
                     return null;
                 }
 
-                final String refreshUri = core.getUri().logPendingEAV(ctx);
+                final String refreshUri = core.getUri().logOpenPendingEAV(ctx);
                 final String failureUri = core.getUri().upload(ctx, scope, slot.getId());
 
                 return storeFile(

@@ -485,9 +485,9 @@ public class Core {
                 /* 13 summary due nice 4 */ dueNice,
                 /* 14 score sort */ scoreSort,
                 /* 15 score nice 5 */ scoreNice,
-                /* 16 uploads ref 6 */ adm ? uri.logPendingEA(ctxAss) : classFrom.isStarted() ? uri.logPendingEAV(ctxAss) : null,
-                /* 17 uploads-open ref 7 */ adm ? uri.logOpenEA(ctxAss) : classFrom.isStarted() ? uri.logOpenEAV(ctxAss) : null,
-                /* 18 uploads-course ref 8 */ adm ? uri.logCourseEA(ctxAss) : classFrom.isStarted() ? uri.logCourseEAV(ctxAss) : null,
+                /* 16 uploads ref 6 */ adm || classFrom.isStarted() ? uri.logOpenPendingEAV(ctxAss) : null,
+                /* 17 uploads-open ref 7 */ adm || classFrom.isStarted() ? uri.logApprovedDeclinedEAV(ctxAss) : null,
+                /* 18 uploads-course ref 8 */ adm || classFrom.isStarted() ? uri.logCourseEAV(ctxAss) : null,
                 /* 19 task-total sort - */ 0
         };
 
