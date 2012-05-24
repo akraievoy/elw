@@ -249,19 +249,23 @@ th.text_align_right {
 }
 
 .elw_overdue {
-  border: 1px dotted #FFCCCC;
+  background-color: #FFEEEE;
 }
 
 .elw_open.elw_overdue {
-  border: 1px dashed #FF6666;
+  background-color: #FFDDDD;
 }
 
 .elw_offsite {
-  text-decoration: underline;
+  border-bottom: #CCCCCC 1px dotted;
 }
 
 .elw_offtime {
-  font-style: italic !important;
+  border-bottom: #CCCCCC 1px dashed;
+}
+
+.elw_offsite.elw_offtime {
+  border-bottom: #999999 1px solid;
 }
 
 .elw_nodue {
