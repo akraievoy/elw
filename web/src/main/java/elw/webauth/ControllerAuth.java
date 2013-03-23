@@ -88,8 +88,8 @@ public abstract class ControllerAuth {
                 new HashMap<Pattern, Pattern>();
 
         trustedProviders.put(OID_YAHOO, Pattern.compile("^.+@yahoo\\.com$"));
-        trustedProviders.put(OID_GOOGLE, Pattern.compile("^.+@(gmail\\.com)|(akraievoy\\.org)$"));
-        trustedProviders.put(OID_GOOGLE_PROFILES, Pattern.compile("^.+@(gmail\\.com)|(akraievoy\\.org)$"));
+        trustedProviders.put(OID_GOOGLE, Pattern.compile("^.+@(gmail\\.com|akraievoy\\.org)$"));
+        trustedProviders.put(OID_GOOGLE_PROFILES, Pattern.compile("^.+@(gmail\\.com|akraievoy\\.org)$"));
         trustedProviders.put(OID_YANDEX, Pattern.compile("^.+@yandex\\.ru$"));
         trustedProviders.put(OID_MAILRU, Pattern.compile("^.+@mail\\.ru$"));
 
