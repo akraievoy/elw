@@ -49,4 +49,15 @@ public class Student implements IdNamed {
     public int hashCode() {
         return id.hashCode();
     }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("Student{ ");
+        sb.append("id ").append(id).append(' ');
+        sb.append("name ").append(name).append(' ');
+        sb.append("email ").append(email).append(' ');
+        sb.append('}');
+        return sb.toString();
+    }
 }

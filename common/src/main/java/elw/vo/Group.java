@@ -28,4 +28,15 @@ public class Group extends Squab implements IdNamed {
     protected String[] pathElems() {
         return new String[] { id };
     }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("Group{ ");
+        sb.append("id ").append(id).append(' ');
+        sb.append("name ").append(name).append(' ');
+        sb.append("students [").append(students).append("] ");
+        sb.append('}');
+        return sb.toString();
+    }
 }

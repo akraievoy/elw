@@ -291,6 +291,7 @@ public class Ctx implements elw.vo.Ctx {
             throw new IllegalStateException("group not resolved");
         }
         if (group.getValue().getStudents().get(newStud.getId()) == null) {
+            log.warn("group {} / student {} mismatch", group.getValue(), newStud);
             throw new IllegalArgumentException("group/student mismatch");
         }
         student.resolve(newStud);
