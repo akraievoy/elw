@@ -869,8 +869,12 @@ public abstract class ControllerAuth {
             for (String email : emails) {
                 if (trustedEmails.matcher(email).matches()) {
                     emailsEffective.add(email);
+                } else {
+                    log.warn("claimed email {} does not match trustedEmails pattern: {}", email, trustedEmails);
                 }
             }
+        } else {
+            log.warn("ignoring emails: {}", emails);
         }
 
         return new OpenIdResponseResult(
