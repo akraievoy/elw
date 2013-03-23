@@ -26,6 +26,7 @@ import java.util.SortedMap;
  * has security-related decorator.
  */
 public interface Queries {
+    void invalidateCaches();
 
     Group group(String groupId);
 
@@ -53,6 +54,8 @@ public interface Queries {
     InputSupplier<InputStream> solutionInput(
             @Nonnull CtxSolution ctxSolution, @Nonnull String fileName
     );
+
+    List<Course> courses();
 
     List<String> courseIds();
 

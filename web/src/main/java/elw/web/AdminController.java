@@ -45,6 +45,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
 
+import static elw.ElwPackage.*;
+
 @Controller
 @RequestMapping("/a/**/*")
 public class AdminController extends ControllerElw {
@@ -453,6 +455,76 @@ public class AdminController extends ControllerElw {
                 return null;
             }
         });
+    }
+
+
+    @RequestMapping(value = "SelftestStatus", method = RequestMethod.GET)
+    public ModelAndView do_selftestStatus(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+        final List<Message> messages = new ArrayList<Message>();
+
+        queries.invalidateCaches();
+
+        final List<Admin> admins = queries.admins();
+        for (Admin a : admins) {
+            if (a.getOpenIds().isEmpty()) {
+                messages.add(Message.warn("no openIds set for " + a));
+            }
+        }
+        for (List<Admin> dupes : filterDuplicateIds(admins)) {
+            messages.add(Message.err("Admin records with duplicate ids: " + mapToCouchIds(dupes)));
+        }
+
+        //  FIXME there's a GRAND MESS below this innocent method:
+        //      aliased data objects updates under a global lock when the objects already sit in the cache
+        final List<Course> courses = queries.courses();
+        for (Course c : courses) {
+            //  FIXME this place is really unsafe, but I don't have access to raw data to complain properly
+            //      actually the GRAND MESS was caused by someone trying to prevent me from having the access
+        }
+        for (List<Course> dupes : filterDuplicateIds(courses)) {
+            messages.add(Message.err("Course records with duplicate ids: " + mapToCouchIds(dupes)));
+        }
+        final Map<String, Course> coursesById = groupById(courses);
+
+        final List<Group> groups = queries.groups();
+        for (Group g : groups) {
+            for (Student s : g.getStudents().values()) {
+                if (s.getEmail() == null || s.getEmail().isEmpty()) {
+                    messages.add(Message.warn(
+                        String.format(
+                            "No email set for student %s(%s) of group %s",
+                            s.getName(),
+                            s.getId(),
+                            g.getId()
+                        )
+                    ));
+                }
+            }
+            //  LATER check that all students have unique emails and names
+        }
+        for (List<Group> dupes : filterDuplicateIds(groups)) {
+            messages.add(Message.err("Group records with duplicate ids: " + mapToCouchIds(dupes)));
+        }
+        final Map<String, Group> groupsById = groupById(groups);
+
+        final List<Enrollment> enrollments = queries.enrollments();
+        for (Enrollment e : enrollments) {
+            if (!coursesById.containsKey(e.getCourseId())) {
+                messages.add(Message.err(
+                    String.format("Enrollment %s refers to missing course %s", e.getCouchId(), e.getCourseId())
+                ));
+            }
+            if (!groupsById.containsKey(e.getGroupId())) {
+                messages.add(Message.err(
+                    String.format("Enrollment %s refers to missing group %s", e.getCouchId(), e.getGroupId())
+                ));
+            }
+        }
+        for (List<Enrollment> dupes : filterDuplicateIds(enrollments)) {
+            messages.add(Message.err("Enrollment records with duplicate ids: " + mapToCouchIds(dupes)));
+        }
+
+        return new ModelAndView(ViewJackson.data(messages));
     }
 }
 

@@ -409,6 +409,10 @@ public class QueriesSecure implements Queries {
         );
     }
 
+    public List<Course> courses() {
+        return queries.courses();
+    }
+
     public List<String> courseIds() {
         //  check auth-scope cache
         final List<String> preCached = visibleCourseIds;
@@ -470,6 +474,12 @@ public class QueriesSecure implements Queries {
         }
 
         return Collections.unmodifiableList(groupIds);
+    }
+
+    public void invalidateCaches() {
+        if (auth.isAdm()) {
+            queries.invalidateCaches();
+        }
     }
 
     public Group group(String groupId) {

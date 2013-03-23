@@ -48,6 +48,10 @@ public class Message {
         }
     }
 
+    public static Message info(String text) { return new Message(text, TYPE_INFO); }
+    public static Message warn(String text) { return new Message(text, TYPE_WARN); }
+    public static Message err(String text) { return new Message(text, TYPE_ERR); }
+
     public String getText() {
         return text;
     }

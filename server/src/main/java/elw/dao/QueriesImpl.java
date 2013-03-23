@@ -57,6 +57,12 @@ public class QueriesImpl implements Queries {
     public QueriesImpl() {
     }
     
+    public void invalidateCaches() {
+        for (CouchDao dao : new CouchDao[] {metaDao, userDao, attachmentDao, solutionDao, authDao}) {
+            dao.invalidateCaches();
+        }
+    }
+
     public QueriesSecure secure(final Auth auth) {
         final QueriesSecure queriesSecure = new QueriesSecure(this, auth);
 
@@ -588,6 +594,15 @@ public class QueriesImpl implements Queries {
                 ctxAttachment.attachment.getCouchPath(),
                 fileName
         );
+    }
+
+    public List<Course> courses() {
+        final List<Course> courses = new ArrayList<Course>();
+        final List<String> courseIds = courseIds();
+        for (String courseId : courseIds) {
+            courses.add(course(courseId));
+        }
+        return courses;
     }
 
     public List<String> courseIds() {
