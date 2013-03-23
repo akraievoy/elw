@@ -1,5 +1,6 @@
 #* @vtlvariable name="__qId" type="java.lang.String" *#
 #* @vtlvariable name="__highlight" type="java.lang.String" *#
+#* @vtlvariable name="restPrefix" type="java.lang.String" *#
 
 #* @vtlvariable name="elw_auth" type="elw.dao.Auth" *#
 #* @vtlvariable name="elw_ctx" type="elw.dao.Ctx" *#
@@ -95,7 +96,7 @@
 
    jQuery.ajax({
     "type": "GET",
-    "url": "rest/log",
+    "url": "${restPrefix}rest/log",
     "data": f_data,
     "success": function(resp) {
      f_inputs.attr("disabled", "");

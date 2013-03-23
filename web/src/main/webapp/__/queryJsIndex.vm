@@ -1,5 +1,6 @@
 #* @vtlvariable name="elw_auth" type="elw.dao.Auth" *#
 #* @vtlvariable name="__qId" type="java.lang.String" *#
+#* @vtlvariable name="restPrefix" type="java.lang.String" *#
 <script type="text/javascript">
  jQuery(document).ready(function() {
   var dataTable = jQuery('#${__qId}_dataTable').dataTable({
@@ -33,7 +34,7 @@
   function loadData() {
    jQuery.ajax({
     "type": "GET",
-    "url": "rest/index",
+    "url": "${restPrefix}rest/index",
     "data": {},
     "success": function(resp) {
      if (resp == null || !resp.success) {

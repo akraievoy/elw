@@ -28,6 +28,6 @@
   #set($__qId = "log") #parse("/__/queryTableLog.vm")
  </div>
 </body>
- #set($__qId = "log") #parse("/__/queryJsLog.vm")
+ #set($__qId = "log") #set($restPrefix = "s/") #parse("/__/queryJsLog.vm")
  #parse("/__/ready.vm")
 </html>
