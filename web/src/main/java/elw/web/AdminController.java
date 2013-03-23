@@ -23,6 +23,7 @@ import elw.dao.Auth;
 import elw.dao.Ctx;
 import elw.dao.Queries;
 import elw.dao.ctx.CtxSolution;
+import elw.miniweb.Message;
 import elw.miniweb.ViewJackson;
 import elw.vo.*;
 import elw.web.core.Core;
@@ -97,6 +98,17 @@ public class AdminController extends ControllerElw {
         req.getSession(true).invalidate();
         resp.sendRedirect("index");
         return null;
+    }
+
+    @RequestMapping(
+            value = "SessionMessage",
+            method = RequestMethod.GET
+    )
+    public ModelAndView do_SessionMessageGet(
+            final HttpServletRequest req,
+            final HttpServletResponse resp
+    ) throws IOException {
+        return new ModelAndView(ViewJackson.data(Message.getMessages(req)));
     }
 
     @RequestMapping(value = "index", method = RequestMethod.GET)
