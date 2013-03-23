@@ -20,6 +20,6 @@
   #set($__qId = "tasks") #parse("/__/queryTableTasks.vm")
  </div>
 </body>
- #set($__qId = "tasks") #set($restPrefix = "s/") #parse("/__/queryJsTasks.vm")
+ #set($__qId = "tasks") #parse("/__/queryJsTasks.vm")
  #parse("/__/ready.vm")
 </html>

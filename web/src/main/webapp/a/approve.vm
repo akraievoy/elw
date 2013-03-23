@@ -208,6 +208,6 @@
  #if(!$f_mode) #set($f_mode = "s") #end
  #if(!$f_latest) #set($f_latest = "true") #end
  #set($__highlight = $file.id)
- #set($__qId = "log") #set($restPrefix = "a/") #parse("/__/queryJsLog.vm")
+ #set($__qId = "log") #parse("/__/queryJsLog.vm")
  #parse("/__/ready.vm")
 </html>

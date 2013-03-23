@@ -16,6 +16,6 @@
  #set($__qId="idx") #parse("/__/queryTableIndex.vm")
 </div>
 </body>
- #set($__qId="idx") #set($restPrefix = "s/") #parse("/__/queryJsIndex.vm")
+ #set($__qId="idx") #parse("/__/queryJsIndex.vm")
  #parse("/__/ready.vm")
 </html>
