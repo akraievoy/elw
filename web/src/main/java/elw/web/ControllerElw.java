@@ -119,7 +119,6 @@ public abstract class ControllerElw extends MultiActionController implements Web
         model.put(ElwUri.MODEL_KEY, core.getUri());
         model.put(Auth.MODEL_KEY, auth);
         model.put(QueriesSecure.MODEL_KEY, core.getQueries().secure(auth));
-        model.put("elw_baseUrl", elwServerConfig.getBaseUrl());
 
         return model;
     }
