@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -41,6 +42,7 @@ public class StudentCodeValidator extends Executors.Task {
     public static final String SLOT_ID_SOLUTIONS = "code";
     public static final String SLOT_ID_STATEMENT = "statement";
     public static final String SLOT_ID_TEST = "test";
+    private static final String[] NO_PENDING_ENROLLMENTS = new String[0];
 
     private int periodMillis = 300000;
     private final Queries queries;
@@ -54,6 +56,8 @@ public class StudentCodeValidator extends Executors.Task {
         this.queries = queries;
     }
 
+    private final List<String> pendingEnrollmentIds = new ArrayList<String>();
+
     public void setPeriodMillis(int periodMillis) {
         this.periodMillis = periodMillis;
     }
@@ -66,7 +70,31 @@ public class StudentCodeValidator extends Executors.Task {
         return periodMillis;
     }
 
+    public StudentCodeValidator workPending(String enrollmentId) {
+        synchronized (pendingEnrollmentIds) {
+            if (!pendingEnrollmentIds.contains(enrollmentId)) {
+                pendingEnrollmentIds.add(enrollmentId);
+            }
+        }
+        return this;
+    }
+
     protected void runInternal() throws Throwable {
+        final String[] pendingEnrollmentsIdArr;
+        synchronized (pendingEnrollmentIds) {
+            if (pendingEnrollmentIds.isEmpty()) {
+                pendingEnrollmentsIdArr = NO_PENDING_ENROLLMENTS;
+            } else {
+                pendingEnrollmentsIdArr = pendingEnrollmentIds.toArray(new String[pendingEnrollmentIds.size()]);
+                pendingEnrollmentIds.clear();
+                Arrays.sort(pendingEnrollmentsIdArr);
+            }
+        }
+
+        if (pendingEnrollmentsIdArr.length == 0) {
+            return;
+        }
+
         final List<Enrollment> enrs = queries.enrollments();
         for (Enrollment enr : enrs) {
             final CtxEnrollment ctxEnr;
@@ -76,7 +104,11 @@ public class StudentCodeValidator extends Executors.Task {
                 ctxEnr = new CtxEnrollment(enr, course, group);
             }
 
-            if (!ctxEnr.course.getId().contains(COURSE_ID_AOS)) {
+
+            if (
+                !ctxEnr.course.getId().contains(COURSE_ID_AOS) ||
+                Arrays.binarySearch(pendingEnrollmentsIdArr, ctxEnr.enr.getId()) < 0
+            ) {
                 continue;
             }
 

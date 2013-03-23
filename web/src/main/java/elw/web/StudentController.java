@@ -49,15 +49,18 @@ public class StudentController extends ControllerElw {
     private static final Logger log = LoggerFactory.getLogger(StudentController.class);
 
     private final Queries queries;
+    private final StudentCodeValidator studentCodeValidator;
 
     public StudentController(
             Queries queries,
             Core core,
-            ElwServerConfig elwServerConfig
+            ElwServerConfig elwServerConfig,
+            StudentCodeValidator studentCodeValidator0
     ) {
         super(core, elwServerConfig);
 
         this.queries = queries;
+        this.studentCodeValidator = studentCodeValidator0;
     }
 
     protected HashMap<String, Object> auth(
@@ -393,10 +396,13 @@ public class StudentController extends ControllerElw {
                 final String refreshUri = core.getUri().logOpenPendingEAV(ctx);
                 final String failureUri = core.getUri().upload(ctx, scope, slot.getId());
 
-                return storeFile(
+
+                final ModelAndView nullViewAfterRedirect = storeFile(
                         slot, refreshUri, failureUri, ctx.getStudent().getName(),
                         queries, new Solution()
                 );
+                studentCodeValidator.workPending(ctx.getEnr().getId());
+                return nullViewAfterRedirect;
             }
         });
     }
