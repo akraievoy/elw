@@ -267,6 +267,12 @@ public class Ctx implements elw.vo.Ctx {
     }
 
     public Ctx extCourse(final Course newCourse) {
+        if (isNull(newCourse)) {
+            log.error("HOUSTON on newCourse.getId()");
+        } else if (isNull(newCourse.getId())) {
+            log.error("HOUSTON on newCourse.getId().equals()");
+        }
+
         if (enr.isResolved() && !newCourse.getId().equals(enr.getValue().getCourseId())) {
             throw new IllegalArgumentException("enrollment/course mismatch");
         }
@@ -811,4 +817,6 @@ public class Ctx implements elw.vo.Ctx {
             return result;
         }
     }
+
+    private static boolean isNull(Object value) { return value == null; }
 }
