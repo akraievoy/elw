@@ -1,8 +1,10 @@
+#* @vtlvariable name="__relPath" type="java.lang.String" *#
 #* @vtlvariable name="__page" type="java.lang.String" *#
+#if(!$__relPath) #set($__relPath="../") #end
 
-<script type="text/javascript" src="js/elw.js"></script>
+<script type="text/javascript" src="${__relPath}js/elw.js"></script>
 #if($__page)
 <script type="text/javascript">
- elw_updateExpandTriggersUri = "s/updateExpandTriggers?view=$__page";
+ elw_updateExpandTriggersUri = "${__relPath}s/updateExpandTriggers?view=$__page";
 </script>
 #end
