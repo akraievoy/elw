@@ -259,6 +259,12 @@ public class Ctx implements elw.vo.Ctx {
     }
 
     public Ctx extGroup(final Group newGroup) {
+        if (isNull(newGroup)) {
+            log.error("HOUSTON on newGroup.getId()");
+        } else if (isNull(newGroup.getId())) {
+            log.error("HOUSTON on newGroup.getId().equals()");
+        }
+
         if (enr.isResolved() && !newGroup.getId().equals(enr.getValue().getGroupId())) {
             throw new IllegalArgumentException("enrollment/group mismatch");
         }
