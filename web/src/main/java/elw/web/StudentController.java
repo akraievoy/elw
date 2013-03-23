@@ -32,6 +32,7 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
@@ -136,6 +137,19 @@ public class StudentController extends ControllerElw {
             final HttpServletResponse resp
     ) throws IOException {
         return new ModelAndView(ViewJackson.data(Message.getMessages(req)));
+    }
+
+    @RequestMapping(
+            value = "SessionMessage/{stamp}",
+            method = RequestMethod.DELETE
+    )
+    public ModelAndView do_SessionMessageDelete(
+            final HttpServletRequest req,
+            final HttpServletResponse resp,
+            @PathVariable("stamp") final String stamp
+    ) throws IOException {
+        Message.delete(req, stamp);
+        return null;
     }
 
     @RequestMapping(value = "courses", method = RequestMethod.GET)
