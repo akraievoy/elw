@@ -66,7 +66,7 @@ public abstract class ControllerAuth {
             Pattern.compile("^https?://www\\.google\\.com/profiles/.+$");
     protected static final Pattern OID_YANDEX =
             Pattern.compile("^https?://openid\\.yandex\\.ru(/.*)?$");
-    protected static final Pattern OID_MAILRU =
+    protected static final Pattern OID_MAILRU = //TODO: toss this, add all possible Rambler patterns
             Pattern.compile("^https?://openid\\.mail\\.ru/mail(/.*)?$");
 
     protected static final String OID_REDIR_BODY_TARGETURL = "${targetUrl}";
@@ -89,7 +89,8 @@ public abstract class ControllerAuth {
 
         trustedProviders.put(OID_YAHOO, Pattern.compile("^.+@yahoo\\.com$"));
         trustedProviders.put(OID_GOOGLE, Pattern.compile("^.+@(gmail\\.com|akraievoy\\.org)$"));
-        trustedProviders.put(OID_GOOGLE_PROFILES, Pattern.compile("^.+@(gmail\\.com|akraievoy\\.org)$"));
+        //what is this for?
+		trustedProviders.put(OID_GOOGLE_PROFILES, Pattern.compile("^.+@(gmail\\.com|akraievoy\\.org)$"));
         trustedProviders.put(OID_YANDEX, Pattern.compile("^.+@yandex\\.ru$"));
         trustedProviders.put(OID_MAILRU, Pattern.compile("^.+@mail\\.ru$"));
 
@@ -742,7 +743,7 @@ public abstract class ControllerAuth {
                     "email",
                     "http://axschema.org/contact/email",
                     true
-            );
+            ); //TODO: add for other russian openID providers
         } else {
             // TODO works for myOpenID, but should this be the default case?
             fetch.addAttribute(
