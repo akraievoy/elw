@@ -732,22 +732,21 @@ public abstract class ControllerAuth {
                 );
 
         FetchRequest fetch = FetchRequest.createFetchRequest();
-        if (OID_GOOGLE.matcher(oidIdent).matches()) {
+        if (OID_GOOGLE.matcher(oidIdent).matches() || 
+          OID_YAHOO.matcher(oidIdent).matches() ||
+          OID_YANDEX.matcher(oidIdent).matches()) {
             fetch.addAttribute(
                     "email",
-                    "http://axschema.org/contact/email",
-                    true
-            );
-        } else if (OID_YAHOO.matcher(oidIdent).matches()) {
-            fetch.addAttribute(
-                    "email",
-                    "http://axschema.org/contact/email",
+                    // this is not online any more. They say it will be replaced \
+                    // with http://openid.net/schema/...
+                    "http://axschema.org/contact/email",  
                     true
             ); //TODO: add for other russian openID providers
         } else {
             // TODO works for myOpenID, but should this be the default case?
             fetch.addAttribute(
                     "email",
+                    //this is not online either
                     "http://schema.openid.net/contact/email",
                     true
             );
