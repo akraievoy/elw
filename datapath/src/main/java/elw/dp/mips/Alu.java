@@ -1,7 +1,10 @@
 package elw.dp.mips;
 
 public class Alu {
-    protected static Integer s32(long unsigned) {
+    /* TODO: if integer overflow happens, show it on the status bar of the applet and 
+	 * don't modify $d */
+	
+	protected static Integer s32(long unsigned) {
         return (int) unsigned;
     }
 
@@ -16,19 +19,19 @@ public class Alu {
     /*
      * switches from 32bit signed to 32bit signed holding value of 16 
      * least significant bits treated as unsigned
-     */
+	this is not used anymore
     protected static int u16(final int signed) {
         return (int) signed & 0x0000FFFF;
-    }
+    } 
+	*/
 
     @InstructionDesc(
             syntax = "addu $d, $s, $t",
             template = "000000ssssstttttddddd00000100001",
-            writeRegs = "$d",
-            unsigned = true
-    )
+            writeRegs = "$d"
+    ) //the only difference from add is that this ignores overflow
     public void addu(final InstructionContext ctx) {
-        ctx.setD(s32(u32(ctx.getS()) + u32(ctx.getT())));
+        ctx.setD(ctx.getS() + ctx.getT());
         ctx.advPc();
     }
 
@@ -36,7 +39,7 @@ public class Alu {
             syntax = "add $d, $s, $t",
             template = "000000ssssstttttddddd00000100000",
             writeRegs = "$d"
-    )
+    ) 
     public void add(final InstructionContext ctx) {
         ctx.setD(ctx.getS() + ctx.getT());
         ctx.advPc();
@@ -55,11 +58,10 @@ public class Alu {
     @InstructionDesc(
             syntax = "addiu $t, $s, imm16",
             template = "001001ssssstttttiiiiiiiiiiiiiiii",
-            writeRegs = "$t",
-            unsigned = true
-    )
+            writeRegs = "$t"
+    ) //again, this is signed arithmetic, just doesn't trap on overflow
     public void addiu(final InstructionContext ctx) {
-        ctx.setT(ctx.getS() + u16(ctx.getI16()));
+        ctx.setT(ctx.getS() + ctx.getI16());
         ctx.advPc();
     }
 
@@ -263,7 +265,7 @@ public class Alu {
 
     @InstructionDesc(
             syntax = "lui $t, imm16",
-            template = "001111-----tttttiiiiiiiiiiiiiiii",
+            template = "001111000000tttttiiiiiiiiiiiiiiii",
             writeRegs = "$t"
     )
     public void lui(final InstructionContext ctx) {
@@ -404,21 +406,6 @@ public class Alu {
     }
 
     @InstructionDesc(
-            syntax = "sltu $d, $s, $t",
-            template = "000000ssssstttttddddd00000101011",
-            writeRegs = "$d",
-            unsigned = true
-    )
-    public void sltu(final InstructionContext ctx) {
-        if (u32(ctx.getS()) < u32(ctx.getT())) {
-            ctx.setD(1);
-        } else {
-            ctx.setD(0);
-        }
-        ctx.advPc();
-    }
-
-    @InstructionDesc(
             syntax = "slt $d, $s, $t",
             template = "000000ssssstttttddddd00000101010",
             writeRegs = "$d"
@@ -439,10 +426,25 @@ public class Alu {
             unsigned = true
     )
     public void sltiu(final InstructionContext ctx) {
-        if (ctx.getS() < u16(ctx.getI16())) {
+        if (u32(ctx.getS()) < u32(ctx.getI16())) { //immediate should is sign-extended before comparison
             ctx.setT(1);
         } else {
             ctx.setT(0);
+        }
+        ctx.advPc();
+    }
+	
+	@InstructionDesc(
+            syntax = "sltu $d, $s, $t",
+            template = "000000ssssstttttddddd00000101011",
+            writeRegs = "$d",
+            unsigned = true
+    )
+    public void sltu(final InstructionContext ctx) {
+        if (u32(ctx.getS()) < u32(ctx.getT())) {
+            ctx.setD(1);
+        } else {
+            ctx.setD(0);
         }
         ctx.advPc();
     }
