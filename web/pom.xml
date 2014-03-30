@@ -48,11 +48,6 @@
 
         <!-- web-tier stuff -->
         <dependency>
-            <artifactId>commons-fileupload</artifactId>
-            <groupId>commons-fileupload</groupId>
-            <version>1.2</version>
-        </dependency>
-        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
             <version>3.1.0.RELEASE</version>
