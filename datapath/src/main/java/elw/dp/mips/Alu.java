@@ -265,7 +265,7 @@ public class Alu {
 
     @InstructionDesc(
             syntax = "lui $t, imm16",
-            template = "001111000000tttttiiiiiiiiiiiiiiii",
+            template = "00111100000tttttiiiiiiiiiiiiiiii",
             writeRegs = "$t"
     )
     public void lui(final InstructionContext ctx) {
